@@ -1,0 +1,26 @@
+/*
+ * Dashboard Grid Layout Styles
+ *
+ * This file contains styles to fix common z-index and box-sizing issues with react-grid-layout.
+ */
+
+.dashboard-card-wrapper {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+/* Ensure the grid item being resized or dragged is brought to the front. */
+.react-grid-item.react-grid-item--resizing,
+.react-grid-item.react-grid-item--dragging {
+  z-index: 10;
+}
+
+/*
+ * Force the resizable handle to appear on top of the card's content.
+ * The !important flag is used here to ensure it overrides any inline styles
+ * that might be applied by the library.
+ */
+.react-resizable-handle {
+  z-index: 20 !important;
+}

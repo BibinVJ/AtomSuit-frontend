@@ -4,7 +4,6 @@ interface AvatarTextProps {
   name: string;
   className?: string;
 }
-
 const AvatarText: React.FC<AvatarTextProps> = ({ name, className = "" }) => {
   // Generate initials from name
   const initials = name
@@ -13,7 +12,6 @@ const AvatarText: React.FC<AvatarTextProps> = ({ name, className = "" }) => {
     .join("")
     .toUpperCase()
     .slice(0, 2);
-
   // Generate a consistent pastel color based on the name
   const getColorClass = (name: string) => {
     const colors = [
@@ -26,13 +24,11 @@ const AvatarText: React.FC<AvatarTextProps> = ({ name, className = "" }) => {
       "bg-yellow-100 text-yellow-600",
       "bg-error-100 text-error-600",
     ];
-
     const index = name
       .split("")
       .reduce((acc, char) => acc + char.charCodeAt(0), 0);
     return colors[index % colors.length];
   };
-
   return (
     <div
       className={`flex h-10 w-10 ${className} items-center justify-center rounded-full ${getColorClass(
@@ -43,5 +39,4 @@ const AvatarText: React.FC<AvatarTextProps> = ({ name, className = "" }) => {
     </div>
   );
 };
-
 export default AvatarText;

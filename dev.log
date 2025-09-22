@@ -1,0 +1,40 @@
+
+> free-nextjs-admin-dashboard@2.0.2 dev
+> next dev
+
+ ⚠ Port 3000 is in use, trying 3001 instead.
+ ⚠ Port 3001 is in use, trying 3002 instead.
+   ▲ Next.js 15.2.3
+   - Local:        http://localhost:3002
+   - Network:      http://192.168.1.2:3002
+   - Environments: .env
+
+ ✓ Starting...
+ ✓ Ready in 4.7s
+ ○ Compiling / ...
+Request timed out after 3000ms
+
+Retrying 1/3...
+Client network socket disconnected before secure TLS connection was established
+
+Retrying 1/3...
+Client network socket disconnected before secure TLS connection was established
+
+Retrying 2/3...
+Client network socket disconnected before secure TLS connection was established
+
+Retrying 2/3...
+Request timed out after 3000ms
+
+Retrying 3/3...
+socket hang up
+
+Retrying 3/3...
+[Error: Request timed out after 3000ms]
+[Error: Client network socket disconnected before secure TLS connection was established] {
+  code: 'ECONNRESET',
+  path: null,
+  host: 'fonts.gstatic.com',
+  port: 443,
+  localAddress: undefined
+}

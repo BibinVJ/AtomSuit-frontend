@@ -1,39 +1,40 @@
-import React, { useState } from "react";
+type Period = "monthly" | "quarterly" | "annually";
 
-const ChartTab: React.FC = () => {
-  const [selected, setSelected] = useState<
-    "optionOne" | "optionTwo" | "optionThree"
-  >("optionOne");
+interface ChartTabProps {
+  selectedPeriod: Period;
+  onSelectPeriod: (period: Period) => void;
+}
 
-  const getButtonClass = (option: "optionOne" | "optionTwo" | "optionThree") =>
-    selected === option
+const ChartTab: React.FC<ChartTabProps> = ({ selectedPeriod, onSelectPeriod }) => {
+  const getButtonClass = (period: Period) =>
+    selectedPeriod === period
       ? "shadow-theme-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800"
       : "text-gray-500 dark:text-gray-400";
 
   return (
     <div className="flex items-center gap-0.5 rounded-lg bg-gray-100 p-0.5 dark:bg-gray-900">
       <button
-        onClick={() => setSelected("optionOne")}
+        onClick={() => onSelectPeriod("monthly")}
         className={`px-3 py-2 font-medium w-full rounded-md text-theme-sm hover:text-gray-900   dark:hover:text-white ${getButtonClass(
-          "optionOne"
+          "monthly"
         )}`}
       >
         Monthly
       </button>
 
       <button
-        onClick={() => setSelected("optionTwo")}
+        onClick={() => onSelectPeriod("quarterly")}
         className={`px-3 py-2 font-medium w-full rounded-md text-theme-sm hover:text-gray-900   dark:hover:text-white ${getButtonClass(
-          "optionTwo"
+          "quarterly"
         )}`}
       >
         Quarterly
       </button>
 
       <button
-        onClick={() => setSelected("optionThree")}
+        onClick={() => onSelectPeriod("annually")}
         className={`px-3 py-2 font-medium w-full rounded-md text-theme-sm hover:text-gray-900   dark:hover:text-white ${getButtonClass(
-          "optionThree"
+          "annually"
         )}`}
       >
         Annually

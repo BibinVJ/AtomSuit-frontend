@@ -1,14 +1,12 @@
 import React from "react";
 
 type AspectRatio = "16:9" | "4:3" | "21:9" | "1:1";
-
 interface YouTubeEmbedProps {
   videoId: string;
   aspectRatio?: AspectRatio;
   title?: string;
   className?: string;
 }
-
 const YouTubeEmbed: React.FC<YouTubeEmbedProps> = ({
   videoId,
   aspectRatio = "16:9",
@@ -21,7 +19,6 @@ const YouTubeEmbed: React.FC<YouTubeEmbedProps> = ({
     "21:9": "aspect-21/9",
     "1:1": "aspect-square",
   }[aspectRatio];
-
   return (
     <div
       className={`overflow-hidden rounded-lg ${aspectRatioClass} ${className}`}
@@ -37,5 +34,4 @@ const YouTubeEmbed: React.FC<YouTubeEmbedProps> = ({
     </div>
   );
 };
-
 export default YouTubeEmbed;

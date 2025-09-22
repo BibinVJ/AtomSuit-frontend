@@ -1,9 +1,10 @@
 "use client";
-import React, { useState } from "react";
+
+import { useState, useEffect } from "react";
 
 interface SwitchProps {
   label: string;
-  defaultChecked?: boolean;
+  checked?: boolean;
   disabled?: boolean;
   onChange?: (checked: boolean) => void;
   color?: "blue" | "gray"; // Added prop to toggle color theme
@@ -11,12 +12,16 @@ interface SwitchProps {
 
 const Switch: React.FC<SwitchProps> = ({
   label,
-  defaultChecked = false,
+  checked = false,
   disabled = false,
   onChange,
   color = "blue", // Default to blue color
 }) => {
-  const [isChecked, setIsChecked] = useState(defaultChecked);
+  const [isChecked, setIsChecked] = useState(checked);
+
+  useEffect(() => {
+    setIsChecked(checked);
+  }, [checked]);
 
   const handleToggle = () => {
     if (disabled) return;
@@ -51,9 +56,8 @@ const Switch: React.FC<SwitchProps> = ({
       className={`flex cursor-pointer select-none items-center gap-3 text-sm font-medium ${
         disabled ? "text-gray-400" : "text-gray-700 dark:text-gray-400"
       }`}
-      onClick={handleToggle} // Toggle when the label itself is clicked
     >
-      <div className="relative">
+      <div className="relative" onClick={handleToggle}>
         <div
           className={`block transition duration-150 ease-linear h-6 w-11 rounded-full ${
             disabled

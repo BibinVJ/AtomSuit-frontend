@@ -1,11 +1,12 @@
 "use client";
-import { ThemeToggleButton } from "@/components/common/ThemeToggleButton";
-import NotificationDropdown from "@/components/header/NotificationDropdown";
-import UserDropdown from "@/components/header/UserDropdown";
-import { useSidebar } from "@/context/SidebarContext";
-import Image from "next/image";
+
+import { useEffect, useRef, useState } from "react";
+
 import Link from "next/link";
-import React, { useState ,useEffect,useRef} from "react";
+import { useSidebar } from "../hooks/useSidebar";
+import { ThemeToggleButton } from "../components/common/ThemeToggleButton";
+// import NotificationDropdown from "../components/header/NotificationDropdown";
+import UserDropdown from "../components/header/UserDropdown";
 
 const AppHeader: React.FC = () => {
   const [isApplicationMenuOpen, setApplicationMenuOpen] = useState(false);
@@ -23,6 +24,7 @@ const AppHeader: React.FC = () => {
   const toggleApplicationMenu = () => {
     setApplicationMenuOpen(!isApplicationMenuOpen);
   };
+
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -41,7 +43,7 @@ const AppHeader: React.FC = () => {
   }, []);
 
   return (
-    <header className="sticky top-0 flex w-full bg-white border-gray-200 z-99999 dark:border-gray-800 dark:bg-gray-900 lg:border-b">
+    <header className="sticky top-0 flex w-full custom-header-bg border-gray-200 z-99999 dark:border-gray-800 lg:border-b">
       <div className="flex flex-col items-center justify-between grow lg:flex-row lg:px-6">
         <div className="flex items-center justify-between w-full gap-2 px-3 py-3 border-b border-gray-200 dark:border-gray-800 sm:gap-4 lg:justify-normal lg:border-b-0 lg:px-0 lg:py-4">
           <button
@@ -84,18 +86,14 @@ const AppHeader: React.FC = () => {
           </button>
 
           <Link href="/" className="lg:hidden">
-            <Image
-              width={154}
-              height={32}
+            <img
               className="dark:hidden"
-              src="./images/logo/logo.svg"
+              src="./images/logo/icon.png"
               alt="Logo"
             />
-            <Image
-              width={154}
-              height={32}
+            <img
               className="hidden dark:block"
-              src="./images/logo/logo-dark.svg"
+              src="./images/logo/icon.png"
               alt="Logo"
             />
           </Link>
@@ -123,7 +121,7 @@ const AppHeader: React.FC = () => {
           <div className="hidden lg:block">
             <form>
               <div className="relative">
-                <span className="absolute -translate-y-1/2 left-4 top-1/2 pointer-events-none">
+                <span className="absolute -translate-y-1/2 pointer-events-none left-4 top-1/2">
                   <svg
                     className="fill-gray-500 dark:fill-gray-400"
                     width="20"
@@ -163,14 +161,13 @@ const AppHeader: React.FC = () => {
           <div className="flex items-center gap-2 2xsm:gap-3">
             {/* <!-- Dark Mode Toggler --> */}
             <ThemeToggleButton />
-            {/* <!-- Dark Mode Toggler --> */}
 
-           <NotificationDropdown /> 
             {/* <!-- Notification Menu Area --> */}
+            {/* <NotificationDropdown /> */}
           </div>
+
           {/* <!-- User Area --> */}
-          <UserDropdown /> 
-    
+          <UserDropdown />
         </div>
       </div>
     </header>

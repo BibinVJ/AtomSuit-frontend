@@ -1,17 +1,15 @@
+"use client";
+
 import { useRouter } from "next/navigation";
-
-const useGoBack = () => {
+export const useGoBack = () => {
   const router = useRouter();
-
-  const goBack = () => {
-    if (window.history.length > 1) {
-      router.back(); // Navigate to the previous route
+  return () => router.back();
+};
+    if (window.history.state && window.history.state.idx > 0) {
+      router.push(-1); // Go back to the previous page
     } else {
       router.push("/"); // Redirect to home if no history exists
     }
   };
-
   return goBack;
-};
-
 export default useGoBack;
