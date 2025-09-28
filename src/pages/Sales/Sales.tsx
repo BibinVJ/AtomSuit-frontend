@@ -8,7 +8,7 @@ import SaleTable from '../../components/sales/SaleTable';
 import Pagination from '../../components/common/Pagination';
 import Button from '../../components/ui/button/Button';
 import Select from '../../components/form/Select';
-import { useNavigate } from 'react-router';
+import { useRouter } from 'next/navigation';
 import { getSales } from '../../services/SaleService';
 import { Sale } from '../../types';
 
@@ -16,6 +16,7 @@ import { usePermissions } from '../../hooks/usePermissions';
 
 export default function Sales() {
   const { hasPermission } = usePermissions();
+  const router = useRouter();
   const [sales, setSales] = useState<Sale[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
@@ -25,7 +26,6 @@ export default function Sales() {
   const [total, setTotal] = useState(0);
   const [sortBy, setSortBy] = useState('created_at');
   const [sortDirection, setSortDirection] = useState('desc');
-  const router = useRouter();
 
   const fetchSales = async (page = 1, limit = 10, sortCol = 'created_at', sortDir = 'desc') => {
     try {

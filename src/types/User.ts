@@ -13,6 +13,8 @@ export interface Address {
 export interface SocialLink {
   platform: string;
   url: string;
+}
+
 export interface User {
   id: number;
   name: string;
@@ -35,6 +37,8 @@ export interface User {
   addresses: Address[];
   social_links: SocialLink[];
   created_at: string;
+}
+
 export interface UserApiResponse {
   data: User[];
   meta: {
@@ -44,6 +48,8 @@ export interface UserApiResponse {
     from: number;
     to: number;
   };
+}
+
 export type UserUpdatePayload = Partial<
   Pick<User, "name" | "email" | "phone" | "status">
 > & {

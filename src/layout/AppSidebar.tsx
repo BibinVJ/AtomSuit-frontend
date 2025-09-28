@@ -3,26 +3,20 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import TenantInfo from "../components/tenant/TenantInfo";
 
-// Assume these icons are imported from an icon library
 import {
-  BoxCubeIcon,
-  // CalenderIcon,
-  ChevronDownIcon,
-  GridIcon,
-  HorizontaLDots,
-  ListIcon,
-  // PageIcon,
-  // PieChartIcon,
-  // TableIcon,
-  UserCircleIcon,
-  DollarLineIcon,
-  BoxIconLine,
-} from "../icons";
+  LayoutDashboard,
+  Package,
+  ShoppingCart,
+  Receipt,
+  Users,
+  Shield,
+  ChevronDown,
+  MoreHorizontal,
+} from "lucide-react";
 import { useSidebar } from "../hooks/useSidebar";
-
 import { usePermissions } from "../hooks/usePermissions";
-import { ShoppingCart } from "lucide-react";
 
 type NavItem = {
   name: string;
@@ -34,26 +28,14 @@ type NavItem = {
 
 const navItems: NavItem[] = [
   {
-    icon: <GridIcon />,
+    icon: <LayoutDashboard size={20} />,
     name: "Dashboard",
-    path: "/",
+    path: "/dashboard",
     permission: "view-dashboard",
   },
   {
-    name: "POS",
-    icon: <DollarLineIcon />,
-    subItems: [
-      { name: "Add Sale", path: "/sales/add", permission: "create-sale" },
-    ],
-  },
-  // {
-  //   icon: <CalenderIcon />,
-  //   name: "Calendar",
-  //   path: "/calendar",
-  // },
-  {
     name: "Inventory",
-    icon: <BoxIconLine />,
+    icon: <Package size={20} />,
     subItems: [
       { name: "Categories", path: "/inventory/categories", permission: "view-category" },
       { name: "Units", path: "/inventory/units", permission: "view-unit" },
@@ -62,7 +44,7 @@ const navItems: NavItem[] = [
   },
   {
     name: "Sales",
-    icon: <ListIcon />,
+    icon: <Receipt size={20} />,
     subItems: [
       { name: "Customers", path: "/customers", permission: "view-customer" },
       { name: "Sales", path: "/sales", permission: "view-sale" },
@@ -70,7 +52,7 @@ const navItems: NavItem[] = [
   },
   {
     name: "Purchases",
-    icon: <ShoppingCart />,
+    icon: <ShoppingCart size={20} />,
     subItems: [
       { name: "Vendors", path: "/vendors", permission: "view-vendor" },
       { name: "Purchases", path: "/purchases", permission: "view-purchase" },
@@ -97,19 +79,14 @@ const navItems: NavItem[] = [
 ];
 
 const othersItems: NavItem[] = [
-  // {
-  //   icon: <UserCircleIcon />,
-  //   name: "User Profile",
-  //   path: "/profile",
-  // },
   {
-    icon: <UserCircleIcon />,
+    icon: <Users size={20} />,
     name: "User Management",
     path: "/users",
     permission: "view-user",
   },
   {
-    icon: <BoxCubeIcon />,
+    icon: <Shield size={20} />,
     name: "Role Management",
     path: "/roles",
     permission: "view-role",
@@ -152,7 +129,7 @@ const AppSidebar: React.FC = () => {
   // const isActive = (path: string) => pathname === path;
   const isActive = useCallback(
     (path: string) => {
-      if (path === "/") {
+      if (path === "/dashboard") {
         return pathname === path;
       }
       return pathname.startsWith(path);
@@ -270,7 +247,7 @@ const AppSidebar: React.FC = () => {
                   <span className="menu-item-text">{nav.name}</span>
                 )}
                 {(isExpanded || isHovered || isMobileOpen) && (
-                  <ChevronDownIcon
+                  <ChevronDown
                     className={`ml-auto w-5 h-5 transition-transform duration-200 ${openSubmenu?.type === menuType &&
                       openSubmenu?.index === index
                       ? "rotate-180 text-brand-500"
@@ -384,7 +361,7 @@ const AppSidebar: React.FC = () => {
         className={`py-8 flex ${!isExpanded && !isHovered ? "lg:justify-center" : "justify-start"
           }`}
       >
-        <Link href="/">
+        <Link href="/dashboard">
           {isExpanded || isHovered || isMobileOpen ? (
             <>
               <img
@@ -426,7 +403,7 @@ const AppSidebar: React.FC = () => {
                   {isExpanded || isHovered || isMobileOpen ? (
                     "Menu"
                   ) : (
-                    <HorizontaLDots className="size-6" />
+                    <MoreHorizontal className="size-6" />
                   )}
                 </h2>
                 {renderMenuItems(navItems, "main")}
@@ -443,7 +420,7 @@ const AppSidebar: React.FC = () => {
                   {isExpanded || isHovered || isMobileOpen ? (
                     "Others"
                   ) : (
-                    <HorizontaLDots />
+                    <MoreHorizontal />
                   )}
                 </h2>
                 {renderMenuItems(othersItems, "others")}

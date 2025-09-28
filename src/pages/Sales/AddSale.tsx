@@ -9,7 +9,7 @@ import Button from '../../components/ui/button/Button';
 import Select from '../../components/form/Select';
 import Input from '../../components/form/input/InputField';
 import Label from '../../components/form/Label';
-import { useNavigate } from 'react-router';
+import { useRouter } from 'next/navigation';
 import DatePicker from '../../components/form/date-picker';
 import { formatDate } from '../../utils/date';
 import { toast } from 'sonner';
@@ -38,6 +38,7 @@ interface ApiError {
 
 export default function AddSale() {
   const { isOpen: isCustomerModalOpen, openModal: openCustomerModal, closeModal: closeCustomerModal } = useModal();
+  const router = useRouter();
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [items, setItems] = useState<Item[]>([]);
   const [customerId, setCustomerId] = useState('');
@@ -47,7 +48,6 @@ export default function AddSale() {
     { item_id: '', quantity: 1, unit_price: 0, description: '', stock_on_hand: 0 }
   ]);
   const [errors, setErrors] = useState<ApiError>({});
-  const router = useRouter();
 
   useEffect(() => {
     fetchInitialData();

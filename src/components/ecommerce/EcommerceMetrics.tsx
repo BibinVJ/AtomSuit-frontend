@@ -1,11 +1,4 @@
-import {
-  ArrowDownIcon,
-  ArrowUpIcon,
-  BoxIconLine,
-  GroupIcon,
-  DollarLineIcon,
-  PageIcon,
-} from "../../icons";
+import { ArrowDown, ArrowUp, Package, Users, DollarSign, FileText } from "lucide-react";
 import Badge from "../ui/badge/Badge";
 import { ReactNode } from "react";
 
@@ -33,7 +26,7 @@ const MetricCard = ({ icon, title, value, percentage, trend }: MetricCardProps) 
       </div>
       {trend && percentage && (
         <Badge color={trend === "up" ? "success" : "error"}>
-          {trend === "up" ? <ArrowUpIcon /> : <ArrowDownIcon />}
+          {trend === "up" ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />}
           {percentage}%
         </Badge>
       )}
@@ -50,22 +43,22 @@ export default function EcommerceMetrics({ data }: { data: {
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 md:gap-6">
       <MetricCard
-        icon={<DollarLineIcon className="text-gray-800 size-6 dark:text-white/90" />}
+        icon={<DollarSign className="text-gray-800 size-6 dark:text-white/90" />}
         title="Total Sales"
         value={`${data?.total_sales_amount ?? 0}`}
       />
       <MetricCard
-        icon={<BoxIconLine className="text-gray-800 size-6 dark:text-white/90" />}
+        icon={<Package className="text-gray-800 size-6 dark:text-white/90" />}
         title="Total Purchase"
         value={`${data?.total_purchase_amount ?? 0}`}
       />
       <MetricCard
-        icon={<GroupIcon className="text-gray-800 size-6 dark:text-white/90" />}
+        icon={<Users className="text-gray-800 size-6 dark:text-white/90" />}
         title="Total Customers"
         value={data?.total_customers ?? 0}
       />
       <MetricCard
-        icon={<PageIcon className="text-gray-800 size-6 dark:text-white/90" />}
+        icon={<FileText className="text-gray-800 size-6 dark:text-white/90" />}
         title="Total Items"
         value={data?.total_items ?? 0}
       />

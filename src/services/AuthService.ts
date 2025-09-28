@@ -18,7 +18,7 @@ export const logout = async () => {
       await api.post('/logout');
     }
   } catch (error) {
-    console.error("Logout failed on server:", error);
+    // Silently handle logout errors
   } finally {
     // Always clear local data
     localStorage.removeItem("user");
@@ -32,10 +32,14 @@ export const logout = async () => {
 
 export const storeUser = (user: LoginResponse, persistent = false) => {
   const userString = JSON.stringify(user);
+  const token = user.data.token.access_token;
+  
   if (persistent) {
     localStorage.setItem("user", userString);
+    localStorage.setItem("token", token);
   } else {
     sessionStorage.setItem("user", userString);
+    sessionStorage.setItem("token", token);
   }
 };
 

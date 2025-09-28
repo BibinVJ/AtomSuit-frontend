@@ -36,7 +36,7 @@ export default function EditSocialLinksModal({
   });
 
   useEffect(() => {
-    if (user) {
+    if (user && user.social_links && Array.isArray(user.social_links)) {
       setFormData({
         facebook:
           user.social_links.find((link) => link.platform === "facebook")?.url ||
@@ -45,6 +45,13 @@ export default function EditSocialLinksModal({
         linkedin:
           user.social_links.find((link) => link.platform === "linkedin")
             ?.url || "",
+      });
+    } else {
+      // Reset form data if user doesn't have social_links
+      setFormData({
+        facebook: "",
+        x: "",
+        linkedin: "",
       });
     }
   }, [user]);

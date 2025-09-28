@@ -2,7 +2,7 @@
 
 
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router';
+import { useRouter, useParams } from 'next/navigation';
 import PageMeta from '../../components/common/PageMeta';
 import PageBreadcrumb from '../../components/common/PageBreadCrumb';
 import ComponentCard from '../../components/common/ComponentCard';
@@ -15,7 +15,8 @@ import { getPurchase } from '../../services/PurchaseService';
 import { Purchase } from '../../types';
 
 export default function ViewPurchase() {
-  const { id } = useParams<{ id: string }>();
+  const params = useParams<{ id: string }>();
+  const id = params.id;
   const router = useRouter();
   const [purchase, setPurchase] = useState<Purchase | null>(null);
   const [isVoidModalOpen, setIsVoidModalOpen] = useState(false);

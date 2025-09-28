@@ -1,5 +1,5 @@
 import { User } from "../../types";
-import { PencilIcon } from "../../icons";
+import { Pencil } from "lucide-react";
 
 interface UserSocialLinksCardProps {
   user: User | null;
@@ -11,7 +11,10 @@ export default function UserSocialLinksCard({
   onEdit,
 }: UserSocialLinksCardProps) {
   const getSocialLink = (platform: string) => {
-    return user?.social_links.find((link) => link.platform === platform)?.url;
+    if (!user?.social_links || !Array.isArray(user.social_links)) {
+      return undefined;
+    }
+    return user.social_links.find((link) => link.platform === platform)?.url;
   };
 
   return (
@@ -65,11 +68,9 @@ export default function UserSocialLinksCard({
         </div>
         <button
           onClick={onEdit}
-          className="flex w-full items-center justify-center gap-2 rounded-full custom-primary-btn px-4 py-3 text-sm font-medium lg:inline-flex lg:w-auto"
+          className="flex w-full items-center justify-center gap-2 rounded-full bg-brand-500 border border-brand-300 text-white px-4 py-3 text-sm font-medium hover:bg-brand-600 hover:border-brand-400 transition-colors duration-200 lg:inline-flex lg:w-auto dark:bg-brand-500 dark:border-brand-600 dark:hover:bg-brand-400 dark:hover:border-brand-500"
         >
-          <PencilIcon className="fill-current"
-            width="18"
-            height="18"/>
+          <Pencil size={18} />
           Edit
         </button>
       </div>

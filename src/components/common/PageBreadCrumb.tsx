@@ -14,7 +14,7 @@ const PageBreadcrumb: React.FC<BreadcrumbProps> = ({ pageTitle, breadcrumbs, bac
     <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
       <div className="flex items-center gap-4">
         {backButton && (
-          <button onClick={() => router.push(-1)} className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 dark:text-gray-400">
+          <button onClick={() => router.back()} className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 dark:text-gray-400">
             <svg className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
             </svg>
@@ -32,7 +32,7 @@ const PageBreadcrumb: React.FC<BreadcrumbProps> = ({ pageTitle, breadcrumbs, bac
           <li>
             <Link
               className="inline-flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400"
-              href="/"
+              href="/dashboard"
             >
               Home
             </Link>
@@ -57,7 +57,7 @@ const PageBreadcrumb: React.FC<BreadcrumbProps> = ({ pageTitle, breadcrumbs, bac
               </svg>
               <Link
                 className="inline-flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400"
-                to={breadcrumb.path}
+                href={breadcrumb.path}
               >
                 {breadcrumb.label}
               </Link>

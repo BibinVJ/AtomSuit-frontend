@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import FilterIcon from "../../../icons/FilterIcon";
+import { Filter } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 interface Props {
@@ -36,7 +36,7 @@ export default function TableSection({
           <div className="flex items-center gap-3">
             {showFilter && (
               <button className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-theme-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200">
-                <FilterIcon />
+                <Filter className="w-4 h-4" />
                 Filter
               </button>
             )}

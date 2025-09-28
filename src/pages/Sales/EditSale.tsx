@@ -9,7 +9,7 @@ import Button from '../../components/ui/button/Button';
 import Select from '../../components/form/Select';
 import Input from '../../components/form/input/InputField';
 import Label from '../../components/form/Label';
-import { useNavigate, useParams } from 'react-router';
+import { useRouter, useParams } from 'next/navigation';
 import DatePicker from '../../components/form/date-picker';
 import { toast } from 'sonner';
 import TextArea from '../../components/form/input/TextArea';
@@ -34,7 +34,9 @@ interface ApiError {
 }
 
 export default function EditSale() {
-  const { id } = useParams<{ id: string }>();
+  const params = useParams<{ id: string }>();
+  const id = params.id;
+  const router = useRouter();
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [items, setItems] = useState<Item[]>([]);
   const [customerId, setCustomerId] = useState('');
@@ -42,7 +44,6 @@ export default function EditSale() {
   const [saleDate, setSaleDate] = useState('');
   const [saleItems, setSaleItems] = useState<SaleItem[]>([]);
   const [errors, setErrors] = useState<ApiError>({});
-  const router = useRouter();
 
   const fetchInitialData = useCallback(async () => {
     try {

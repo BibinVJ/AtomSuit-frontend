@@ -2,10 +2,10 @@ import {
   Facebook,
   Instagram,
   Linkedin,
+  Pencil,
 } from "lucide-react";
 import { User } from "../../types";
 import { formatKebabCase } from "../../utils/string";
-import { PencilIcon } from "../../icons";
 
 interface UserMetaCardProps {
   user: User | null;
@@ -19,7 +19,10 @@ export default function UserMetaCard({
   onEditImage,
 }: UserMetaCardProps) {
   const getSocialLink = (platform: string) => {
-    return user?.social_links.find((link) => link.platform === platform)?.url;
+    if (!user?.social_links || !Array.isArray(user.social_links)) {
+      return undefined;
+    }
+    return user.social_links.find((link) => link.platform === platform)?.url;
   };
   return (
     <div className="p-5 border border-gray-200 rounded-2xl dark:border-gray-800 lg:p-6">
@@ -34,9 +37,9 @@ export default function UserMetaCard({
             </div>
             <button
               onClick={onEditImage}
-              className="absolute bottom-0 right-0 flex items-center justify-center w-8 h-8 custom-secondary-btn rounded-full"
+              className="absolute bottom-0 right-0 flex items-center justify-center w-8 h-8 bg-white border-2 border-gray-300 rounded-full shadow-sm hover:bg-gray-50 hover:border-brand-400 transition-colors duration-200 dark:bg-gray-800 dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-brand-400"
             >
-              <PencilIcon className="w-4 h-4" />
+              <Pencil className="w-4 h-4 text-gray-600 hover:text-brand-600 dark:text-gray-300 dark:hover:text-brand-400" />
             </button>
           </div>
           <div className="order-3 xl:order-2">
@@ -55,7 +58,7 @@ export default function UserMetaCard({
               href={getSocialLink("facebook") || "#"}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex h-11 w-11 items-center justify-center gap-2 rounded-full custom-secondary-btn text-sm font-medium"
+              className="flex h-11 w-11 items-center justify-center rounded-full border border-gray-200 bg-gray-50 text-blue-600 hover:bg-blue-50 hover:border-blue-300 transition-colors duration-200 dark:bg-gray-800 dark:border-gray-600 dark:text-blue-400 dark:hover:bg-gray-700 dark:hover:border-blue-400"
             >
               <Facebook size={20} />
             </a>
@@ -64,7 +67,7 @@ export default function UserMetaCard({
               href={getSocialLink("linkedin") || "#"}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex h-11 w-11 items-center justify-center gap-2 rounded-full custom-secondary-btn text-sm font-medium"
+              className="flex h-11 w-11 items-center justify-center rounded-full border border-gray-200 bg-gray-50 text-blue-700 hover:bg-blue-50 hover:border-blue-300 transition-colors duration-200 dark:bg-gray-800 dark:border-gray-600 dark:text-blue-400 dark:hover:bg-gray-700 dark:hover:border-blue-400"
             >
               <Linkedin size={20} />
             </a>
@@ -73,7 +76,7 @@ export default function UserMetaCard({
               href={getSocialLink("instagram") || "#"}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex h-11 w-11 items-center justify-center gap-2 rounded-full custom-secondary-btn text-sm font-medium"
+              className="flex h-11 w-11 items-center justify-center rounded-full border border-gray-200 bg-gray-50 text-pink-600 hover:bg-pink-50 hover:border-pink-300 transition-colors duration-200 dark:bg-gray-800 dark:border-gray-600 dark:text-pink-400 dark:hover:bg-gray-700 dark:hover:border-pink-400"
             >
               <Instagram size={20} />
             </a>
@@ -83,9 +86,9 @@ export default function UserMetaCard({
 
         <button
           onClick={onEditSocials}
-          className="flex w-full items-center justify-center gap-2 rounded-full custom-primary-btn px-4 py-3 text-sm font-medium lg:inline-flex lg:w-auto"
+          className="flex w-full items-center justify-center gap-2 rounded-full bg-brand-500 border border-brand-300 text-white px-4 py-3 text-sm font-medium hover:bg-brand-600 hover:border-brand-400 transition-colors duration-200 lg:inline-flex lg:w-auto dark:bg-brand-500 dark:border-brand-600 dark:hover:bg-brand-400 dark:hover:border-brand-500"
         >
-          <PencilIcon className="fill-current" width="18" height="18" />
+          <Pencil size={18} />
           Edit Socials
         </button>
       </div>

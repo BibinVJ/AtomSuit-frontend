@@ -10,7 +10,7 @@ import Pagination from '../../components/common/Pagination';
 import Button from '../../components/ui/button/Button';
 import Select from '../../components/form/Select';
 import { getRoles } from '../../services/RoleService';
-import { useNavigate } from 'react-router';
+import { useRouter } from 'next/navigation';
 import { Role } from '../../types';
 
 export default function Roles() {
@@ -112,4 +112,3 @@ export default function Roles() {
     </>
   );
 }
-

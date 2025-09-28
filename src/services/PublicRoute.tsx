@@ -8,5 +8,5 @@ export default function PublicRoute() {
   if (loading) return null;
 
   // If already logged in, bounce to dashboard
-  return user ? <Navigate to="/" replace /> : <Outlet />;
+  return user ? <Navigate to="/dashboard" replace /> : <Outlet />;
 }

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Dropdown } from "../ui/dropdown/Dropdown";
 import { DropdownItem } from "../ui/dropdown/DropdownItem";
-import { MoreDotIcon } from "../../icons";
+import { MoreHorizontal } from "lucide-react";
 import CountryMap from "./CountryMap";
 
 export default function DemographicCard() {
@@ -29,7 +29,7 @@ export default function DemographicCard() {
         </div>
         <div className="relative inline-block">
           <button className="dropdown-toggle" onClick={toggleDropdown}>
-            <MoreDotIcon className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 size-6" />
+            <MoreHorizontal className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 size-6" />
           </button>
           <Dropdown
             isOpen={isOpen}
@@ -64,7 +64,7 @@ export default function DemographicCard() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="items-center w-full rounded-full max-w-8">
-              <img src="./images/country/country-01.svg" alt="usa" />
+              <img src="/images/country/country-01.svg" alt="usa" />
             </div>
             <div>
               <p className="font-semibold text-gray-800 text-theme-sm dark:text-white/90">
@@ -89,7 +89,7 @@ export default function DemographicCard() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="items-center w-full rounded-full max-w-8">
-              <img src="./images/country/country-02.svg" alt="france" />
+              <img src="/images/country/country-02.svg" alt="france" />
             </div>
             <div>
               <p className="font-semibold text-gray-800 text-theme-sm dark:text-white/90">

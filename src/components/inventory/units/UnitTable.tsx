@@ -12,9 +12,8 @@ import { useState } from "react";
 import Badge from "../../ui/badge/Badge";
 import EditUnitModal from "./EditUnitModal";
 import DeleteUnitModal from "./DeleteUnitModal";
-import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide } from 'lucide-react';
+import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide, Edit, Trash2 } from 'lucide-react';
 import Button from "../../ui/button/Button";
-import { PencilIcon, TrashBinIcon } from "../../../icons";
 import Tooltip from "../../ui/tooltip/Tooltip";
 
 import { Unit } from '../../../types';
@@ -151,7 +150,7 @@ export default function UnitTable({ data, onAction, onSort, sortBy, sortDirectio
                           onClick={() => handleEdit(unit)}
                           className="bg-blue-600 hover:bg-blue-700 text-white"
                         >
-                          <PencilIcon className="w-4 h-4" />
+                          <Edit className="w-4 h-4" />
                         </Button>
                       </Tooltip>
                     )}
@@ -162,7 +161,7 @@ export default function UnitTable({ data, onAction, onSort, sortBy, sortDirectio
                           onClick={() => handleDelete(unit)}
                           className="bg-red-600 hover:bg-red-700 text-white"
                         >
-                          <TrashBinIcon className="w-4 h-4" />
+                          <Trash2 className="w-4 h-4" />
                         </Button>
                       </Tooltip>
                     )}

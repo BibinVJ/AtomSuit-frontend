@@ -2,7 +2,7 @@
 
 
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router';
+import { useRouter, useParams } from 'next/navigation';
 import PageMeta from '../../components/common/PageMeta';
 import PageBreadcrumb from '../../components/common/PageBreadCrumb';
 import ComponentCard from '../../components/common/ComponentCard';
@@ -15,7 +15,8 @@ import { getSale } from '../../services/SaleService';
 import { Sale } from '../../types';
 
 export default function ViewSale() {
-  const { id } = useParams<{ id: string }>();
+  const params = useParams<{ id: string }>();
+  const id = params.id;
   const router = useRouter();
   const [sale, setSale] = useState<Sale | null>(null);
   const [isVoidModalOpen, setIsVoidModalOpen] = useState(false);

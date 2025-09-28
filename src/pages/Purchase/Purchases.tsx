@@ -9,7 +9,7 @@ import PurchaseTable from '../../components/purchase/PurchaseTable';
 import Pagination from '../../components/common/Pagination';
 import Button from '../../components/ui/button/Button';
 import Select from '../../components/form/Select';
-import { useNavigate } from 'react-router';
+import { useRouter } from 'next/navigation';
 import { getPurchases } from '../../services/PurchaseService';
 import { Purchase } from '../../types';
 
@@ -17,6 +17,7 @@ import { usePermissions } from '../../hooks/usePermissions';
 
 export default function Purchases() {
   const { hasPermission } = usePermissions();
+  const router = useRouter();
   const [purchases, setPurchases] = useState<Purchase[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
@@ -26,7 +27,6 @@ export default function Purchases() {
   const [total, setTotal] = useState(0);
   const [sortBy, setSortBy] = useState('created_at');
   const [sortDirection, setSortDirection] = useState('desc');
-  const router = useRouter();
 
   const fetchPurchases = async (page = 1, limit = 10, sortCol = 'created_at', sortDir = 'desc') => {
     try {

@@ -10,9 +10,8 @@ import {
 } from "../ui/table";
 import { useState } from "react";
 import DeleteRoleModal from "./DeleteRoleModal";
-import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide } from 'lucide-react';
+import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide, Edit, Trash2 } from 'lucide-react';
 import Button from "../ui/button/Button";
-import { PencilIcon, TrashBinIcon } from "../../icons";
 import Tooltip from "../ui/tooltip/Tooltip";
 import { Role } from "../../types";
 import { useRouter } from "next/navigation";
@@ -91,7 +90,7 @@ export default function RoleTable({ data, onAction, onSort, sortBy, sortDirectio
                           onClick={() => handleEdit(role)}
                           className="bg-blue-600 hover:bg-blue-700 text-white"
                         >
-                          <PencilIcon className="w-4 h-4" />
+                          <Edit className="w-4 h-4" />
                         </Button>
                       </Tooltip>
                       <Tooltip text="Delete">
@@ -100,7 +99,7 @@ export default function RoleTable({ data, onAction, onSort, sortBy, sortDirectio
                           onClick={() => handleDelete(role)}
                           className="bg-red-600 hover:bg-red-700 text-white"
                         >
-                          <TrashBinIcon className="w-4 h-4" />
+                          <Trash2 className="w-4 h-4" />
                         </Button>
                       </Tooltip>
                     </div>

@@ -2,7 +2,7 @@
 
 
 import { useState, useEffect, useMemo } from 'react';
-import { useNavigate, useParams } from 'react-router';
+import { useRouter, useParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { getRole, updateRole } from '../../services/RoleService';
 import { getPermissions } from '../../services/PermissionService';
@@ -21,13 +21,14 @@ import { Role } from '../../types/Role';
 import { isApiError } from '../../utils/errors';
 
 export default function EditRole() {
-  const { id } = useParams<{ id: string }>();
+  const params = useParams<{ id: string }>();
+  const id = params.id;
+  const router = useRouter();
   const [role, setRole] = useState<Role | null>(null);
   const [name, setName] = useState('');
   const [selectedPermissions, setSelectedPermissions] = useState<number[]>([]);
   const [availablePermissions, setAvailablePermissions] = useState<Permission[]>([]);
   const [errors, setErrors] = useState({ name: '', permissions: '' });
-  const router = useRouter();
 
   useEffect(() => {
     const fetchRoleAndPermissions = async () => {

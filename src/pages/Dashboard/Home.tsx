@@ -11,17 +11,10 @@ import TopItems from "../../components/ecommerce/TopItems";
 import StockAlerts from "../../components/ecommerce/StockAlerts";
 import CustomersTable from "../../components/ecommerce/CustomersTable";
 import ExpiryItems from "../../components/ecommerce/ExpiryItems";
-import { PencilIcon, SaveIcon, X } from "lucide-react";
-import { Eye, EyeOff } from "lucide-react";
+import { PencilIcon, SaveIcon, X, Eye, EyeOff, DollarSign, Package, Users, FileText } from "lucide-react";
 import { getLayout, saveLayout } from "../../services/LayoutService";
 import MetricCard from "../../components/ecommerce/MetricCard";
 import SkeletonCard from "../../components/common/SkeletonCard";
-import {
-  DollarLineIcon,
-  BoxIconLine,
-  GroupIcon,
-  PageIcon,
-} from "../../icons";
 import { usePermissions } from "../../hooks/usePermissions";
 import { Layout } from "../../types/Layout";
 import { DashboardData } from "../../types/Dashboard";
@@ -58,10 +51,10 @@ const initialCards: Layout[] = [
 ].map(card => ({ ...card, i: card.card_id }));
 
 const iconMap = {
-  DollarLineIcon: <DollarLineIcon className="text-gray-800 size-6 dark:text-white/90" />,
-  BoxIconLine: <BoxIconLine className="text-gray-800 size-6 dark:text-white/90" />,
-  GroupIcon: <GroupIcon className="text-gray-800 size-6 dark:text-white/90" />,
-  PageIcon: <PageIcon className="text-gray-800 size-6 dark:text-white/90" />,
+  DollarLineIcon: <DollarSign className="text-gray-800 size-6 dark:text-white/90" />,
+  BoxIconLine: <Package className="text-gray-800 size-6 dark:text-white/90" />,
+  GroupIcon: <Users className="text-gray-800 size-6 dark:text-white/90" />,
+  PageIcon: <FileText className="text-gray-800 size-6 dark:text-white/90" />,
 };
 
 function Home() {

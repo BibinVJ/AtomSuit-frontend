@@ -10,7 +10,7 @@ import Select from '../../components/form/Select';
 import Input from '../../components/form/input/InputField';
 import Label from '../../components/form/Label';
 import TextArea from '../../components/form/input/TextArea';
-import { useNavigate } from 'react-router';
+import { useRouter } from 'next/navigation';
 import DatePicker from '../../components/form/date-picker';
 import { formatDate } from '../../utils/date';
 import { toast } from 'sonner';
@@ -35,6 +35,7 @@ interface ApiError {
 }
 
 export default function AddPurchase() {
+  const router = useRouter();
   const [vendors, setVendors] = useState<Vendor[]>([]);
   const [items, setItems] = useState<Item[]>([]);
   const [vendorId, setVendorId] = useState('');
@@ -44,7 +45,6 @@ export default function AddPurchase() {
     { item_id: '', description: '', batch_number: '', expiry_date: '', manufacture_date: '', quantity: 1, unit_cost: 0 }
   ]);
   const [errors, setErrors] = useState<ApiError>({});
-  const router = useRouter();
 
   useEffect(() => {
     fetchInitialData();

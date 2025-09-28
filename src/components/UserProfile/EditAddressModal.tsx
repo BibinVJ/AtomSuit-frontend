@@ -36,14 +36,25 @@ export default function EditAddressModal({
   const [formData, setFormData] = useState<Partial<Address>>({});
 
   useEffect(() => {
-    if (user && addressType && addressType !== "new") {
+    if (user && user.addresses && Array.isArray(user.addresses) && addressType && addressType !== "new") {
       const address = user.addresses.find((a) => a.type === addressType);
       if (address) {
         setFormData(address);
+      } else {
+        // Address type not found, set default values
+        setFormData({
+          type: addressType,
+          address_line_1: "",
+          address_line_2: "",
+          city: "",
+          state: "",
+          country: "",
+          postal_code: "",
+        });
       }
     } else {
       setFormData({
-        type: "primary",
+        type: addressType === "new" ? "primary" : (addressType || "primary"),
         address_line_1: "",
         address_line_2: "",
         city: "",

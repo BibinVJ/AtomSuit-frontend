@@ -1,5 +1,5 @@
 import { User } from "../../types";
-import { PencilIcon, PlusIcon } from "../../icons";
+import { Pencil, Plus } from "lucide-react";
 
 interface UserAddressCardProps {
   user: User | null;
@@ -26,9 +26,9 @@ export default function UserAddressCard({ user, onEdit }: UserAddressCardProps) 
                   </h5>
                   <button
                     onClick={() => onEdit(address.type)}
-                    className="flex items-center justify-center w-8 h-8 custom-secondary-btn rounded-full"
+                    className="flex items-center justify-center w-8 h-8 bg-white border-2 border-gray-300 rounded-full shadow-sm hover:bg-gray-50 hover:border-brand-400 transition-colors duration-200 dark:bg-gray-800 dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-brand-400"
                   >
-                    <PencilIcon className="w-4 h-4" />
+                    <Pencil className="w-4 h-4 text-gray-600 hover:text-brand-600 dark:text-gray-300 dark:hover:text-brand-400" />
                   </button>
                 </div>
                 <div className="space-y-2">
@@ -51,9 +51,9 @@ export default function UserAddressCard({ user, onEdit }: UserAddressCardProps) 
         </div>
         <button
           onClick={() => onEdit("new")}
-          className="flex w-full items-center justify-center gap-2 rounded-full custom-primary-btn px-4 py-3 text-sm font-medium lg:inline-flex lg:w-auto"
+          className="flex w-full items-center justify-center gap-2 rounded-full bg-brand-500 border border-brand-300 text-white px-4 py-3 text-sm font-medium hover:bg-brand-600 hover:border-brand-400 transition-colors duration-200 lg:inline-flex lg:w-auto dark:bg-brand-500 dark:border-brand-600 dark:hover:bg-brand-400 dark:hover:border-brand-500"
         >
-          <PlusIcon className="w-4 h-4" />
+          <Plus className="w-4 h-4" />
           Add New
         </button>
       </div>

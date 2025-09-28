@@ -13,7 +13,7 @@ import EditSocialLinksModal from "../components/UserProfile/EditSocialLinksModal
 import EditProfileImageModal from "../components/UserProfile/EditProfileImageModal";
 
 export default function UserProfiles() {
-  const { fetchProfile, user } = useAuth();
+  const { fetchProfile, user, loading } = useAuth();
   const [isProfileModalOpen, setProfileModalOpen] = useState(false);
   const [isAddressModalOpen, setAddressModalOpen] = useState(false);
   const [isSocialLinksModalOpen, setSocialLinksModalOpen] = useState(false);
@@ -30,6 +30,38 @@ export default function UserProfiles() {
     setSelectedAddressType(addressType);
     setAddressModalOpen(true);
   };
+
+  // Show loading state while user data is being fetched
+  if (loading) {
+    return (
+      <>
+        <PageMeta
+          title="User Profile"
+          description="This is the user profile page"
+        />
+        <PageBreadcrumb pageTitle="Profile" />
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-500"></div>
+        </div>
+      </>
+    );
+  }
+
+  // Show message if no user data is available
+  if (!user) {
+    return (
+      <>
+        <PageMeta
+          title="User Profile"
+          description="This is the user profile page"
+        />
+        <PageBreadcrumb pageTitle="Profile" />
+        <div className="flex items-center justify-center min-h-[400px]">
+          <p className="text-gray-500 dark:text-gray-400">User profile not found.</p>
+        </div>
+      </>
+    );
+  }
 
   return (
     <>

@@ -2,7 +2,7 @@
 
 
 import { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { createRole } from '../../services/RoleService';
 import { getPermissions } from '../../services/PermissionService';

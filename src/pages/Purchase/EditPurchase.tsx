@@ -10,7 +10,7 @@ import Select from '../../components/form/Select';
 import Input from '../../components/form/input/InputField';
 import Label from '../../components/form/Label';
 import TextArea from '../../components/form/input/TextArea';
-import { useNavigate, useParams } from 'react-router';
+import { useRouter, useParams } from 'next/navigation';
 import DatePicker from '../../components/form/date-picker';
 import { toast } from 'sonner';
 import { getVendors } from '../../services/VendorService';
@@ -35,7 +35,9 @@ interface ApiError {
 }
 
 export default function EditPurchase() {
-  const { id } = useParams<{ id: string }>();
+  const params = useParams<{ id: string }>();
+  const id = params.id;
+  const router = useRouter();
   const [vendors, setVendors] = useState<Vendor[]>([]);
   const [items, setItems] = useState<Item[]>([]);
   const [vendorId, setVendorId] = useState('');
@@ -43,7 +45,6 @@ export default function EditPurchase() {
   const [purchaseDate, setPurchaseDate] = useState('');
   const [purchaseItems, setPurchaseItems] = useState<PurchaseItem[]>([]);
   const [errors, setErrors] = useState<ApiError>({});
-  const router = useRouter();
 
   useEffect(() => {
     const fetchInitialData = async () => {

@@ -1,9 +1,6 @@
 "use client";
 
-import {
-  ArrowDownIcon,
-  ArrowUpIcon,
-} from "../../icons";
+import { ArrowDown, ArrowUp } from "lucide-react";
 import Badge from "../ui/badge/Badge";
 import { ReactNode, useState, useRef, useEffect } from "react";
 
@@ -63,7 +60,7 @@ const MetricCard = ({ icon, title, value, percentage, trend }: MetricCardProps) 
         </div>
         {trend && percentage && (
           <Badge color={trend === "up" ? "success" : "error"}>
-            {trend === "up" ? <ArrowUpIcon /> : <ArrowDownIcon />}
+            {trend === "up" ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />}
             {percentage}%
           </Badge>
         )}
