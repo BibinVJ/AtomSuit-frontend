@@ -18,3 +18,4 @@ export interface CustomerApiResponse {
     from: number;
     to: number;
   };
+}

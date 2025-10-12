@@ -36,7 +36,7 @@ interface ApiError {
 
 export default function EditPurchase() {
   const params = useParams<{ id: string }>();
-  const id = params.id;
+  const id = params?.id;
   const router = useRouter();
   const [vendors, setVendors] = useState<Vendor[]>([]);
   const [items, setItems] = useState<Item[]>([]);

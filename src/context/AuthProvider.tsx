@@ -10,7 +10,6 @@ import {
 } from "../services/AuthService";
 import api from "../services/api";
 import { useTenant } from "../hooks/useTenant";
-import { buildTenantUrl } from "../utils/tenant";
 
 import { User } from "../types";
 import { AuthContext } from "./AuthContext";
@@ -28,7 +27,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const { data } = await api.get("/profile");
       setUser(data.data);
       return true;
-    } catch (error) {
+    } catch {
       // If profile fetch fails, treat as unauthorized
       await logoutService();
       setUser(null);
@@ -39,7 +38,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const handleLogout = useCallback(async () => {
     try {
       await logoutService();
-    } catch (error) {
+    } catch {
       // Silently handle logout errors
     }
     setUser(null);
@@ -48,7 +47,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     if (pathname !== '/signin' && pathname !== '/signup') {
       router.push('/signin');
     }
-  }, [pathname, router, tenant]);
+  }, [pathname, router]);
 
   useEffect(() => {
     const initializeAuth = async () => {
@@ -64,7 +63,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         // In production or when using real API, verify token validity
         try {
           await fetchProfile();
-        } catch (error) {
+        } catch {
           // If profile fetch fails, clear user data
           setUser(null);
         }
@@ -81,7 +80,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     if (!isInitialized) {
       initializeAuth();
     }
-  }, [isInitialized]); // Only depend on isInitialized
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isInitialized]); // Intentionally omitting 'fetchProfile' dependency to prevent unnecessary re-renders
   
   // Separate useEffect to handle route protection
   useEffect(() => {
@@ -92,7 +92,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const centralPublicRoutes = ['/signin', '/signup', '/'];
     const tenantPublicRoutes = ['/signin', '/signup'];
     const publicRoutes = tenant.isCentral ? centralPublicRoutes : tenantPublicRoutes;
-    const isPublicRoute = publicRoutes.includes(pathname);
+    const isPublicRoute = pathname ? publicRoutes.includes(pathname) : false;
     
     if (user) {
       // User is authenticated - redirect away from auth pages

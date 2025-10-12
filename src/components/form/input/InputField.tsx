@@ -6,6 +6,7 @@ interface InputProps {
   name?: string;
   placeholder?: string;
   value?: string | number;
+  defaultValue?: string | number;
   autoComplete?: string;
   onChange?: (e: ChangeEvent<HTMLInputElement>) => void;
   className?: string;
@@ -27,6 +28,7 @@ const Input: FC<InputProps> = ({
   name,
   placeholder,
   value,
+  defaultValue,
   autoComplete,
   onChange,
   className = "",
@@ -64,6 +66,7 @@ const Input: FC<InputProps> = ({
           name={name}
           placeholder={placeholder}
           value={value}
+          defaultValue={defaultValue}
           autoComplete={autoComplete}
           onChange={onChange}
           min={min}

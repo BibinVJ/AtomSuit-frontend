@@ -1,14 +1,14 @@
 "use client";
 
 import { useTenant } from '../../hooks/useTenant';
-import { Building, Crown, AlertCircle } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 
 interface TenantLoadingProps {
   children: React.ReactNode;
 }
 
 export default function TenantLoading({ children }: TenantLoadingProps) {
-  const { tenant, isLoading, error } = useTenant();
+  const { isLoading, error } = useTenant();
 
   if (isLoading) {
     return (

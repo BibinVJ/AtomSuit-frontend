@@ -16,7 +16,7 @@ import { Purchase } from '../../types';
 
 export default function ViewPurchase() {
   const params = useParams<{ id: string }>();
-  const id = params.id;
+  const id = params?.id;
   const router = useRouter();
   const [purchase, setPurchase] = useState<Purchase | null>(null);
   const [isVoidModalOpen, setIsVoidModalOpen] = useState(false);

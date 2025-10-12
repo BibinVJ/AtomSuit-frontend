@@ -1,3 +1,4 @@
+import Image from "next/image";
 import GridShape from "../../components/common/GridShape";
 import Link from "next/link";
 import PageMeta from "../../components/common/PageMeta";
@@ -16,8 +17,8 @@ export default function NotFound() {
             ERROR
           </h1>
 
-          <img src="/images/error/404.svg" alt="404" className="dark:hidden" />
-          <img
+          <Image src="/images/error/404.svg" alt="404" className="dark:hidden" />
+          <Image
             src="/images/error/404-dark.svg"
             alt="404"
             className="hidden dark:block"

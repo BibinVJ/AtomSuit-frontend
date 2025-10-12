@@ -12,3 +12,4 @@ export interface PermissionApiResponse {
     from: number;
     to: number;
   };
+}

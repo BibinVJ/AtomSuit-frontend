@@ -54,7 +54,7 @@ export default function DeleteVendorModal({ isOpen, onClose, onVendorDeleted, ve
             Delete Vendor
           </h4>
           <p className="mb-6 text-gray-500 dark:text-gray-400">
-            Are you sure you want to delete the vendor "{vendor?.name}"? This action cannot be undone.
+            Are you sure you want to delete the vendor &quot;{vendor?.name}&quot;? This action cannot be undone.
           </p>
           <div className="flex items-center justify-center gap-4">
             <Button type="button" variant="outline" onClick={onClose}>

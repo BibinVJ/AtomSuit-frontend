@@ -5,6 +5,7 @@ import { DropdownItem } from "../ui/dropdown/DropdownItem";
 import { Dropdown } from "../ui/dropdown/Dropdown";
 import { User, Settings, HelpCircle, LogOut } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth";
+import Image from "next/image";
 
 export default function UserDropdown() {
   const [isOpen, setIsOpen] = useState(false);
@@ -29,9 +30,11 @@ export default function UserDropdown() {
         className="flex items-center text-gray-700 dropdown-toggle dark:text-gray-400"
       >
         <span className="mr-3 overflow-hidden rounded-full h-11 w-11 bg-gray-200">
-          <img
+          <Image
             src={profileImage}
             alt="User"
+            width={44}
+            height={44}
             className="object-cover w-full h-full"
           />
         </span>

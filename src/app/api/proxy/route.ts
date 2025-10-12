@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
       }
     });
 
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: true, message: 'Proxy request failed' },
       { status: 500 }
@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
 }
 
 // Handle preflight OPTIONS requests
-export async function OPTIONS(request: NextRequest) {
+export async function OPTIONS() {
   return NextResponse.json({}, {
     status: 200,
     headers: {

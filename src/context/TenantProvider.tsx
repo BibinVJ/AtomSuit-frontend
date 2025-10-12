@@ -1,15 +1,12 @@
 "use client";
 
 import { useState, useEffect, useCallback, ReactNode } from 'react';
-import { useRouter } from 'next/navigation';
 import { TenantContext, TenantContextType } from './TenantContext';
 import {
   getTenantFromBrowser,
   TenantInfo,
   getMainDomainUrl,
-  isDevelopment
 } from '../utils/tenant';
-import api from '../services/api';
 
 interface TenantProviderProps {
   children: ReactNode;
@@ -19,7 +16,6 @@ export const TenantProvider = ({ children }: TenantProviderProps) => {
   const [tenant, setTenant] = useState<TenantInfo>({ subdomain: '', isCentral: true });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
 
   const validateTenant = useCallback(async (tenantToValidate?: TenantInfo): Promise<boolean> => {
     const targetTenant = tenantToValidate || tenant;
@@ -62,10 +58,16 @@ export const TenantProvider = ({ children }: TenantProviderProps) => {
         console.log('[TenantProvider] Tenant validation failed - invalid response data:', data);
         throw new Error(data.message || 'Tenant validation failed');
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('[TenantProvider] Tenant validation error:', err);
       // If it's a network error or the API returns an error response
-      const errorMessage = err.response?.data?.message || err.message || 'Tenant not found';
+      let errorMessage = 'Tenant not found';
+      if (err instanceof Error) {
+        errorMessage = err.message;
+      } else if (typeof err === 'object' && err !== null && 'response' in err) {
+        const axiosError = err as { response?: { data?: { message?: string } }; message?: string };
+        errorMessage = axiosError.response?.data?.message || axiosError.message || 'Tenant not found';
+      }
       setError(errorMessage);
 
       console.log('[TenantProvider] Tenant validation failed, redirecting to main domain:', getMainDomainUrl());
@@ -73,7 +75,8 @@ export const TenantProvider = ({ children }: TenantProviderProps) => {
 
       return false;
     }
-  }, [tenant]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Intentionally omitting 'tenant' dependency to prevent infinite loop
 
   const refreshTenant = useCallback(() => {
     const currentTenant = getTenantFromBrowser();
@@ -95,7 +98,8 @@ export const TenantProvider = ({ children }: TenantProviderProps) => {
     };
     
     initializeTenant();
-  }, []); // Remove validateTenant from dependencies to prevent infinite re-renders
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Intentionally omitting 'validateTenant' dependency to prevent infinite loop
 
   const contextValue: TenantContextType = {
     tenant,

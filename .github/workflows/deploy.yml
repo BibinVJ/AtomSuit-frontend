@@ -1,0 +1,57 @@
+name: Deploy Frontend (Next.js SSR) to EC2
+
+on:
+  push:
+    branches:
+      - main
+      - staging
+
+jobs:
+  deploy-frontend:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Inject .env File
+        run: |
+          if [ "${GITHUB_REF}" = "refs/heads/main" ]; then
+            echo "${{ secrets.FRONTEND_ENV_MAIN }}" > .env
+          else
+            echo "${{ secrets.FRONTEND_ENV_STAGING }}" > .env
+          fi
+
+      - name: Build Frontend
+        run: npm run build
+
+      - name: Upload to EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: ".next/*,package.json,package-lock.json,public/*,next.config.js,.env"
+          target: ${{ github.ref == 'refs/heads/main' && '/var/www/atomsuit/production/frontend' || '/var/www/atomsuit/staging/frontend' }}
+
+      - name: Restart Frontend App
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd ${{ github.ref == 'refs/heads/main' && '/var/www/atomsuit/production/frontend' || '/var/www/atomsuit/staging/frontend' }}
+            npm ci --omit=dev
+            pm2 restart atomsuit-frontend || pm2 start npm --name "atomsuit-frontend" -- run start -- -p 3000
+            sudo systemctl reload nginx
+            echo "✅ Frontend deployed and running with SSR"

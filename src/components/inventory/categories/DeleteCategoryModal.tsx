@@ -53,7 +53,7 @@ export default function DeleteCategoryModal({ isOpen, onClose, onCategoryDeleted
             Delete Category
           </h4>
           <p className="mb-6 text-gray-500 dark:text-gray-400">
-            Are you sure you want to delete the category "{category?.name}"? This action cannot be undone.
+            Are you sure you want to delete the category &quot;{category?.name}&quot;? This action cannot be undone.
           </p>
           <div className="flex items-center justify-center gap-4">
             <Button type="button" variant="outline" onClick={onClose}>

@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 interface AvatarProps {
   src: string; // URL of the avatar image
   alt?: string; // Alt text for the avatar
@@ -38,7 +40,7 @@ const Avatar: React.FC<AvatarProps> = ({
   return (
     <div className={`relative  rounded-full ${sizeClasses[size]}`}>
       {/* Avatar Image */}
-      <img src={src} alt={alt} className="object-cover rounded-full" />
+      <Image src={src} alt={alt} width={64} height={64} className="object-cover rounded-full" />
 
       {/* Status Indicator */}
       {status !== "none" && (

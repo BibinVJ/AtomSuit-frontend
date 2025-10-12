@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import GridShape from "../../components/common/GridShape";
 import Link from "next/link";
 import ThemeTogglerTwo from "../../components/common/ThemeTogglerTwo";
@@ -19,7 +20,7 @@ export default function AuthLayout({
             <GridShape />
             <div className="flex flex-col items-center max-w-xs">
               <Link href="/" className="block mb-4">
-                <img
+                <Image
                   width={231}
                   height={48}
                   src="/images/logo/logo.png"

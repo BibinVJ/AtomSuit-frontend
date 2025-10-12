@@ -1,7 +1,18 @@
-import Chart from "react-apexcharts";
+"use client";
+
+import { useState, useEffect } from "react";
+import dynamic from "next/dynamic";
 import { ApexOptions } from "apexcharts";
 
+// Dynamically import Chart with no SSR
+const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
+
 export default function BarChartOne() {
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
   const options: ApexOptions = {
     colors: ["#465fff"],
     chart: {
@@ -87,6 +98,17 @@ export default function BarChartOne() {
       data: [168, 385, 201, 298, 187, 195, 291, 110, 215, 390, 280, 112],
     },
   ];
+  // Don't render the chart during SSR
+  if (!isClient) {
+    return (
+      <div className="max-w-full overflow-x-auto custom-scrollbar">
+        <div id="chartOne" className="min-w-[1000px] h-[180px] flex items-center justify-center">
+          <div className="text-gray-500">Loading chart...</div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-full overflow-x-auto custom-scrollbar">
       <div id="chartOne" className="min-w-[1000px]">

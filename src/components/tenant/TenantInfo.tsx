@@ -1,12 +1,10 @@
 "use client";
 
 import { useTenant } from '../../hooks/useTenant';
-import { useAuth } from '../../hooks/useAuth';
 import { Building, Crown } from 'lucide-react';
 
 export default function TenantInfo() {
   const { tenant, isLoading, error } = useTenant();
-  const { user } = useAuth();
 
   if (isLoading) {
     return (

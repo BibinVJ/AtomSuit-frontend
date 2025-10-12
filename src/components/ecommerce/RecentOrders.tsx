@@ -7,6 +7,7 @@ import {
 } from "../ui/table";
 import Badge from "../ui/badge/Badge";
 import TableSection from "../ui/table/TableSection";
+import Image from "next/image";
 
 // Define the TypeScript interface for the table rows
 interface Product {
@@ -111,9 +112,11 @@ export default function RecentOrders() {
               <TableCell className="py-3">
                 <div className="flex items-center gap-3">
                   <div className="h-[50px] w-[50px] overflow-hidden rounded-md">
-                    <img
+                    <Image
                       src={product.image}
                       className="h-[50px] w-[50px]"
+                      width={50}
+                      height={50}
                       alt={product.name}
                     />
                   </div>

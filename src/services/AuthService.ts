@@ -17,7 +17,7 @@ export const logout = async () => {
     if (token) {
       await api.post('/logout');
     }
-  } catch (error) {
+  } catch {
     // Silently handle logout errors
   } finally {
     // Always clear local data

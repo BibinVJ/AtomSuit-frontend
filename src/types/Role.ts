@@ -14,3 +14,4 @@ export interface RoleApiResponse {
     from: number;
     to: number;
   };
+}

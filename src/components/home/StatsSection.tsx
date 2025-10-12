@@ -108,7 +108,7 @@ const StatsSection = () => {
                   </div>
                 </div>
                 <blockquote className="text-gray-700 italic">
-                  "{testimonial.quote}"
+                  &quot;{testimonial.quote}&quot;
                 </blockquote>
                 <div className="flex text-yellow-400 mt-4">
                   {[...Array(5)].map((_, i) => (

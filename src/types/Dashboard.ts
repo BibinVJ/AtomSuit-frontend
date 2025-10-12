@@ -10,14 +10,18 @@ export interface DashboardData {
   charts: {
     sales: { date: string; total: number }[];
     purchases: { date: string; total: number }[];
+  };
   customers: {
     best_customers: Customer[];
+  };
   stock_alerts: {
     out_of_stock_items: StockAlert[];
     low_stock_items: StockAlert[];
     expiring_items: StockAlert[];
     dead_stock_items: StockAlert[];
+  };
   top_items: {
     sold: Item[];
     purchased: Item[];
+  };
 }

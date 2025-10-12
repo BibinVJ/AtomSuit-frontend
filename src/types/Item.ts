@@ -25,9 +25,12 @@ export interface ItemApiResponse {
     from: number;
     to: number;
   };
+}
+
 export interface StockAlert {
-    id: number;
-    name: string;
-    sku: string;
-    stock_on_hand: number;
-    reorder_level: number;
+  id: number;
+  name: string;
+  sku: string;
+  stock_on_hand: number;
+  reorder_level: number;
+}

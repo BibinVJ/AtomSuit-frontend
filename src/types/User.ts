@@ -58,3 +58,4 @@ export type UserUpdatePayload = Partial<
 export interface UserFormData {
   phone: string;
   role_id: number | string;
+}

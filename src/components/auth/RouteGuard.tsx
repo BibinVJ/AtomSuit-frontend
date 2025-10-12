@@ -1,10 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { useTenant } from "@/hooks/useTenant";
-import { buildTenantUrl } from "@/utils/tenant";
 
 interface RouteGuardProps {
   children: React.ReactNode;
@@ -20,7 +19,6 @@ const RouteGuard: React.FC<RouteGuardProps> = ({
   const { user, loading } = useAuth();
   const { tenant } = useTenant();
   const router = useRouter();
-  const pathname = usePathname();
   const [authorized, setAuthorized] = useState(false);
 
   useEffect(() => {

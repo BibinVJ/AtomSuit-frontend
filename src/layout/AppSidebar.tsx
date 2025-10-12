@@ -1,9 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import TenantInfo from "../components/tenant/TenantInfo";
 
 import {
   LayoutDashboard,
@@ -129,6 +129,7 @@ const AppSidebar: React.FC = () => {
   // const isActive = (path: string) => pathname === path;
   const isActive = useCallback(
     (path: string) => {
+      if (!pathname) return false;
       if (path === "/dashboard") {
         return pathname === path;
       }
@@ -364,14 +365,14 @@ const AppSidebar: React.FC = () => {
         <Link href="/dashboard">
           {isExpanded || isHovered || isMobileOpen ? (
             <>
-              <img
+              <Image
                 className="dark:hidden"
                 src="/images/logo/logo.png"
                 alt="Logo"
                 width={250}
                 height={60}
               />
-              <img
+              <Image
                 className="hidden dark:block"
                 src="/images/logo/logo.png"
                 alt="Logo"
@@ -380,7 +381,7 @@ const AppSidebar: React.FC = () => {
               />
             </>
           ) : (
-            <img
+            <Image
                 src="/images/logo/icon.png"
               alt="Logo"
               width={32}
