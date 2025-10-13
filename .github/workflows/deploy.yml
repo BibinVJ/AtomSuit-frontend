@@ -54,4 +54,4 @@ jobs:
             npm ci --omit=dev
             pm2 restart atomsuit-frontend || pm2 start npm --name "atomsuit-frontend" -- run start -- -p 3000
             sudo systemctl reload nginx
-            echo "✅ Frontend deployed and running with SSR"
+            echo "Frontend deployed and running with SSR"
