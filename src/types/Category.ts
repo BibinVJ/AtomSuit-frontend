@@ -14,3 +14,4 @@ export interface CategoryApiResponse {
     from: number;
     to: number;
   };
+}

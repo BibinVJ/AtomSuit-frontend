@@ -22,7 +22,7 @@ import { isApiError } from '../../utils/errors';
 
 export default function EditRole() {
   const params = useParams<{ id: string }>();
-  const id = params.id;
+  const id = params?.id;
   const router = useRouter();
   const [role, setRole] = useState<Role | null>(null);
   const [name, setName] = useState('');

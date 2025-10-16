@@ -54,7 +54,7 @@ export default function VoidPurchaseModal({ isOpen, onClose, onPurchaseVoided, p
             Void Purchase
           </h4>
           <p className="mb-6 text-gray-500 dark:text-gray-400">
-            Are you sure you want to void the purchase "{purchase?.invoice_number}"? This action cannot be undone.
+            Are you sure you want to void the purchase &quot;{purchase?.invoice_number}&quot;? This action cannot be undone.
           </p>
           <div className="flex items-center justify-center gap-4">
             <Button type="button" variant="outline" onClick={onClose}>

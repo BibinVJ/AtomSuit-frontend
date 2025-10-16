@@ -5,6 +5,7 @@ import { ThemeToggleButton } from "../common/ThemeToggleButton";
 import NotificationDropdown from "./NotificationDropdown";
 import UserDropdown from "./UserDropdown";
 import Link from "next/link";
+import Image from "next/image";
 
 // Define the interface for the props
 interface HeaderProps {
@@ -81,15 +82,19 @@ const Header: React.FC<HeaderProps> = ({ onClick, onToggle }) => {
           </button>
 
           <Link href="/dashboard" className="lg:hidden">
-            <img
+            <Image
               className="dark:hidden"
               src="/images/logo/icon.png"
               alt="Logo"
+              width={40}
+              height={40}
             />
-            <img
+            <Image
               className="hidden dark:block"
               src="/images/logo/icon.png"
               alt="Logo"
+              width={40}
+              height={40}
             />
           </Link>
 

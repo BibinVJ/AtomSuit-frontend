@@ -24,6 +24,8 @@ export interface Purchase {
   payment_status: string;
   is_active: boolean;
   items: PurchaseItemDetail[];
+}
+
 export interface PurchaseApiResponse {
   data: Purchase[];
   meta: {
@@ -33,9 +35,15 @@ export interface PurchaseApiResponse {
     from: number;
     to: number;
   };
+}
+
 export interface PurchasePayload {
   vendor_id: string;
+  invoice_number?: string;
+  purchase_date?: string;
   items: {
     item_id: string;
     unit_price: number;
+    quantity?: number;
   }[];
+}

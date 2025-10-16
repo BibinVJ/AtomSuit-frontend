@@ -57,12 +57,12 @@ export async function middleware(request: NextRequest) {
         // Tenant validation failed, redirect to main domain
         return NextResponse.redirect(getMainDomainUrl());
       }
-    } catch (error) {
+    } catch {
       // If API call fails, redirect to main domain for safety
       return NextResponse.redirect(getMainDomainUrl());
     }
 
-  } catch (error) {
+  } catch {
     // In case of any error, allow the request to continue in development
     // but redirect in production
     if (process.env.NODE_ENV === 'production') {

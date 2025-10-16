@@ -27,7 +27,7 @@ api.interceptors.request.use(config => {
     if (!tenant.isCentral && tenant.subdomain) {
       config.headers['X-Tenant'] = tenant.subdomain;
     }
-  } catch (error) {
+  } catch {
     // If tenant extraction fails, continue without X-Tenant header
     // Silently continue without tenant header if extraction fails
   }

@@ -18,6 +18,20 @@ interface CalendarEvent extends EventInput {
     calendar: string;
   };
 }
+
+const renderEventContent = (eventInfo: EventContentArg) => {
+  const colorClass = `fc-bg-${eventInfo.event.extendedProps.calendar.toLowerCase()}`;
+  return (
+    <div
+      className={`event-fc-color flex fc-event-main ${colorClass} p-1 rounded-sm`}
+    >
+      <div className="fc-daygrid-event-dot"></div>
+      <div className="fc-event-time">{eventInfo.timeText}</div>
+      <div className="fc-event-title">{eventInfo.event.title}</div>
+    </div>
+  );
+};
+
 const Calendar: React.FC = () => {
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(
     null
@@ -34,6 +48,8 @@ const Calendar: React.FC = () => {
     Success: "success",
     Primary: "primary",
     Warning: "warning",
+  };
+
   useEffect(() => {
     // Initialize with some events
     setEvents([
@@ -43,15 +59,19 @@ const Calendar: React.FC = () => {
         start: new Date().toISOString().split("T")[0],
         extendedProps: { calendar: "Danger" },
       },
+      {
         id: "2",
         title: "Meeting",
         start: new Date(Date.now() + 86400000).toISOString().split("T")[0],
         extendedProps: { calendar: "Success" },
+      },
+      {
         id: "3",
         title: "Workshop",
         start: new Date(Date.now() + 172800000).toISOString().split("T")[0],
         end: new Date(Date.now() + 259200000).toISOString().split("T")[0],
         extendedProps: { calendar: "Primary" },
+      },
     ]);
   }, []);
   const handleDateSelect = (selectInfo: DateSelectArg) => {
@@ -59,6 +79,8 @@ const Calendar: React.FC = () => {
     setEventStartDate(selectInfo.startStr);
     setEventEndDate(selectInfo.endStr || selectInfo.startStr);
     openModal();
+  };
+
   const handleEventClick = (clickInfo: EventClickArg) => {
     const event = clickInfo.event;
     setSelectedEvent(event as unknown as CalendarEvent);
@@ -66,6 +88,9 @@ const Calendar: React.FC = () => {
     setEventStartDate(event.start?.toISOString().split("T")[0] || "");
     setEventEndDate(event.end?.toISOString().split("T")[0] || "");
     setEventLevel(event.extendedProps.calendar);
+    openModal();
+  };
+
   const handleAddOrUpdateEvent = () => {
     if (selectedEvent) {
       // Update existing event
@@ -95,12 +120,16 @@ const Calendar: React.FC = () => {
       setEvents((prevEvents) => [...prevEvents, newEvent]);
     }
     closeModal();
+  };
+
   const resetModalFields = () => {
     setEventTitle("");
     setEventStartDate("");
     setEventEndDate("");
     setEventLevel("");
     setSelectedEvent(null);
+  };
+
   return (
     <div className="rounded-2xl border  border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
       <div className="custom-calendar">
@@ -123,6 +152,7 @@ const Calendar: React.FC = () => {
               text: "Add Event +",
               click: openModal,
             },
+          }}
         />
       </div>
       <Modal
@@ -183,7 +213,7 @@ const Calendar: React.FC = () => {
                             <span
                               className={`h-2 w-2 rounded-full bg-white ${
                                 eventLevel === key ? "block" : "hidden"
-                              }`}  
+                              }`}
                             ></span>
                           </span>
                         </span>
@@ -192,18 +222,37 @@ const Calendar: React.FC = () => {
                     </div>
                   </div>
                 ))}
+              </div>
+            </div>
+            <div className="mt-6">
               <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
                 Enter Start Date
+              </label>
               <div className="relative">
+                <input
                   id="event-start-date"
                   type="date"
                   value={eventStartDate}
                   onChange={(e) => setEventStartDate(e.target.value)}
                   className="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pl-4 pr-11 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
+                />
+              </div>
+            </div>
+            <div className="mt-6">
+              <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
                 Enter End Date
+              </label>
+              <div className="relative">
+                <input
                   id="event-end-date"
+                  type="date"
                   value={eventEndDate}
                   onChange={(e) => setEventEndDate(e.target.value)}
+                  className="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pl-4 pr-11 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
+                />
+              </div>
+            </div>
+          </div>
           <div className="flex items-center gap-3 mt-6 modal-footer sm:justify-end">
             <button
               onClick={closeModal}
@@ -212,19 +261,17 @@ const Calendar: React.FC = () => {
             >
               Close
             </button>
+            <button
               onClick={handleAddOrUpdateEvent}
+              type="button"
               className="btn btn-success btn-update-event flex w-full justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 sm:w-auto"
+            >
               {selectedEvent ? "Update Changes" : "Add Event"}
+            </button>
+          </div>
         </div>
       </Modal>
     </div>
-};
-const renderEventContent = (eventInfo: EventContentArg) => {
-  const colorClass = `fc-bg-${eventInfo.event.extendedProps.calendar.toLowerCase()}`;
-    <div
-      className={`event-fc-color flex fc-event-main ${colorClass} p-1 rounded-sm`}
-    >
-      <div className="fc-daygrid-event-dot"></div>
-      <div className="fc-event-time">{eventInfo.timeText}</div>
-      <div className="fc-event-title">{eventInfo.event.title}</div>
+  );
+}
 export default Calendar;

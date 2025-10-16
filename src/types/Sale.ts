@@ -9,6 +9,7 @@ export interface SaleItem {
   unit_price: number;
 }
 export interface Sale {
+  id: number;
   invoice_number: string;
   user: User;
   customer: Customer;
@@ -20,6 +21,8 @@ export interface Sale {
   note?: string;
   is_active: boolean;
   items: SaleItem[];
+}
+
 export interface SaleApiResponse {
   data: Sale[];
   meta: {
@@ -29,10 +32,15 @@ export interface SaleApiResponse {
     from: number;
     to: number;
   };
+}
+
 export interface SalePayload {
   customer_id: string;
+  invoice_number?: string;
+  sale_date?: string;
   items: {
     item_id: string;
     quantity: number;
     unit_price: number;
   }[];
+}

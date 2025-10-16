@@ -4,6 +4,7 @@ import {
   Linkedin,
   Pencil,
 } from "lucide-react";
+import Image from "next/image";
 import { User } from "../../types";
 import { formatKebabCase } from "../../utils/string";
 
@@ -30,9 +31,11 @@ export default function UserMetaCard({
         <div className="flex flex-col items-center w-full gap-6 xl:flex-row">
           <div className="relative">
             <div className="w-20 h-20 overflow-hidden border border-gray-200 rounded-full dark:border-gray-800">
-              <img
+              <Image
                 src={user?.profile_image || "/images/user/default.jpg"}
                 alt={user?.name || "user"}
+                width={80}
+                height={80}
               />
             </div>
             <button

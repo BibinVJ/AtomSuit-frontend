@@ -1,6 +1,6 @@
 export const toast = {
-  success: vi.fn(),
-  error: vi.fn(),
-  info: vi.fn(),
-  warning: vi.fn(),
+  success: () => {},
+  error: () => {},
+  info: () => {},
+  warning: () => {},
 };

@@ -1,7 +1,18 @@
-import Chart from "react-apexcharts";
+"use client";
+
+import { useState, useEffect } from "react";
+import dynamic from "next/dynamic";
 import { ApexOptions } from "apexcharts";
 
+// Dynamically import Chart with no SSR
+const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
+
 export default function LineChartOne() {
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
   const options: ApexOptions = {
     legend: {
       show: false, // Hide legend
@@ -110,6 +121,17 @@ export default function LineChartOne() {
       data: [40, 30, 50, 40, 55, 40, 70, 100, 110, 120, 150, 140],
     },
   ];
+  // Don't render the chart during SSR
+  if (!isClient) {
+    return (
+      <div className="max-w-full overflow-x-auto custom-scrollbar">
+        <div id="chartEight" className="min-w-[1000px] h-[310px] flex items-center justify-center">
+          <div className="text-gray-500">Loading chart...</div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-full overflow-x-auto custom-scrollbar">
       <div id="chartEight" className="min-w-[1000px]">

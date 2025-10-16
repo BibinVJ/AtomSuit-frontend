@@ -33,14 +33,22 @@ export default function FormInModal() {
               <Label>First Name</Label>
               <Input type="text" placeholder="Emirhan" />
             </div>
+            <div className="col-span-1">
               <Label>Last Name</Label>
               <Input type="text" placeholder="Boruch" />
+            </div>
+            <div className="col-span-1">
+              <Label>Email</Label>
               <Input type="email" placeholder="emirhanboruch55@gmail.com" />
+            </div>
+            <div className="col-span-1">
               <Label>Phone</Label>
               <Input type="text" placeholder="+09 363 398 46" />
+            </div>
             <div className="col-span-1 sm:col-span-2">
               <Label>Bio</Label>
               <Input type="text" placeholder="Team Manager" />
+            </div>
           </div>
           <div className="flex items-center justify-end w-full gap-3 mt-6">
             <Button size="sm" variant="outline" onClick={closeModal}>
@@ -48,6 +56,8 @@ export default function FormInModal() {
             </Button>
             <Button size="sm" onClick={handleSave}>
               Save Changes
+            </Button>
+          </div>
         </form>
       </Modal>
     </ComponentCard>

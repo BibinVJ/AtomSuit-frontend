@@ -1,9 +1,12 @@
 "use client";
 
-import Chart from "react-apexcharts";
+import dynamic from "next/dynamic";
 import { ApexOptions } from "apexcharts";
 import ChartTab from "../common/ChartTab";
 import { useState, useEffect } from "react";
+
+// Dynamically import Chart with no SSR
+const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
 type Period = "monthly" | "quarterly" | "annually";
 
@@ -15,9 +18,14 @@ interface StatisticsChartProps {
 }
 
 export default function StatisticsChart({ data }: StatisticsChartProps) {
+  const [isClient, setIsClient] = useState(false);
   const [period, setPeriod] = useState<Period>("monthly");
   const [chartSeries, setChartSeries] = useState<{ name: string; data: number[] }[]>([]);
   const [chartOptions, setChartOptions] = useState<ApexOptions>({});
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   useEffect(() => {
     const processChartData = () => {
@@ -123,6 +131,30 @@ export default function StatisticsChart({ data }: StatisticsChartProps) {
 
     processChartData();
   }, [data, period]);
+
+  // Don't render the chart during SSR
+  if (!isClient) {
+    return (
+      <div className="flex flex-col h-full rounded-2xl border border-gray-200 custom-card-bg p-5 dark:border-gray-800">
+        <div className="flex flex-col gap-5 mb-6 sm:flex-row sm:justify-between flex-shrink-0">
+          <div className="w-full">
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">
+              Statistics
+            </h3>
+            <p className="mt-1 text-gray-500 text-theme-sm dark:text-gray-400">
+              Sale and purchase comparison chart
+            </p>
+          </div>
+          <div className="flex items-start w-full gap-3 sm:justify-end">
+            <ChartTab selectedPeriod={period} onSelectPeriod={setPeriod} />
+          </div>
+        </div>
+        <div className="flex-grow w-full h-full flex items-center justify-center">
+          <div className="text-gray-500">Loading chart...</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-full rounded-2xl border border-gray-200 custom-card-bg p-5 dark:border-gray-800">

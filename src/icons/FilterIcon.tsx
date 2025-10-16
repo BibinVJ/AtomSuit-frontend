@@ -15,7 +15,11 @@ export default function FilterIcon({ className = "" }: { className?: string }) {
         fill=""
         strokeWidth="1.5"
       />
+      <path
         d="M7.917 11.525c-1.42 0-2.571 1.151-2.571 2.571s1.151 2.571 2.571 2.571 2.571-1.151 2.571-2.571-1.151-2.571-2.571-2.571Z"
+        fill=""
+        strokeWidth="1.5"
+      />
     </svg>
   );
 }

@@ -34,12 +34,14 @@ export default function DefaultModal() {
           </p>
           <p className="mt-5 text-sm leading-6 text-gray-500 dark:text-gray-400">
             ac odio.
+          </p>
           <div className="flex items-center justify-end w-full gap-3 mt-8">
             <Button size="sm" variant="outline" onClick={closeModal}>
               Close
             </Button>
             <Button size="sm" onClick={handleSave}>
               Save Changes
+            </Button>
           </div>
         </Modal>
       </ComponentCard>

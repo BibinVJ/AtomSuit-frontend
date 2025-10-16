@@ -1,12 +1,42 @@
-import { Navigate, Outlet } from "react-router";
+"use client";
+
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useAuth } from "../hooks/useAuth";
 
-export default function PublicRoute() {
+interface PublicRouteProps {
+  children: React.ReactNode;
+}
+
+export default function PublicRoute({ children }: PublicRouteProps) {
   const { user, loading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    // If user is already logged in, redirect to dashboard
+    if (!loading && user) {
+      router.push('/dashboard');
+    }
+  }, [loading, user, router]);
 
   // Wait until auth finishes checking
-  if (loading) return null;
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
 
-  // If already logged in, bounce to dashboard
-  return user ? <Navigate to="/dashboard" replace /> : <Outlet />;
+  // If user is logged in, show loading while redirecting
+  if (user) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  // If not logged in, show the children (public content)
+  return <>{children}</>;
 }

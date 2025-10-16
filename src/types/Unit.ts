@@ -15,3 +15,4 @@ export interface UnitApiResponse {
     from: number;
     to: number;
   };
+}

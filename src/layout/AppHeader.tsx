@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 
 import Link from "next/link";
 import { useSidebar } from "../hooks/useSidebar";
@@ -86,15 +87,21 @@ const AppHeader: React.FC = () => {
           </button>
 
           <Link href="/dashboard" className="flex-1 flex justify-center lg:hidden">
-            <img
+            <Image
               className="dark:hidden h-7 w-auto"
               src="/images/logo/logo.png"
               alt="Atom Suit Logo"
+              width={112}
+              height={28}
+              priority
             />
-            <img
+            <Image
               className="hidden dark:block h-7 w-auto"
               src="/images/logo/logo.png"
               alt="Atom Suit Logo"
+              width={112}
+              height={28}
+              priority
             />
           </Link>
 

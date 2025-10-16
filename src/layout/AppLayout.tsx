@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { SidebarProvider } from "../context/SidebarContext.tsx";
+import { SidebarProvider } from "../context/SidebarContext";
 import { useSidebar } from "../hooks/useSidebar";
 
 import AppHeader from "./AppHeader";
@@ -10,10 +10,11 @@ import AppSidebar from "./AppSidebar";
 
 const LayoutContent: React.FC = () => {
   const { isExpanded, isHovered, isMobileOpen, isFullScreen, enterFullScreen, exitFullScreen } = useSidebar();
-  const pathname = usePathname();
 
   useEffect(() => {
-    const shouldGoFullScreen = location.state?.goFullScreen;
+    // Remove location dependency since it's not available in Next.js
+    // const shouldGoFullScreen = location.state?.goFullScreen;
+    const shouldGoFullScreen = false;
     if (shouldGoFullScreen) {
       enterFullScreen();
     } else {
@@ -21,7 +22,7 @@ const LayoutContent: React.FC = () => {
         exitFullScreen();
       }
     }
-  }, [location, isFullScreen, enterFullScreen, exitFullScreen]);
+  }, [isFullScreen, enterFullScreen, exitFullScreen]);
 
   if (isFullScreen) {
     return (

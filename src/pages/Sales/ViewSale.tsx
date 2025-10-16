@@ -16,7 +16,7 @@ import { Sale } from '../../types';
 
 export default function ViewSale() {
   const params = useParams<{ id: string }>();
-  const id = params.id;
+  const id = params?.id;
   const router = useRouter();
   const [sale, setSale] = useState<Sale | null>(null);
   const [isVoidModalOpen, setIsVoidModalOpen] = useState(false);

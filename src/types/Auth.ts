@@ -9,7 +9,7 @@ export interface AuthContextType {
   ) => Promise<User>;
   logout: () => void;
   loading: boolean;
-  fetchProfile: () => Promise<void>;
+  fetchProfile: () => Promise<boolean>;
   hasPermission: (permission: string) => boolean;
 }
 export interface LoginResponse {
@@ -19,3 +19,4 @@ export interface LoginResponse {
       access_token: string;
     };
   };
+}

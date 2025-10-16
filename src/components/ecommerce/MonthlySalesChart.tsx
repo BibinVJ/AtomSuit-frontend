@@ -1,5 +1,11 @@
-import Chart from "react-apexcharts";
+"use client";
+
+import { useState, useEffect } from "react";
+import dynamic from "next/dynamic";
 import { ApexOptions } from "apexcharts";
+
+// Dynamically import Chart with no SSR
+const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
 interface MonthlySalesChartProps {
   data: {
@@ -9,6 +15,12 @@ interface MonthlySalesChartProps {
 }
 
 export default function MonthlySalesChart({ data }: MonthlySalesChartProps) {
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   const options: ApexOptions = {
     colors: ["#465fff"],
     chart: {
@@ -103,6 +115,22 @@ export default function MonthlySalesChart({ data }: MonthlySalesChartProps) {
       data: monthlySales,
     },
   ];
+
+  // Don't render the chart during SSR
+  if (!isClient) {
+    return (
+      <div className="flex flex-col h-full overflow-hidden rounded-2xl border border-gray-200 custom-card-bg p-5 dark:border-gray-800">
+        <div className="flex items-center justify-between flex-shrink-0">
+          <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">
+            Monthly Sales
+          </h3>
+        </div>
+        <div className="flex-grow w-full h-full flex items-center justify-center">
+          <div className="text-gray-500">Loading chart...</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-full overflow-hidden rounded-2xl border border-gray-200 custom-card-bg p-5 dark:border-gray-800">

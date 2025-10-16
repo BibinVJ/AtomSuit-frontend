@@ -6,7 +6,7 @@ import Label from "../Label";
 import Input from "../input/InputField";
 import Select from "../Select";
 import { EyeOff, Eye, Clock } from "lucide-react";
-import DatePicker from "../date-picker.tsx";
+import DatePicker from "../date-picker";
 
 export default function DefaultInputs() {
   const [showPassword, setShowPassword] = useState(false);

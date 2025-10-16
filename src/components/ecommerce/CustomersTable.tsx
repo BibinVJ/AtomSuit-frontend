@@ -6,6 +6,7 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
+import Image from "next/image";
 
 import { Customer } from '../../types';
 
@@ -65,9 +66,11 @@ export default function CustomersTable({ customers, title = "Customers" }: Props
               <TableCell className="py-3 text-theme-sm text-gray-500 dark:text-gray-400">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 overflow-hidden rounded-full">
-                    <img
+                    <Image
                       src={customer.profile_image || '/images/user/default.jpg'}
                       alt={customer.name}
+                      width={40}
+                      height={40}
                       className="object-cover w-full h-full"
                     />
                   </div>

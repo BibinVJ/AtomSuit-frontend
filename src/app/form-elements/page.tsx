@@ -1,3 +1,5 @@
+"use client";
+
 import FormElements from '@/pages/Forms/FormElements';
 import ProtectedLayout from '@/components/layout/ProtectedLayout';
 

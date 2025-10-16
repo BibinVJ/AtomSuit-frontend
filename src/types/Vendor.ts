@@ -16,3 +16,4 @@ export interface VendorApiResponse {
     from: number;
     to: number;
   };
+}

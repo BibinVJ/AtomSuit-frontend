@@ -88,7 +88,7 @@ const CTASection = () => {
                   </div>
                   <div>
                     <div className="font-semibold text-gray-900">Import Data</div>
-                    <div className="text-sm text-gray-500">We'll help you migrate</div>
+                    <div className="text-sm text-gray-500">We&apos;ll help you migrate</div>
                   </div>
                 </div>
                 
