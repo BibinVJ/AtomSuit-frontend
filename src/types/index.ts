@@ -11,3 +11,7 @@ export * from './Unit';
 export * from './User';
 export * from './Vendor';
 export * from './Dashboard';
+export * from './Plan';
+export * from './Tenant';
+export * from './Subscription';
+export * from './Settings';

@@ -14,6 +14,10 @@ import {
   Shield,
   ChevronDown,
   MoreHorizontal,
+  CreditCard,
+  Building2,
+  Globe,
+  Settings,
 } from "lucide-react";
 import { useSidebar } from "../hooks/useSidebar";
 import { usePermissions } from "../hooks/usePermissions";
@@ -76,6 +80,35 @@ const navItems: NavItem[] = [
   //     { name: "404 Error", path: "/error-404" },
   //   ],
   // },
+];
+
+const administrationItems: NavItem[] = [
+  {
+    icon: <CreditCard size={20} />,
+    name: "Plans",
+    path: "/plans",
+  },
+  {
+    icon: <Building2 size={20} />,
+    name: "Tenants",
+    path: "/tenants",
+  },
+  {
+    icon: <Package size={20} />,
+    name: "Subscriptions",
+    path: "/subscriptions",
+  },
+  {
+    icon: <Globe size={20} />,
+    name: "Domains",
+    path: "/domains",
+  },
+  {
+    icon: <Settings size={20} />,
+    name: "Settings",
+    path: "/settings",
+    permission: "view-setting",
+  },
 ];
 
 const othersItems: NavItem[] = [
@@ -425,6 +458,23 @@ const AppSidebar: React.FC = () => {
                   )}
                 </h2>
                 {renderMenuItems(othersItems, "others")}
+              </div>
+            )}
+            {hasAnyPermission(administrationItems) && (
+              <div className="">
+                <h2
+                  className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${!isExpanded && !isHovered
+                    ? "lg:justify-center"
+                    : "justify-start"
+                    }`}
+                >
+                  {isExpanded || isHovered || isMobileOpen ? (
+                    "Administration"
+                  ) : (
+                    <MoreHorizontal />
+                  )}
+                </h2>
+                {renderMenuItems(administrationItems, "others")}
               </div>
             )}
           </div>
