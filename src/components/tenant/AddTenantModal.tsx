@@ -22,6 +22,8 @@ interface Props {
 export default function AddTenantModal({ isOpen, onClose, onTenantAdded }: Props) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [password, setPassword] = useState('');
   const [domainName, setDomainName] = useState('');
   const [planId, setPlanId] = useState<number | undefined>(undefined);
   const [loadSampleData, setLoadSampleData] = useState(false);
@@ -47,6 +49,8 @@ export default function AddTenantModal({ isOpen, onClose, onTenantAdded }: Props
   const resetForm = () => {
     setName('');
     setEmail('');
+    setPhone('');
+    setPassword('');
     setDomainName('');
     setPlanId(undefined);
     setLoadSampleData(false);
@@ -74,6 +78,19 @@ export default function AddTenantModal({ isOpen, onClose, onTenantAdded }: Props
       hasError = true;
     }
 
+    if (!phone) {
+      newErrors.phone = 'Phone is required';
+      hasError = true;
+    }
+
+    if (!password) {
+      newErrors.password = 'Password is required';
+      hasError = true;
+    } else if (password.length < 6) {
+      newErrors.password = 'Password must be at least 6 characters';
+      hasError = true;
+    }
+
     if (!domainName) {
       newErrors.domain_name = 'Domain is required';
       hasError = true;
@@ -94,6 +111,8 @@ export default function AddTenantModal({ isOpen, onClose, onTenantAdded }: Props
       const payload = {
         name,
         email,
+        phone,
+        password,
         domain_name: domainName,
         plan_id: planId,
         load_sample_data: loadSampleData,
@@ -110,6 +129,8 @@ export default function AddTenantModal({ isOpen, onClose, onTenantAdded }: Props
           const newErrors: { [key: string]: string } = {
             name: apiErrors?.name?.[0] || '',
             email: apiErrors?.email?.[0] || '',
+            phone: apiErrors?.phone?.[0] || '',
+            password: apiErrors?.password?.[0] || '',
             domain_name: apiErrors?.domain_name?.[0] || '',
             plan_id: apiErrors?.plan_id?.[0] || '',
           };
@@ -166,6 +187,32 @@ export default function AddTenantModal({ isOpen, onClose, onTenantAdded }: Props
                   }} 
                   error={!!errors.email} 
                   hint={errors.email} 
+                />
+              </div>
+              <div>
+                <Label>Phone <span className="text-red-500">*</span></Label>
+                <Input 
+                  type="tel" 
+                  value={phone} 
+                  onChange={(e) => {
+                    setPhone(e.target.value);
+                    setErrors({...errors, phone: ''});
+                  }} 
+                  error={!!errors.phone} 
+                  hint={errors.phone} 
+                />
+              </div>
+              <div>
+                <Label>Password <span className="text-red-500">*</span></Label>
+                <Input 
+                  type="password" 
+                  value={password} 
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    setErrors({...errors, password: ''});
+                  }} 
+                  error={!!errors.password} 
+                  hint={errors.password} 
                 />
               </div>
               <div>

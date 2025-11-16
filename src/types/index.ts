@@ -1,6 +1,7 @@
 export * from './Auth';
 export * from './Category';
 export * from './Customer';
+export * from './Domain';
 export * from './Item';
 export * from './Layout';
 export * from './Permission';

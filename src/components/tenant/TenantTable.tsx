@@ -9,9 +9,8 @@ import {
 } from "../ui/table";
 import { useState } from "react";
 import Badge from "../ui/badge/Badge";
-import EditTenantModal from "./EditTenantModal";
 import DeleteTenantModal from "./DeleteTenantModal";
-import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide, Edit, Trash2 } from 'lucide-react';
+import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide, Trash2 } from 'lucide-react';
 import Button from "../ui/button/Button";
 import Tooltip from "../ui/tooltip/Tooltip";
 
@@ -32,21 +31,8 @@ interface Props {
 
 export default function TenantTable({ data, onAction, onSort, sortBy, sortDirection, currentPage, perPage }: Props) {
   const { hasPermission } = usePermissions();
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedTenant, setSelectedTenant] = useState<Tenant | null>(null);
-
-  const handleEdit = async (tenant: Tenant) => {
-    try {
-      // Fetch full tenant details with relations
-      const response = await getTenant(tenant.id);
-      setSelectedTenant(response.data as Tenant);
-      setIsEditModalOpen(true);
-    } catch (error) {
-      console.error('Error fetching tenant details:', error);
-      toast.error('Failed to load tenant details');
-    }
-  };
 
   const handleDelete = (tenant: Tenant) => {
     setSelectedTenant(tenant);
@@ -54,7 +40,6 @@ export default function TenantTable({ data, onAction, onSort, sortBy, sortDirect
   };
 
   const handleCloseModals = () => {
-    setIsEditModalOpen(false);
     setIsDeleteModalOpen(false);
     setSelectedTenant(null);
   };
@@ -135,17 +120,6 @@ export default function TenantTable({ data, onAction, onSort, sortBy, sortDirect
                 </TableCell>
                 <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
                   <div className="flex items-center gap-2">
-                    {hasPermission("update-tenant") && (
-                      <Tooltip text="Edit">
-                        <Button
-                          size="xs"
-                          onClick={() => handleEdit(tenant)}
-                          className="bg-blue-600 hover:bg-blue-700 text-white"
-                        >
-                          <Edit className="w-4 h-4" />
-                        </Button>
-                      </Tooltip>
-                    )}
                     {hasPermission("delete-tenant") && (
                       <Tooltip text="Delete">
                         <Button
@@ -165,20 +139,12 @@ export default function TenantTable({ data, onAction, onSort, sortBy, sortDirect
         </Table>
       </div>
       {selectedTenant && (
-        <>
-          <EditTenantModal
-            isOpen={isEditModalOpen}
-            onClose={handleCloseModals}
-            onTenantUpdated={onAction}
-            tenant={selectedTenant}
-          />
-          <DeleteTenantModal
-            isOpen={isDeleteModalOpen}
-            onClose={handleCloseModals}
-            onTenantDeleted={onAction}
-            tenant={selectedTenant}
-          />
-        </>
+        <DeleteTenantModal
+          isOpen={isDeleteModalOpen}
+          onClose={handleCloseModals}
+          onTenantDeleted={onAction}
+          tenant={selectedTenant}
+        />
       )}
     </div>
   );

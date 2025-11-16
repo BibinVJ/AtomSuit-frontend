@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Menu, X, ChevronDown } from 'lucide-react';
 import { useTenant } from '@/hooks/useTenant';
 
@@ -21,10 +22,14 @@ const Navbar = () => {
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <Link href="/" className="flex-shrink-0 flex items-center">
-              <div className="w-8 h-8 bg-brand-500 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">A</span>
-              </div>
-              <span className="ml-2 text-xl font-bold text-gray-900">Atom Suit</span>
+              <Image
+                src="/images/logo/logo.png"
+                alt="Atom Suit Logo"
+                width={120}
+                height={32}
+                className="h-8 w-auto"
+                priority
+              />
             </Link>
           </div>
 
@@ -60,7 +65,7 @@ const Navbar = () => {
                 </div>
               )}
             </div>
-            <Link href="#pricing" className="text-gray-700 hover:text-brand-500 px-3 py-2 text-sm font-medium">
+            <Link href="/pricing" className="text-gray-700 hover:text-brand-500 px-3 py-2 text-sm font-medium">
               Pricing
             </Link>
             <Link href="#about" className="text-gray-700 hover:text-brand-500 px-3 py-2 text-sm font-medium">
@@ -109,7 +114,7 @@ const Navbar = () => {
             <Link href="#solutions" className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-brand-500">
               Solutions
             </Link>
-            <Link href="#pricing" className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-brand-500">
+            <Link href="/pricing" className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-brand-500">
               Pricing
             </Link>
             <Link href="#about" className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-brand-500">

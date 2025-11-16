@@ -89,7 +89,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     if (loading || !isInitialized) return;
     
     // Define public routes differently for central vs tenant domains
-    const centralPublicRoutes = ['/signin', '/signup', '/'];
+    const centralPublicRoutes = ['/signin', '/signup', '/', '/pricing'];
     const tenantPublicRoutes = ['/signin', '/signup'];
     const publicRoutes = tenant.isCentral ? centralPublicRoutes : tenantPublicRoutes;
     const isPublicRoute = pathname ? publicRoutes.includes(pathname) : false;

@@ -13,6 +13,7 @@ import SocialButton from "../ui/button/SocialButton";
 import { toast } from "sonner";
 import { isApiError } from "../../utils/errors";
 import { Eye, EyeClosed } from "lucide-react";
+import { getTenantFromBrowser, buildTenantUrl } from "../../utils/tenant";
 
 export default function SignInForm() {
   const [form, setForm] = useState({ identifier: "", password: "" }); // email or mobile
@@ -174,7 +175,10 @@ export default function SignInForm() {
             <p className="text-sm font-normal text-center text-gray-700 dark:text-gray-400 sm:text-start">
               Don&apos;t have an account?{" "}
               <Link
-                href="/signup"
+                href={(() => {
+                  const tenant = getTenantFromBrowser();
+                  return tenant.isCentral ? "/signup" : buildTenantUrl("/signup", { subdomain: '', isCentral: true });
+                })()}
                 className="text-brand-500 hover:text-brand-600 dark:text-brand-400"
               >
                 Sign Up

@@ -4,52 +4,41 @@ import { useEffect, useState } from 'react';
 import PageBreadcrumb from '../../components/common/PageBreadCrumb';
 import ComponentCard from '../../components/common/ComponentCard';
 import PageMeta from '../../components/common/PageMeta';
-import TenantTable from '../../components/tenant/TenantTable';
-import AddTenantModal from '../../components/tenant/AddTenantModal';
-import { useModal } from '../../hooks/useModal';
+import DomainTable from '../../components/domain/DomainTable';
 import Pagination from '../../components/common/Pagination';
-import Button from '../../components/ui/button/Button';
 import Select from '../../components/form/Select';
-import { getTenants } from '../../services/TenantService';
-import { usePermissions } from '../../hooks/usePermissions';
-import { Tenant } from '../../types';
+import { getDomains } from '../../services/DomainService';
+import { Domain } from '../../types';
 
-export default function Tenants() {
-  const { hasPermission } = usePermissions();
-  const [tenants, setTenants] = useState<Tenant[]>([]);
-  const { isOpen, openModal, closeModal } = useModal();
+export default function Domains() {
+  const [domains, setDomains] = useState<Domain[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
   const [from, setFrom] = useState(0);
   const [to, setTo] = useState(0);
   const [total, setTotal] = useState(0);
-  const [sortBy, setSortBy] = useState('created_at');
-  const [sortDirection, setSortDirection] = useState('desc');
+  const [sortBy, setSortBy] = useState('domain');
+  const [sortDirection, setSortDirection] = useState('asc');
 
-  const fetchTenants = async (page = 1, limit = 10, sortCol = 'created_at', sortDir = 'desc') => {
+  const fetchDomains = async (page = 1, limit = 10, sortCol = 'domain', sortDir = 'asc') => {
     try {
-      const response = await getTenants(page, limit, sortCol, sortDir);      
-      // Ensure data is always an array
-      const tenantsData = Array.isArray(response.data) ? response.data : [];
-      setTenants(tenantsData);
-      
-      // Safely handle meta data
+      const response = await getDomains(page, limit, sortCol, sortDir);
+      setDomains(response.data as Domain[]);
       if (response.meta) {
-        setTotalPages(response.meta.last_page || 1);
-        setCurrentPage(response.meta.current_page || 1);
-        setFrom(response.meta.from || 0);
-        setTo(response.meta.to || 0);
-        setTotal(response.meta.total || 0);
+        setTotalPages(response.meta.last_page);
+        setCurrentPage(response.meta.current_page);
+        setFrom(response.meta.from);
+        setTo(response.meta.to);
+        setTotal(response.meta.total);
       }
     } catch (error) {
-      console.error('Error fetching tenants:', error);
-      setTenants([]);
+      console.error('Error fetching domains:', error);
     }
   };
 
   useEffect(() => {
-    fetchTenants(currentPage, perPage, sortBy, sortDirection);
+    fetchDomains(currentPage, perPage, sortBy, sortDirection);
   }, [currentPage, perPage, sortBy, sortDirection]);
 
   const handlePageChange = (page: number) => {
@@ -73,10 +62,10 @@ export default function Tenants() {
   return (
     <>
       <PageMeta
-        title="Tenants"
-        description="List of tenants"
+        title="Domains"
+        description="List of domains"
       />
-      <PageBreadcrumb pageTitle="Tenants" />
+      <PageBreadcrumb pageTitle="Domains" />
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <label htmlFor="perPage" className="text-sm font-medium text-gray-700">Per Page:</label>
@@ -93,17 +82,11 @@ export default function Tenants() {
             searchable={false}
           />
         </div>
-        {hasPermission("create-tenant") && (
-          <Button onClick={openModal}>
-            Add Tenant
-          </Button>
-        )}
       </div>
       <div className="space-y-6">
-        <ComponentCard title="Tenants">
-          <TenantTable
-            data={tenants}
-            onAction={() => fetchTenants(currentPage, perPage, sortBy, sortDirection)}
+        <ComponentCard title="Domains">
+          <DomainTable
+            data={domains}
             onSort={handleSort}
             sortBy={sortBy}
             sortDirection={sortDirection}
@@ -120,7 +103,6 @@ export default function Tenants() {
           />
         </ComponentCard>
       </div>
-      <AddTenantModal isOpen={isOpen} onClose={closeModal} onTenantAdded={() => fetchTenants(1, perPage)} />
     </>
   );
 }

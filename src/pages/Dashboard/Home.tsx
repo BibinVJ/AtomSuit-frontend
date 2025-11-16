@@ -11,6 +11,10 @@ import TopItems from "../../components/ecommerce/TopItems";
 import StockAlerts from "../../components/ecommerce/StockAlerts";
 import CustomersTable from "../../components/ecommerce/CustomersTable";
 import ExpiryItems from "../../components/ecommerce/ExpiryItems";
+import PlanDistributionChart from "../../components/ecommerce/PlanDistributionChart";
+import TenantOverviewCard from "../../components/ecommerce/TenantOverviewCard";
+import RevenueCard from "../../components/ecommerce/RevenueCard";
+import GrowthCard from "../../components/ecommerce/GrowthCard";
 import { PencilIcon, SaveIcon, X, Eye, EyeOff, DollarSign, Package, Users, FileText } from "lucide-react";
 import { getLayout, saveLayout } from "../../services/LayoutService";
 import MetricCard from "../../components/ecommerce/MetricCard";
@@ -49,6 +53,19 @@ const componentNameToComponent: Record<string, React.ComponentType<any>> = {
   'TopSoldCard': TopItems,
   'TopPurchasedCard': TopItems,
   'DeadStockCard': StockAlerts,
+  // Central dashboard components
+  'TotalTenantsCard': MetricCard,
+  'ActiveTenantsCard': MetricCard,
+  'PaidSubscribersCard': MetricCard,
+  'TotalRevenueCard': MetricCard,
+  'TrialTenantsCard': MetricCard,
+  'MonthlyRevenueCard': MetricCard,
+  'PlanDistributionCard': PlanDistributionChart,
+  'RecentRegistrationsCard': MetricCard,
+  'ConversionRateCard': MetricCard,
+  'TenantOverviewCard': TenantOverviewCard,
+  'RevenueOverviewCard': RevenueCard,
+  'GrowthMetricsCard': GrowthCard,
 };
 
 // Card-specific props mapping (hardcoded for now, could be moved to backend later)
@@ -66,6 +83,19 @@ const cardPropsMap: Record<string, any> = {
   'top-sold': { title: "Top Sold Items", items: 'data.top_items.sold' },
   'top-purchased': { title: "Top Purchased Items", items: 'data.top_items.purchased' },
   'dead-stock': { title: "Dead Stock Items", items: 'data.stock_alerts.dead_stock_items', color: "secondary" },
+  // Central dashboard cards
+  'total-tenants': { icon: 'GroupIcon', title: "Total Tenants", value: 'data.tenant_overview.total' },
+  'active-tenants': { icon: 'GroupIcon', title: "Active Tenants", value: 'data.tenant_overview.active' },
+  'paid-subscribers': { icon: 'DollarLineIcon', title: "Paid Subscribers", value: 'data.tenant_overview.paid_subscribers' },
+  'total-revenue': { icon: 'DollarLineIcon', title: "Total Revenue", value: 'data.revenue.total', prefix: '$' },
+  'trial-tenants': { icon: 'GroupIcon', title: "Trial Tenants", value: 'data.tenant_overview.on_trial' },
+  'monthly-revenue': { icon: 'DollarLineIcon', title: "Monthly Revenue", value: 'data.revenue.this_month', prefix: '$' },
+  'plan-distribution': { data: 'data.plan_distribution' },
+  'recent-registrations': { icon: 'GroupIcon', title: "Recent Registrations", value: 'data.tenant_overview.recent_registrations' },
+  'conversion-rate': { icon: 'DollarLineIcon', title: "Conversion Rate", value: 'data.growth.conversion_rate' },
+  'tenant-overview': { data: 'data.tenant_overview' },
+  'revenue-overview': { data: 'data.revenue' },
+  'growth-metrics': { data: 'data.growth' },
 };
 
 const iconMap = {
@@ -103,6 +133,9 @@ function Home() {
             newProps[key] = chartData?.sales || [];
         } else if (typeof props[key] === 'string' && props[key] === 'chartData') {
             newProps[key] = chartData || { sales: [], purchases: [] };
+        } else if (typeof props[key] === 'string' && (props[key] as string) === 'data.plan_distribution') {
+            // Pass plan distribution data directly to PlanDistributionChart
+            newProps[key] = data.plan_distribution || {};
         }
     }
     return newProps;
@@ -125,11 +158,9 @@ function Home() {
         // Backend automatically filters cards based on user permissions
         // Only cards the user has permission to view are returned
         const layoutRes = await getLayout();
-        console.log('Layout response from backend:', layoutRes.data.data);
         if (layoutRes.data.data && layoutRes.data.data.length > 0) {
           // Backend returned permission-filtered layouts
           const adaptedLayout = layoutRes.data.data.map((item: any) => {
-            console.log('Processing card:', item.card_id, 'component:', item.component);
             return {
               ...item,
               i: item.card_id,
@@ -147,7 +178,6 @@ function Home() {
         } else {
           // Backend returns empty on first load, will auto-initialize on next request
           // Frontend displays empty dashboard until backend initializes layouts
-          console.log('No layouts returned from backend - backend will auto-initialize on next request');
           setCards([]);
         }
       } catch (err) {

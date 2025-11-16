@@ -25,8 +25,8 @@ export async function middleware(request: NextRequest) {
     }
 
     // For tenant subdomains, handle routing logic
-    // Only restrict access to marketing pages, allow all app functionality
-    const restrictedTenantRoutes = ['/'];
+    // Restrict access to marketing pages and signup page
+    const restrictedTenantRoutes = ['/', '/signup'];
     const isRestrictedRoute = restrictedTenantRoutes.includes(pathname);
     
     // If trying to access restricted routes on tenant domain, redirect to signin

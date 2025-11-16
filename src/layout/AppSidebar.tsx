@@ -85,23 +85,37 @@ const navItems: NavItem[] = [
 const administrationItems: NavItem[] = [
   {
     icon: <CreditCard size={20} />,
+    name: "Billing",
+    permission: "my-subscription",
+    subItems: [
+      { name: "Plans", path: "/billing/plans", permission: "my-subscription", },
+      { name: "My Subscription", path: "/billing/subscription", permission: "my-subscription", },
+      { name: "Invoices & Payments", path: "/billing/invoices", permission: "my-subscription", },
+    ],
+  },
+  {
+    icon: <CreditCard size={20} />,
     name: "Plans",
     path: "/plans",
+    permission: "create-plan",
   },
   {
     icon: <Building2 size={20} />,
     name: "Tenants",
     path: "/tenants",
+    permission: "view-tenant",
   },
   {
     icon: <Package size={20} />,
     name: "Subscriptions",
     path: "/subscriptions",
+    permission: "view-subscription",
   },
   {
     icon: <Globe size={20} />,
     name: "Domains",
     path: "/domains",
+    permission: "view-domain",
   },
   {
     icon: <Settings size={20} />,

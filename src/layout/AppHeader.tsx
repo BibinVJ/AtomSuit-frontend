@@ -88,19 +88,11 @@ const AppHeader: React.FC = () => {
 
           <Link href="/dashboard" className="flex-1 flex justify-center lg:hidden">
             <Image
-              className="dark:hidden h-7 w-auto"
               src="/images/logo/logo.png"
               alt="Atom Suit Logo"
               width={112}
               height={28}
-              priority
-            />
-            <Image
-              className="hidden dark:block h-7 w-auto"
-              src="/images/logo/logo.png"
-              alt="Atom Suit Logo"
-              width={112}
-              height={28}
+              className="h-7 w-auto"
               priority
             />
           </Link>

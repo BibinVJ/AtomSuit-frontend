@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { Mail, Phone, MapPin, Facebook, Twitter, Linkedin, Instagram } from 'lucide-react';
 
 const Footer = () => {
@@ -9,10 +10,13 @@ const Footer = () => {
           {/* Company Info */}
           <div className="space-y-4">
             <div className="flex items-center">
-              <div className="w-8 h-8 bg-brand-500 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">A</span>
-              </div>
-              <span className="ml-2 text-xl font-bold">Atom Suit</span>
+              <Image
+                src="/images/logo/logo.png"
+                alt="Atom Suit Logo"
+                width={120}
+                height={32}
+                className="h-8 w-auto"
+              />
             </div>
             <p className="text-gray-300 text-sm">
               Streamline your business operations with our comprehensive ERP solution. 
