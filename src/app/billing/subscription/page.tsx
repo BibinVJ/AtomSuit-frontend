@@ -1,11 +1,10 @@
-"use client";
-
-import SubscriptionManagement from '../../../components/subscription/SubscriptionManagement';
+import BillingSubscription from '../../../pages/Billing/BillingSubscription';
+import ProtectedLayout from '../../../components/layout/ProtectedLayout';
 
 export default function BillingSubscriptionPage() {
   return (
-    <div className="p-6">
-      <SubscriptionManagement />
-    </div>
+    <ProtectedLayout>
+      <BillingSubscription />
+    </ProtectedLayout>
   );
 }

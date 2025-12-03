@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Input from "../form/input/InputField";
@@ -21,9 +21,16 @@ export default function SignInForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [stayLoggedIn, setStayLoggedIn] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [signUpUrl, setSignUpUrl] = useState("/signup");
 
   const router = useRouter();
   const { login } = useAuth();
+
+  useEffect(() => {
+    const tenant = getTenantFromBrowser();
+    const url = tenant.isCentral ? "/signup" : buildTenantUrl("/signup", { subdomain: '', isCentral: true });
+    setSignUpUrl(url);
+  }, []);
 
   const isEmail = (value: string) =>
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
@@ -175,10 +182,7 @@ export default function SignInForm() {
             <p className="text-sm font-normal text-center text-gray-700 dark:text-gray-400 sm:text-start">
               Don&apos;t have an account?{" "}
               <Link
-                href={(() => {
-                  const tenant = getTenantFromBrowser();
-                  return tenant.isCentral ? "/signup" : buildTenantUrl("/signup", { subdomain: '', isCentral: true });
-                })()}
+                href={signUpUrl}
                 className="text-brand-500 hover:text-brand-600 dark:text-brand-400"
               >
                 Sign Up

@@ -2,11 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
-import TenantSubscriptionService, { Plan, Subscription } from '../../services/TenantSubscriptionService';
+import { getCurrentSubscription, changePlan } from '../../services/TenantSubscriptionService';
+import { getPlans } from '../../services/PlanService';
 import { RefreshCw, Star } from 'lucide-react';
-import Button from '../../components/ui/button/Button';
 import PlanCard from '../../components/plan/PlanCard';
 import LifetimePlanCard from '../../components/plan/LifetimePlanCard';
+import { Plan, Subscription } from '@/types';
 
 export default function BillingPlans() {
   const [plans, setPlans] = useState<Plan[]>([]);
@@ -22,12 +23,13 @@ export default function BillingPlans() {
   const loadData = async () => {
     try {
       setLoading(true);
-      const [plansData, subscriptionData] = await Promise.all([
-        TenantSubscriptionService.getAvailablePlans(),
-        TenantSubscriptionService.getCurrentSubscription().catch(() => null)
+      const [plansResponse, subscriptionData] = await Promise.all([
+        getPlans(undefined, undefined, undefined, undefined, true),
+        getCurrentSubscription().catch(() => null)
       ]);
-      setPlans(plansData);
+      setPlans(plansResponse.data as Plan[]);
       setSubscription(subscriptionData);
+
     } catch (error) {
       toast.error('Failed to load plans');
     } finally {
@@ -35,28 +37,11 @@ export default function BillingPlans() {
     }
   };
 
-  const getCurrentPlanPrice = () => {
-    if (!subscription?.items.length) return 0;
-    return subscription.items[0].price.unit_amount;
-  };
-
   const handlePlanSelect = async (planId: string) => {
-    const selectedPlan = plans.find(p => p.id === planId);
-    if (!selectedPlan || !subscription) return;
-
-    const currentPrice = getCurrentPlanPrice();
-    const newPrice = getDisplayPrice(selectedPlan) * 100;
-    const isUpgrade = newPrice > currentPrice;
-
     try {
       setActionLoading(true);
-      if (isUpgrade) {
-        await TenantSubscriptionService.upgradePlan(planId);
-        toast.success('Plan upgraded successfully!');
-      } else {
-        await TenantSubscriptionService.downgradePlan(planId);
-        toast.success('Plan downgrade scheduled for end of billing period');
-      }
+      await changePlan(planId);
+      toast.success('Plan changed successfully!');
       await loadData();
     } catch (error: any) {
       toast.error(error.response?.data?.message || 'Failed to change plan');
@@ -65,32 +50,13 @@ export default function BillingPlans() {
     }
   };
 
-  const formatAmount = (amount: number, currency: string) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: (currency || 'USD').toUpperCase(),
-    }).format(amount);
-  };
-
-  const getDisplayPrice = (plan: Plan) => {
-    return plan.price;
-  };
-
-  const getDisplayInterval = (plan: Plan) => {
-    return plan.interval;
-  };
-
-  const getButtonText = (plan: Plan, isCurrentPlan: boolean, isUpgrade: boolean, isDowngrade: boolean) => {
+  const getButtonText = (isCurrentPlan: boolean) => {
     if (isCurrentPlan) return 'Current Plan';
-    if (isUpgrade) return 'Upgrade';
-    if (isDowngrade) return 'Downgrade';
-    return 'Select Plan';
+    return 'Change Plan';
   };
 
-  const getButtonStyle = (isCurrentPlan: boolean, isUpgrade: boolean, isDowngrade: boolean) => {
+  const getButtonStyle = (isCurrentPlan: boolean) => {
     if (isCurrentPlan) return 'bg-gray-100 text-gray-500 cursor-not-allowed';
-    if (isUpgrade) return 'bg-green-600 hover:bg-green-700 text-white';
-    if (isDowngrade) return 'bg-orange-600 hover:bg-orange-700 text-white';
     return 'bg-blue-600 hover:bg-blue-700 text-white';
   };
 
@@ -102,8 +68,6 @@ export default function BillingPlans() {
       </div>
     );
   }
-
-  const currentPrice = getCurrentPlanPrice();
   
   // Filter plans based on billing interval and active status
   const monthlyPlans = plans.filter(plan => 
@@ -163,11 +127,7 @@ export default function BillingPlans() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {displayPlans.map((plan) => {
-          const displayPrice = getDisplayPrice(plan);
-          const planPrice = displayPrice * 100;
-          const isCurrentPlan = subscription?.stripe_price === plan.stripe_price_id;
-          const isUpgrade = planPrice > currentPrice;
-          const isDowngrade = planPrice < currentPrice;
+          const isCurrentPlan = subscription?.plan?.id === plan.id;
 
           return (
             <div key={plan.id} className="relative">
@@ -182,8 +142,8 @@ export default function BillingPlans() {
               <PlanCard
                 plan={plan}
                 onSelect={handlePlanSelect}
-                buttonText={actionLoading ? 'Processing...' : getButtonText(plan, isCurrentPlan, isUpgrade, isDowngrade)}
-                buttonStyle={getButtonStyle(isCurrentPlan, isUpgrade, isDowngrade)}
+                buttonText={actionLoading ? 'Processing...' : getButtonText(isCurrentPlan)}
+                buttonStyle={getButtonStyle(isCurrentPlan)}
                 disabled={isCurrentPlan || actionLoading}
               />
             </div>
@@ -200,11 +160,7 @@ export default function BillingPlans() {
           </div>
           <div className="space-y-8">
             {lifetimePlans.map((plan) => {
-              const displayPrice = getDisplayPrice(plan);
-              const planPrice = displayPrice * 100;
-              const isCurrentPlan = subscription?.stripe_price === plan.stripe_price_id;
-              const isUpgrade = planPrice > currentPrice;
-              const isDowngrade = planPrice < currentPrice;
+              const isCurrentPlan = subscription?.plan?.id === plan.id;
 
               return (
                 <div key={plan.id} className="relative">
@@ -219,8 +175,8 @@ export default function BillingPlans() {
                   <LifetimePlanCard
                     plan={plan}
                     onSelect={handlePlanSelect}
-                    buttonText={actionLoading ? 'Processing...' : getButtonText(plan, isCurrentPlan, isUpgrade, isDowngrade)}
-                    buttonStyle={getButtonStyle(isCurrentPlan, isUpgrade, isDowngrade)}
+                    buttonText={actionLoading ? 'Processing...' : getButtonText(isCurrentPlan)}
+                    buttonStyle={getButtonStyle(isCurrentPlan)}
                     disabled={isCurrentPlan || actionLoading}
                   />
                 </div>

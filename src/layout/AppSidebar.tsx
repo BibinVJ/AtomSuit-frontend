@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { useSidebar } from "../hooks/useSidebar";
 import { usePermissions } from "../hooks/usePermissions";
+import { ListIcon } from "@/icons";
 
 type NavItem = {
   name: string;
@@ -62,11 +63,11 @@ const navItems: NavItem[] = [
       { name: "Purchases", path: "/purchases", permission: "view-purchase" },
     ],
   },
-  // {
-  //   name: "Forms",
-  //   icon: <ListIcon />,
-  //   subItems: [{ name: "Form Elements", path: "/form-elements" }],
-  // },
+  {
+    name: "Forms",
+    icon: <ListIcon />,
+    subItems: [{ name: "Form Elements", path: "/form-elements" }],
+  },
   // {
   //   name: "Tables",
   //   icon: <TableIcon />,
@@ -90,7 +91,6 @@ const administrationItems: NavItem[] = [
     subItems: [
       { name: "Plans", path: "/billing/plans", permission: "my-subscription", },
       { name: "My Subscription", path: "/billing/subscription", permission: "my-subscription", },
-      { name: "Invoices & Payments", path: "/billing/invoices", permission: "my-subscription", },
     ],
   },
   {
@@ -165,7 +165,7 @@ const AppSidebar: React.FC = () => {
   const pathname = usePathname();
 
   const [openSubmenu, setOpenSubmenu] = useState<{
-    type: "main" | "others";
+    type: "main" | "others" | "administration";
     index: number;
   } | null>(null);
   const [subMenuHeight, setSubMenuHeight] = useState<Record<string, number>>(
@@ -187,14 +187,14 @@ const AppSidebar: React.FC = () => {
 
   useEffect(() => {
     let submenuMatched = false;
-    ["main", "others"].forEach((menuType) => {
-      const items = menuType === "main" ? navItems : othersItems;
+    ["main", "others", "administration"].forEach((menuType) => {
+      const items = menuType === "main" ? navItems : menuType === "others" ? othersItems : administrationItems;
       items.forEach((nav, index) => {
         if (nav.subItems) {
           nav.subItems.forEach((subItem) => {
             if (isActive(subItem.path)) {
               setOpenSubmenu({
-                type: menuType as "main" | "others",
+                type: menuType as "main" | "others" | "administration",
                 index,
               });
               submenuMatched = true;
@@ -221,7 +221,7 @@ const AppSidebar: React.FC = () => {
     }
   }, [openSubmenu]);
 
-  const handleSubmenuToggle = (index: number, menuType: "main" | "others") => {
+  const handleSubmenuToggle = (index: number, menuType: "main" | "others" | "administration") => {
     setOpenSubmenu((prevOpenSubmenu) => {
       if (
         prevOpenSubmenu &&
@@ -245,7 +245,7 @@ const AppSidebar: React.FC = () => {
     });
   };
 
-  const renderMenuItems = (items: NavItem[], menuType: "main" | "others") => (
+  const renderMenuItems = (items: NavItem[], menuType: "main" | "others" | "administration") => (
     <ul className="flex flex-col gap-4">
       {items.map((nav, index) => {
         const hasSubItems = nav.subItems && nav.subItems.length > 0;
@@ -488,7 +488,7 @@ const AppSidebar: React.FC = () => {
                     <MoreHorizontal />
                   )}
                 </h2>
-                {renderMenuItems(administrationItems, "others")}
+                {renderMenuItems(administrationItems, "administration")}
               </div>
             )}
           </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from 'react';
-import { Subscription } from '../../services/TenantSubscriptionService';
+import { Subscription } from '../../types';
 import Button from '../ui/button/Button';
 import { Calendar, CreditCard, AlertTriangle, CheckCircle } from 'lucide-react';
 
@@ -16,32 +16,26 @@ export default function SubscriptionCard({ subscription, onManage }: Props) {
     return new Date(dateString).toLocaleDateString();
   };
 
-  const formatAmount = (amount: number, currency: string) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: currency.toUpperCase(),
-    }).format(amount / 100);
+  const formatAmount = (amount: string) => {
+    return `$${amount}`;
   };
 
   const getStatusColor = () => {
-    if (subscription.is_past_due) return 'text-red-600 bg-red-50';
-    if (subscription.is_cancelled) return 'text-orange-600 bg-orange-50';
+    if (subscription.is_canceled) return 'text-orange-600 bg-orange-50';
     if (subscription.is_on_trial) return 'text-blue-600 bg-blue-50';
     if (subscription.is_active) return 'text-green-600 bg-green-50';
     return 'text-gray-600 bg-gray-50';
   };
 
   const getStatusText = () => {
-    if (subscription.is_past_due) return 'Past Due';
-    if (subscription.is_cancelled) return 'Cancelled';
+    if (subscription.is_canceled) return 'Cancelled';
     if (subscription.is_on_trial) return 'Trial';
     if (subscription.is_active) return 'Active';
     return 'Inactive';
   };
 
   const getStatusIcon = () => {
-    if (subscription.is_past_due) return <AlertTriangle className="w-4 h-4" />;
-    if (subscription.is_cancelled) return <AlertTriangle className="w-4 h-4" />;
+    if (subscription.is_canceled) return <AlertTriangle className="w-4 h-4" />;
     if (subscription.is_active || subscription.is_on_trial) return <CheckCircle className="w-4 h-4" />;
     return <CreditCard className="w-4 h-4" />;
   };
@@ -63,27 +57,23 @@ export default function SubscriptionCard({ subscription, onManage }: Props) {
         </div>
       </div>
 
-      {subscription.items.length > 0 && (
+      {subscription.plan && (
         <div className="mb-4">
           <div className="flex items-center justify-between">
             <span className="text-2xl font-bold text-gray-900 dark:text-white">
-              {formatAmount(subscription.items[0].price.unit_amount, subscription.items[0].price.currency)}
+              {formatAmount(subscription.plan.price)}
             </span>
             <span className="text-sm text-gray-500 dark:text-gray-400">
-              per {subscription.items[0].price.recurring.interval}
+              per {subscription.plan.interval}
             </span>
           </div>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+            {subscription.plan.name}
+          </p>
         </div>
       )}
 
       <div className="space-y-3 mb-6">
-        {subscription.current_period_start && (
-          <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
-            <Calendar className="w-4 h-4" />
-            <span>Current period: {formatDate(subscription.current_period_start)} - {formatDate(subscription.current_period_end)}</span>
-          </div>
-        )}
-
         {subscription.trial_ends_at && subscription.is_on_trial && (
           <div className="flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400">
             <Calendar className="w-4 h-4" />
@@ -91,12 +81,17 @@ export default function SubscriptionCard({ subscription, onManage }: Props) {
           </div>
         )}
 
-        {subscription.ends_at && subscription.is_cancelled && (
+        {subscription.ends_at && subscription.is_canceled && (
           <div className="flex items-center gap-2 text-sm text-orange-600 dark:text-orange-400">
             <AlertTriangle className="w-4 h-4" />
             <span>Cancels on: {formatDate(subscription.ends_at)}</span>
           </div>
         )}
+
+        <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+          <Calendar className="w-4 h-4" />
+          <span>Created: {formatDate(subscription.created_at)}</span>
+        </div>
       </div>
 
       <Button

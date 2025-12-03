@@ -2,10 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
-import TenantSubscriptionService, { 
-  Subscription, 
-  Plan 
-} from '../../services/TenantSubscriptionService';
+import { getCurrentSubscription, changePlan, cancelSubscription } from '../../services/TenantSubscriptionService';
+import { getPlans } from '../../services/PlanService';
+import { Plan, Subscription } from '../../types';
 import SubscriptionCard from './SubscriptionCard';
 import PlanCard from './PlanCard';
 import Button from '../ui/button/Button';
@@ -27,12 +26,12 @@ export default function SubscriptionManagement() {
   const loadData = async () => {
     try {
       setLoading(true);
-      const [subscriptionData, plansData] = await Promise.all([
-        TenantSubscriptionService.getCurrentSubscription(),
-        TenantSubscriptionService.getAvailablePlans()
+      const [subscriptionData, plansResponse] = await Promise.all([
+        getCurrentSubscription().catch(() => null),
+        getPlans(undefined, undefined, undefined, undefined, true)
       ]);
       setSubscription(subscriptionData);
-      setPlans(plansData);
+      setPlans(plansResponse.data as Plan[]);
     } catch (error) {
       toast.error('Failed to load subscription data');
     } finally {
@@ -40,32 +39,16 @@ export default function SubscriptionManagement() {
     }
   };
 
-  const getCurrentPlanPrice = () => {
-    if (!subscription?.items.length) return 0;
-    return subscription.items[0].price.unit_amount;
+  const getCurrentPlanId = () => {
+    return subscription?.plan?.id;
   };
 
   const handlePlanChange = async (planId: string) => {
-    const selectedPlan = plans.find(p => p.id === planId);
-    if (!selectedPlan || !subscription) return;
-
-    const currentPrice = getCurrentPlanPrice();
-    const newPrice = selectedPlan.price * 100; // Convert to cents
-    const isUpgrade = newPrice > currentPrice;
-
     try {
       setActionLoading(true);
-      let updatedSubscription;
-      
-      if (isUpgrade) {
-        updatedSubscription = await TenantSubscriptionService.upgradePlan(planId);
-        toast.success('Plan upgraded successfully!');
-      } else {
-        updatedSubscription = await TenantSubscriptionService.downgradePlan(planId);
-        toast.success('Plan downgrade scheduled for end of billing period');
-      }
-      
-      setSubscription(updatedSubscription);
+      await changePlan(planId);
+      toast.success('Plan changed successfully!');
+      await loadData();
       setShowPlansModal(false);
     } catch (error: any) {
       toast.error(error.response?.data?.message || 'Failed to change plan');
@@ -77,8 +60,8 @@ export default function SubscriptionManagement() {
   const handleCancelSubscription = async () => {
     try {
       setActionLoading(true);
-      const updatedSubscription = await TenantSubscriptionService.cancelSubscription();
-      setSubscription(updatedSubscription);
+      await cancelSubscription();
+      await loadData();
       setShowCancelModal(false);
       toast.success('Subscription cancelled. Access will continue until end of billing period.');
     } catch (error: any) {
@@ -89,16 +72,8 @@ export default function SubscriptionManagement() {
   };
 
   const handleResumeSubscription = async () => {
-    try {
-      setActionLoading(true);
-      const updatedSubscription = await TenantSubscriptionService.resumeSubscription();
-      setSubscription(updatedSubscription);
-      toast.success('Subscription resumed successfully!');
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Failed to resume subscription');
-    } finally {
-      setActionLoading(false);
-    }
+    // Resume functionality not available in current API
+    toast.info('Resume functionality not yet implemented');
   };
 
   if (loading) {
@@ -123,7 +98,7 @@ export default function SubscriptionManagement() {
     );
   }
 
-  const currentPrice = getCurrentPlanPrice();
+  const currentPlanId = getCurrentPlanId();
 
   return (
     <div className="space-y-6">
@@ -161,7 +136,7 @@ export default function SubscriptionManagement() {
                 Change Plan
               </Button>
               
-              {subscription.is_cancelled ? (
+              {subscription.is_canceled ? (
                 <Button
                   onClick={handleResumeSubscription}
                   disabled={actionLoading}
@@ -192,22 +167,26 @@ export default function SubscriptionManagement() {
       >
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Choose Your Plan</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {plans.map((plan) => {
-            const planPrice = plan.price * 100; // Convert to cents
-            const isCurrentPlan = planPrice === currentPrice;
-            const isUpgrade = planPrice > currentPrice;
-            const isDowngrade = planPrice < currentPrice;
+          {plans.filter(plan => plan.is_active).map((plan) => {
+            const isCurrentPlan = currentPlanId === plan.id;
 
             return (
-              <PlanCard
-                key={plan.id}
-                plan={plan}
-                isCurrentPlan={isCurrentPlan}
-                isUpgrade={isUpgrade}
-                isDowngrade={isDowngrade}
-                onSelect={handlePlanChange}
-                loading={actionLoading}
-              />
+              <div key={plan.id} className="border rounded-lg p-4 bg-white dark:bg-gray-800">
+                <h3 className="text-lg font-semibold mb-2">{plan.name}</h3>
+                <p className="text-2xl font-bold mb-4">${plan.price}</p>
+                <p className="text-sm text-gray-600 mb-4">per {plan.interval}</p>
+                <button
+                  onClick={() => handlePlanChange(plan.id.toString())}
+                  disabled={isCurrentPlan || actionLoading}
+                  className={`w-full py-2 px-4 rounded ${
+                    isCurrentPlan 
+                      ? 'bg-gray-100 text-gray-500 cursor-not-allowed' 
+                      : 'bg-blue-600 hover:bg-blue-700 text-white'
+                  }`}
+                >
+                  {isCurrentPlan ? 'Current Plan' : actionLoading ? 'Changing...' : 'Select Plan'}
+                </button>
+              </div>
             );
           })}
         </div>
