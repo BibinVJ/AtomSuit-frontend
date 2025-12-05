@@ -1,4 +1,4 @@
-name: Deploy Frontend (Next.js SSR) to EC2
+name: Deploy Frontend (Next.js SSR)
 
 on:
   push:
@@ -26,32 +26,56 @@ jobs:
       - name: Inject .env File
         run: |
           if [ "${GITHUB_REF}" = "refs/heads/main" ]; then
-            echo "${{ secrets.FRONTEND_ENV_MAIN }}" > .env
+            echo "${{ secrets.FRONTEND_ENV_PRODUCTION }}" > .env
           else
             echo "${{ secrets.FRONTEND_ENV_STAGING }}" > .env
           fi
+          echo " .env file created for $(basename ${GITHUB_REF})"
 
       - name: Build Frontend
         run: npm run build
 
-      - name: Upload to EC2
+      - name: Upload Files to Server
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          source: ".next/*,package.json,package-lock.json,public/*,next.config.js,.env"
+          source: ".next,package.json,package-lock.json,public,next.config.js,.env"
           target: ${{ github.ref == 'refs/heads/main' && '/var/www/atomsuit/production/frontend' || '/var/www/atomsuit/staging/frontend' }}
+          strip_components: 0
 
-      - name: Restart Frontend App
+      - name: Restart Frontend App on Server
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            cd ${{ github.ref == 'refs/heads/main' && '/var/www/atomsuit/production/frontend' || '/var/www/atomsuit/staging/frontend' }}
+            if [ "${GITHUB_REF}" = "refs/heads/main" ]; then
+              APP_DIR="/var/www/atomsuit/production/frontend"
+              APP_NAME="atomsuit-production-frontend"
+              PORT=3000
+            else
+              APP_DIR="/var/www/atomsuit/staging/frontend"
+              APP_NAME="atomsuit-staging-frontend"
+              PORT=3001
+            fi
+
+            echo "Deploying frontend to $APP_DIR"
+            cd $APP_DIR
+
+            echo "Installing dependencies..."
             npm ci --omit=dev
-            pm2 restart atomsuit-frontend || pm2 start npm --name "atomsuit-frontend" -- run start -- -p 3000
-            sudo systemctl reload nginx
-            echo "Frontend deployed and running with SSR"
+
+            echo "Restarting PM2 app..."
+            pm2 describe "$APP_NAME" > /dev/null
+            if [ $? -eq 0 ]; then
+              pm2 restart "$APP_NAME"
+            else
+              pm2 start npm --name "$APP_NAME" -- run start -- -p $PORT
+            fi
+
+            pm2 save
+            sudo systemctl reload nginx || true
+            echo "Frontend deployed successfully on port $PORT"

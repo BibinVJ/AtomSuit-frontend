@@ -11,6 +11,10 @@ import TopItems from "../../components/ecommerce/TopItems";
 import StockAlerts from "../../components/ecommerce/StockAlerts";
 import CustomersTable from "../../components/ecommerce/CustomersTable";
 import ExpiryItems from "../../components/ecommerce/ExpiryItems";
+import PlanDistributionChart from "../../components/ecommerce/PlanDistributionChart";
+import TenantOverviewCard from "../../components/ecommerce/TenantOverviewCard";
+import RevenueCard from "../../components/ecommerce/RevenueCard";
+import GrowthCard from "../../components/ecommerce/GrowthCard";
 import { PencilIcon, SaveIcon, X, Eye, EyeOff, DollarSign, Package, Users, FileText } from "lucide-react";
 import { getLayout, saveLayout } from "../../services/LayoutService";
 import MetricCard from "../../components/ecommerce/MetricCard";
@@ -34,21 +38,65 @@ const componentMap = {
     TopItems,
 };
 
-const initialCards: Layout[] = [
-  { card_id: 'total-sales', x: 0, y: 0, w: 6, h: 4, minW: 4, minH: 3, visible: true, component: 'MetricCard', props: { icon: 'DollarLineIcon', title: "Total Sales", value: 'data.metrics.total_sales_amount' } },
-  { card_id: 'total-purchase', x: 6, y: 0, w: 6, h: 4, minW: 4, minH: 3, visible: true, component: 'MetricCard', props: { icon: 'BoxIconLine', title: "Total Purchase", value: 'data.metrics.total_purchase_amount' } },
-  { card_id: 'total-customers', x: 12, y: 0, w: 6, h: 4, minW: 4, minH: 3, visible: true, component: 'MetricCard', props: { icon: 'GroupIcon', title: "Total Customers", value: 'data.metrics.total_customers' } },
-  { card_id: 'total-items', x: 18, y: 0, w: 6, h: 4, minW: 4, minH: 3, visible: true, component: 'MetricCard', props: { icon: 'PageIcon', title: "Total Items", value: 'data.metrics.total_items' } },
-  { card_id: 'monthly-sales', x: 0, y: 4, w: 12, h: 8, minW: 8, minH: 6, visible: true, component: 'MonthlySalesChart', props: { data: 'chartData.sales' } },
-  { card_id: 'statistics', x: 12, y: 4, w: 12, h: 10, minW: 8, minH: 8, visible: true, component: 'StatisticsChart', props: { data: 'chartData' } },
-  { card_id: 'top-customers', x: 0, y: 12, w: 12, h: 10, minW: 10, minH: 8, visible: true, component: 'CustomersTable', props: { title: "Top Customers", customers: 'data.customers.best_customers' } },
-  { card_id: 'out-of-stock', x: 12, y: 14, w: 12, h: 8, minW: 10, minH: 6, visible: true, component: 'StockAlerts', props: { title: "Out of Stock Items", items: 'data.stock_alerts.out_of_stock_items', color: "error" } },
-  { card_id: 'low-stock', x: 0, y: 22, w: 12, h: 8, minW: 10, minH: 6, visible: true, component: 'StockAlerts', props: { title: "Low Stock Items", items: 'data.stock_alerts.low_stock_items', color: "warning" } },
-  { card_id: 'expiry-items', x: 12, y: 22, w: 12, h: 8, minW: 10, minH: 8, visible: true, component: 'ExpiryItems', props: { items: 'data.stock_alerts.expiring_items' } },
-  { card_id: 'top-sold', x: 0, y: 30, w: 12, h: 8, minW: 10, minH: 8, visible: true, component: 'TopItems', props: { title: "Top Sold Items", items: 'data.top_items.sold' } },
-  { card_id: 'top-purchased', x: 12, y: 30, w: 12, h: 8, minW: 10, minH: 8, visible: true, component: 'TopItems', props: { title: "Top Purchased Items", items: 'data.top_items.purchased' } },
-  { card_id: 'dead-stock', x: 0, y: 38, w: 12, h: 8, minW: 10, minH: 6, visible: true, component: 'StockAlerts', props: { title: "Dead Stock Items", items: 'data.stock_alerts.dead_stock_items', color: "secondary" } },
-].map(card => ({ ...card, i: card.card_id }));
+// Component mapping - maps backend component names to React components
+const componentNameToComponent: Record<string, React.ComponentType<any>> = {
+  'TotalSalesCard': MetricCard,
+  'TotalPurchaseCard': MetricCard,
+  'TotalCustomersCard': MetricCard,
+  'TotalItemsCard': MetricCard,
+  'MonthlySalesChart': MonthlySalesChart,
+  'StatisticsCard': StatisticsChart,
+  'TopCustomersCard': CustomersTable,
+  'OutOfStockCard': StockAlerts,
+  'LowStockCard': StockAlerts,
+  'ExpiringItemsCard': ExpiryItems,
+  'TopSoldCard': TopItems,
+  'TopPurchasedCard': TopItems,
+  'DeadStockCard': StockAlerts,
+  // Central dashboard components
+  'TotalTenantsCard': MetricCard,
+  'ActiveTenantsCard': MetricCard,
+  'PaidSubscribersCard': MetricCard,
+  'TotalRevenueCard': MetricCard,
+  'TrialTenantsCard': MetricCard,
+  'MonthlyRevenueCard': MetricCard,
+  'PlanDistributionCard': PlanDistributionChart,
+  'RecentRegistrationsCard': MetricCard,
+  'ConversionRateCard': MetricCard,
+  'TenantOverviewCard': TenantOverviewCard,
+  'RevenueOverviewCard': RevenueCard,
+  'GrowthMetricsCard': GrowthCard,
+};
+
+// Card-specific props mapping (hardcoded for now, could be moved to backend later)
+const cardPropsMap: Record<string, any> = {
+  'total-sales': { icon: 'DollarLineIcon', title: "Total Sales", value: 'data.metrics.total_sales_amount' },
+  'total-purchase': { icon: 'BoxIconLine', title: "Total Purchase", value: 'data.metrics.total_purchase_amount' },
+  'total-customers': { icon: 'GroupIcon', title: "Total Customers", value: 'data.metrics.total_customers' },
+  'total-items': { icon: 'PageIcon', title: "Total Items", value: 'data.metrics.total_items' },
+  'monthly-sales': { data: 'chartData.sales' },
+  'statistics': { data: 'chartData' },
+  'top-customers': { title: "Top Customers", customers: 'data.customers.best_customers' },
+  'out-of-stock': { title: "Out of Stock Items", items: 'data.stock_alerts.out_of_stock_items', color: "error" },
+  'low-stock': { title: "Low Stock Items", items: 'data.stock_alerts.low_stock_items', color: "warning" },
+  'expiry-items': { items: 'data.stock_alerts.expiring_items' },
+  'top-sold': { title: "Top Sold Items", items: 'data.top_items.sold' },
+  'top-purchased': { title: "Top Purchased Items", items: 'data.top_items.purchased' },
+  'dead-stock': { title: "Dead Stock Items", items: 'data.stock_alerts.dead_stock_items', color: "secondary" },
+  // Central dashboard cards
+  'total-tenants': { icon: 'GroupIcon', title: "Total Tenants", value: 'data.tenant_overview.total' },
+  'active-tenants': { icon: 'GroupIcon', title: "Active Tenants", value: 'data.tenant_overview.active' },
+  'paid-subscribers': { icon: 'DollarLineIcon', title: "Paid Subscribers", value: 'data.tenant_overview.paid_subscribers' },
+  'total-revenue': { icon: 'DollarLineIcon', title: "Total Revenue", value: 'data.revenue.total', prefix: '$' },
+  'trial-tenants': { icon: 'GroupIcon', title: "Trial Tenants", value: 'data.tenant_overview.on_trial' },
+  'monthly-revenue': { icon: 'DollarLineIcon', title: "Monthly Revenue", value: 'data.revenue.this_month', prefix: '$' },
+  'plan-distribution': { data: 'data.plan_distribution' },
+  'recent-registrations': { icon: 'GroupIcon', title: "Recent Registrations", value: 'data.tenant_overview.recent_registrations' },
+  'conversion-rate': { icon: 'DollarLineIcon', title: "Conversion Rate", value: 'data.growth.conversion_rate' },
+  'tenant-overview': { data: 'data.tenant_overview' },
+  'revenue-overview': { data: 'data.revenue' },
+  'growth-metrics': { data: 'data.growth' },
+};
 
 const iconMap = {
   DollarLineIcon: <DollarSign className="text-gray-800 size-6 dark:text-white/90" />,
@@ -85,6 +133,9 @@ function Home() {
             newProps[key] = chartData?.sales || [];
         } else if (typeof props[key] === 'string' && props[key] === 'chartData') {
             newProps[key] = chartData || { sales: [], purchases: [] };
+        } else if (typeof props[key] === 'string' && (props[key] as string) === 'data.plan_distribution') {
+            // Pass plan distribution data directly to PlanDistributionChart
+            newProps[key] = data.plan_distribution || {};
         }
     }
     return newProps;
@@ -103,44 +154,31 @@ function Home() {
         };
         setChartData(transformedChartData);
 
+        // Fetch user's dashboard layout from backend
+        // Backend automatically filters cards based on user permissions
+        // Only cards the user has permission to view are returned
         const layoutRes = await getLayout();
-        if (layoutRes.data.results && layoutRes.data.results.length > 0) {
-          const adaptedLayout = layoutRes.data.results.map((item: Layout) => {
-            const initialCard = initialCards.find(c => c.card_id === item.card_id);
+        if (layoutRes.data.data && layoutRes.data.data.length > 0) {
+          // Backend returned permission-filtered layouts
+          const adaptedLayout = layoutRes.data.data.map((item: any) => {
             return {
               ...item,
               i: item.card_id,
-              w: item.width || initialCard?.w || 12,
-              h: item.height || initialCard?.h || 4,
-              x: item.x,
-              y: item.y,
-              component: initialCard?.component,
-              props: initialCard?.props,
-              minW: initialCard?.minW,
-              minH: initialCard?.minH,
+              w: item.width || item.default_width || 12,
+              h: item.height || item.default_height || 4,
+              x: item.x || 0,
+              y: item.y || 0,
+              component: item.component, // Backend provides component name
+              props: cardPropsMap[item.card_id], // Local props mapping
+              minW: 4,
+              minH: 3,
             };
           });
           setCards(adaptedLayout);
         } else {
-          setCards(initialCards);
-          const layoutToSave: Layout[] = initialCards.map(card => {
-            const { i, w, h, x, y, visible, draggable, area, rotation, col_span, config } = card;
-            return {
-              i,
-              w,
-              h,
-              x,
-              y,
-              visible: visible === false ? false : true,
-              draggable: draggable === false ? false : true,
-              area: area || null,
-              rotation: rotation || 0,
-              col_span: col_span || null,
-              config: config || undefined,
-              card_id: i,
-            };
-          });
-          await saveLayout(layoutToSave);
+          // Backend returns empty on first load, will auto-initialize on next request
+          // Frontend displays empty dashboard until backend initializes layouts
+          setCards([]);
         }
       } catch (err) {
         console.error("Dashboard fetch failed", err);
@@ -206,26 +244,11 @@ function Home() {
   }
 
   if (loading) {
-    const skeletonLayouts = {
-      lg: initialCards.map(({ i, x, y, w, h, minW, minH }) => ({ i, x, y, w, h, minW, minH })),
-    };
     return (
       <div className="p-4 space-y-6 md:p-6 2-xl:p-10">
-        <ResponsiveGridLayout
-          className="layout"
-          layouts={skeletonLayouts}
-          breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
-          cols={{ lg: 24, md: 20, sm: 12, xs: 8, xxs: 4 }}
-          rowHeight={25}
-          isDraggable={false}
-          isResizable={false}
-        >
-          {initialCards.map(card => (
-            <div key={card.i}>
-              <SkeletonCard />
-            </div>
-          ))}
-        </ResponsiveGridLayout>
+        <div className="text-center py-10">
+          <div className="animate-pulse">Loading dashboard...</div>
+        </div>
       </div>
     );
   }
@@ -260,21 +283,9 @@ function Home() {
         </div>
         {!loading && cards.length > 0 && (
           <Suspense fallback={<div className="p-4 space-y-6 md:p-6 2-xl:p-10">
-            <ResponsiveGridLayout
-              className="layout"
-              layouts={{ lg: initialCards.map(({ i, x, y, w, h, minW, minH }) => ({ i, x, y, w, h, minW, minH })) }}
-              breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
-              cols={{ lg: 24, md: 20, sm: 12, xs: 8, xxs: 4 }}
-              rowHeight={25}
-              isDraggable={false}
-              isResizable={false}
-            >
-              {initialCards.map(card => (
-                <div key={card.i}>
-                  <SkeletonCard />
-                </div>
-              ))}
-            </ResponsiveGridLayout>
+            <div className="text-center py-10">
+              <div className="animate-pulse">Loading dashboard components...</div>
+            </div>
           </div>}>
             <ResponsiveGridLayout
               className="layout"
@@ -288,12 +299,16 @@ function Home() {
               draggableCancel=".cancel-drag"
             >
               {cardsToRender.map(card => {
-                const Component = componentMap[card.component as keyof typeof componentMap];
+                // Map backend component name to actual React component
+                const Component = componentNameToComponent[card.component] || componentMap[card.component as keyof typeof componentMap];
+                if (!Component) {
+                  console.warn('Component not found for:', card.component, 'card_id:', card.card_id);
+                }
                 const resolvedProps = getComponentProps(card.props as { [key:string]: string | number | object });
                 return (
                   <div key={card.i} className={`dashboard-card-wrapper ${!card.visible && editMode ? 'opacity-50' : ''}`}>
                     {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                    {Component ? <Component {...resolvedProps as any} /> : null}
+                    {Component ? <Component {...resolvedProps as any} /> : <div className="p-4 text-red-500">Component not found: {card.component}</div>}
                     {editMode && (
                       <button
                         className="absolute top-4 right-4 z-10 p-1 bg-gray-200 rounded-full hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 cancel-drag"
