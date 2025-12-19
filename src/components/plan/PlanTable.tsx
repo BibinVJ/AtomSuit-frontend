@@ -17,6 +17,7 @@ import Tooltip from "../ui/tooltip/Tooltip";
 
 import { Plan } from '../../types';
 import { usePermissions } from "../../hooks/usePermissions";
+import { useSettings } from "../../hooks/useSettings";
 import { getPlan } from '../../services/PlanService';
 import { toast } from 'sonner';
 
@@ -32,6 +33,7 @@ interface Props {
 
 export default function PlanTable({ data, onAction, onSort, sortBy, sortDirection, currentPage, perPage }: Props) {
   const { hasPermission } = usePermissions();
+  const { formatCurrency } = useSettings();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
@@ -98,7 +100,7 @@ export default function PlanTable({ data, onAction, onSort, sortBy, sortDirectio
                 <TableCell className="px-4 py-3 text-start">
                   <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">{plan.name}</p>
                 </TableCell>
-                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">${plan.price}</TableCell>
+                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">{formatCurrency(plan.price)}</TableCell>
                 <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
                   <span className="capitalize">{plan.interval_count} {plan.interval}{plan.interval_count > 1 ? 's' : ''}</span>
                 </TableCell>

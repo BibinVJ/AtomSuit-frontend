@@ -34,23 +34,26 @@ const MetricCard = ({ icon, title, value, percentage, trend }: MetricCardProps) 
   </div>
 );
 
+import { useSettings } from "../../hooks/useSettings";
+
 export default function EcommerceMetrics({ data }: { data: {
   total_sales_amount: number;
   total_purchase_amount: number;
   total_customers: number;
   total_items: number;
 } }) {
+  const { formatCurrency } = useSettings();
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 md:gap-6">
       <MetricCard
         icon={<DollarSign className="text-gray-800 size-6 dark:text-white/90" />}
         title="Total Sales"
-        value={`${data?.total_sales_amount ?? 0}`}
+        value={formatCurrency(data?.total_sales_amount ?? 0)}
       />
       <MetricCard
         icon={<Package className="text-gray-800 size-6 dark:text-white/90" />}
         title="Total Purchase"
-        value={`${data?.total_purchase_amount ?? 0}`}
+        value={formatCurrency(data?.total_purchase_amount ?? 0)}
       />
       <MetricCard
         icon={<Users className="text-gray-800 size-6 dark:text-white/90" />}

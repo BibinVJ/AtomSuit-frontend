@@ -17,6 +17,7 @@ import Tooltip from "../ui/tooltip/Tooltip";
 
 import { Subscription } from '../../types';
 import { usePermissions } from "../../hooks/usePermissions";
+import { useSettings } from "../../hooks/useSettings";
 import { getSubscription } from '../../services/SubscriptionService';
 import { toast } from 'sonner';
 
@@ -31,7 +32,9 @@ interface Props {
 }
 
 export default function SubscriptionTable({ data, onAction, onSort, sortBy, sortDirection, currentPage, perPage }: Props) {
+  const { hasPermission } = hasPermission(); // Wait, fixing potential typo in original if any
   const { hasPermission } = usePermissions();
+  const { formatCurrency, formatDate: globalFormatDate } = useSettings();
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const [selectedSubscription, setSelectedSubscription] = useState<Subscription | null>(null);
@@ -72,11 +75,7 @@ export default function SubscriptionTable({ data, onAction, onSort, sortBy, sort
 
   const formatDate = (date?: string) => {
     if (!date) return 'N/A';
-    return new Date(date).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
+    return globalFormatDate(date);
   };
 
   const getStatusBadge = (subscription: Subscription) => {
@@ -128,7 +127,7 @@ export default function SubscriptionTable({ data, onAction, onSort, sortBy, sort
                   {subscription.plan?.name || 'N/A'}
                 </TableCell>
                 <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
-                  ${subscription.stripe_price} x {subscription.quantity}
+                  {formatCurrency(subscription.stripe_price)} x {subscription.quantity}
                 </TableCell>
                 <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
                   {formatDate(subscription.created_at)}

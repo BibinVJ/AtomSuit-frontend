@@ -6,8 +6,10 @@ import { getCurrentSubscription, changePlan, cancelSubscription } from '../../se
 import { getPlans } from '../../services/PlanService';
 import { RefreshCw, Star, Calendar, CreditCard, AlertTriangle, CheckCircle } from 'lucide-react';
 import { Plan, Subscription } from '@/types';
+import { useSettings } from '../../hooks/useSettings';
 
 export default function BillingSubscription() {
+  const { formatCurrency, formatDate: globalFormatDate } = useSettings();
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [plans, setPlans] = useState<Plan[]>([]);
   const [loading, setLoading] = useState(true);
@@ -65,7 +67,7 @@ export default function BillingSubscription() {
 
   const formatDate = (dateString: string | null) => {
     if (!dateString) return 'N/A';
-    return new Date(dateString).toLocaleDateString();
+    return globalFormatDate(dateString);
   };
 
   const getStatusColor = () => {
@@ -152,7 +154,7 @@ export default function BillingSubscription() {
               <div className="mb-4">
                 <div className="flex items-center justify-between">
                   <span className="text-2xl font-bold text-gray-900 dark:text-white">
-                    ${subscription.plan.price}
+                    {formatCurrency(subscription.plan.price)}
                   </span>
                   <span className="text-sm text-gray-500 dark:text-gray-400">
                     per {subscription.plan.interval}
@@ -185,12 +187,7 @@ export default function BillingSubscription() {
               </div>
             </div>
 
-            <button
-              onClick={() => setShowPlansModal(true)}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg"
-            >
-              Manage Subscription
-            </button>
+
           </div>
         </div>
         
@@ -198,12 +195,7 @@ export default function BillingSubscription() {
           <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
             <h3 className="font-semibold text-gray-900 dark:text-white mb-3">Quick Actions</h3>
             <div className="space-y-2">
-              <button
-                onClick={() => setShowPlansModal(true)}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg text-sm"
-              >
-                Change Plan
-              </button>
+
               
               {!subscription.is_canceled && (
                 <button
@@ -238,7 +230,7 @@ export default function BillingSubscription() {
                 return (
                   <div key={plan.id} className="border rounded-lg p-4 bg-white dark:bg-gray-800">
                     <h3 className="text-lg font-semibold mb-2">{plan.name}</h3>
-                    <p className="text-2xl font-bold mb-4">${plan.price}</p>
+                    <p className="text-2xl font-bold mb-4">{formatCurrency(plan.price)}</p>
                     <p className="text-sm text-gray-600 mb-4">per {plan.interval}</p>
                     <button
                       onClick={() => handlePlanChange(plan.id.toString())}

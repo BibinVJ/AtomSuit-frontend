@@ -11,6 +11,7 @@ import Badge from '../../components/ui/badge/Badge';
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '../../components/ui/table';
 import VoidSaleModal from '../../components/sales/VoidSaleModal';
 import { getSale } from '../../services/SaleService';
+import { useSettings } from '../../hooks/useSettings';
 
 import { Sale } from '../../types';
 
@@ -18,6 +19,7 @@ export default function ViewSale() {
   const params = useParams<{ id: string }>();
   const id = params?.id;
   const router = useRouter();
+  const { formatCurrency, formatDate } = useSettings();
   const [sale, setSale] = useState<Sale | null>(null);
   const [isVoidModalOpen, setIsVoidModalOpen] = useState(false);
 
@@ -80,7 +82,7 @@ export default function ViewSale() {
             <div>
               <h3 className="text-lg font-semibold mb-2 dark:text-gray-400">Sale Details</h3>
               <p className="dark:text-gray-400">Invoice #: <strong>{sale.invoice_number}</strong></p>
-              <p className="dark:text-gray-400">Sale Date: <strong>{sale.sale_date}</strong></p>
+              <p className="dark:text-gray-400">Sale Date: <strong>{formatDate(sale.sale_date)}</strong></p>
               <p className="dark:text-gray-400">Entered By: <strong>{sale.user.name}</strong></p>
               <p className="dark:text-gray-400">Status: <strong>
                 <Badge size="sm" color={sale.status === 'completed' ? 'success' : (sale.status === 'voided' ? 'error' : 'primary')}>
@@ -108,15 +110,15 @@ export default function ViewSale() {
                     <TableRow key={index}>
                       <TableCell className="px-5 py-4 text-gray-800 text-start text-theme-sm dark:text-gray-400">{item.item.name}</TableCell>
                       <TableCell className="px-5 py-4 text-gray-800 text-end text-theme-sm dark:text-gray-400">{item.quantity}</TableCell>
-                      <TableCell className="px-5 py-4 text-gray-800 text-end text-theme-sm dark:text-gray-400">{item.unit_price}</TableCell>
-                      <TableCell className="px-5 py-4 text-gray-800 text-end text-theme-sm dark:text-gray-400">{item.quantity * item.unit_price}</TableCell>
+                      <TableCell className="px-5 py-4 text-gray-800 text-end text-theme-sm dark:text-gray-400">{formatCurrency(item.unit_price)}</TableCell>
+                      <TableCell className="px-5 py-4 text-gray-800 text-end text-theme-sm dark:text-gray-400">{formatCurrency(item.quantity * item.unit_price)}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
                 <tfoot className="border-t border-gray-100 dark:border-white/[0.05]">
                   <TableRow className="font-semibold">
                     <TableCell colSpan={3} className="px-5 py-4 text-end text-gray-800 dark:text-white/90">Total Amount:</TableCell>
-                    <TableCell className="px-5 py-4 text-end text-gray-800 dark:text-white/90">{sale.total_amount}</TableCell>
+                    <TableCell className="px-5 py-4 text-end text-gray-800 dark:text-white/90">{formatCurrency(sale.total_amount)}</TableCell>
                   </TableRow>
                 </tfoot>
               </Table>

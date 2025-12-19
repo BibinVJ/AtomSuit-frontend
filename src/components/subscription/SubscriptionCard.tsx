@@ -7,16 +7,15 @@ import { Calendar, CreditCard, AlertTriangle, CheckCircle } from 'lucide-react';
 
 interface Props {
   subscription: Subscription;
-  onManage: () => void;
 }
 
-export default function SubscriptionCard({ subscription, onManage }: Props) {
+export default function SubscriptionCard({ subscription }: Props) {
   const formatDate = (dateString: string | null) => {
     if (!dateString) return 'N/A';
     return new Date(dateString).toLocaleDateString();
   };
 
-  const formatAmount = (amount: string) => {
+  const formatAmount = (amount: number | string) => {
     return `$${amount}`;
   };
 
@@ -94,12 +93,7 @@ export default function SubscriptionCard({ subscription, onManage }: Props) {
         </div>
       </div>
 
-      <Button
-        onClick={onManage}
-        className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-      >
-        Manage Subscription
-      </Button>
+
     </div>
   );
 }

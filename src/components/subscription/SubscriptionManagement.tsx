@@ -120,7 +120,6 @@ export default function SubscriptionManagement() {
         <div className="lg:col-span-2">
           <SubscriptionCard 
             subscription={subscription}
-            onManage={() => setShowPlansModal(true)}
           />
         </div>
         
@@ -128,13 +127,7 @@ export default function SubscriptionManagement() {
           <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
             <h3 className="font-semibold text-gray-900 dark:text-white mb-3">Quick Actions</h3>
             <div className="space-y-2">
-              <Button
-                onClick={() => setShowPlansModal(true)}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-                size="sm"
-              >
-                Change Plan
-              </Button>
+
               
               {subscription.is_canceled ? (
                 <Button

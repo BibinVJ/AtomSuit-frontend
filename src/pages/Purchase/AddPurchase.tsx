@@ -12,7 +12,7 @@ import Label from '../../components/form/Label';
 import TextArea from '../../components/form/input/TextArea';
 import { useRouter } from 'next/navigation';
 import DatePicker from '../../components/form/date-picker';
-import { formatDate } from '../../utils/date';
+import { useSettings } from '../../hooks/useSettings';
 import { toast } from 'sonner';
 import { getVendors } from '../../services/VendorService';
 import { getItems } from '../../services/ItemService';
@@ -35,12 +35,13 @@ interface ApiError {
 }
 
 export default function AddPurchase() {
+  const { formatDate } = useSettings();
   const router = useRouter();
   const [vendors, setVendors] = useState<Vendor[]>([]);
   const [items, setItems] = useState<Item[]>([]);
   const [vendorId, setVendorId] = useState('');
   const [invoiceNumber, setInvoiceNumber] = useState('');
-  const [purchaseDate, setPurchaseDate] = useState(formatDate(new Date()));
+  const [purchaseDate, setPurchaseDate] = useState(new Date().toISOString().split('T')[0]);
   const [purchaseItems, setPurchaseItems] = useState<PurchaseItem[]>([
     { item_id: '', description: '', batch_number: '', expiry_date: '', manufacture_date: '', quantity: 1, unit_cost: 0 }
   ]);

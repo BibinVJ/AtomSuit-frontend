@@ -8,8 +8,10 @@ import { RefreshCw, Star } from 'lucide-react';
 import PlanCard from '../../components/plan/PlanCard';
 import LifetimePlanCard from '../../components/plan/LifetimePlanCard';
 import { Plan, Subscription } from '@/types';
+import { useSettings } from '../../hooks/useSettings';
 
 export default function BillingPlans() {
+  const { formatCurrency } = useSettings();
   const [plans, setPlans] = useState<Plan[]>([]);
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [loading, setLoading] = useState(true);

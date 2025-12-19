@@ -29,7 +29,7 @@ export default function EditPlanModal({ isOpen, onClose, onPlanUpdated, plan }: 
   const [trialDays, setTrialDays] = useState('14');
   const [isExpiredUserPlan, setIsExpiredUserPlan] = useState(false);
   const [isActive, setIsActive] = useState(true);
-  const [features, setFeatures] = useState<Omit<PlanFeature, 'id'>[]>([]);
+  const [features, setFeatures] = useState<PlanFeature[]>([]);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
@@ -163,7 +163,7 @@ export default function EditPlanModal({ isOpen, onClose, onPlanUpdated, plan }: 
     setFeatures(features.filter((_, i) => i !== index));
   };
 
-  const updateFeature = (index: number, field: keyof Omit<PlanFeature, 'id'>, value: any) => {
+  const updateFeature = (index: number, field: keyof PlanFeature, value: any) => {
     const updated = [...features];
     updated[index] = { ...updated[index], [field]: value };
     setFeatures(updated);

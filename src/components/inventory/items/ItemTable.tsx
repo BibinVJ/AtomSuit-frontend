@@ -29,9 +29,11 @@ interface Props {
 }
 
 import { usePermissions } from "../../../hooks/usePermissions";
+import { useSettings } from "../../../hooks/useSettings";
 
 export default function ItemTable({ data, onAction, onSort, sortBy, sortDirection, currentPage, perPage }: Props) {
   const { hasPermission } = usePermissions();
+  const { formatCurrency } = useSettings();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
@@ -94,7 +96,7 @@ export default function ItemTable({ data, onAction, onSort, sortBy, sortDirectio
                 <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">{item.category.name}</TableCell>
                 <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">{item.unit.name} ({item.unit.code})</TableCell>
                 <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">{item.type}</TableCell>
-                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">{item.selling_price}</TableCell>
+                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">{formatCurrency(item.selling_price)}</TableCell>
                 <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
                   <Badge size="sm" color={item.is_active ? "success" : "error"}>
                     {item.is_active ? "Active" : "Inactive"}

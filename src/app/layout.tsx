@@ -8,6 +8,7 @@ import { SidebarProvider } from '@/context/SidebarContext';
 import { ThemeProvider } from '@/context/ThemeContext';
 import { AuthProvider } from '@/context/AuthProvider';
 import { TenantProvider } from '@/context/TenantProvider';
+import { SettingsProvider } from '@/context/SettingsProvider';
 import { Toaster } from 'sonner';
 
 const outfit = Outfit({
@@ -29,10 +30,12 @@ export default function RootLayout({
         <ThemeProvider>
           <TenantProvider>
             <AuthProvider>
-              <SidebarProvider>
-                <Toaster richColors position="top-center" closeButton={true} />
-                {children}
-              </SidebarProvider>
+              <SettingsProvider>
+                <SidebarProvider>
+                  <Toaster richColors position="top-center" closeButton={true} />
+                  {children}
+                </SidebarProvider>
+              </SettingsProvider>
             </AuthProvider>
           </TenantProvider>
         </ThemeProvider>

@@ -28,9 +28,11 @@ interface Props {
 }
 
 import { usePermissions } from "../../hooks/usePermissions";
+import { useSettings } from "../../hooks/useSettings";
 
 export default function PurchaseTable({ data, onAction, onSort, sortBy, sortDirection, currentPage, perPage }: Props) {
   const { hasPermission } = usePermissions();
+  const { formatCurrency, formatDate } = useSettings();
   const router = useRouter();
   const [isVoidModalOpen, setIsVoidModalOpen] = useState(false);
   const [selectedPurchase, setSelectedPurchase] = useState<Purchase | null>(null);
@@ -89,9 +91,9 @@ export default function PurchaseTable({ data, onAction, onSort, sortBy, sortDire
                   </p>
                 </TableCell>
                 <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">{purchase.invoice_number}</TableCell>
-                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">{purchase.purchase_date}</TableCell>
+                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">{formatDate(purchase.purchase_date)}</TableCell>
                 <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">{purchase.vendor.name}</TableCell>
-                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">{purchase.total_amount}</TableCell>
+                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">{formatCurrency(purchase.total_amount)}</TableCell>
                 <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
                   <Badge size="sm" color={purchase.payment_status === 'paid' ? "success" : "warning"}>
                     {purchase.payment_status}

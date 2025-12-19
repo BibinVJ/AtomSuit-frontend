@@ -1,5 +1,6 @@
 import { Check } from 'lucide-react';
 import { Plan } from '../../types';
+import { useSettings } from '../../hooks/useSettings';
 
 interface Props {
   plan: Plan;
@@ -18,9 +19,10 @@ export default function PlanCard({
   buttonStyle,
   disabled = false
 }: Props) {
+  const { formatCurrency } = useSettings();
   const handleClick = () => {
     if (onSelect && !disabled) {
-      onSelect(plan.id);
+      onSelect(String(plan.id));
     }
   };
 
@@ -69,7 +71,7 @@ export default function PlanCard({
         <div className="mb-6">
           <div className="flex items-baseline">
             <span className="text-5xl font-bold text-gray-900 dark:text-white">
-              {plan.price === 0 ? 'Free' : `$${plan.price}`}
+              {plan.price === 0 ? 'Free' : formatCurrency(plan.price)}
             </span>
             {!plan.is_trial_plan && plan.interval !== 'lifetime' && (
               <span className="ml-2 text-xl text-gray-500 dark:text-gray-400">

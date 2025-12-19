@@ -39,17 +39,17 @@
   --color-black: #101828;
 
   --color-brand-25: #f2f7ff;
-  --color-brand-50: #ecf3ff;
-  --color-brand-100: #dde9ff;
-  --color-brand-200: #c2d6ff;
-  --color-brand-300: #9cb9ff;
-  --color-brand-400: #7592ff;
-  --color-brand-500: #465fff;
-  --color-brand-600: #3641f5;
-  --color-brand-700: #2a31d8;
-  --color-brand-800: #252dae;
-  --color-brand-900: #262e89;
-  --color-brand-950: #161950;
+  --color-brand-50: var(--color-brand-50, #ecf3ff);
+  --color-brand-100: var(--color-brand-100, #dde9ff);
+  --color-brand-200: var(--color-brand-200, #c2d6ff);
+  --color-brand-300: var(--color-brand-300, #9cb9ff);
+  --color-brand-400: var(--color-brand-400, #7592ff);
+  --color-brand-500: var(--color-primary, #465fff);
+  --color-brand-600: var(--color-primary-dark, #3641f5);
+  --color-brand-700: var(--color-primary-darker, #2a31d8);
+  --color-brand-800: var(--color-primary-darkest, #252dae);
+  --color-brand-900: var(--color-brand-900, #262e89);
+  --color-brand-950: var(--color-brand-950, #161950);
 
   --color-blue-light-25: #f5fbff;
   --color-blue-light-50: #f0f9ff;
@@ -57,7 +57,7 @@
   --color-blue-light-200: #b9e6fe;
   --color-blue-light-300: #7cd4fd;
   --color-blue-light-400: #36bffa;
-  --color-blue-light-500: #0ba5ec;
+  --color-blue-light-500: var(--color-info, #0ba5ec);
   --color-blue-light-600: #0086c9;
   --color-blue-light-700: #026aa2;
   --color-blue-light-800: #065986;
@@ -97,7 +97,7 @@
   --color-success-200: #a6f4c5;
   --color-success-300: #6ce9a6;
   --color-success-400: #32d583;
-  --color-success-500: #12b76a;
+  --color-success-500: var(--color-success, #12b76a);
   --color-success-600: #039855;
   --color-success-700: #027a48;
   --color-success-800: #05603a;
@@ -110,7 +110,7 @@
   --color-error-200: #fecdca;
   --color-error-300: #fda29b;
   --color-error-400: #f97066;
-  --color-error-500: #f04438;
+  --color-error-500: var(--color-error, #f04438);
   --color-error-600: #d92d20;
   --color-error-700: #b42318;
   --color-error-800: #912018;
@@ -123,7 +123,7 @@
   --color-warning-200: #fedf89;
   --color-warning-300: #fec84b;
   --color-warning-400: #fdb022;
-  --color-warning-500: #f79009;
+  --color-warning-500: var(--color-warning, #f79009);
   --color-warning-600: #dc6803;
   --color-warning-700: #b54708;
   --color-warning-800: #93370d;

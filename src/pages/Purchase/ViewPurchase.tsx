@@ -11,6 +11,7 @@ import Badge from '../../components/ui/badge/Badge';
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '../../components/ui/table';
 import VoidPurchaseModal from '../../components/purchase/VoidPurchaseModal';
 import { getPurchase } from '../../services/PurchaseService';
+import { useSettings } from '../../hooks/useSettings';
 
 import { Purchase } from '../../types';
 
@@ -18,6 +19,7 @@ export default function ViewPurchase() {
   const params = useParams<{ id: string }>();
   const id = params?.id;
   const router = useRouter();
+  const { formatCurrency, formatDate } = useSettings();
   const [purchase, setPurchase] = useState<Purchase | null>(null);
   const [isVoidModalOpen, setIsVoidModalOpen] = useState(false);
 
@@ -80,7 +82,7 @@ export default function ViewPurchase() {
             <div>
               <h3 className="text-lg font-semibold mb-2 dark:text-gray-400">Purchase Details</h3>
               <p className="dark:text-gray-400"><strong>Invoice #:</strong> {purchase.invoice_number}</p>
-              <p className="dark:text-gray-400"><strong>Purchase Date:</strong> {purchase.purchase_date}</p>
+              <p className="dark:text-gray-400"><strong>Purchase Date:</strong> {formatDate(purchase.purchase_date)}</p>
               <p className="dark:text-gray-400"><strong>Payment Status:</strong>
                 <Badge size="sm" color={purchase.payment_status === 'paid' ? 'success' : 'warning'}>
                   {purchase.payment_status}
@@ -108,18 +110,18 @@ export default function ViewPurchase() {
                     <TableRow key={index}>
                       <TableCell className="px-5 py-4 text-gray-800 text-start text-theme-sm dark:text-gray-400">{item.item.name}</TableCell>
                       <TableCell className="px-5 py-4 text-gray-800 text-start text-theme-sm dark:text-gray-400">{item.batch.batch_number}</TableCell>
-                      <TableCell className="px-5 py-4 text-gray-800 text-start text-theme-sm dark:text-gray-400">{item.batch.manufacture_date || '-'}</TableCell>
-                      <TableCell className="px-5 py-4 text-gray-800 text-start text-theme-sm dark:text-gray-400">{item.batch.expiry_date || '-'}</TableCell>
+                      <TableCell className="px-5 py-4 text-gray-800 text-start text-theme-sm dark:text-gray-400">{item.batch.manufacture_date ? formatDate(item.batch.manufacture_date) : '-'}</TableCell>
+                      <TableCell className="px-5 py-4 text-gray-800 text-start text-theme-sm dark:text-gray-400">{item.batch.expiry_date ? formatDate(item.batch.expiry_date) : '-'}</TableCell>
                       <TableCell className="px-5 py-4 text-gray-800 text-end text-theme-sm dark:text-gray-400">{item.quantity}</TableCell>
-                      <TableCell className="px-5 py-4 text-gray-800 text-end text-theme-sm dark:text-gray-400">{item.unit_cost}</TableCell>
-                      <TableCell className="px-5 py-4 text-gray-800 text-end text-theme-sm dark:text-gray-400">{item.total_cost}</TableCell>
+                      <TableCell className="px-5 py-4 text-gray-800 text-end text-theme-sm dark:text-gray-400">{formatCurrency(item.unit_cost)}</TableCell>
+                      <TableCell className="px-5 py-4 text-gray-800 text-end text-theme-sm dark:text-gray-400">{formatCurrency(item.total_cost)}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
                 <tfoot className="border-t border-gray-100 dark:border-white/[0.05]">
                   <TableRow className="font-semibold">
                     <TableCell colSpan={6} className="px-5 py-4 text-end text-gray-800 dark:text-white/90">Total Amount:</TableCell>
-                    <TableCell className="px-5 py-4 text-end text-gray-800 dark:text-white/90">{purchase.total_amount}</TableCell>
+                    <TableCell className="px-5 py-4 text-end text-gray-800 dark:text-white/90">{formatCurrency(purchase.total_amount)}</TableCell>
                   </TableRow>
                 </tfoot>
               </Table>

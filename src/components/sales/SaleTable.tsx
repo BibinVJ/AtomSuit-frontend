@@ -28,9 +28,11 @@ interface Props {
 }
 
 import { usePermissions } from "../../hooks/usePermissions";
+import { useSettings } from "../../hooks/useSettings";
 
 export default function SaleTable({ data, onAction, onSort, sortBy, sortDirection, currentPage, perPage }: Props) {
   const { hasPermission } = usePermissions();
+  const { formatCurrency, formatDate } = useSettings();
   const router = useRouter();
   const [isVoidModalOpen, setIsVoidModalOpen] = useState(false);
   const [selectedSale, setSelectedSale] = useState<Sale | null>(null);
@@ -89,9 +91,9 @@ export default function SaleTable({ data, onAction, onSort, sortBy, sortDirectio
                   </p>
                 </TableCell>
                 <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">{sale.invoice_number}</TableCell>
-                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">{sale.sale_date}</TableCell>
+                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">{formatDate(sale.sale_date)}</TableCell>
                 <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">{sale.customer.name}</TableCell>
-                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">{sale.total_amount}</TableCell>
+                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">{formatCurrency(sale.total_amount)}</TableCell>
                 <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
                   <Badge size="sm" color={sale.status === 'completed' ? 'success' : (sale.status === 'voided' ? 'error' : 'primary')}>
                     {sale.status}

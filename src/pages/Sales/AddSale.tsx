@@ -11,7 +11,7 @@ import Input from '../../components/form/input/InputField';
 import Label from '../../components/form/Label';
 import { useRouter } from 'next/navigation';
 import DatePicker from '../../components/form/date-picker';
-import { formatDate } from '../../utils/date';
+import { useSettings } from '../../hooks/useSettings';
 import { toast } from 'sonner';
 import TextArea from '../../components/form/input/TextArea';
 import { getCustomers } from '../../services/CustomerService';
@@ -37,13 +37,14 @@ interface ApiError {
 }
 
 export default function AddSale() {
+  const { formatDate } = useSettings();
   const { isOpen: isCustomerModalOpen, openModal: openCustomerModal, closeModal: closeCustomerModal } = useModal();
   const router = useRouter();
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [items, setItems] = useState<Item[]>([]);
   const [customerId, setCustomerId] = useState('');
   const [invoiceNumber, setInvoiceNumber] = useState('');
-  const [saleDate, setSaleDate] = useState(formatDate(new Date()));
+  const [saleDate, setSaleDate] = useState(new Date().toISOString().split('T')[0]);
   const [saleItems, setSaleItems] = useState<SaleItem[]>([
     { item_id: '', quantity: 1, unit_price: 0, description: '', stock_on_hand: 0 }
   ]);
@@ -204,7 +205,7 @@ export default function AddSale() {
               <DatePicker
                 id="sale_date"
                 label="Sale Date"
-                onChange={(_, dateStr) => { setSaleDate(dateStr); clearError('sale_date'); }}
+                onChange={(_, dateStr: string) => { setSaleDate(dateStr); clearError('sale_date'); }}
                 defaultDate={saleDate}
                 error={!!getErrorMessage('sale_date')}
                 hint={getErrorMessage('sale_date')}

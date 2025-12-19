@@ -25,6 +25,8 @@ export const updateSetting = async (key: string, value: any, type?: string, grou
   
   if (value instanceof File) {
     formData.append('value', value);
+  } else if (typeof value === 'object' && value !== null) {
+    formData.append('value', JSON.stringify(value));
   } else {
     formData.append('value', value);
   }

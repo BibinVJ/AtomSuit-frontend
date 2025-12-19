@@ -12,6 +12,8 @@ import MultiSelect from '../form/MultiSelect';
 import { Save, Trash2, Clock } from 'lucide-react';
 import { updateSetting, deleteSettingFile } from '../../services/SettingsService';
 import { toast } from 'sonner';
+import { formatLabel } from '../../utils/string';
+import { useSettings } from '../../hooks/useSettings';
 
 interface Props {
   setting: Setting;
@@ -19,19 +21,19 @@ interface Props {
 }
 
 const DATE_FORMATS = [
-  { value: 'Y-m-d', label: '2024-01-15 (Y-m-d)' },
-  { value: 'd/m/Y', label: '15/01/2024 (d/m/Y)' },
-  { value: 'm/d/Y', label: '01/15/2024 (m/d/Y)' },
-  { value: 'd-m-Y', label: '15-01-2024 (d-m-Y)' },
-  { value: 'F j, Y', label: 'January 15, 2024 (F j, Y)' },
-  { value: 'j F Y', label: '15 January 2024 (j F Y)' },
+  { value: 'Y-m-d', label: 'YYYY-MM-DD' },
+  { value: 'd/m/Y', label: 'DD/MM/YYYY' },
+  { value: 'm/d/Y', label: 'MM/DD/YYYY' },
+  { value: 'd-m-Y', label: 'DD-MM-YYYY' },
+  { value: 'F j, Y', label: 'Month Day, Year' },
+  { value: 'j F Y', label: 'Day Month Year' },
 ];
 
 const TIME_FORMATS = [
-  { value: 'H:i:s', label: '14:30:00 (H:i:s)' },
-  { value: 'H:i', label: '14:30 (H:i)' },
-  { value: 'g:i A', label: '2:30 PM (g:i A)' },
-  { value: 'g:i a', label: '2:30 pm (g:i a)' },
+  { value: 'H:i:s', label: '24 Hour (with seconds)' },
+  { value: 'H:i', label: '24 Hour' },
+  { value: 'g:i A', label: '12 Hour (AM/PM)' },
+  { value: 'g:i a', label: '12 Hour (am/pm)' },
 ];
 
 const THEME_OPTIONS = [
@@ -41,8 +43,8 @@ const THEME_OPTIONS = [
 ];
 
 const CURRENCY_POSITION_OPTIONS = [
-  { value: 'before', label: 'Before ($100)' },
-  { value: 'after', label: 'After (100$)' },
+  { value: 'before', label: 'Before' },
+  { value: 'after', label: 'After' },
 ];
 
 const DAY_OPTIONS = [
@@ -56,6 +58,7 @@ const DAY_OPTIONS = [
 ];
 
 export default function SettingField({ setting, onUpdate }: Props) {
+  const { refreshSettings } = useSettings();
   const [value, setValue] = useState(setting.value);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -64,6 +67,7 @@ export default function SettingField({ setting, onUpdate }: Props) {
     try {
       await updateSetting(setting.key, value, setting.type, setting.group);
       toast.success('Setting updated successfully');
+      await refreshSettings();
       onUpdate();
     } catch (error) {
       toast.error('Failed to update setting');
@@ -302,12 +306,11 @@ export default function SettingField({ setting, onUpdate }: Props) {
     <div className="p-4 border border-gray-200 rounded-lg dark:border-gray-700">
       <div className="flex justify-between items-start mb-2">
         <div>
-          <h3 className="font-medium text-gray-900 dark:text-white">{setting.key}</h3>
+          <h3 className="font-medium text-gray-900 dark:text-white">{formatLabel(setting.key)}</h3>
           {setting.description && (
             <p className="text-sm text-gray-500 dark:text-gray-400">{setting.description}</p>
           )}
         </div>
-        <span className="text-xs bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">{setting.type}</span>
       </div>
       
       <div className="space-y-2">
