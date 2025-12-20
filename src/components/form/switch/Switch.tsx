@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Tooltip from "../../ui/tooltip/Tooltip";
 
 interface SwitchProps {
   label: string;
@@ -8,6 +9,7 @@ interface SwitchProps {
   disabled?: boolean;
   onChange?: (checked: boolean) => void;
   color?: "blue" | "gray"; // Added prop to toggle color theme
+  tooltip?: string;
 }
 
 const Switch: React.FC<SwitchProps> = ({
@@ -16,6 +18,7 @@ const Switch: React.FC<SwitchProps> = ({
   disabled = false,
   onChange,
   color = "blue", // Default to blue color
+  tooltip,
 }) => {
   const [isChecked, setIsChecked] = useState(checked);
 
@@ -51,7 +54,7 @@ const Switch: React.FC<SwitchProps> = ({
             : "translate-x-0 bg-white",
         };
 
-  return (
+  const content = (
     <label
       className={`flex cursor-pointer select-none items-center gap-3 text-sm font-medium ${
         disabled ? "text-gray-400" : "text-gray-700 dark:text-gray-400"
@@ -71,6 +74,12 @@ const Switch: React.FC<SwitchProps> = ({
       </div>
       {label}
     </label>
+  );
+
+  return tooltip ? (
+    <Tooltip text={tooltip}>{content}</Tooltip>
+  ) : (
+    content
   );
 };
 

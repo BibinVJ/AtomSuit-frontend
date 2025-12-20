@@ -19,7 +19,7 @@ import { PencilIcon, SaveIcon, X, Eye, EyeOff, DollarSign, Package, Users, FileT
 import { getLayout, saveLayout } from "../../services/LayoutService";
 import MetricCard from "../../components/ecommerce/MetricCard";
 import SkeletonCard from "../../components/common/SkeletonCard";
-import { usePermissions } from "../../hooks/usePermissions";
+import { useAuth } from "../../hooks/useAuth";
 import { Layout } from "../../types/Layout";
 import { DashboardData } from "../../types/Dashboard";
 
@@ -105,8 +105,32 @@ const iconMap = {
   PageIcon: <FileText className="text-gray-800 size-6 dark:text-white/90" />,
 };
 
+const DashboardSkeleton = () => (
+  <div className="p-4 space-y-6 md:p-6 2-xl:p-10">
+    <div className="flex justify-between items-center mb-6">
+      <div className="h-8 w-48 bg-gray-200 dark:bg-gray-700 animate-pulse rounded"></div>
+      <div className="h-10 w-10 bg-gray-200 dark:bg-gray-700 animate-pulse rounded-full"></div>
+    </div>
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      {[...Array(4)].map((_, i) => (
+        <div key={i} className="h-32">
+          <SkeletonCard />
+        </div>
+      ))}
+    </div>
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="h-64">
+        <SkeletonCard />
+      </div>
+      <div className="h-64">
+        <SkeletonCard />
+      </div>
+    </div>
+  </div>
+);
+
 function Home() {
-  const { hasPermission } = usePermissions();
+  const { hasPermission, loading: authLoading } = useAuth();
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [chartData, setChartData] = useState<{ sales: { date: string; total: number }[]; purchases: { date: string; total: number }[] } | null>(null);
@@ -142,6 +166,9 @@ function Home() {
   }, [data, chartData]);
 
   useEffect(() => {
+    // Wait for auth to initialize and check permission
+    if (authLoading || !hasPermission("view-dashboard")) return;
+
     const fetchInitialData = async () => {
       try {
         const dashboardRes = await getDashboardData();
@@ -163,13 +190,15 @@ function Home() {
           const adaptedLayout = layoutRes.data.data.map((item: any) => {
             return {
               ...item,
-              i: item.card_id,
+              i: item.slug || item.dashboard_card_id.toString(),
+              dashboard_card_id: item.dashboard_card_id,
+              slug: item.slug,
               w: item.width || item.default_width || 12,
               h: item.height || item.default_height || 4,
               x: item.x || 0,
               y: item.y || 0,
               component: item.component, // Backend provides component name
-              props: cardPropsMap[item.card_id], // Local props mapping
+              props: cardPropsMap[item.slug || ''], // Local props mapping
               minW: 4,
               minH: 3,
             };
@@ -188,7 +217,7 @@ function Home() {
     };
 
     fetchInitialData();
-  }, []);
+  }, [authLoading, hasPermission]);
 
   const onLayoutChange = (newLayout: ReactGridLayout.Layout[]) => {
     setCards(prevCards =>
@@ -214,7 +243,7 @@ function Home() {
         rotation: rotation || 0,
         col_span: col_span || null,
         config: config || undefined,
-        card_id: i,
+        dashboard_card_id: card.dashboard_card_id,
       };
     });
     await saveLayout(layoutToSave);
@@ -243,14 +272,8 @@ function Home() {
     return <div>This is dashboard</div>;
   }
 
-  if (loading) {
-    return (
-      <div className="p-4 space-y-6 md:p-6 2-xl:p-10">
-        <div className="text-center py-10">
-          <div className="animate-pulse">Loading dashboard...</div>
-        </div>
-      </div>
-    );
+  if (loading || authLoading) {
+    return <DashboardSkeleton />;
   }
 
   const cardsToRender = editMode ? cards : cards.filter(c => c.visible);
@@ -282,11 +305,7 @@ function Home() {
           )}
         </div>
         {!loading && cards.length > 0 && (
-          <Suspense fallback={<div className="p-4 space-y-6 md:p-6 2-xl:p-10">
-            <div className="text-center py-10">
-              <div className="animate-pulse">Loading dashboard components...</div>
-            </div>
-          </div>}>
+          <Suspense fallback={<DashboardSkeleton />}>
             <ResponsiveGridLayout
               className="layout"
               layouts={layouts}
@@ -300,9 +319,9 @@ function Home() {
             >
               {cardsToRender.map(card => {
                 // Map backend component name to actual React component
-                const Component = componentNameToComponent[card.component] || componentMap[card.component as keyof typeof componentMap];
+                const Component = card.component ? (componentNameToComponent[card.component] || componentMap[card.component as keyof typeof componentMap]) : null;
                 if (!Component) {
-                  console.warn('Component not found for:', card.component, 'card_id:', card.card_id);
+                  console.warn('Component not found for:', card.component, 'slug:', card.slug);
                 }
                 const resolvedProps = getComponentProps(card.props as { [key:string]: string | number | object });
                 return (

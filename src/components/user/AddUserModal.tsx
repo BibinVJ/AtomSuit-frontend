@@ -7,7 +7,7 @@ import Input from '../form/input/InputField';
 import Label from '../form/Label';
 import Button from '../ui/button/Button';
 import { toast } from 'sonner';
-import { createUser } from '../../services/UserService';
+import { addUser } from '../../services/UserService';
 import { getRoles } from '../../services/RoleService';
 import Select from '../form/Select';
 import { formatKebabCase } from '../../utils/string';
@@ -33,7 +33,7 @@ export default function AddUserModal({ isOpen, onClose, onUserAdded }: Props) {
     if (isOpen) {
       const fetchRoles = async () => {
         try {
-          const rolesData = await getRoles(1, 10, 'created_at', 'desc', true);
+          const rolesData = await getRoles({ page: 1, limit: 10, sortCol: 'created_at', sortDir: 'desc', unpaginated: true });
           if (rolesData && Array.isArray(rolesData.data)) {
             setRoles(rolesData.data);
           } else {
@@ -98,7 +98,7 @@ export default function AddUserModal({ isOpen, onClose, onUserAdded }: Props) {
     }
 
     try {
-      await createUser({ name, email, phone, password, role_id: roleId, profile_image: null, alternate_email: null, alternate_phone: null, id_proof_type: null, id_proof_number: null, dob: null, gender: null, addresses: [], social_links: [] });
+      await addUser({ name, email, phone, password, role_id: roleId, profile_image: null, alternate_email: null, alternate_phone: null, id_proof_type: null, id_proof_number: null, dob: null, gender: null, addresses: [], social_links: [] });
       onUserAdded();
       toast.success('User added successfully');
       handleClose();
@@ -124,8 +124,8 @@ export default function AddUserModal({ isOpen, onClose, onUserAdded }: Props) {
   const roleOptions = roles.map(r => ({ value: String(r.id), label: formatKebabCase(r.name) }));
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} className="max-w-[700px] lg:p-11">
-      <div className="relative w-full p-4 overflow-y-auto bg-white no-scrollbar rounded-3xl dark:bg-gray-900">
+    <Modal isOpen={isOpen} onClose={handleClose} className="max-w-[700px] p-6 md:p-10">
+      <div className="relative w-full">
         <div className="px-2 pr-14">
           <h4 className="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90">
             Add New User

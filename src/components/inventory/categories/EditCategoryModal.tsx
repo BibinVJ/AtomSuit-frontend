@@ -24,14 +24,12 @@ interface Props {
 export default function EditCategoryModal({ isOpen, onClose, onCategoryUpdated, category }: Props) {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
-  const [isActive, setIsActive] = useState(true);
   const [errors, setErrors] = useState({ name: '' });
 
   useEffect(() => {
     if (category) {
       setName(category.name);
       setDescription(category.description || '');
-      setIsActive(category.is_active);
     }
   }, [category]);
 
@@ -43,7 +41,7 @@ export default function EditCategoryModal({ isOpen, onClose, onCategoryUpdated, 
     }
     
     try {
-      await updateCategory(category.id, { name, description, is_active: isActive });
+      await updateCategory(category.id, { name, description });
       onCategoryUpdated();
       toast.success('Category updated successfully');
       onClose();
@@ -65,8 +63,8 @@ export default function EditCategoryModal({ isOpen, onClose, onCategoryUpdated, 
 
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} className="max-w-[700px] lg:p-11">
-      <div className="relative w-full p-4 overflow-y-auto bg-white no-scrollbar rounded-3xl dark:bg-gray-900">
+    <Modal isOpen={isOpen} onClose={onClose} className="max-w-[700px] p-6 md:p-10">
+      <div className="relative w-full">
           <div className="px-2 pr-14">
             <h4 className="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90">
               Edit Category
@@ -101,15 +99,7 @@ export default function EditCategoryModal({ isOpen, onClose, onCategoryUpdated, 
                     onChange={setDescription}
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   />
-                </div>
-                <div>
-                  <Label>Status</Label>
-                  <Switch
-                    label={isActive ? 'Active' : 'Inactive'}
-                    checked={isActive}
-                    onChange={setIsActive}
-                  />
-                </div>
+              </div>
               </div>
             </div>
             <div className="flex items-center gap-3 px-2 mt-6 lg:justify-end">

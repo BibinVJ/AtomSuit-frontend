@@ -12,7 +12,9 @@ import { useState } from "react";
 import Badge from "../ui/badge/Badge";
 import EditVendorModal from "./EditVendorModal";
 import DeleteVendorModal from "./DeleteVendorModal";
-import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide, Edit, Trash2 } from 'lucide-react';
+import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide, Edit, Trash2, RefreshCw } from 'lucide-react';
+import { restoreVendor } from "../../services/VendorService";
+import { toast } from "sonner";
 import Button from "../ui/button/Button";
 import Tooltip from "../ui/tooltip/Tooltip";
 
@@ -26,11 +28,13 @@ interface Props {
   sortDirection: string;
   currentPage: number;
   perPage: number;
+  startIndex?: number;
+  viewMode?: 'active' | 'trashed';
 }
 
 import { usePermissions } from "../../hooks/usePermissions";
 
-export default function VendorTable({ data, onAction, onSort, sortBy, sortDirection, currentPage, perPage }: Props) {
+export default function VendorTable({ data, onAction, onSort, sortBy, sortDirection, currentPage, perPage, startIndex, viewMode = 'active' }: Props) {
   const { hasPermission } = usePermissions();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -52,6 +56,17 @@ export default function VendorTable({ data, onAction, onSort, sortBy, sortDirect
     setIsEditModalOpen(false);
     setIsDeleteModalOpen(false);
     setSelectedVendor(null);
+  };
+
+  const handleRestore = async (id: number) => {
+    try {
+      await restoreVendor(id);
+      toast.success('Vendor restored successfully');
+      onAction();
+    } catch (error) {
+      console.error('Error restoring vendor:', error);
+      toast.error('Failed to restore vendor');
+    }
   };
 
   const renderSortIcon = (column: string) => {
@@ -76,7 +91,6 @@ export default function VendorTable({ data, onAction, onSort, sortBy, sortDirect
               <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400" onClick={() => onSort('email')}>Email {renderSortIcon('email')}</TableCell>
               <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400" onClick={() => onSort('phone')}>Phone {renderSortIcon('phone')}</TableCell>
               <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">Address</TableCell>
-              <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400" onClick={() => onSort('is_active')}>Status {renderSortIcon('is_active')}</TableCell>
               <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">Actions</TableCell>
             </TableRow>
           </TableHeader>
@@ -86,7 +100,7 @@ export default function VendorTable({ data, onAction, onSort, sortBy, sortDirect
               <TableRow key={vendor.id}>
                 <TableCell className="px-5 py-4 sm:px-6 text-start">
                   <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                    {(currentPage - 1) * perPage + index + 1}
+                    {startIndex !== undefined ? startIndex + index : (currentPage - 1) * perPage + index + 1}
                   </p>
                 </TableCell>
                 <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">{vendor.name}</TableCell>
@@ -94,33 +108,57 @@ export default function VendorTable({ data, onAction, onSort, sortBy, sortDirect
                 <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">{vendor.phone}</TableCell>
                 <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">{vendor.address}</TableCell>
                 <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                  <Badge size="sm" color={vendor.is_active ? "success" : "error"}>
-                    {vendor.is_active ? "Active" : "Inactive"}
-                  </Badge>
-                </TableCell>
-                <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
                   <div className="flex items-center gap-2">
-                    {hasPermission("update-vendor") && (
-                      <Tooltip text="Edit">
-                        <Button
-                          size="xs"
-                          onClick={() => handleEdit(vendor)}
-                          className="bg-blue-600 hover:bg-blue-700 text-white"
-                        >
-                          <Edit className="w-4 h-4" />
-                        </Button>
-                      </Tooltip>
-                    )}
-                    {hasPermission("delete-vendor") && (
-                      <Tooltip text="Delete">
-                        <Button
-                          size="xs"
-                          onClick={() => handleDelete(vendor)}
-                          className="bg-red-600 hover:bg-red-700 text-white"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </Tooltip>
+                    {viewMode === 'active' ? (
+                      <>
+                        {hasPermission("update-vendor") && (
+                          <Tooltip text="Edit">
+                            <Button
+                              size="xs"
+                              onClick={() => handleEdit(vendor)}
+                              className="bg-blue-600 hover:bg-blue-700 text-white"
+                            >
+                              <Edit className="w-4 h-4" />
+                            </Button>
+                          </Tooltip>
+                        )}
+                        {hasPermission("delete-vendor") && (
+                          <Tooltip text="Delete">
+                            <Button
+                              size="xs"
+                              onClick={() => handleDelete(vendor)}
+                              className="bg-red-600 hover:bg-red-700 text-white"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </Tooltip>
+                        )}
+                      </>
+                    ) : (
+                      <>
+                        {hasPermission("update-vendor") && (
+                          <Tooltip text="Restore">
+                            <Button
+                              size="xs"
+                              onClick={() => handleRestore(vendor.id)}
+                              className="bg-green-600 hover:bg-green-700 text-white"
+                            >
+                              <RefreshCw className="w-4 h-4" />
+                            </Button>
+                          </Tooltip>
+                        )}
+                        {hasPermission("delete-vendor") && (
+                          <Tooltip text="Delete Permanently">
+                            <Button
+                              size="xs"
+                              onClick={() => handleDelete(vendor)}
+                              className="bg-red-600 hover:bg-red-700 text-white"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </Tooltip>
+                        )}
+                      </>
                     )}
                   </div>
                 </TableCell>
@@ -142,6 +180,7 @@ export default function VendorTable({ data, onAction, onSort, sortBy, sortDirect
             onClose={handleCloseModals}
             onVendorDeleted={onAction}
             vendor={selectedVendor}
+            force={viewMode === 'trashed'}
           />
         </>
       )}

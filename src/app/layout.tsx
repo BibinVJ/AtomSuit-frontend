@@ -19,6 +19,7 @@ export const metadata: Metadata = {
   title: 'Atom Suit - Dashboard',
   description: 'Atom Suit inventory management system',
 };
+
 export default function RootLayout({
   children,
 }: Readonly<{

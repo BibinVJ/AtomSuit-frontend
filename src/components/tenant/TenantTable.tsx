@@ -27,9 +27,10 @@ interface Props {
   sortDirection: string;
   currentPage: number;
   perPage: number;
+  startIndex?: number;
 }
 
-export default function TenantTable({ data, onAction, onSort, sortBy, sortDirection, currentPage, perPage }: Props) {
+export default function TenantTable({ data, onAction, onSort, sortBy, sortDirection, currentPage, perPage, startIndex }: Props) {
   const { hasPermission } = usePermissions();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedTenant, setSelectedTenant] = useState<Tenant | null>(null);
@@ -97,7 +98,7 @@ export default function TenantTable({ data, onAction, onSort, sortBy, sortDirect
               <TableRow key={tenant.id}>
                 <TableCell className="px-5 py-4 sm:px-6 text-start">
                   <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                    {(currentPage - 1) * perPage + index + 1}
+                    {startIndex !== undefined ? startIndex + index : (currentPage - 1) * perPage + index + 1}
                   </p>
                 </TableCell>
                 <TableCell className="px-4 py-3 text-start">

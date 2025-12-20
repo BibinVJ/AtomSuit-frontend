@@ -10,16 +10,26 @@ import AddVendorModal from '../../components/vendor/AddVendorModal';
 import { useModal } from '../../hooks/useModal';
 import Pagination from '../../components/common/Pagination';
 import Button from '../../components/ui/button/Button';
+import Tooltip from '../../components/ui/tooltip/Tooltip';
 import Select from '../../components/form/Select';
-import { getVendors } from '../../services/VendorService';
+import { getVendors, exportVendors, importVendors, downloadSampleVendorExcel } from '../../services/VendorService';
 import { Vendor } from '../../types';
+import ImportModal from '../../components/common/ImportModal';
+import { Download, Upload } from 'lucide-react';
+import { toast } from 'sonner';
+import ViewModeTabs from '../../components/common/ViewModeTabs';
 
 import { usePermissions } from '../../hooks/usePermissions';
+
+import { useDebounce } from '../../hooks/useDebounce';
+import TableToolbar from '../../components/common/TableToolbar';
+import { Plus } from 'lucide-react';
 
 export default function Vendors() {
   const { hasPermission } = usePermissions();
   const [vendors, setVendors] = useState<Vendor[]>([]);
   const { isOpen, openModal, closeModal } = useModal();
+  const { isOpen: isImportModalOpen, openModal: openImportModal, closeModal: closeImportModal } = useModal();
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
@@ -28,16 +38,37 @@ export default function Vendors() {
   const [total, setTotal] = useState(0);
   const [sortBy, setSortBy] = useState('created_at');
   const [sortDirection, setSortDirection] = useState('desc');
+  const [viewMode, setViewMode] = useState<'active' | 'trashed'>('active');
+
+  /* State for Range Fetching & Search */
+  const [rangeFrom, setRangeFrom] = useState<number | ''>('');
+  const [rangeTo, setRangeTo] = useState<number | ''>('');
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const debouncedSearchTerm = useDebounce(searchTerm, 1000);
+  const debouncedRangeFrom = useDebounce(rangeFrom, 1000);
+  const debouncedRangeTo = useDebounce(rangeTo, 1000);
 
   const fetchVendors = async (page = 1, limit = 10, sortCol = 'created_at', sortDir = 'desc') => {
     try {
-      const response = await getVendors(page, limit, sortCol, sortDir);
+      const response = await getVendors({
+        page,
+        limit,
+        sortCol,
+        sortDir,
+        from: debouncedRangeFrom !== '' ? Number(debouncedRangeFrom) : undefined,
+        to: debouncedRangeTo !== '' ? Number(debouncedRangeTo) : undefined,
+        search: debouncedSearchTerm,
+        trashed: viewMode === 'trashed' ? 'only' : undefined
+      });
       setVendors(response.data);
-      setTotalPages(response.meta.last_page);
-      setCurrentPage(response.meta.current_page);
-      setFrom(response.meta.from);
-      setTo(response.meta.to);
-      setTotal(response.meta.total);
+      if (response.meta) {
+        setTotalPages(response.meta.last_page || 1);
+        setCurrentPage(response.meta.current_page || 1);
+        setFrom(response.meta.from !== undefined ? response.meta.from : (debouncedRangeFrom !== '' ? Number(debouncedRangeFrom) : 0));
+        setTo(response.meta.to !== undefined ? response.meta.to : (debouncedRangeTo !== '' ? Number(debouncedRangeTo) : 0));
+        setTotal(response.meta.total || 0);
+      }
     } catch (error) {
       console.error('Error fetching vendors:', error);
     }
@@ -45,7 +76,7 @@ export default function Vendors() {
 
   useEffect(() => {
     fetchVendors(currentPage, perPage, sortBy, sortDirection);
-  }, [currentPage, perPage, sortBy, sortDirection]);
+  }, [currentPage, perPage, sortBy, sortDirection, debouncedSearchTerm, debouncedRangeFrom, debouncedRangeTo, viewMode]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -65,6 +96,24 @@ export default function Vendors() {
     }
   };
 
+  const handleExport = async () => {
+    try {
+      const response = await exportVendors();
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+      link.setAttribute('download', `vendors_${timestamp}.xlsx`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      toast.error('Failed to export vendors');
+      console.error('Export error:', error);
+    }
+  };
+
   return (
     <>
       <PageMeta
@@ -72,30 +121,53 @@ export default function Vendors() {
         description="List of vendors"
       />
       <PageBreadcrumb pageTitle="Vendors" />
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <label htmlFor="perPage" className="text-sm font-medium text-gray-700">Per Page:</label>
-          <Select
-            options={[
-              { value: '10', label: '10' },
-              { value: '20', label: '20' },
-              { value: '50', label: '50' },
-            ]}
-            onChange={handlePerPageChange}
-            defaultValue={String(perPage)}
-            showPlaceholder={false}
-            className="w-20"
-            searchable={false}
+
+      <div className="space-y-6">
+        <div className="p-5 border border-gray-200 rounded-2xl bg-gray-50 dark:bg-white/[0.03] dark:border-gray-800 shadow-sm">
+          <TableToolbar
+            className="mb-0"
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            searchPlaceholder="Search vendors..."
+            rangeFrom={rangeFrom}
+            onRangeFromChange={(val) => setRangeFrom(val as number | '')}
+            rangeTo={rangeTo}
+            onRangeToChange={(val) => setRangeTo(val as number | '')}
+            perPage={perPage}
+            onPerPageChange={handlePerPageChange}
+            onReset={() => {
+              setSearchTerm('');
+              setRangeFrom('');
+              setRangeTo('');
+            }}
           />
         </div>
-        {hasPermission("create-vendor") && (
-          <Button onClick={openModal}>
-            Add Vendor
-          </Button>
-        )}
-      </div>
-      <div className="space-y-6">
-        <ComponentCard title="Vendors">
+
+        <ComponentCard
+          title={`Vendors (${viewMode})`}
+          action={
+            <div className="flex flex-wrap items-center gap-2">
+              <ViewModeTabs viewMode={viewMode} setViewMode={setViewMode} />
+              <Tooltip text="Import Vendors">
+                <Button variant="outline" size="sm" onClick={openImportModal} startIcon={<Upload className="w-4 h-4" />}>
+                  Import
+                </Button>
+              </Tooltip>
+              <Tooltip text="Export Vendors">
+                <Button variant="outline" size="sm" onClick={handleExport} startIcon={<Download className="w-4 h-4" />}>
+                  Export
+                </Button>
+              </Tooltip>
+              {hasPermission("create-vendor") && (
+                <Tooltip text="Add New Vendor">
+                  <Button onClick={openModal} size="sm" startIcon={<Plus className="w-4 h-4" />}>
+                    Add Vendor
+                  </Button>
+                </Tooltip>
+              )}
+            </div>
+          }
+        >
           <VendorTable
             data={vendors}
             onAction={() => fetchVendors(currentPage, perPage, sortBy, sortDirection)}
@@ -104,6 +176,8 @@ export default function Vendors() {
             sortDirection={sortDirection}
             currentPage={currentPage}
             perPage={perPage}
+            startIndex={debouncedRangeFrom !== '' ? Number(debouncedRangeFrom) : undefined}
+            viewMode={viewMode}
           />
           <Pagination
             currentPage={currentPage}
@@ -116,6 +190,15 @@ export default function Vendors() {
         </ComponentCard>
       </div>
       <AddVendorModal isOpen={isOpen} onClose={closeModal} onVendorAdded={() => fetchVendors(1, perPage)} />
+      <ImportModal
+        isOpen={isImportModalOpen}
+        onClose={closeImportModal}
+        onImport={importVendors}
+        onDownloadSample={downloadSampleVendorExcel}
+        onSuccess={() => fetchVendors(1, perPage)}
+        entityName="Vendors"
+      />
     </>
   );
 }
+

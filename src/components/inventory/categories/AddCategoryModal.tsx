@@ -21,13 +21,11 @@ interface Props {
 export default function AddCategoryModal({ isOpen, onClose, onCategoryAdded }: Props) {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
-  const [isActive, setIsActive] = useState(true);
   const [errors, setErrors] = useState({ name: '' });
 
   const resetForm = () => {
     setName('');
     setDescription('');
-    setIsActive(true);
     setErrors({ name: '' });
   };
 
@@ -44,7 +42,7 @@ export default function AddCategoryModal({ isOpen, onClose, onCategoryAdded }: P
     }
     
     try {
-      await addCategory({ name, description, is_active: isActive });
+      await addCategory({ name, description });
       onCategoryAdded();
       toast.success('Category added successfully');
       handleClose();
@@ -64,8 +62,8 @@ export default function AddCategoryModal({ isOpen, onClose, onCategoryAdded }: P
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} className="max-w-[700px] lg:p-11">
-      <div className="relative w-full p-4 overflow-y-auto bg-white no-scrollbar rounded-3xl dark:bg-gray-900">
+    <Modal isOpen={isOpen} onClose={handleClose} className="max-w-[700px] p-6 md:p-10">
+      <div className="relative w-full">
           <div className="px-2 pr-14">
             <h4 className="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90">
               Add New Category
@@ -100,15 +98,7 @@ export default function AddCategoryModal({ isOpen, onClose, onCategoryAdded }: P
                     onChange={setDescription}
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   />
-                </div>
-                <div>
-                  <Label>Status</Label>
-                  <Switch
-                    label={isActive ? 'Active' : 'Inactive'}
-                    checked={isActive}
-                    onChange={setIsActive}
-                  />
-                </div>
+              </div>
               </div>
             </div>
             <div className="flex items-center gap-3 px-2 mt-6 lg:justify-end">

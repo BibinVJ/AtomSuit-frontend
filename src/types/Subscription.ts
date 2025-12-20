@@ -14,7 +14,6 @@ export interface Subscription {
   ends_at?: string;
   plan_id: number;
   plan?: Plan;
-  is_active: boolean;
   is_canceled: boolean;
   is_on_trial: boolean;
   is_on_grace_period: boolean;
@@ -58,6 +57,8 @@ export interface SubscriptionApiResponse {
     last_page: number;
     per_page: number;
     total: number;
+    from?: number;
+    to?: number;
   };
   links?: {
     first: string;

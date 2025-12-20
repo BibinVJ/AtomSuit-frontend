@@ -10,6 +10,7 @@ import Select from '../../components/form/Select';
 import { getSubscriptions } from '../../services/SubscriptionService';
 import { usePermissions } from '../../hooks/usePermissions';
 import { Subscription } from '../../types';
+import TableToolbar from '../../components/common/TableToolbar';
 
 export default function Subscriptions() {
   const { hasPermission } = usePermissions();
@@ -22,16 +23,19 @@ export default function Subscriptions() {
   const [total, setTotal] = useState(0);
   const [sortBy, setSortBy] = useState('created_at');
   const [sortDirection, setSortDirection] = useState('desc');
+  const [searchTerm, setSearchTerm] = useState('');
 
   const fetchSubscriptions = async (page = 1, limit = 10, sortCol = 'created_at', sortDir = 'desc') => {
     try {
       const response = await getSubscriptions(page, limit, sortCol, sortDir);
-      setSubscriptions(response.data as Subscription[]);
-      setTotalPages(response.meta.last_page);
-      setCurrentPage(response.meta.current_page);
-      setFrom(response.meta.from);
-      setTo(response.meta.to);
-      setTotal(response.meta.total);
+      setSubscriptions(Array.isArray(response.data) ? response.data : []);
+      if (response.meta) {
+        setTotalPages(response.meta.last_page || 1);
+        setCurrentPage(response.meta.current_page || 1);
+        setFrom(response.meta.from || 0);
+        setTo(response.meta.to || 0);
+        setTotal(response.meta.total || 0);
+      }
     } catch (error) {
       console.error('Error fetching subscriptions:', error);
     }
@@ -66,24 +70,21 @@ export default function Subscriptions() {
         description="List of subscriptions"
       />
       <PageBreadcrumb pageTitle="Subscriptions" />
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <label htmlFor="perPage" className="text-sm font-medium text-gray-700">Per Page:</label>
-          <Select
-            options={[
-              { value: '10', label: '10' },
-              { value: '20', label: '20' },
-              { value: '50', label: '50' },
-            ]}
-            onChange={handlePerPageChange}
-            defaultValue={String(perPage)}
-            showPlaceholder={false}
-            className="w-20"
-            searchable={false}
+      <div className="space-y-6">
+        <div className="p-5 border border-gray-200 rounded-2xl bg-gray-50 dark:bg-white/[0.03] dark:border-gray-800 shadow-sm">
+          <TableToolbar
+            className="mb-0"
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            searchPlaceholder="Search subscriptions..."
+            perPage={perPage}
+            onPerPageChange={handlePerPageChange}
+            showRange={false}
+            onReset={() => {
+              setSearchTerm('');
+            }}
           />
         </div>
-      </div>
-      <div className="space-y-6">
         <ComponentCard title="Subscriptions">
           <SubscriptionTable
             data={subscriptions}

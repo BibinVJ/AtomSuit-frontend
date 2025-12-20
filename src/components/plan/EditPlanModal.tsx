@@ -28,7 +28,6 @@ export default function EditPlanModal({ isOpen, onClose, onPlanUpdated, plan }: 
   const [isTrial, setIsTrial] = useState(false);
   const [trialDays, setTrialDays] = useState('14');
   const [isExpiredUserPlan, setIsExpiredUserPlan] = useState(false);
-  const [isActive, setIsActive] = useState(true);
   const [features, setFeatures] = useState<PlanFeature[]>([]);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
@@ -41,7 +40,6 @@ export default function EditPlanModal({ isOpen, onClose, onPlanUpdated, plan }: 
       setIsTrial(plan.is_trial_plan);
       setTrialDays(String(plan.trial_duration_in_days || 14));
       setIsExpiredUserPlan(plan.is_expired_user_plan);
-      setIsActive(plan.is_active);
       setFeatures(plan.features?.map(f => ({
         id: f.id,
         key: f.key,
@@ -106,7 +104,6 @@ export default function EditPlanModal({ isOpen, onClose, onPlanUpdated, plan }: 
         is_trial_plan: isTrial,
         trial_duration_in_days: isTrial ? Number(trialDays) : undefined,
         is_expired_user_plan: isExpiredUserPlan,
-        is_active: isActive,
         features: features.map((f, index) => ({
           id: f.id,
           key: f.key,
@@ -223,11 +220,7 @@ export default function EditPlanModal({ isOpen, onClose, onPlanUpdated, plan }: 
                 <div>
                   <Label>Expired User Plan?</Label>
                   <Switch label={isExpiredUserPlan ? 'Yes' : 'No'} checked={isExpiredUserPlan} onChange={setIsExpiredUserPlan} />
-                </div>
-                <div>
-                  <Label>Status</Label>
-                  <Switch label={isActive ? 'Active' : 'Inactive'} checked={isActive} onChange={setIsActive} />
-                </div>
+              </div>
               </div>
 
               {/* Features Section */}

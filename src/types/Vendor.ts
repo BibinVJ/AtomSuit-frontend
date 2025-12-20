@@ -4,7 +4,6 @@ export interface Vendor {
   email: string;
   phone: string;
   address: string;
-  is_active: boolean;
 }
 
 export interface VendorApiResponse {

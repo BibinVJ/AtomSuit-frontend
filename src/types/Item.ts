@@ -10,7 +10,7 @@ export interface Item {
   unit: Unit;
   type: string;
   selling_price: number;
-  is_active: boolean;
+  deleted_at?: string;
   stock_on_hand?: number;
   non_expired_stock?: number;
   expired_stock?: number;

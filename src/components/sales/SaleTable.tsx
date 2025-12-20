@@ -25,12 +25,13 @@ interface Props {
   sortDirection: string;
   currentPage: number;
   perPage: number;
+  startIndex?: number;
 }
 
 import { usePermissions } from "../../hooks/usePermissions";
 import { useSettings } from "../../hooks/useSettings";
 
-export default function SaleTable({ data, onAction, onSort, sortBy, sortDirection, currentPage, perPage }: Props) {
+export default function SaleTable({ data, onAction, onSort, sortBy, sortDirection, currentPage, perPage, startIndex }: Props) {
   const { hasPermission } = usePermissions();
   const { formatCurrency, formatDate } = useSettings();
   const router = useRouter();
@@ -85,9 +86,9 @@ export default function SaleTable({ data, onAction, onSort, sortBy, sortDirectio
           <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
             {data.map((sale, index) => (
               <TableRow key={sale.id}>
-                <TableCell className="px-5 py-4 sm:px-6 text-start">
+                <TableCell className="px-5 py-3 text-start">
                   <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                    {(currentPage - 1) * perPage + index + 1}
+                    {startIndex !== undefined ? startIndex + index : (currentPage - 1) * perPage + index + 1}
                   </p>
                 </TableCell>
                 <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">{sale.invoice_number}</TableCell>

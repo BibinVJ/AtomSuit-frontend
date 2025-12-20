@@ -12,7 +12,9 @@ import { useState } from "react";
 import Badge from "../ui/badge/Badge";
 import EditCustomerModal from "./EditCustomerModal";
 import DeleteCustomerModal from "./DeleteCustomerModal";
-import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide, Edit, Trash2 } from 'lucide-react';
+import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide, Edit, Trash2, RefreshCw } from 'lucide-react';
+import { restoreCustomer } from "../../services/CustomerService";
+import { toast } from "sonner";
 import Button from "../ui/button/Button";
 import Tooltip from "../ui/tooltip/Tooltip";
 
@@ -27,10 +29,12 @@ interface Props {
   sortDirection: string;
   currentPage: number;
   perPage: number;
+  startIndex?: number;
+  viewMode?: 'active' | 'trashed';
 }
 
 
-export default function CustomerTable({ data, onAction, onSort, sortBy, sortDirection, currentPage, perPage }: Props) {
+export default function CustomerTable({ data, onAction, onSort, sortBy, sortDirection, currentPage, perPage, startIndex, viewMode = 'active' }: Props) {
   const { hasPermission } = usePermissions();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -52,6 +56,17 @@ export default function CustomerTable({ data, onAction, onSort, sortBy, sortDire
     setIsEditModalOpen(false);
     setIsDeleteModalOpen(false);
     setSelectedCustomer(null);
+  };
+
+  const handleRestore = async (id: number) => {
+    try {
+      await restoreCustomer(id);
+      toast.success('Customer restored successfully');
+      onAction();
+    } catch (error) {
+      console.error('Error restoring customer:', error);
+      toast.error('Failed to restore customer');
+    }
   };
 
   const renderSortIcon = (column: string) => {
@@ -76,7 +91,6 @@ export default function CustomerTable({ data, onAction, onSort, sortBy, sortDire
               <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400" onClick={() => onSort('email')}>Email {renderSortIcon('email')}</TableCell>
               <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400" onClick={() => onSort('phone')}>Phone {renderSortIcon('phone')}</TableCell>
               <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">Address</TableCell>
-              <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400" onClick={() => onSort('is_active')}>Status {renderSortIcon('is_active')}</TableCell>
               <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">Actions</TableCell>
             </TableRow>
           </TableHeader>
@@ -86,7 +100,7 @@ export default function CustomerTable({ data, onAction, onSort, sortBy, sortDire
               <TableRow key={customer.id}>
                 <TableCell className="px-5 py-4 sm:px-6 text-start">
                   <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                    {(currentPage - 1) * perPage + index + 1}
+                    {startIndex !== undefined ? startIndex + index : (currentPage - 1) * perPage + index + 1}
                   </p>
                 </TableCell>
                 <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">{customer.name}</TableCell>
@@ -94,33 +108,57 @@ export default function CustomerTable({ data, onAction, onSort, sortBy, sortDire
                 <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">{customer.phone}</TableCell>
                 <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">{customer.address}</TableCell>
                 <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                  <Badge size="sm" color={customer.is_active ? "success" : "error"}>
-                    {customer.is_active ? "Active" : "Inactive"}
-                  </Badge>
-                </TableCell>
-                <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
                   <div className="flex items-center gap-2">
-                    {hasPermission("update-customer") && (
-                      <Tooltip text="Edit">
-                        <Button
-                          size="xs"
-                          onClick={() => handleEdit(customer)}
-                          className="bg-blue-600 hover:bg-blue-700 text-white"
-                        >
-                          <Edit className="w-4 h-4" />
-                        </Button>
-                      </Tooltip>
-                    )}
-                    {hasPermission("delete-customer") && (
-                      <Tooltip text="Delete">
-                        <Button
-                          size="xs"
-                          onClick={() => handleDelete(customer)}
-                          className="bg-red-600 hover:bg-red-700 text-white"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </Tooltip>
+                    {viewMode === 'active' ? (
+                      <>
+                        {hasPermission("update-customer") && (
+                          <Tooltip text="Edit">
+                            <Button
+                              size="xs"
+                              onClick={() => handleEdit(customer)}
+                              className="bg-blue-600 hover:bg-blue-700 text-white"
+                            >
+                              <Edit className="w-4 h-4" />
+                            </Button>
+                          </Tooltip>
+                        )}
+                        {hasPermission("delete-customer") && (
+                          <Tooltip text="Delete">
+                            <Button
+                              size="xs"
+                              onClick={() => handleDelete(customer)}
+                              className="bg-red-600 hover:bg-red-700 text-white"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </Tooltip>
+                        )}
+                      </>
+                    ) : (
+                      <>
+                        {hasPermission("update-customer") && (
+                          <Tooltip text="Restore">
+                            <Button
+                              size="xs"
+                              onClick={() => handleRestore(customer.id)}
+                              className="bg-green-600 hover:bg-green-700 text-white"
+                            >
+                              <RefreshCw className="w-4 h-4" />
+                            </Button>
+                          </Tooltip>
+                        )}
+                        {hasPermission("delete-customer") && (
+                          <Tooltip text="Delete Permanently">
+                            <Button
+                              size="xs"
+                              onClick={() => handleDelete(customer)}
+                              className="bg-red-600 hover:bg-red-700 text-white"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </Tooltip>
+                        )}
+                      </>
                     )}
                   </div>
                 </TableCell>
@@ -142,6 +180,7 @@ export default function CustomerTable({ data, onAction, onSort, sortBy, sortDire
             onClose={handleCloseModals}
             onCustomerDeleted={onAction}
             customer={selectedCustomer}
+            force={viewMode === 'trashed'}
           />
         </>
       )}

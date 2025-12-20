@@ -7,12 +7,17 @@ import PageMeta from '../../components/common/PageMeta';
 import SaleTable from '../../components/sales/SaleTable';
 import Pagination from '../../components/common/Pagination';
 import Button from '../../components/ui/button/Button';
+import Tooltip from '../../components/ui/tooltip/Tooltip';
 import Select from '../../components/form/Select';
 import { useRouter } from 'next/navigation';
 import { getSales } from '../../services/SaleService';
 import { Sale } from '../../types';
 
 import { usePermissions } from '../../hooks/usePermissions';
+
+import { useDebounce } from '../../hooks/useDebounce';
+import TableToolbar from '../../components/common/TableToolbar';
+import { Plus } from 'lucide-react';
 
 export default function Sales() {
   const { hasPermission } = usePermissions();
@@ -27,15 +32,34 @@ export default function Sales() {
   const [sortBy, setSortBy] = useState('created_at');
   const [sortDirection, setSortDirection] = useState('desc');
 
+  /* State for Range Fetching & Search */
+  const [rangeFrom, setRangeFrom] = useState<number | ''>('');
+  const [rangeTo, setRangeTo] = useState<number | ''>('');
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const debouncedSearchTerm = useDebounce(searchTerm, 1000);
+  const debouncedRangeFrom = useDebounce(rangeFrom, 1000);
+  const debouncedRangeTo = useDebounce(rangeTo, 1000);
+
   const fetchSales = async (page = 1, limit = 10, sortCol = 'created_at', sortDir = 'desc') => {
     try {
-      const response = await getSales(page, limit, sortCol, sortDir);
+      const response = await getSales(
+        page,
+        limit,
+        sortCol,
+        sortDir,
+        debouncedRangeFrom !== '' ? Number(debouncedRangeFrom) : undefined,
+        debouncedRangeTo !== '' ? Number(debouncedRangeTo) : undefined,
+        debouncedSearchTerm
+      );
       setSales(response.data);
-      setTotalPages(response.meta.last_page);
-      setCurrentPage(response.meta.current_page);
-      setFrom(response.meta.from);
-      setTo(response.meta.to);
-      setTotal(response.meta.total);
+      if (response.meta) {
+        setTotalPages(response.meta.last_page || 1);
+        setCurrentPage(response.meta.current_page || 1);
+        setFrom(response.meta.from !== undefined ? response.meta.from : (debouncedRangeFrom !== '' ? Number(debouncedRangeFrom) : 0));
+        setTo(response.meta.to !== undefined ? response.meta.to : (debouncedRangeTo !== '' ? Number(debouncedRangeTo) : 0));
+        setTotal(response.meta.total || 0);
+      }
     } catch (error) {
       console.error('Error fetching sales:', error);
     }
@@ -43,7 +67,7 @@ export default function Sales() {
 
   useEffect(() => {
     fetchSales(currentPage, perPage, sortBy, sortDirection);
-  }, [currentPage, perPage, sortBy, sortDirection]);
+  }, [currentPage, perPage, sortBy, sortDirection, debouncedSearchTerm, debouncedRangeFrom, debouncedRangeTo]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -70,30 +94,42 @@ export default function Sales() {
         description="List of sales"
       />
       <PageBreadcrumb pageTitle="Sales" />
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <label htmlFor="perPage" className="text-sm font-medium text-gray-700">Per Page:</label>
-          <Select
-            options={[
-              { value: '10', label: '10' },
-              { value: '20', label: '20' },
-              { value: '50', label: '50' },
-            ]}
-            onChange={handlePerPageChange}
-            defaultValue={String(perPage)}
-            showPlaceholder={false}
-            className="w-20"
-            searchable={false}
+
+      <div className="space-y-6">
+        <div className="p-5 border border-gray-200 rounded-2xl bg-gray-50 dark:bg-white/[0.03] dark:border-gray-800 shadow-sm">
+          <TableToolbar
+            className="mb-0"
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            searchPlaceholder="Search sales..."
+            rangeFrom={rangeFrom}
+            onRangeFromChange={(val) => setRangeFrom(val as number | '')}
+            rangeTo={rangeTo}
+            onRangeToChange={(val) => setRangeTo(val as number | '')}
+            perPage={perPage}
+            onPerPageChange={handlePerPageChange}
+            onReset={() => {
+              setSearchTerm('');
+              setRangeFrom('');
+              setRangeTo('');
+            }}
           />
         </div>
-        {hasPermission("create-sale") && (
-          <Button onClick={() => router.push('/sales/add')}>
-            Add Sale
-          </Button>
-        )}
-      </div>
-      <div className="space-y-6">
-        <ComponentCard>
+
+        <ComponentCard
+          title="Sales"
+          action={
+            <div className="flex flex-wrap items-center gap-2">
+              {hasPermission("create-sale") && (
+                <Tooltip text="Add New Sale">
+                  <Button onClick={() => router.push('/sales/add')} size="sm" startIcon={<Plus className="w-4 h-4" />}>
+                    Add Sale
+                  </Button>
+                </Tooltip>
+              )}
+            </div>
+          }
+        >
           <SaleTable
             data={sales}
             onAction={() => fetchSales(currentPage, perPage, sortBy, sortDirection)}
@@ -102,6 +138,7 @@ export default function Sales() {
             sortDirection={sortDirection}
             currentPage={currentPage}
             perPage={perPage}
+            startIndex={debouncedRangeFrom !== '' ? Number(debouncedRangeFrom) : undefined}
           />
           <Pagination
             currentPage={currentPage}

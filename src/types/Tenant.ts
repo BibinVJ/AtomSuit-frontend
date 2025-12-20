@@ -1,4 +1,5 @@
 import { Plan } from './Plan';
+import { Domain } from './Domain';
 
 export interface Tenant {
   id: string;
@@ -17,14 +18,6 @@ export interface Tenant {
   updated_at?: string;
 }
 
-export interface Domain {
-  id: number;
-  tenant_id: number;
-  domain: string;
-  is_primary: boolean;
-  created_at: string;
-  updated_at: string;
-}
 
 export interface TenantApiResponse {
   message: string;
@@ -36,6 +29,8 @@ export interface TenantApiResponse {
     last_page: number;
     per_page: number;
     total: number;
+    from?: number;
+    to?: number;
   };
   links?: {
     first: string;

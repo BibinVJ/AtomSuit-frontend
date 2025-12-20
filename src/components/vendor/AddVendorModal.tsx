@@ -23,7 +23,6 @@ export default function AddVendorModal({ isOpen, onClose, onVendorAdded }: Props
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
-  const [isActive, setIsActive] = useState(true);
   const [errors, setErrors] = useState({ name: '', email: '', phone: '', address: '' });
 
   const resetForm = () => {
@@ -31,7 +30,6 @@ export default function AddVendorModal({ isOpen, onClose, onVendorAdded }: Props
     setEmail('');
     setPhone('');
     setAddress('');
-    setIsActive(true);
     setErrors({ name: '', email: '', phone: '', address: '' });
   };
 
@@ -62,7 +60,7 @@ export default function AddVendorModal({ isOpen, onClose, onVendorAdded }: Props
     }
 
     try {
-      await addVendor({ name, email, phone, address, is_active: isActive });
+      await addVendor({ name, email, phone, address });
       onVendorAdded();
       toast.success('Vendor added successfully');
       handleClose();
@@ -85,8 +83,8 @@ export default function AddVendorModal({ isOpen, onClose, onVendorAdded }: Props
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} className="max-w-[700px] lg:p-11">
-      <div className="relative w-full p-4 overflow-y-auto bg-white no-scrollbar rounded-3xl dark:bg-gray-900">
+    <Modal isOpen={isOpen} onClose={handleClose} className="max-w-[700px] p-6 md:p-10">
+      <div className="relative w-full">
           <div className="px-2 pr-14">
             <h4 className="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90">
               Add New Vendor
@@ -113,11 +111,7 @@ export default function AddVendorModal({ isOpen, onClose, onVendorAdded }: Props
                 <div className="lg:col-span-2">
                   <Label>Address</Label>
                   <TextArea placeholder="Enter address" value={address} onChange={(value) => {setAddress(value); setErrors({...errors, address: ''})}} error={!!errors.address} hint={errors.address} />
-                </div>
-                <div>
-                  <Label>Status</Label>
-                  <Switch label={isActive ? 'Active' : 'Inactive'} checked={isActive} onChange={setIsActive} />
-                </div>
+              </div>
               </div>
             </div>
             <div className="flex items-center gap-3 px-2 mt-6 lg:justify-end">

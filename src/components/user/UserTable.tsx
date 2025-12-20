@@ -12,7 +12,9 @@ import { useState } from "react";
 import Badge from "../ui/badge/Badge";
 import EditUserModal from "./EditUserModal";
 import DeleteUserModal from "./DeleteUserModal";
-import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide, Pencil, Trash2 } from 'lucide-react';
+import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide, Pencil, Trash2, RefreshCw } from 'lucide-react';
+import { restoreUser } from "../../services/UserService";
+import { toast } from "sonner";
 import Button from "../ui/button/Button";
 import Tooltip from "../ui/tooltip/Tooltip";
 import { formatKebabCase } from "../../utils/string";
@@ -26,9 +28,11 @@ interface Props {
   sortDirection: string;
   currentPage: number;
   perPage: number;
+  startIndex?: number;
+  viewMode?: 'active' | 'trashed';
 }
 
-export default function UserTable({ data, onAction, onSort, sortBy, sortDirection, currentPage, perPage }: Props) {
+export default function UserTable({ data, onAction, onSort, sortBy, sortDirection, currentPage, perPage, startIndex, viewMode = 'active' }: Props) {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(
@@ -49,6 +53,17 @@ export default function UserTable({ data, onAction, onSort, sortBy, sortDirectio
     setIsEditModalOpen(false);
     setIsDeleteModalOpen(false);
     setSelectedUser(null);
+  };
+
+  const handleRestore = async (id: number) => {
+    try {
+      await restoreUser(id);
+      toast.success('User restored successfully');
+      onAction();
+    } catch (error) {
+      console.error('Error restoring user:', error);
+      toast.error('Failed to restore user');
+    }
   };
 
   const renderSortIcon = (column: string) => {
@@ -83,7 +98,7 @@ export default function UserTable({ data, onAction, onSort, sortBy, sortDirectio
               <TableRow key={user.id}>
                 <TableCell className="px-5 py-4 sm:px-6 text-start">
                   <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                    {(currentPage - 1) * perPage + index + 1}
+                    {startIndex !== undefined ? startIndex + index : (currentPage - 1) * perPage + index + 1}
                   </p>
                 </TableCell>
                 <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">{user.name}</TableCell>
@@ -99,24 +114,49 @@ export default function UserTable({ data, onAction, onSort, sortBy, sortDirectio
                 </TableCell>
                 <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
                   <div className="flex items-center gap-2">
-                    <Tooltip text="Edit">
-                      <Button
-                        size="xs"
-                        onClick={() => handleEdit(user)}
-                        className="bg-blue-600 hover:bg-blue-700 text-white"
-                      >
-                        <Pencil className="w-4 h-4" />
-                      </Button>
-                    </Tooltip>
-                    <Tooltip text="Delete">
-                      <Button
-                        size="xs"
-                        onClick={() => handleDelete(user)}
-                        className="bg-red-600 hover:bg-red-700 text-white"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </Tooltip>
+                    {viewMode === 'active' ? (
+                      <>
+                        <Tooltip text="Edit">
+                          <Button
+                            size="xs"
+                            onClick={() => handleEdit(user)}
+                            className="bg-blue-600 hover:bg-blue-700 text-white"
+                          >
+                            <Pencil className="w-4 h-4" />
+                          </Button>
+                        </Tooltip>
+                        <Tooltip text="Delete">
+                          <Button
+                            size="xs"
+                            onClick={() => handleDelete(user)}
+                            className="bg-red-600 hover:bg-red-700 text-white"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </Tooltip>
+                      </>
+                    ) : (
+                      <>
+                        <Tooltip text="Restore">
+                          <Button
+                            size="xs"
+                            onClick={() => handleRestore(user.id)}
+                            className="bg-green-600 hover:bg-green-700 text-white"
+                          >
+                            <RefreshCw className="w-4 h-4" />
+                          </Button>
+                        </Tooltip>
+                        <Tooltip text="Delete Permanently">
+                          <Button
+                            size="xs"
+                            onClick={() => handleDelete(user)}
+                            className="bg-red-600 hover:bg-red-700 text-white"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </Tooltip>
+                      </>
+                    )}
                   </div>
                 </TableCell>
               </TableRow>
@@ -137,6 +177,7 @@ export default function UserTable({ data, onAction, onSort, sortBy, sortDirectio
             onClose={handleCloseModals}
             onUserDeleted={onAction}
             user={selectedUser}
+            force={viewMode === 'trashed'}
           />
         </>
       )}

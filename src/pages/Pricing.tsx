@@ -17,7 +17,12 @@ export default function Pricing() {
     const fetchPlans = async () => {
       try {
         const response = await getPlans(1, 10, 'created_at', 'desc', true);
-        setPlans(response.data.filter((plan: Plan) => plan.is_active));
+        if (Array.isArray(response.data)) {
+          setPlans(response.data);
+        } else if (response.data && typeof response.data === 'object') {
+          // If it's a single plan (unlikely here but for safety)
+          setPlans([response.data as any]);
+        }
       } catch (error) {
         console.error('Failed to fetch plans:', error);
         setPlans([]);

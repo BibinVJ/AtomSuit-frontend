@@ -13,8 +13,10 @@ import Badge from "../../ui/badge/Badge";
 import EditItemModal from "./EditItemModal";
 import DeleteItemModal from "./DeleteItemModal";
 import Button from "../../ui/button/Button";
-import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide, Edit, Trash2 } from 'lucide-react';
+import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide, Edit, Trash2, RotateCcw, Trash } from 'lucide-react';
 import Tooltip from "../../ui/tooltip/Tooltip";
+import { restoreItem } from "../../../services/ItemService";
+import { toast } from "sonner";
 
 import { Item } from '../../../types';
 
@@ -26,12 +28,14 @@ interface Props {
   sortDirection: string;
   currentPage: number;
   perPage: number;
+  startIndex?: number;
+  viewMode?: 'active' | 'trashed';
 }
 
 import { usePermissions } from "../../../hooks/usePermissions";
 import { useSettings } from "../../../hooks/useSettings";
 
-export default function ItemTable({ data, onAction, onSort, sortBy, sortDirection, currentPage, perPage }: Props) {
+export default function ItemTable({ data, onAction, onSort, sortBy, sortDirection, currentPage, perPage, startIndex, viewMode }: Props) {
   const { hasPermission } = usePermissions();
   const { formatCurrency } = useSettings();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -78,7 +82,6 @@ export default function ItemTable({ data, onAction, onSort, sortBy, sortDirectio
               <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400" onClick={() => onSort('unit_id')}>Unit {renderSortIcon('unit_id')}</TableCell>
               <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400" onClick={() => onSort('type')}>Type {renderSortIcon('type')}</TableCell>
               <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400" onClick={() => onSort('selling_price')}>Selling Price {renderSortIcon('selling_price')}</TableCell>
-              <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400" onClick={() => onSort('is_active')}>Status {renderSortIcon('is_active')}</TableCell>
               <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">Actions</TableCell>
             </TableRow>
           </TableHeader>
@@ -88,7 +91,7 @@ export default function ItemTable({ data, onAction, onSort, sortBy, sortDirectio
               <TableRow key={item.id}>
                 <TableCell className="px-5 py-4 sm:px-6 text-start">
                   <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                    {(currentPage - 1) * perPage + index + 1}
+                    {startIndex !== undefined ? startIndex + index : (currentPage - 1) * perPage + index + 1}
                   </p>
                 </TableCell>
                 <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">{item.sku}</TableCell>
@@ -97,35 +100,67 @@ export default function ItemTable({ data, onAction, onSort, sortBy, sortDirectio
                 <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">{item.unit.name} ({item.unit.code})</TableCell>
                 <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">{item.type}</TableCell>
                 <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">{formatCurrency(item.selling_price)}</TableCell>
-                <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                  <Badge size="sm" color={item.is_active ? "success" : "error"}>
-                    {item.is_active ? "Active" : "Inactive"}
-                  </Badge>
-                </TableCell>
 
                 <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
                   <div className="flex items-center gap-2">
-                    {hasPermission("update-item") && (
-                      <Tooltip text="Edit">
-                        <Button
-                          size="xs"
-                          onClick={() => handleEdit(item)}
-                          className="bg-blue-600 hover:bg-blue-700 text-white"
-                        >
-                          <Edit className="w-4 h-4" />
-                        </Button>
-                      </Tooltip>
-                    )}
-                    {hasPermission("delete-item") && (
-                      <Tooltip text="Delete">
-                        <Button
-                          size="xs"
-                          onClick={() => handleDelete(item)}
-                          className="bg-red-600 hover:bg-red-700 text-white"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </Tooltip>
+                    {viewMode === 'active' ? (
+                      <>
+                        {hasPermission("update-item") && (
+                          <Tooltip text="Edit">
+                            <Button
+                              size="xs"
+                              onClick={() => handleEdit(item)}
+                              className="bg-blue-600 hover:bg-blue-700 text-white"
+                            >
+                              <Edit className="w-4 h-4" />
+                            </Button>
+                          </Tooltip>
+                        )}
+                        {hasPermission("delete-item") && (
+                          <Tooltip text="Delete">
+                            <Button
+                              size="xs"
+                              onClick={() => handleDelete(item)}
+                              className="bg-red-600 hover:bg-red-700 text-white"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </Tooltip>
+                        )}
+                      </>
+                    ) : (
+                      <>
+                        {hasPermission("update-item") && (
+                          <Tooltip text="Restore">
+                            <Button
+                              size="xs"
+                              onClick={async () => {
+                                try {
+                                  await restoreItem(item.id);
+                                  toast.success('Item restored successfully');
+                                  onAction();
+                                } catch (error) {
+                                  toast.error('Failed to restore item');
+                                }
+                              }}
+                              className="bg-green-600 hover:bg-green-700 text-white"
+                            >
+                              <RotateCcw className="w-4 h-4" />
+                            </Button>
+                          </Tooltip>
+                        )}
+                        {hasPermission("delete-item") && (
+                          <Tooltip text="Permanent Delete">
+                            <Button
+                              size="xs"
+                              onClick={() => handleDelete(item)}
+                              className="bg-red-600 hover:bg-red-700 text-white"
+                            >
+                              <Trash className="w-4 h-4" />
+                            </Button>
+                          </Tooltip>
+                        )}
+                      </>
                     )}
                   </div>
                 </TableCell>
@@ -147,6 +182,7 @@ export default function ItemTable({ data, onAction, onSort, sortBy, sortDirectio
             onClose={handleCloseModals}
             onItemDeleted={onAction}
             item={selectedItem}
+            isForceDelete={viewMode === 'trashed'}
           />
         </>
       )}

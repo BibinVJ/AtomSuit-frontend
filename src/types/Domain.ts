@@ -2,8 +2,12 @@ import { Tenant } from './Tenant';
 
 export interface Domain {
   id: number;
+  tenant_id?: number | string;
   domain: string;
+  is_primary?: boolean;
   tenant?: Tenant;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface DomainApiResponse {

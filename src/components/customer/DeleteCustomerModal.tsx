@@ -1,9 +1,7 @@
-
 import { Modal } from '../ui/modal';
 import Button from '../ui/button/Button';
 import { toast } from 'sonner';
 import { deleteCustomer } from '../../services/CustomerService';
-
 import { Customer } from '../../types';
 
 interface Props {
@@ -11,15 +9,16 @@ interface Props {
   onClose: () => void;
   onCustomerDeleted: () => void;
   customer: Customer;
+  force?: boolean;
 }
 
-export default function DeleteCustomerModal({ isOpen, onClose, onCustomerDeleted, customer }: Props) {
+export default function DeleteCustomerModal({ isOpen, onClose, onCustomerDeleted, customer, force = false }: Props) {
 
   const handleDelete = async () => {
     try {
-      await deleteCustomer(customer.id);
+      await deleteCustomer(customer.id, force);
       onCustomerDeleted();
-      toast.success('Customer deleted successfully');
+      toast.success(force ? 'Customer permanently deleted' : 'Customer deleted successfully');
       onClose();
     } catch (error) {
       console.error('Error deleting customer:', error);
@@ -28,8 +27,8 @@ export default function DeleteCustomerModal({ isOpen, onClose, onCustomerDeleted
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} className="max-w-lg">
-      <div className="relative w-full p-4 overflow-y-auto bg-white no-scrollbar rounded-3xl dark:bg-gray-900">
+    <Modal isOpen={isOpen} onClose={onClose} className="max-w-lg p-6 md:p-10">
+      <div className="relative w-full">
         <div className="p-4 text-center">
           <div className="mx-auto mb-5 text-red-500 bg-red-100 rounded-full w-14 h-14">
             <svg
@@ -51,10 +50,10 @@ export default function DeleteCustomerModal({ isOpen, onClose, onCustomerDeleted
             </svg>
           </div>
           <h4 className="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90">
-            Delete Customer
+            {force ? 'Permanently Delete Customer' : 'Delete Customer'}
           </h4>
           <p className="mb-6 text-gray-500 dark:text-gray-400">
-            Are you sure you want to delete the customer &quot;{customer?.name}&quot;? This action cannot be undone.
+            Are you sure you want to {force ? 'permanently ' : ''}delete the customer &quot;{customer?.name}&quot;? {force ? 'This action cannot be undone.' : 'You can restore it later from the trash.'}
           </p>
           <div className="flex items-center justify-center gap-4">
             <Button type="button" variant="outline" onClick={onClose}>
@@ -65,7 +64,7 @@ export default function DeleteCustomerModal({ isOpen, onClose, onCustomerDeleted
               className="text-white bg-red-600 hover:bg-red-800"
               onClick={handleDelete}
             >
-              Delete
+              {force ? 'Permanently Delete' : 'Delete'}
             </Button>
           </div>
         </div>

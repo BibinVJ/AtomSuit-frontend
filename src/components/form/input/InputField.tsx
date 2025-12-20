@@ -19,6 +19,7 @@ interface InputProps {
   hint?: string;
   rightIcon?: ReactNode;
   onRightIconClick?: () => void;
+  prefix?: string;
   suffix?: string;
 }
 
@@ -41,6 +42,7 @@ const Input: FC<InputProps> = ({
   hint,
   rightIcon,
   onRightIconClick,
+  prefix,
   suffix,
 }) => {
   let containerClasses = `relative flex items-center h-11 w-full rounded-lg border shadow-theme-xs focus-within:ring-3`;
@@ -55,11 +57,18 @@ const Input: FC<InputProps> = ({
     containerClasses += ` bg-transparent text-gray-800 border-gray-300 focus-within:border-brand-300 focus-within:ring-brand-500/20 dark:border-gray-700 dark:text-white/90 dark:focus-within:border-brand-800`;
   }
 
-  const inputClasses = `h-full w-full appearance-none px-3 py-2.5 text-sm bg-transparent placeholder:text-gray-400 focus:outline-none dark:text-white/90 dark:placeholder:text-white/30`;
+  // Add overflow-hidden to ensure border-radius clips children and we don't bleed out
+  containerClasses += " overflow-hidden";
+
+  const inputClasses = `h-full flex-1 min-w-0 appearance-none ${prefix ? 'pl-2' : 'pl-3'} ${suffix ? 'pr-2' : 'pr-3'} py-2.5 text-sm bg-transparent placeholder:text-gray-400 focus:outline-none dark:text-white/90 dark:placeholder:text-white/30`;
 
   return (
     <div>
       <div className={`${containerClasses} ${className}`}>
+        {prefix && (
+          <div className="pl-3 pr-1 text-gray-500 text-sm whitespace-nowrap">{prefix}</div>
+        )}
+
         <input
           type={type}
           id={id}
@@ -77,7 +86,7 @@ const Input: FC<InputProps> = ({
         />
 
         {suffix && (
-          <div className="px-2 text-gray-500 text-sm">{suffix}</div>
+          <div className="pl-1 pr-3 text-gray-500 text-sm whitespace-nowrap">{suffix}</div>
         )}
 
         {rightIcon && (

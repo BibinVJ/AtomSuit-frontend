@@ -36,7 +36,7 @@ export default function EditUserModal({ isOpen, onClose, onUserUpdated, user }: 
     if (isOpen) {
       const fetchRoles = async () => {
         try {
-          const rolesData = await getRoles(1, 1, 'created_at', 'desc', true);
+          const rolesData = await getRoles({ page: 1, limit: 10, sortCol: 'created_at', sortDir: 'desc', unpaginated: true });
           setRoles(rolesData.data);
         } catch (error) {
           console.error('Error fetching roles:', error);
@@ -104,8 +104,8 @@ export default function EditUserModal({ isOpen, onClose, onUserUpdated, user }: 
   const roleOptions = roles.map(r => ({ value: String(r.id), label: formatKebabCase(r.name) }));
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} className="max-w-[700px] lg:p-11">
-      <div className="relative w-full p-4 overflow-y-auto bg-white no-scrollbar rounded-3xl dark:bg-gray-900">
+    <Modal isOpen={isOpen} onClose={onClose} className="max-w-[700px] p-6 md:p-10">
+      <div className="relative w-full">
         <div className="px-2 pr-14">
           <h4 className="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90">
             Edit User

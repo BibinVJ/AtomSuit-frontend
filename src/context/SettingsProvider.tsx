@@ -97,7 +97,7 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const thousandSeparator = getSetting('thousand_separator', ',');
     const decimalPlaces = parseInt(getSetting('decimal_places', '2'));
 
-    let formatted = num.toFixed(decimalPlaces);
+    let formatted = (num !== null && num !== undefined) ? num.toFixed(decimalPlaces) : (0).toFixed(decimalPlaces);
 
     // Replace default separators with custom ones
     const parts = formatted.split('.');

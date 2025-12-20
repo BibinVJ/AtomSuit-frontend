@@ -27,7 +27,6 @@ export default function AddPlanModal({ isOpen, onClose, onPlanAdded }: Props) {
   const [isTrial, setIsTrial] = useState(false);
   const [trialDays, setTrialDays] = useState('14');
   const [isExpiredUserPlan, setIsExpiredUserPlan] = useState(false);
-  const [isActive, setIsActive] = useState(true);
   const [features, setFeatures] = useState<Omit<PlanFeature, 'id'>[]>([]);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
@@ -39,7 +38,6 @@ export default function AddPlanModal({ isOpen, onClose, onPlanAdded }: Props) {
     setIsTrial(false);
     setTrialDays('14');
     setIsExpiredUserPlan(false);
-    setIsActive(true);
     setFeatures([]);
     setErrors({});
   };
@@ -101,7 +99,6 @@ export default function AddPlanModal({ isOpen, onClose, onPlanAdded }: Props) {
         is_trial_plan: isTrial,
         trial_duration_in_days: isTrial ? Number(trialDays) : undefined,
         is_expired_user_plan: isExpiredUserPlan,
-        is_active: isActive,
         features: features.map((f, index) => ({
           key: f.key,
           value: f.value,
@@ -217,11 +214,7 @@ export default function AddPlanModal({ isOpen, onClose, onPlanAdded }: Props) {
                 <div>
                   <Label>Expired User Plan?</Label>
                   <Switch label={isExpiredUserPlan ? 'Yes' : 'No'} checked={isExpiredUserPlan} onChange={setIsExpiredUserPlan} />
-                </div>
-                <div>
-                  <Label>Status</Label>
-                  <Switch label={isActive ? 'Active' : 'Inactive'} checked={isActive} onChange={setIsActive} />
-                </div>
+              </div>
               </div>
 
               {/* Features Section */}

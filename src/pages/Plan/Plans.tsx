@@ -9,10 +9,13 @@ import AddPlanModal from '../../components/plan/AddPlanModal';
 import { useModal } from '../../hooks/useModal';
 import Pagination from '../../components/common/Pagination';
 import Button from '../../components/ui/button/Button';
+import Tooltip from '../../components/ui/tooltip/Tooltip';
 import Select from '../../components/form/Select';
 import { getPlans } from '../../services/PlanService';
 import { usePermissions } from '../../hooks/usePermissions';
 import { Plan } from '../../types';
+import TableToolbar from '../../components/common/TableToolbar';
+import { Plus } from 'lucide-react';
 
 export default function Plans() {
   const { hasPermission } = usePermissions();
@@ -26,16 +29,19 @@ export default function Plans() {
   const [total, setTotal] = useState(0);
   const [sortBy, setSortBy] = useState('created_at');
   const [sortDirection, setSortDirection] = useState('desc');
+  const [searchTerm, setSearchTerm] = useState('');
 
   const fetchPlans = async (page = 1, limit = 10, sortCol = 'created_at', sortDir = 'desc') => {
     try {
       const response = await getPlans(page, limit, sortCol, sortDir);
-      setPlans(response.data);
-      setTotalPages(response.meta.last_page);
-      setCurrentPage(response.meta.current_page);
-      setFrom(response.meta.from);
-      setTo(response.meta.to);
-      setTotal(response.meta.total);
+      setPlans(Array.isArray(response.data) ? response.data : []);
+      if (response.meta) {
+        setTotalPages(response.meta.last_page || 1);
+        setCurrentPage(response.meta.current_page || 1);
+        setFrom(response.meta.from || 0);
+        setTo(response.meta.to || 0);
+        setTotal(response.meta.total || 0);
+      }
     } catch (error) {
       console.error('Error fetching plans:', error);
     }
@@ -43,7 +49,7 @@ export default function Plans() {
 
   useEffect(() => {
     fetchPlans(currentPage, perPage, sortBy, sortDirection);
-  }, [currentPage, perPage, sortBy, sortDirection]);
+  }, [currentPage, perPage, sortBy, sortDirection, searchTerm]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -70,30 +76,34 @@ export default function Plans() {
         description="List of plans"
       />
       <PageBreadcrumb pageTitle="Plans" />
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <label htmlFor="perPage" className="text-sm font-medium text-gray-700">Per Page:</label>
-          <Select
-            options={[
-              { value: '10', label: '10' },
-              { value: '20', label: '20' },
-              { value: '50', label: '50' },
-            ]}
-            onChange={handlePerPageChange}
-            defaultValue={String(perPage)}
-            showPlaceholder={false}
-            className="w-20"
-            searchable={false}
+      <div className="space-y-6">
+        <div className="p-5 border border-gray-200 rounded-2xl bg-gray-50 dark:bg-white/[0.03] dark:border-gray-800 shadow-sm">
+          <TableToolbar
+            className="mb-0"
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            searchPlaceholder="Search plans..."
+            perPage={perPage}
+            onPerPageChange={handlePerPageChange}
+            showRange={false}
+            onReset={() => {
+              setSearchTerm('');
+            }}
           />
         </div>
-        {hasPermission("create-plan") && (
-          <Button onClick={openModal}>
-            Add Plan
-          </Button>
-        )}
-      </div>
-      <div className="space-y-6">
-        <ComponentCard title="Plans">
+
+        <ComponentCard
+          title="Plans"
+          action={
+            hasPermission("create-plan") && (
+              <Tooltip text="Add New Plan">
+                <Button onClick={openModal} size="sm">
+                  Add Plan
+                </Button>
+              </Tooltip>
+            )
+          }
+        >
           <PlanTable
             data={plans}
             onAction={() => fetchPlans(currentPage, perPage, sortBy, sortDirection)}

@@ -1,6 +1,7 @@
 export interface Layout {
   id?: number;
-  card_id: string;
+  dashboard_card_id: number;
+  slug?: string;
   area?: string | null;
   x: number;
   y: number;

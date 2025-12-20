@@ -6,16 +6,17 @@ export const getTenants = async (
   limit = 10,
   sortCol = 'created_at',
   sortDir = 'desc',
-  filters: any = {}
+  from?: number,
+  to?: number,
+  search?: string,
+  plan_id?: string | number
 ): Promise<TenantApiResponse> => {
-  const params = new URLSearchParams({
-    perPage: limit.toString(),
-    page: page.toString(),
-    sort_by: sortCol,
-    sort_direction: sortDir,
-    ...filters,
-  });
-  const response = await api.get(`/tenant?${params.toString()}`);
+  const params: any = { perPage: limit, page, sort_by: sortCol, sort_direction: sortDir };
+  if (from !== undefined) params.from = from;
+  if (to !== undefined) params.to = to;
+  if (search) params.search = search;
+  if (plan_id) params.plan_id = plan_id;
+  const response = await api.get(`/tenant`, { params });
   return response.data;
 };
 

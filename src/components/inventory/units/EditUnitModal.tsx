@@ -24,7 +24,6 @@ export default function EditUnitModal({ isOpen, onClose, onUnitUpdated, unit }: 
   const [name, setName] = useState('');
   const [code, setCode] = useState('');
   const [description, setDescription] = useState('');
-  const [isActive, setIsActive] = useState(true);
   const [errors, setErrors] = useState({ name: '', code: '' });
 
   useEffect(() => {
@@ -32,7 +31,6 @@ export default function EditUnitModal({ isOpen, onClose, onUnitUpdated, unit }: 
       setName(unit.name);
       setCode(unit.code);
       setDescription(unit.description || '');
-      setIsActive(unit.is_active);
     }
   }, [unit]);
 
@@ -48,7 +46,7 @@ export default function EditUnitModal({ isOpen, onClose, onUnitUpdated, unit }: 
     }
 
     try {
-      await updateUnit(unit.id, { name, code, description, is_active: isActive });
+      await updateUnit(unit.id, { name, code, description });
       onUnitUpdated();
       toast.success('Unit updated successfully');
       onClose();
@@ -69,8 +67,8 @@ export default function EditUnitModal({ isOpen, onClose, onUnitUpdated, unit }: 
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} className="max-w-[700px] lg:p-11">
-      <div className="relative w-full p-4 overflow-y-auto bg-white no-scrollbar rounded-3xl dark:bg-gray-900">
+    <Modal isOpen={isOpen} onClose={onClose} className="max-w-[700px] p-6 md:p-10">
+      <div className="relative w-full">
         <div className="px-2 pr-14">
           <h4 className="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90">
             Edit Unit
@@ -117,14 +115,6 @@ export default function EditUnitModal({ isOpen, onClose, onUnitUpdated, unit }: 
                   value={description}
                   onChange={setDescription}
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                />
-              </div>
-              <div>
-                <Label>Status</Label>
-                <Switch
-                  label={isActive ? 'Active' : 'Inactive'}
-                  checked={isActive}
-                  onChange={setIsActive}
                 />
               </div>
             </div>

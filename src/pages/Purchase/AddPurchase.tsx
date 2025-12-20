@@ -35,7 +35,7 @@ interface ApiError {
 }
 
 export default function AddPurchase() {
-  const { formatDate } = useSettings();
+  const { formatDate, getSetting } = useSettings();
   const router = useRouter();
   const [vendors, setVendors] = useState<Vendor[]>([]);
   const [items, setItems] = useState<Item[]>([]);
@@ -55,7 +55,7 @@ export default function AddPurchase() {
     try {
       const [vendorResponse, itemResponse, invoiceResponse] = await Promise.all([
         getVendors(1, 10, 'created_at', 'desc', true),
-        getItems(1, 10, 'created_at', 'desc', true),
+        getItems({ page: 1, limit: 10, sortCol: 'created_at', sortDir: 'desc', unpaginated: true }),
         getNextPurchaseInvoiceNumber()
       ]);
       setVendors(vendorResponse.data || vendorResponse);
@@ -242,20 +242,14 @@ export default function AddPurchase() {
                 </div>
                 <div>
                   <Label>Quantity</Label>
-                  <div className="relative">
-                    <Input
-                      type="number"
-                      value={item.quantity}
-                      onChange={(e) => { handleItemChange(index, 'quantity', Number(e.target.value)); clearError(`items.${index}.quantity`); }}
-                      error={!!getErrorMessage(`items.${index}.quantity`)}
-                      hint={getErrorMessage(`items.${index}.quantity`)}
-                    />
-                    {item.item_id && (
-                      <span className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500">
-                        {items.find(i => i.id === Number(item.item_id))?.unit.code}
-                      </span>
-                    )}
-                  </div>
+                  <Input
+                    type="number"
+                    value={item.quantity}
+                    onChange={(e) => { handleItemChange(index, 'quantity', Number(e.target.value)); clearError(`items.${index}.quantity`); }}
+                    error={!!getErrorMessage(`items.${index}.quantity`)}
+                    hint={getErrorMessage(`items.${index}.quantity`)}
+                    suffix={item.item_id ? items.find(i => i.id === Number(item.item_id))?.unit.code : undefined}
+                  />
                 </div>
                 <div>
                   <Label>Unit Cost</Label>
@@ -265,6 +259,8 @@ export default function AddPurchase() {
                     onChange={(e) => { handleItemChange(index, 'unit_cost', Number(e.target.value)); clearError(`items.${index}.unit_cost`); }}
                     error={!!getErrorMessage(`items.${index}.unit_cost`)}
                     hint={getErrorMessage(`items.${index}.unit_cost`)}
+                    prefix={getSetting('currency_position') === 'before' ? getSetting('currency_symbol') : undefined}
+                    suffix={getSetting('currency_position') === 'after' ? getSetting('currency_symbol') : undefined}
                   />
                 </div>
               </div>

@@ -28,9 +28,7 @@ export default function ViewSubscriptionModal({ isOpen, onClose, subscription }:
     if (subscription.is_on_trial) {
       return <Badge size="sm" color="warning">Trial</Badge>;
     }
-    if (subscription.is_active) {
-      return <Badge size="sm" color="success">Active</Badge>;
-    }
+    return <Badge size="sm" color="success">Active</Badge>;
     return <Badge size="sm" color="secondary">Inactive</Badge>;
   };
 

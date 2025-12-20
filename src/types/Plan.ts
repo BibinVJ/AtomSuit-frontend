@@ -7,7 +7,6 @@ export interface Plan {
   is_trial_plan: boolean;
   trial_duration_in_days?: number;
   is_expired_user_plan: boolean;
-  is_active: boolean;
   features?: PlanFeature[];
   subscribed_tenants?: any[];
 }
@@ -32,6 +31,8 @@ export interface PlanApiResponse {
     last_page: number;
     per_page: number;
     total: number;
+    from?: number;
+    to?: number;
   };
   links?: {
     first: string;

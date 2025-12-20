@@ -10,13 +10,23 @@ import AddCategoryModal from '../../components/inventory/categories/AddCategoryM
 import { useModal } from '../../hooks/useModal';
 import Pagination from '../../components/common/Pagination';
 import Button from '../../components/ui/button/Button';
+import Tooltip from '../../components/ui/tooltip/Tooltip';
 import Select from '../../components/form/Select';
-import { getCategories } from '../../services/CategoryService';
+import { getCategories, exportCategories, importCategories, downloadSampleCategoryExcel } from '../../services/CategoryService';
 import { Category } from '../../types';
+import ImportModal from '../../components/common/ImportModal';
+import { Download, Upload } from 'lucide-react';
+import { toast } from 'sonner';
+import ViewModeTabs from '../../components/common/ViewModeTabs';
+
+import { useDebounce } from '../../hooks/useDebounce';
+import TableToolbar from '../../components/common/TableToolbar';
+import { Plus } from 'lucide-react';
 
 export default function Categories() {
   const [categories, setCategories] = useState<Category[]>([]);
   const { isOpen, openModal, closeModal } = useModal();
+  const { isOpen: isImportModalOpen, openModal: openImportModal, closeModal: closeImportModal } = useModal();
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
@@ -25,16 +35,37 @@ export default function Categories() {
   const [total, setTotal] = useState(0);
   const [sortBy, setSortBy] = useState('created_at');
   const [sortDirection, setSortDirection] = useState('desc');
+  const [viewMode, setViewMode] = useState<'active' | 'trashed'>('active');
+
+  /* State for Range Fetching & Search */
+  const [rangeFrom, setRangeFrom] = useState<number | ''>('');
+  const [rangeTo, setRangeTo] = useState<number | ''>('');
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const debouncedSearchTerm = useDebounce(searchTerm, 1000);
+  const debouncedRangeFrom = useDebounce(rangeFrom, 1000);
+  const debouncedRangeTo = useDebounce(rangeTo, 1000);
 
   const fetchCategories = async (page = 1, limit = 10, sortCol = 'created_at', sortDir = 'desc') => {
     try {
-      const response = await getCategories(page, limit, sortCol, sortDir);
+      const response = await getCategories({
+        page,
+        limit,
+        sortCol,
+        sortDir,
+        from: debouncedRangeFrom !== '' ? Number(debouncedRangeFrom) : undefined,
+        to: debouncedRangeTo !== '' ? Number(debouncedRangeTo) : undefined,
+        search: debouncedSearchTerm,
+        trashed: viewMode === 'trashed' ? 'only' : undefined
+      });
       setCategories(response.data);
-      setTotalPages(response.meta.last_page);
-      setCurrentPage(response.meta.current_page);
-      setFrom(response.meta.from);
-      setTo(response.meta.to);
-      setTotal(response.meta.total);
+      if (response.meta) {
+        setTotalPages(response.meta.last_page || 1);
+        setCurrentPage(response.meta.current_page || 1);
+        setFrom(response.meta.from !== undefined ? response.meta.from : (debouncedRangeFrom !== '' ? Number(debouncedRangeFrom) : 0));
+        setTo(response.meta.to !== undefined ? response.meta.to : (debouncedRangeTo !== '' ? Number(debouncedRangeTo) : 0));
+        setTotal(response.meta.total || 0);
+      }
     } catch (error) {
       console.error('Error fetching categories:', error);
     }
@@ -42,7 +73,7 @@ export default function Categories() {
 
   useEffect(() => {
     fetchCategories(currentPage, perPage, sortBy, sortDirection);
-  }, [currentPage, perPage, sortBy, sortDirection]);
+  }, [currentPage, perPage, sortBy, sortDirection, debouncedSearchTerm, debouncedRangeFrom, debouncedRangeTo, viewMode]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -62,6 +93,24 @@ export default function Categories() {
     }
   };
 
+  const handleExport = async () => {
+    try {
+      const response = await exportCategories();
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+      link.setAttribute('download', `categories_${timestamp}.xlsx`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      toast.error('Failed to export categories');
+      console.error('Export error:', error);
+    }
+  };
+
   return (
     <>
       <PageMeta
@@ -69,28 +118,58 @@ export default function Categories() {
         description="List of categories"
       />
       <PageBreadcrumb pageTitle="Categories" />
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <label htmlFor="perPage" className="text-sm font-medium text-gray-700">Per Page:</label>
-          <Select
-            options={[
-              { value: '10', label: '10' },
-              { value: '20', label: '20' },
-              { value: '50', label: '50' },
-            ]}
-            onChange={handlePerPageChange}
-            defaultValue={String(perPage)}
-            showPlaceholder={false}
-            className="w-20"
-            searchable={false}
+
+      <div className="space-y-6">
+        <div className="p-5 border border-gray-200 rounded-2xl bg-gray-50 dark:bg-white/[0.03] dark:border-gray-800 shadow-sm">
+          <TableToolbar
+            className="mb-0"
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            searchPlaceholder="Search categories..."
+            rangeFrom={rangeFrom}
+            onRangeFromChange={(val) => setRangeFrom(val as number | '')}
+            rangeTo={rangeTo}
+            onRangeToChange={(val) => setRangeTo(val as number | '')}
+            perPage={perPage}
+            onPerPageChange={handlePerPageChange}
+            onReset={() => {
+              setSearchTerm('');
+              setRangeFrom('');
+              setRangeTo('');
+            }}
           />
         </div>
-        <Button onClick={openModal}>
-          Add Category
-        </Button>
-      </div>
-      <div className="space-y-6">
-        <ComponentCard title="Categories">
+
+        <ComponentCard
+          title={`Categories (${viewMode})`}
+          action={
+            <div className="flex flex-wrap items-center gap-3">
+              <ViewModeTabs viewMode={viewMode} setViewMode={setViewMode} />
+              <Tooltip text="Import Categories">
+                <Button variant="outline" size="sm" onClick={openImportModal} className="flex items-center gap-2">
+                  <Upload size={16} />
+                  Import
+                </Button>
+              </Tooltip>
+              <Tooltip text="Export Categories">
+                <Button variant="outline" size="sm" onClick={handleExport} className="flex items-center gap-2">
+                  <Download size={16} />
+                  Export
+                </Button>
+              </Tooltip>
+              <Tooltip text="Add New Category">
+                <Button
+                  onClick={openModal}
+                  size="sm"
+                  className="flex items-center gap-2"
+                >
+                  <Plus size={16} />
+                  Add Category
+                </Button>
+              </Tooltip>
+            </div>
+          }
+        >
           <CategoryTable
             data={categories}
             onAction={() => fetchCategories(currentPage, perPage, sortBy, sortDirection)}
@@ -99,6 +178,8 @@ export default function Categories() {
             sortDirection={sortDirection}
             currentPage={currentPage}
             perPage={perPage}
+            startIndex={debouncedRangeFrom !== '' ? Number(debouncedRangeFrom) : undefined}
+            viewMode={viewMode}
           />
           <Pagination
             currentPage={currentPage}
@@ -111,6 +192,15 @@ export default function Categories() {
         </ComponentCard>
       </div>
       <AddCategoryModal isOpen={isOpen} onClose={closeModal} onCategoryAdded={() => fetchCategories(1, perPage)} />
+      <ImportModal
+        isOpen={isImportModalOpen}
+        onClose={closeImportModal}
+        onImport={importCategories}
+        onDownloadSample={downloadSampleCategoryExcel}
+        onSuccess={() => fetchCategories(1, perPage)}
+        entityName="Categories"
+      />
     </>
   );
 }
+

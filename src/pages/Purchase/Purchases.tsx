@@ -8,12 +8,17 @@ import PageMeta from '../../components/common/PageMeta';
 import PurchaseTable from '../../components/purchase/PurchaseTable';
 import Pagination from '../../components/common/Pagination';
 import Button from '../../components/ui/button/Button';
+import Tooltip from '../../components/ui/tooltip/Tooltip';
 import Select from '../../components/form/Select';
 import { useRouter } from 'next/navigation';
 import { getPurchases } from '../../services/PurchaseService';
 import { Purchase } from '../../types';
 
 import { usePermissions } from '../../hooks/usePermissions';
+
+import { useDebounce } from '../../hooks/useDebounce';
+import TableToolbar from '../../components/common/TableToolbar';
+import { Plus } from 'lucide-react';
 
 export default function Purchases() {
   const { hasPermission } = usePermissions();
@@ -28,15 +33,34 @@ export default function Purchases() {
   const [sortBy, setSortBy] = useState('created_at');
   const [sortDirection, setSortDirection] = useState('desc');
 
+  /* State for Range Fetching & Search */
+  const [rangeFrom, setRangeFrom] = useState<number | ''>('');
+  const [rangeTo, setRangeTo] = useState<number | ''>('');
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const debouncedSearchTerm = useDebounce(searchTerm, 1000);
+  const debouncedRangeFrom = useDebounce(rangeFrom, 1000);
+  const debouncedRangeTo = useDebounce(rangeTo, 1000);
+
   const fetchPurchases = async (page = 1, limit = 10, sortCol = 'created_at', sortDir = 'desc') => {
     try {
-      const response = await getPurchases(page, limit, sortCol, sortDir);
+      const response = await getPurchases(
+        page,
+        limit,
+        sortCol,
+        sortDir,
+        debouncedRangeFrom !== '' ? Number(debouncedRangeFrom) : undefined,
+        debouncedRangeTo !== '' ? Number(debouncedRangeTo) : undefined,
+        debouncedSearchTerm
+      );
       setPurchases(response.data);
-      setTotalPages(response.meta.last_page);
-      setCurrentPage(response.meta.current_page);
-      setFrom(response.meta.from);
-      setTo(response.meta.to);
-      setTotal(response.meta.total);
+      if (response.meta) {
+        setTotalPages(response.meta.last_page || 1);
+        setCurrentPage(response.meta.current_page || 1);
+        setFrom(response.meta.from !== undefined ? response.meta.from : (debouncedRangeFrom !== '' ? Number(debouncedRangeFrom) : 0));
+        setTo(response.meta.to !== undefined ? response.meta.to : (debouncedRangeTo !== '' ? Number(debouncedRangeTo) : 0));
+        setTotal(response.meta.total || 0);
+      }
     } catch (error) {
       console.error('Error fetching purchases:', error);
     }
@@ -44,7 +68,7 @@ export default function Purchases() {
 
   useEffect(() => {
     fetchPurchases(currentPage, perPage, sortBy, sortDirection);
-  }, [currentPage, perPage, sortBy, sortDirection]);
+  }, [currentPage, perPage, sortBy, sortDirection, debouncedSearchTerm, debouncedRangeFrom, debouncedRangeTo]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -71,30 +95,42 @@ export default function Purchases() {
         description="List of purchases"
       />
       <PageBreadcrumb pageTitle="Purchases" />
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <label htmlFor="perPage" className="text-sm font-medium text-gray-700">Per Page:</label>
-          <Select
-            options={[
-              { value: '10', label: '10' },
-              { value: '20', label: '20' },
-              { value: '50', label: '50' },
-            ]}
-            onChange={handlePerPageChange}
-            defaultValue={String(perPage)}
-            showPlaceholder={false}
-            className="w-20"
-            searchable={false}
+
+      <div className="space-y-6">
+        <div className="p-5 border border-gray-200 rounded-2xl bg-gray-50 dark:bg-white/[0.03] dark:border-gray-800 shadow-sm">
+          <TableToolbar
+            className="mb-0"
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            searchPlaceholder="Search purchases..."
+            rangeFrom={rangeFrom}
+            onRangeFromChange={(val) => setRangeFrom(val as number | '')}
+            rangeTo={rangeTo}
+            onRangeToChange={(val) => setRangeTo(val as number | '')}
+            perPage={perPage}
+            onPerPageChange={handlePerPageChange}
+            onReset={() => {
+              setSearchTerm('');
+              setRangeFrom('');
+              setRangeTo('');
+            }}
           />
         </div>
-        {hasPermission("create-purchase") && (
-          <Button onClick={() => router.push('/purchases/add')}>
-            Add Purchase
-          </Button>
-        )}
-      </div>
-      <div className="space-y-6">
-        <ComponentCard>
+
+        <ComponentCard
+          title="Purchases"
+          action={
+            <div className="flex flex-wrap items-center gap-2">
+              {hasPermission("create-purchase") && (
+                <Tooltip text="Add New Purchase">
+                  <Button onClick={() => router.push('/purchases/add')} size="sm" startIcon={<Plus className="w-4 h-4" />}>
+                    Add Purchase
+                  </Button>
+                </Tooltip>
+              )}
+            </div>
+          }
+        >
           <PurchaseTable
             data={purchases}
             onAction={() => fetchPurchases(currentPage, perPage, sortBy, sortDirection)}
@@ -103,6 +139,7 @@ export default function Purchases() {
             sortDirection={sortDirection}
             currentPage={currentPage}
             perPage={perPage}
+            startIndex={debouncedRangeFrom !== '' ? Number(debouncedRangeFrom) : undefined}
           />
           <Pagination
             currentPage={currentPage}
@@ -117,3 +154,4 @@ export default function Purchases() {
     </>
   );
 }
+

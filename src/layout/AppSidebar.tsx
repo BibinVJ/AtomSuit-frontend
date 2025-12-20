@@ -18,6 +18,7 @@ import {
   Building2,
   Globe,
   Settings,
+  Activity,
 } from "lucide-react";
 import { useSidebar } from "../hooks/useSidebar";
 import { usePermissions } from "../hooks/usePermissions";
@@ -138,6 +139,12 @@ const othersItems: NavItem[] = [
     path: "/roles",
     permission: "view-role",
   },
+  {
+    icon: <Activity size={20} />,
+    name: "Audit Logs",
+    path: "/audits",
+    permission: "view-audit",
+  },
   // {
   //   icon: <PieChartIcon />,
   //   name: "Charts",
@@ -161,7 +168,7 @@ const othersItems: NavItem[] = [
 ];
 
 const AppSidebar: React.FC = () => {
-  const { isExpanded, isMobileOpen, isHovered, setIsHovered, toggleSidebar } = useSidebar();
+  const { isExpanded, isMobileOpen, isHovered, setIsHovered, toggleSidebar, toggleMobileSidebar } = useSidebar();
   const pathname = usePathname();
 
   const [openSubmenu, setOpenSubmenu] = useState<{
@@ -284,7 +291,7 @@ const AppSidebar: React.FC = () => {
                   }`}
               >
                 <span
-                  className={`menu-item-icon-size  ${openSubmenu?.type === menuType && openSubmenu?.index === index
+                  className={`menu-item-icon-size ${openSubmenu?.type === menuType && openSubmenu?.index === index
                     ? "menu-item-icon-active"
                     : "menu-item-icon-inactive"
                     }`}
@@ -312,7 +319,7 @@ const AppSidebar: React.FC = () => {
                     }`}
                 >
                   <span
-                    className={`menu-item-icon-size ${isActive(nav.path)
+                      className={`menu-item-icon-size ${isActive(nav.path)
                       ? "menu-item-icon-active"
                       : "menu-item-icon-inactive"
                       }`}
@@ -328,7 +335,7 @@ const AppSidebar: React.FC = () => {
                 <div
                   className="menu-item group menu-item-inactive cursor-default"
                 >
-                  <span className="menu-item-icon-size menu-item-icon-inactive">
+                      <span className="menu-item-icon-size menu-item-icon-inactive">
                     {nav.icon}
                   </span>
                   {(isExpanded || isHovered || isMobileOpen) && (
@@ -391,22 +398,31 @@ const AppSidebar: React.FC = () => {
   );
 
   return (
-    <aside
-      className={`fixed mt-16 flex flex-col lg:mt-0 top-0 px-5 left-0 text-gray-900 h-screen transition-all duration-300 ease-in-out z-50 border-r border-gray-200 dark:border-gray-800
-        custom-sidebar-bg
+    <>
+      {/* Mobile Backdrop */}
+      {isMobileOpen && (
+        <div
+          className="fixed inset-0 z-50 bg-gray-900/50 backdrop-blur-sm lg:hidden transition-opacity duration-300"
+          onClick={() => toggleMobileSidebar()}
+        />
+      )}
+
+      <aside
+        className={`fixed mt-16 lg:mt-0 flex flex-col top-0 px-5 left-0 text-gray-900 h-[calc(100vh-64px)] lg:h-screen transition-all duration-300 ease-in-out z-999999 border-r border-gray-200 dark:border-gray-800
+        custom-sidebar-bg bg-white dark:bg-gray-900
         ${isExpanded || isMobileOpen
           ? "w-[290px]"
           : isHovered
             ? "w-[290px]"
             : "w-[90px]"
-        }
-        ${isMobileOpen ? "translate-x-0" : "-translate-x-full"}
+          }
+        ${isMobileOpen ? "translate-x-0 opacity-100" : "-translate-x-full opacity-0 lg:opacity-100"}
         lg:translate-x-0`}
-      onMouseEnter={() => !isExpanded && setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
+        onMouseEnter={() => !isExpanded && setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
       <div
-        className={`py-8 flex ${!isExpanded && !isHovered ? "lg:justify-center" : "justify-start"
+          className={`py-8 hidden lg:flex ${!isExpanded && !isHovered ? "lg:justify-center" : "justify-start"
           }`}
       >
         <Link href="/dashboard">
@@ -437,7 +453,7 @@ const AppSidebar: React.FC = () => {
           )}
         </Link>
       </div>
-      <div className="flex flex-col overflow-y-auto duration-300 ease-linear no-scrollbar">
+        <div className="flex flex-col flex-1 overflow-y-auto duration-300 ease-linear no-scrollbar">
         <nav className="mb-6">
           <div className="flex flex-col gap-4">
             {hasAnyPermission(navItems) && (
@@ -495,6 +511,7 @@ const AppSidebar: React.FC = () => {
         </nav>
       </div>
     </aside>
+    </>
   );
 };
 

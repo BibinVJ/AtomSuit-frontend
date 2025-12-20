@@ -32,7 +32,6 @@ interface Props {
 }
 
 export default function SubscriptionTable({ data, onAction, onSort, sortBy, sortDirection, currentPage, perPage }: Props) {
-  const { hasPermission } = hasPermission(); // Wait, fixing potential typo in original if any
   const { hasPermission } = usePermissions();
   const { formatCurrency, formatDate: globalFormatDate } = useSettings();
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
@@ -85,9 +84,7 @@ export default function SubscriptionTable({ data, onAction, onSort, sortBy, sort
     if (subscription.is_on_trial) {
       return <Badge size="sm" color="warning">Trial</Badge>;
     }
-    if (subscription.is_active) {
-      return <Badge size="sm" color="success">Active</Badge>;
-    }
+    return <Badge size="sm" color="success">Active</Badge>;
     return <Badge size="sm" color="secondary">Inactive</Badge>;
   };
 

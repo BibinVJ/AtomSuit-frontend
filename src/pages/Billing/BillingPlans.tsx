@@ -73,7 +73,6 @@ export default function BillingPlans() {
   
   // Filter plans based on billing interval and active status
   const monthlyPlans = plans.filter(plan => 
-    plan.is_active && 
     plan.interval === 'month' && 
     !plan.name.toLowerCase().includes('trial') &&
     !plan.name.toLowerCase().includes('expired') &&
@@ -81,7 +80,6 @@ export default function BillingPlans() {
   );
   
   const yearlyPlans = plans.filter(plan => 
-    plan.is_active && 
     plan.interval === 'year' && 
     !plan.name.toLowerCase().includes('trial') &&
     !plan.name.toLowerCase().includes('expired') &&
@@ -89,7 +87,6 @@ export default function BillingPlans() {
   );
   
   const lifetimePlans = plans.filter(plan => 
-    plan.is_active && 
     (plan.interval === 'lifetime' || plan.name.toLowerCase().includes('lifetime')) &&
     !plan.is_expired_user_plan
   );

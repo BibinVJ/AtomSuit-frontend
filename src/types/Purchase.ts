@@ -22,7 +22,6 @@ export interface Purchase {
   total_amount: number;
   status: string;
   payment_status: string;
-  is_active: boolean;
   items: PurchaseItemDetail[];
 }
 

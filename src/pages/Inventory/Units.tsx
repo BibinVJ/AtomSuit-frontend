@@ -10,16 +10,26 @@ import AddUnitModal from '../../components/inventory/units/AddUnitModal';
 import { useModal } from '../../hooks/useModal';
 import Pagination from '../../components/common/Pagination';
 import Button from '../../components/ui/button/Button';
+import Tooltip from '../../components/ui/tooltip/Tooltip';
 import Select from '../../components/form/Select';
-import { getUnits } from '../../services/UnitService';
+import { getUnits, exportUnits, importUnits, downloadSampleUnitExcel } from '../../services/UnitService';
 import { Unit } from '../../types';
+import ImportModal from '../../components/common/ImportModal';
+import { Download, Upload } from 'lucide-react';
+import { toast } from 'sonner';
+import ViewModeTabs from '../../components/common/ViewModeTabs';
 
 import { usePermissions } from '../../hooks/usePermissions';
+
+import { useDebounce } from '../../hooks/useDebounce';
+import TableToolbar from '../../components/common/TableToolbar';
+import { Plus } from 'lucide-react';
 
 export default function Units() {
   const { hasPermission } = usePermissions();
   const [units, setUnits] = useState<Unit[]>([]);
   const { isOpen, openModal, closeModal } = useModal();
+  const { isOpen: isImportModalOpen, openModal: openImportModal, closeModal: closeImportModal } = useModal();
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
@@ -28,16 +38,37 @@ export default function Units() {
   const [total, setTotal] = useState(0);
   const [sortBy, setSortBy] = useState('created_at');
   const [sortDirection, setSortDirection] = useState('desc');
+  const [viewMode, setViewMode] = useState<'active' | 'trashed'>('active');
+
+  /* State for Range Fetching & Search */
+  const [rangeFrom, setRangeFrom] = useState<number | ''>('');
+  const [rangeTo, setRangeTo] = useState<number | ''>('');
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const debouncedSearchTerm = useDebounce(searchTerm, 1000);
+  const debouncedRangeFrom = useDebounce(rangeFrom, 1000);
+  const debouncedRangeTo = useDebounce(rangeTo, 1000);
 
   const fetchUnits = async (page = 1, limit = 10, sortCol = 'created_at', sortDir = 'desc') => {
     try {
-      const response = await getUnits(page, limit, sortCol, sortDir);
+      const response = await getUnits({
+        page,
+        limit,
+        sortCol,
+        sortDir,
+        from: debouncedRangeFrom !== '' ? Number(debouncedRangeFrom) : undefined,
+        to: debouncedRangeTo !== '' ? Number(debouncedRangeTo) : undefined,
+        search: debouncedSearchTerm,
+        trashed: viewMode === 'trashed' ? 'only' : undefined
+      });
       setUnits(response.data);
-      setTotalPages(response.meta.last_page);
-      setCurrentPage(response.meta.current_page);
-      setFrom(response.meta.from);
-      setTo(response.meta.to);
-      setTotal(response.meta.total);
+      if (response.meta) {
+        setTotalPages(response.meta.last_page || 1);
+        setCurrentPage(response.meta.current_page || 1);
+        setFrom(response.meta.from !== undefined ? response.meta.from : (debouncedRangeFrom !== '' ? Number(debouncedRangeFrom) : 0));
+        setTo(response.meta.to !== undefined ? response.meta.to : (debouncedRangeTo !== '' ? Number(debouncedRangeTo) : 0));
+        setTotal(response.meta.total || 0);
+      }
     } catch (error) {
       console.error('Error fetching units:', error);
     }
@@ -45,7 +76,7 @@ export default function Units() {
 
   useEffect(() => {
     fetchUnits(currentPage, perPage, sortBy, sortDirection);
-  }, [currentPage, perPage, sortBy, sortDirection]);
+  }, [currentPage, perPage, sortBy, sortDirection, debouncedSearchTerm, debouncedRangeFrom, debouncedRangeTo, viewMode]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -65,6 +96,24 @@ export default function Units() {
     }
   };
 
+  const handleExport = async () => {
+    try {
+      const response = await exportUnits();
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+      link.setAttribute('download', `units_${timestamp}.xlsx`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      toast.error('Failed to export units');
+      console.error('Export error:', error);
+    }
+  };
+
   return (
     <>
       <PageMeta
@@ -72,30 +121,53 @@ export default function Units() {
         description="List of units"
       />
       <PageBreadcrumb pageTitle="Units" />
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <label htmlFor="perPage" className="text-sm font-medium text-gray-700">Per Page:</label>
-          <Select
-            options={[
-              { value: '10', label: '10' },
-              { value: '20', label: '20' },
-              { value: '50', label: '50' },
-            ]}
-            onChange={handlePerPageChange}
-            defaultValue={String(perPage)}
-            showPlaceholder={false}
-            className="w-20"
-            searchable={false}
+
+      <div className="space-y-6">
+        <div className="p-5 border border-gray-200 rounded-2xl bg-gray-50 dark:bg-white/[0.03] dark:border-gray-800 shadow-sm">
+          <TableToolbar
+            className="mb-0"
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            searchPlaceholder="Search units..."
+            rangeFrom={rangeFrom}
+            onRangeFromChange={(val) => setRangeFrom(val as number | '')}
+            rangeTo={rangeTo}
+            onRangeToChange={(val) => setRangeTo(val as number | '')}
+            perPage={perPage}
+            onPerPageChange={handlePerPageChange}
+            onReset={() => {
+              setSearchTerm('');
+              setRangeFrom('');
+              setRangeTo('');
+            }}
           />
         </div>
-        {hasPermission("create-unit") && (
-          <Button onClick={openModal}>
-            Add Unit
-          </Button>
-        )}
-      </div>
-      <div className="space-y-6">
-        <ComponentCard title="Units">
+
+        <ComponentCard
+          title={`Units (${viewMode})`}
+          action={
+            <div className="flex flex-wrap items-center gap-2">
+              <ViewModeTabs viewMode={viewMode} setViewMode={setViewMode} />
+              <Tooltip text="Import Units">
+                <Button variant="outline" size="sm" onClick={openImportModal} startIcon={<Upload className="w-4 h-4" />}>
+                  Import
+                </Button>
+              </Tooltip>
+              <Tooltip text="Export Units">
+                <Button variant="outline" size="sm" onClick={handleExport} startIcon={<Download className="w-4 h-4" />}>
+                  Export
+                </Button>
+              </Tooltip>
+              {hasPermission("create-unit") && (
+                <Tooltip text="Add New Unit">
+                  <Button onClick={openModal} size="sm" startIcon={<Plus className="w-4 h-4" />}>
+                    Add Unit
+                  </Button>
+                </Tooltip>
+              )}
+            </div>
+          }
+        >
           <UnitTable
             data={units}
             onAction={() => fetchUnits(currentPage, perPage, sortBy, sortDirection)}
@@ -104,6 +176,8 @@ export default function Units() {
             sortDirection={sortDirection}
             currentPage={currentPage}
             perPage={perPage}
+            startIndex={debouncedRangeFrom !== '' ? Number(debouncedRangeFrom) : undefined}
+            viewMode={viewMode}
           />
           <Pagination
             currentPage={currentPage}
@@ -116,6 +190,15 @@ export default function Units() {
         </ComponentCard>
       </div>
       <AddUnitModal isOpen={isOpen} onClose={closeModal} onUnitAdded={() => fetchUnits(1, perPage)} />
+      <ImportModal
+        isOpen={isImportModalOpen}
+        onClose={closeImportModal}
+        onImport={importUnits}
+        onDownloadSample={downloadSampleUnitExcel}
+        onSuccess={() => fetchUnits(1, perPage)}
+        entityName="Units"
+      />
     </>
   );
 }
+

@@ -27,7 +27,6 @@ export default function AddItemModal({ isOpen, onClose, onItemAdded }: Props) {
   const [categoryId, setCategoryId] = useState('');
   const [unitId, setUnitId] = useState('');
   const [description, setDescription] = useState('');
-  const [isActive, setIsActive] = useState(true);
   const [type, setType] = useState('product');
   const [selling_price, setSellingPrice] = useState('');
   const [categories, setCategories] = useState<Category[]>([]);
@@ -43,7 +42,7 @@ export default function AddItemModal({ isOpen, onClose, onItemAdded }: Props) {
 
   const fetchCategories = async () => {
     try {
-      const response = await getCategories(1, 10, 'created_at', 'desc', true);
+      const response = await getCategories({ page: 1, limit: 10, sortCol: 'created_at', sortDir: 'desc', unpaginated: true });
       setCategories(response.data);
     } catch (error) {
       console.error('Error fetching categories:', error);
@@ -52,7 +51,7 @@ export default function AddItemModal({ isOpen, onClose, onItemAdded }: Props) {
 
   const fetchUnits = async () => {
     try {
-      const response = await getUnits(1, 10, 'created_at', 'desc', true);
+      const response = await getUnits({ page: 1, limit: 10, sortCol: 'created_at', sortDir: 'desc', unpaginated: true });
       setUnits(response.data);
     } catch (error) {
       console.error('Error fetching units:', error);
@@ -65,7 +64,6 @@ export default function AddItemModal({ isOpen, onClose, onItemAdded }: Props) {
     setCategoryId('');
     setUnitId('');
     setDescription('');
-    setIsActive(true);
     setType('product');
     setSellingPrice('');
     setErrors({ sku: '', name: '', category_id: '', unit_id: '', type: '', selling_price: '' });
@@ -111,7 +109,6 @@ export default function AddItemModal({ isOpen, onClose, onItemAdded }: Props) {
         category_id: categoryId,
         unit_id: unitId,
         description,
-        is_active: isActive,
         type,
         selling_price: Number(selling_price)
       });
@@ -139,8 +136,8 @@ export default function AddItemModal({ isOpen, onClose, onItemAdded }: Props) {
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} className="max-w-[700px] lg:p-11">
-      <div className="relative w-full p-4 overflow-y-auto bg-white no-scrollbar rounded-3xl dark:bg-gray-900">
+    <Modal isOpen={isOpen} onClose={handleClose} className="max-w-[700px] p-6 md:p-10">
+      <div className="relative w-full">
         <div className="px-2 pr-14">
           <h4 className="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90">
             Add New Item
@@ -199,10 +196,6 @@ export default function AddItemModal({ isOpen, onClose, onItemAdded }: Props) {
                   error={!!errors.type}
                   hint={errors.type}
                 />
-              </div>
-              <div>
-                <Label>Status</Label>
-                <Switch label={isActive ? 'Active' : 'Inactive'} checked={isActive} onChange={setIsActive} />
               </div>
             </div>
           </div>

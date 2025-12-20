@@ -51,7 +51,7 @@ export default function EditPurchase() {
       try {
         const [vendorResponse, itemResponse, purchaseResponse] = await Promise.all([
           getVendors(1, 10, 'created_at', 'desc', true),
-          getItems(1, 10, 'created_at', 'desc', true),
+          getItems({ page: 1, limit: 10, sortCol: 'created_at', sortDir: 'desc', unpaginated: true }),
           getPurchase(id!)
         ]);
         setVendors(vendorResponse.data || vendorResponse);

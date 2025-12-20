@@ -9,14 +9,21 @@ import AddTenantModal from '../../components/tenant/AddTenantModal';
 import { useModal } from '../../hooks/useModal';
 import Pagination from '../../components/common/Pagination';
 import Button from '../../components/ui/button/Button';
+import Tooltip from '../../components/ui/tooltip/Tooltip';
 import Select from '../../components/form/Select';
 import { getTenants } from '../../services/TenantService';
+import { getPlans } from '../../services/PlanService';
 import { usePermissions } from '../../hooks/usePermissions';
-import { Tenant } from '../../types';
+import { Tenant, Plan } from '../../types';
+
+import { useDebounce } from '../../hooks/useDebounce';
+import TableToolbar from '../../components/common/TableToolbar';
+import { Plus } from 'lucide-react';
 
 export default function Tenants() {
   const { hasPermission } = usePermissions();
   const [tenants, setTenants] = useState<Tenant[]>([]);
+  const [plans, setPlans] = useState<Plan[]>([]);
   const { isOpen, openModal, closeModal } = useModal();
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
@@ -27,9 +34,30 @@ export default function Tenants() {
   const [sortBy, setSortBy] = useState('created_at');
   const [sortDirection, setSortDirection] = useState('desc');
 
+  /* State for Range Fetching & Search */
+  const [rangeFrom, setRangeFrom] = useState<number | ''>('');
+  const [rangeTo, setRangeTo] = useState<number | ''>('');
+  const [searchTerm, setSearchTerm] = useState('');
+
+  /* State for Plan Filter */
+  const [selectedPlan, setSelectedPlan] = useState<string | number>('');
+
+  const debouncedSearchTerm = useDebounce(searchTerm, 1000);
+  const debouncedRangeFrom = useDebounce(rangeFrom, 1000);
+  const debouncedRangeTo = useDebounce(rangeTo, 1000);
+
   const fetchTenants = async (page = 1, limit = 10, sortCol = 'created_at', sortDir = 'desc') => {
     try {
-      const response = await getTenants(page, limit, sortCol, sortDir);      
+      const response = await getTenants(
+        page,
+        limit,
+        sortCol,
+        sortDir,
+        debouncedRangeFrom !== '' ? Number(debouncedRangeFrom) : undefined,
+        debouncedRangeTo !== '' ? Number(debouncedRangeTo) : undefined,
+        debouncedSearchTerm,
+        selectedPlan
+      );      
       // Ensure data is always an array
       const tenantsData = Array.isArray(response.data) ? response.data : [];
       setTenants(tenantsData);
@@ -38,8 +66,8 @@ export default function Tenants() {
       if (response.meta) {
         setTotalPages(response.meta.last_page || 1);
         setCurrentPage(response.meta.current_page || 1);
-        setFrom(response.meta.from || 0);
-        setTo(response.meta.to || 0);
+        setFrom(response.meta.from !== undefined ? response.meta.from : (debouncedRangeFrom !== '' ? Number(debouncedRangeFrom) : 0));
+        setTo(response.meta.to !== undefined ? response.meta.to : (debouncedRangeTo !== '' ? Number(debouncedRangeTo) : 0));
         setTotal(response.meta.total || 0);
       }
     } catch (error) {
@@ -48,9 +76,22 @@ export default function Tenants() {
     }
   };
 
+  const fetchPlans = async () => {
+    try {
+      const response = await getPlans(1, 10, 'name', 'asc', true);
+      setPlans(Array.isArray(response.data) ? response.data : []);
+    } catch (error) {
+      console.error('Error fetching plans:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchPlans();
+  }, []);
+
   useEffect(() => {
     fetchTenants(currentPage, perPage, sortBy, sortDirection);
-  }, [currentPage, perPage, sortBy, sortDirection]);
+  }, [currentPage, perPage, sortBy, sortDirection, debouncedSearchTerm, debouncedRangeFrom, debouncedRangeTo, selectedPlan]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -77,30 +118,59 @@ export default function Tenants() {
         description="List of tenants"
       />
       <PageBreadcrumb pageTitle="Tenants" />
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <label htmlFor="perPage" className="text-sm font-medium text-gray-700">Per Page:</label>
-          <Select
-            options={[
-              { value: '10', label: '10' },
-              { value: '20', label: '20' },
-              { value: '50', label: '50' },
-            ]}
-            onChange={handlePerPageChange}
-            defaultValue={String(perPage)}
-            showPlaceholder={false}
-            className="w-20"
-            searchable={false}
+
+      <div className="space-y-6">
+        <div className="p-5 border border-gray-200 rounded-2xl bg-gray-50 dark:bg-white/[0.03] dark:border-gray-800 shadow-sm">
+          <TableToolbar
+            className="mb-0"
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            searchPlaceholder="Search tenants..."
+            rangeFrom={rangeFrom}
+            onRangeFromChange={(val) => setRangeFrom(val as number | '')}
+            rangeTo={rangeTo}
+            onRangeToChange={(val) => setRangeTo(val as number | '')}
+            perPage={perPage}
+            onPerPageChange={handlePerPageChange}
+            onReset={() => {
+              setSearchTerm('');
+              setRangeFrom('');
+              setRangeTo('');
+              setSelectedPlan('');
+            }}
+            extraFilters={
+              <div className="w-full md:w-44">
+                <Select
+                  options={[
+                    { value: '', label: 'All Plans' },
+                    ...plans.map((plan) => ({ value: String(plan.id), label: plan.name })),
+                  ]}
+                  onChange={(value) => setSelectedPlan(value)}
+                  defaultValue={String(selectedPlan)}
+                  showPlaceholder={true}
+                  placeholder="Plan"
+                  className="w-full"
+                  searchable={true}
+                />
+              </div>
+            }
           />
         </div>
-        {hasPermission("create-tenant") && (
-          <Button onClick={openModal}>
-            Add Tenant
-          </Button>
-        )}
-      </div>
-      <div className="space-y-6">
-        <ComponentCard title="Tenants">
+
+        <ComponentCard
+          title="Tenants"
+          action={
+            <div className="flex flex-wrap items-center gap-2">
+              {hasPermission("create-tenant") && (
+                <Tooltip text="Add New Tenant">
+                  <Button onClick={openModal} size="sm" startIcon={<Plus className="w-4 h-4" />}>
+                    Add Tenant
+                  </Button>
+                </Tooltip>
+              )}
+            </div>
+          }
+        >
           <TenantTable
             data={tenants}
             onAction={() => fetchTenants(currentPage, perPage, sortBy, sortDirection)}
@@ -109,6 +179,7 @@ export default function Tenants() {
             sortDirection={sortDirection}
             currentPage={currentPage}
             perPage={perPage}
+            startIndex={debouncedRangeFrom !== '' ? Number(debouncedRangeFrom) : undefined}
           />
           <Pagination
             currentPage={currentPage}
@@ -124,3 +195,4 @@ export default function Tenants() {
     </>
   );
 }
+

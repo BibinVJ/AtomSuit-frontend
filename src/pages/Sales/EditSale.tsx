@@ -49,7 +49,7 @@ export default function EditSale() {
     try {
       const [customerResponse, itemResponse, saleResponse] = await Promise.all([
         getCustomers(1, 10, 'created_at', 'desc', true),
-        getItems(1, 10, 'created_at', 'desc', true),
+        getItems({ page: 1, limit: 10, sortCol: 'created_at', sortDir: 'desc', unpaginated: true }),
         getSale(id!)
       ]);
       setCustomers(customerResponse.data || customerResponse);

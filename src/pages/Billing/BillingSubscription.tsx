@@ -73,20 +73,21 @@ export default function BillingSubscription() {
   const getStatusColor = () => {
     if (subscription?.is_canceled) return 'text-orange-600 bg-orange-50';
     if (subscription?.is_on_trial) return 'text-blue-600 bg-blue-50';
-    if (subscription?.is_active) return 'text-green-600 bg-green-50';
+    return 'text-green-600 bg-green-50';
     return 'text-gray-600 bg-gray-50';
   };
 
   const getStatusText = () => {
     if (subscription?.is_canceled) return 'Cancelled';
     if (subscription?.is_on_trial) return 'Trial';
-    if (subscription?.is_active) return 'Active';
+    return 'Active';
     return 'Inactive';
   };
 
   const getStatusIcon = () => {
     if (subscription?.is_canceled) return <AlertTriangle className="w-4 h-4" />;
-    if (subscription?.is_active || subscription?.is_on_trial) return <CheckCircle className="w-4 h-4" />;
+    if (subscription?.is_on_trial) return <CheckCircle className="w-4 h-4" />;
+    return <CheckCircle className="w-4 h-4" />;
     return <CreditCard className="w-4 h-4" />;
   };
 
@@ -224,7 +225,7 @@ export default function BillingSubscription() {
               </button>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {plans.filter(plan => plan.is_active).map((plan) => {
+              {plans.map((plan) => {
                 const isCurrentPlan = subscription?.plan?.id === plan.id;
 
                 return (

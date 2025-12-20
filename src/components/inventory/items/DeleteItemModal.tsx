@@ -11,19 +11,20 @@ interface Props {
   onClose: () => void;
   onItemDeleted: () => void;
   item: Item;
+  isForceDelete?: boolean;
 }
 
-export default function DeleteItemModal({ isOpen, onClose, onItemDeleted, item }: Props) {
+export default function DeleteItemModal({ isOpen, onClose, onItemDeleted, item, isForceDelete = false }: Props) {
 
   const handleDelete = async () => {
     try {
-      await deleteItem(item.id);
+      await deleteItem(item.id, isForceDelete);
       onItemDeleted();
-      toast.success('Item deleted successfully');
+      toast.success(isForceDelete ? 'Item permanently deleted' : 'Item deleted successfully');
       onClose();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error deleting item:', error);
-      toast.error('Failed to delete item');
+      toast.error(error.response?.data?.message || 'Failed to delete item');
     }
   };
 
@@ -51,10 +52,12 @@ export default function DeleteItemModal({ isOpen, onClose, onItemDeleted, item }
             </svg>
           </div>
           <h4 className="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90">
-            Delete Item
+            {isForceDelete ? 'Permanently Delete Item' : 'Delete Item'}
           </h4>
           <p className="mb-6 text-gray-500 dark:text-gray-400">
-            Are you sure you want to delete the item &quot;{item?.name}&quot;? This action cannot be undone.
+            {isForceDelete
+              ? `Are you sure you want to PERMANENTLY delete "${item?.name}"? This will check for any related records and fail if any are found. This action cannot be undone.`
+              : `Are you sure you want to delete the item "${item?.name}"? You can restore it later from the Trashed items view.`}
           </p>
           <div className="flex items-center justify-center gap-4">
             <Button type="button" variant="outline" onClick={onClose}>
@@ -65,8 +68,8 @@ export default function DeleteItemModal({ isOpen, onClose, onItemDeleted, item }
               className="text-white bg-red-600 hover:bg-red-800"
               onClick={handleDelete}
             >
-              Delete
-            </Button>.
+              {isForceDelete ? 'Permanently Delete' : 'Delete'}
+            </Button>
           </div>
         </div>
       </div>

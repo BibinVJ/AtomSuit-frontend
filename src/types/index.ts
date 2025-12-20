@@ -16,3 +16,4 @@ export * from './Plan';
 export * from './Tenant';
 export * from './Subscription';
 export * from './Settings';
+export * from './Audit';
