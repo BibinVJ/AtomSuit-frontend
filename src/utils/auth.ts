@@ -14,7 +14,7 @@ export const isAuthenticated = (): boolean => {
 export const getAuthToken = (): string | null => {
   // Check both localStorage and sessionStorage
   const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-  
+
   if (token) {
     return token;
   }
@@ -32,13 +32,7 @@ export const getAuthToken = (): string | null => {
  * Check if current route should be public (no authentication required)
  */
 export const isPublicRoute = (pathname: string): boolean => {
-  const publicRoutes = [
-    '/',
-    '/signin',
-    '/signup',
-    '/forgot-password',
-    '/reset-password'
-  ];
+  const publicRoutes = ['/', '/signin', '/signup', '/forgot-password', '/reset-password'];
 
   return publicRoutes.includes(pathname) || pathname.startsWith('/auth');
 };
@@ -57,7 +51,7 @@ export const clearAuthData = (): void => {
   // Clear localStorage
   localStorage.removeItem('user');
   localStorage.removeItem('token');
-  
+
   // Clear sessionStorage
   sessionStorage.removeItem('user');
   sessionStorage.removeItem('token');

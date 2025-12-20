@@ -1,5 +1,4 @@
-"use client";
-
+'use client';
 
 import { useEffect, useState } from 'react';
 import PageBreadcrumb from '../../components/common/PageBreadCrumb';
@@ -12,7 +11,12 @@ import Pagination from '../../components/common/Pagination';
 import Button from '../../components/ui/button/Button';
 import Tooltip from '../../components/ui/tooltip/Tooltip';
 import Select from '../../components/form/Select';
-import { getCategories, exportCategories, importCategories, downloadSampleCategoryExcel } from '../../services/CategoryService';
+import {
+  getCategories,
+  exportCategories,
+  importCategories,
+  downloadSampleCategoryExcel,
+} from '../../services/CategoryService';
 import { Category } from '../../types';
 import ImportModal from '../../components/common/ImportModal';
 import { Download, Upload } from 'lucide-react';
@@ -26,7 +30,11 @@ import { Plus } from 'lucide-react';
 export default function Categories() {
   const [categories, setCategories] = useState<Category[]>([]);
   const { isOpen, openModal, closeModal } = useModal();
-  const { isOpen: isImportModalOpen, openModal: openImportModal, closeModal: closeImportModal } = useModal();
+  const {
+    isOpen: isImportModalOpen,
+    openModal: openImportModal,
+    closeModal: closeImportModal,
+  } = useModal();
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
@@ -46,7 +54,12 @@ export default function Categories() {
   const debouncedRangeFrom = useDebounce(rangeFrom, 1000);
   const debouncedRangeTo = useDebounce(rangeTo, 1000);
 
-  const fetchCategories = async (page = 1, limit = 10, sortCol = 'created_at', sortDir = 'desc') => {
+  const fetchCategories = async (
+    page = 1,
+    limit = 10,
+    sortCol = 'created_at',
+    sortDir = 'desc'
+  ) => {
     try {
       const response = await getCategories({
         page,
@@ -56,14 +69,26 @@ export default function Categories() {
         from: debouncedRangeFrom !== '' ? Number(debouncedRangeFrom) : undefined,
         to: debouncedRangeTo !== '' ? Number(debouncedRangeTo) : undefined,
         search: debouncedSearchTerm,
-        trashed: viewMode === 'trashed' ? 'only' : undefined
+        trashed: viewMode === 'trashed' ? 'only' : undefined,
       });
       setCategories(response.data);
       if (response.meta) {
         setTotalPages(response.meta.last_page || 1);
         setCurrentPage(response.meta.current_page || 1);
-        setFrom(response.meta.from !== undefined ? response.meta.from : (debouncedRangeFrom !== '' ? Number(debouncedRangeFrom) : 0));
-        setTo(response.meta.to !== undefined ? response.meta.to : (debouncedRangeTo !== '' ? Number(debouncedRangeTo) : 0));
+        setFrom(
+          response.meta.from !== undefined
+            ? response.meta.from
+            : debouncedRangeFrom !== ''
+              ? Number(debouncedRangeFrom)
+              : 0
+        );
+        setTo(
+          response.meta.to !== undefined
+            ? response.meta.to
+            : debouncedRangeTo !== ''
+              ? Number(debouncedRangeTo)
+              : 0
+        );
         setTotal(response.meta.total || 0);
       }
     } catch (error) {
@@ -73,7 +98,16 @@ export default function Categories() {
 
   useEffect(() => {
     fetchCategories(currentPage, perPage, sortBy, sortDirection);
-  }, [currentPage, perPage, sortBy, sortDirection, debouncedSearchTerm, debouncedRangeFrom, debouncedRangeTo, viewMode]);
+  }, [
+    currentPage,
+    perPage,
+    sortBy,
+    sortDirection,
+    debouncedSearchTerm,
+    debouncedRangeFrom,
+    debouncedRangeTo,
+    viewMode,
+  ]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -113,10 +147,7 @@ export default function Categories() {
 
   return (
     <>
-      <PageMeta
-        title="Categories"
-        description="List of categories"
-      />
+      <PageMeta title="Categories" description="List of categories" />
       <PageBreadcrumb pageTitle="Categories" />
 
       <div className="space-y-6">
@@ -146,23 +177,29 @@ export default function Categories() {
             <div className="flex flex-wrap items-center gap-3">
               <ViewModeTabs viewMode={viewMode} setViewMode={setViewMode} />
               <Tooltip text="Import Categories">
-                <Button variant="outline" size="sm" onClick={openImportModal} className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={openImportModal}
+                  className="flex items-center gap-2"
+                >
                   <Upload size={16} />
                   Import
                 </Button>
               </Tooltip>
               <Tooltip text="Export Categories">
-                <Button variant="outline" size="sm" onClick={handleExport} className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleExport}
+                  className="flex items-center gap-2"
+                >
                   <Download size={16} />
                   Export
                 </Button>
               </Tooltip>
               <Tooltip text="Add New Category">
-                <Button
-                  onClick={openModal}
-                  size="sm"
-                  className="flex items-center gap-2"
-                >
+                <Button onClick={openModal} size="sm" className="flex items-center gap-2">
                   <Plus size={16} />
                   Add Category
                 </Button>
@@ -191,7 +228,11 @@ export default function Categories() {
           />
         </ComponentCard>
       </div>
-      <AddCategoryModal isOpen={isOpen} onClose={closeModal} onCategoryAdded={() => fetchCategories(1, perPage)} />
+      <AddCategoryModal
+        isOpen={isOpen}
+        onClose={closeModal}
+        onCategoryAdded={() => fetchCategories(1, perPage)}
+      />
       <ImportModal
         isOpen={isImportModalOpen}
         onClose={closeImportModal}
@@ -203,4 +244,3 @@ export default function Categories() {
     </>
   );
 }
-

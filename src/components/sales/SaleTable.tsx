@@ -1,19 +1,20 @@
-"use client";
+'use client';
 
+import { Table, TableBody, TableCell, TableHeader, TableRow } from '../ui/table';
+import { useState } from 'react';
+import Badge from '../ui/badge/Badge';
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHeader,
-  TableRow,
-} from "../ui/table";
-import { useState } from "react";
-import Badge from "../ui/badge/Badge";
-import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide, View, Edit, Trash2 } from 'lucide-react';
-import Button from "../ui/button/Button";
-import Tooltip from "../ui/tooltip/Tooltip";
-import { useRouter } from "next/navigation";
-import VoidSaleModal from "./VoidSaleModal";
+  ChevronsUpDown,
+  ArrowUpWideNarrow,
+  ArrowDownNarrowWide,
+  View,
+  Edit,
+  Trash2,
+} from 'lucide-react';
+import Button from '../ui/button/Button';
+import Tooltip from '../ui/tooltip/Tooltip';
+import { useRouter } from 'next/navigation';
+import VoidSaleModal from './VoidSaleModal';
 
 import { Sale } from '../../types';
 
@@ -28,10 +29,19 @@ interface Props {
   startIndex?: number;
 }
 
-import { usePermissions } from "../../hooks/usePermissions";
-import { useSettings } from "../../hooks/useSettings";
+import { usePermissions } from '../../hooks/usePermissions';
+import { useSettings } from '../../hooks/useSettings';
 
-export default function SaleTable({ data, onAction, onSort, sortBy, sortDirection, currentPage, perPage, startIndex }: Props) {
+export default function SaleTable({
+  data,
+  onAction,
+  onSort,
+  sortBy,
+  sortDirection,
+  currentPage,
+  perPage,
+  startIndex,
+}: Props) {
   const { hasPermission } = usePermissions();
   const { formatCurrency, formatDate } = useSettings();
   const router = useRouter();
@@ -73,13 +83,53 @@ export default function SaleTable({ data, onAction, onSort, sortBy, sortDirectio
         <Table>
           <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
             <TableRow>
-              <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">#</TableCell>
-              <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400" onClick={() => onSort('invoice_number')}>Invoice # {renderSortIcon('invoice_number')}</TableCell>
-              <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400" onClick={() => onSort('sale_date')}>Sale Date {renderSortIcon('sale_date')}</TableCell>
-              <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400" onClick={() => onSort('customer_id')}>Customer {renderSortIcon('customer_id')}</TableCell>
-              <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400" onClick={() => onSort('total_amount')}>Total Amount {renderSortIcon('total_amount')}</TableCell>
-              <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400" onClick={() => onSort('status')}>Status {renderSortIcon('status')}</TableCell>
-              <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">Actions</TableCell>
+              <TableCell
+                isHeader
+                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+              >
+                #
+              </TableCell>
+              <TableCell
+                isHeader
+                className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400"
+                onClick={() => onSort('invoice_number')}
+              >
+                Invoice # {renderSortIcon('invoice_number')}
+              </TableCell>
+              <TableCell
+                isHeader
+                className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400"
+                onClick={() => onSort('sale_date')}
+              >
+                Sale Date {renderSortIcon('sale_date')}
+              </TableCell>
+              <TableCell
+                isHeader
+                className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400"
+                onClick={() => onSort('customer_id')}
+              >
+                Customer {renderSortIcon('customer_id')}
+              </TableCell>
+              <TableCell
+                isHeader
+                className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400"
+                onClick={() => onSort('total_amount')}
+              >
+                Total Amount {renderSortIcon('total_amount')}
+              </TableCell>
+              <TableCell
+                isHeader
+                className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400"
+                onClick={() => onSort('status')}
+              >
+                Status {renderSortIcon('status')}
+              </TableCell>
+              <TableCell
+                isHeader
+                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+              >
+                Actions
+              </TableCell>
             </TableRow>
           </TableHeader>
 
@@ -88,21 +138,40 @@ export default function SaleTable({ data, onAction, onSort, sortBy, sortDirectio
               <TableRow key={sale.id}>
                 <TableCell className="px-5 py-3 text-start">
                   <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                    {startIndex !== undefined ? startIndex + index : (currentPage - 1) * perPage + index + 1}
+                    {startIndex !== undefined
+                      ? startIndex + index
+                      : (currentPage - 1) * perPage + index + 1}
                   </p>
                 </TableCell>
-                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">{sale.invoice_number}</TableCell>
-                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">{formatDate(sale.sale_date)}</TableCell>
-                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">{sale.customer.name}</TableCell>
-                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">{formatCurrency(sale.total_amount)}</TableCell>
+                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
+                  {sale.invoice_number}
+                </TableCell>
+                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
+                  {formatDate(sale.sale_date)}
+                </TableCell>
+                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
+                  {sale.customer.name}
+                </TableCell>
+                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
+                  {formatCurrency(sale.total_amount)}
+                </TableCell>
                 <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                  <Badge size="sm" color={sale.status === 'completed' ? 'success' : (sale.status === 'voided' ? 'error' : 'primary')}>
+                  <Badge
+                    size="sm"
+                    color={
+                      sale.status === 'completed'
+                        ? 'success'
+                        : sale.status === 'voided'
+                          ? 'error'
+                          : 'primary'
+                    }
+                  >
                     {sale.status}
                   </Badge>
                 </TableCell>
                 <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
                   <div className="flex items-center gap-2">
-                    {hasPermission("view-sale") && (
+                    {hasPermission('view-sale') && (
                       <Tooltip text="View">
                         <Button
                           size="xs"
@@ -113,7 +182,7 @@ export default function SaleTable({ data, onAction, onSort, sortBy, sortDirectio
                         </Button>
                       </Tooltip>
                     )}
-                    {hasPermission("update-sale") && (
+                    {hasPermission('update-sale') && (
                       <Tooltip text="Edit">
                         <Button
                           size="xs"
@@ -124,7 +193,7 @@ export default function SaleTable({ data, onAction, onSort, sortBy, sortDirectio
                         </Button>
                       </Tooltip>
                     )}
-                    {hasPermission("delete-sale") && (
+                    {hasPermission('delete-sale') && (
                       <Tooltip text="Void">
                         <Button
                           size="xs"

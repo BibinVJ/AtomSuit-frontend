@@ -1,18 +1,20 @@
 import api from './api';
 import { UserApiResponse } from '../types';
 
-export const getUsers = async (params: {
-  page?: number;
-  limit?: number;
-  sortCol?: string;
-  sortDir?: string;
-  from?: number;
-  to?: number;
-  search?: string;
-  role?: string;
-  status?: string;
-  trashed?: 'only' | 'with';
-} = {}): Promise<UserApiResponse> => {
+export const getUsers = async (
+  params: {
+    page?: number;
+    limit?: number;
+    sortCol?: string;
+    sortDir?: string;
+    from?: number;
+    to?: number;
+    search?: string;
+    role?: string;
+    status?: string;
+    trashed?: 'only' | 'with';
+  } = {}
+): Promise<UserApiResponse> => {
   const {
     page = 1,
     limit = 10,

@@ -1,12 +1,6 @@
-import TableSection from "../ui/table/TableSection";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHeader,
-  TableRow,
-} from "../ui/table";
-import Badge from "../ui/badge/Badge";
+import TableSection from '../ui/table/TableSection';
+import { Table, TableBody, TableCell, TableHeader, TableRow } from '../ui/table';
+import Badge from '../ui/badge/Badge';
 
 interface TopItem {
   id: number;
@@ -18,11 +12,11 @@ interface TopItem {
 interface Props {
   items: TopItem[] | TopItem;
   title?: string;
-  color?: "success" | "error" | "warning" | "secondary";
+  color?: 'success' | 'error' | 'warning' | 'secondary';
 }
 
-export default function StockAlerts({ items, title = "Stock Alert", color = "error" }: Props) {
-  const itemsArray = Array.isArray(items) ? items : (items ? [items] : []);
+export default function StockAlerts({ items, title = 'Stock Alert', color = 'error' }: Props) {
+  const itemsArray = Array.isArray(items) ? items : items ? [items] : [];
 
   if (itemsArray.length === 0) {
     return (
@@ -83,4 +77,3 @@ export default function StockAlerts({ items, title = "Stock Alert", color = "err
     </TableSection>
   );
 }
-

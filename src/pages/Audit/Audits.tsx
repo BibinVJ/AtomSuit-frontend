@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useEffect, useState } from 'react';
 import PageBreadcrumb from '../../components/common/PageBreadCrumb';
@@ -62,8 +62,20 @@ export default function Audits() {
       if (response.meta) {
         setTotalPages(response.meta.last_page || 1);
         setCurrentPage(response.meta.current_page || 1);
-        setFrom(response.meta.from !== undefined ? response.meta.from : (debouncedRangeFrom !== '' ? Number(debouncedRangeFrom) : 0));
-        setTo(response.meta.to !== undefined ? response.meta.to : (debouncedRangeTo !== '' ? Number(debouncedRangeTo) : 0));
+        setFrom(
+          response.meta.from !== undefined
+            ? response.meta.from
+            : debouncedRangeFrom !== ''
+              ? Number(debouncedRangeFrom)
+              : 0
+        );
+        setTo(
+          response.meta.to !== undefined
+            ? response.meta.to
+            : debouncedRangeTo !== ''
+              ? Number(debouncedRangeTo)
+              : 0
+        );
         setTotal(response.meta.total !== undefined ? response.meta.total : 0);
       } else {
         setTotalPages(1);
@@ -72,7 +84,6 @@ export default function Audits() {
         setTo(debouncedRangeTo !== '' ? Number(debouncedRangeTo) : 0);
         setTotal(response.data?.length || 0);
       }
-
     } catch (error) {
       console.error('Error fetching audits:', error);
     }
@@ -80,7 +91,15 @@ export default function Audits() {
 
   useEffect(() => {
     fetchActivities(currentPage, perPage);
-  }, [currentPage, perPage, selectedEvent, selectedSubjectType, debouncedSearchTerm, debouncedRangeFrom, debouncedRangeTo]);
+  }, [
+    currentPage,
+    perPage,
+    selectedEvent,
+    selectedSubjectType,
+    debouncedSearchTerm,
+    debouncedRangeFrom,
+    debouncedRangeTo,
+  ]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -98,10 +117,7 @@ export default function Audits() {
 
   return (
     <>
-      <PageMeta
-        title="Audit Logs"
-        description="System activity and audit trail"
-      />
+      <PageMeta title="Audit Logs" description="System activity and audit trail" />
       <PageBreadcrumb pageTitle="Audit Logs" />
 
       <div className="space-y-6">
@@ -188,11 +204,7 @@ export default function Audits() {
         </ComponentCard>
       </div>
 
-      <AuditDetailsModal
-        isOpen={isOpen}
-        onClose={closeModal}
-        entry={selectedEntry}
-      />
+      <AuditDetailsModal isOpen={isOpen} onClose={closeModal} entry={selectedEntry} />
     </>
   );
 }

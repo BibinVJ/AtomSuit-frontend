@@ -1,22 +1,22 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import ComponentCard from "../../common/ComponentCard";
-import Label from "../Label";
-import Input from "../input/InputField";
-import Select from "../Select";
-import { EyeOff, Eye, Clock } from "lucide-react";
-import DatePicker from "../date-picker";
+import { useState } from 'react';
+import ComponentCard from '../../common/ComponentCard';
+import Label from '../Label';
+import Input from '../input/InputField';
+import Select from '../Select';
+import { EyeOff, Eye, Clock } from 'lucide-react';
+import DatePicker from '../date-picker';
 
 export default function DefaultInputs() {
   const [showPassword, setShowPassword] = useState(false);
   const options = [
-    { value: "marketing", label: "Marketing" },
-    { value: "template", label: "Template" },
-    { value: "development", label: "Development" },
+    { value: 'marketing', label: 'Marketing' },
+    { value: 'template', label: 'Template' },
+    { value: 'development', label: 'Development' },
   ];
   const handleSelectChange = (value: string) => {
-    console.log("Selected value:", value);
+    console.log('Selected value:', value);
   };
 
   return (
@@ -42,10 +42,7 @@ export default function DefaultInputs() {
         <div>
           <Label>Password Input</Label>
           <div className="relative">
-            <Input
-              type={showPassword ? "text" : "password"}
-              placeholder="Enter your password"
-            />
+            <Input type={showPassword ? 'text' : 'password'} placeholder="Enter your password" />
             <button
               onClick={() => setShowPassword(!showPassword)}
               className="absolute z-30 -translate-y-1/2 cursor-pointer right-4 top-1/2"
@@ -74,12 +71,7 @@ export default function DefaultInputs() {
         <div>
           <Label htmlFor="tm">Time Picker Input</Label>
           <div className="relative">
-            <Input
-              type="time"
-              id="tm"
-              name="tm"
-              onChange={(e) => console.log(e.target.value)}
-            />
+            <Input type="time" id="tm" name="tm" onChange={(e) => console.log(e.target.value)} />
             <span className="absolute text-gray-500 -translate-y-1/2 pointer-events-none right-3 top-1/2 dark:text-gray-400">
               <Clock className="size-6" />
             </span>
@@ -88,11 +80,7 @@ export default function DefaultInputs() {
         <div>
           <Label htmlFor="tm">Input with Payment</Label>
           <div className="relative">
-            <Input
-              type="text"
-              placeholder="Card number"
-              className="pl-[62px]"
-            />
+            <Input type="text" placeholder="Card number" className="pl-[62px]" />
             <span className="absolute left-0 top-1/2 flex h-11 w-[46px] -translate-y-1/2 items-center justify-center border-r border-gray-200 dark:border-gray-800">
               <svg
                 width="20"

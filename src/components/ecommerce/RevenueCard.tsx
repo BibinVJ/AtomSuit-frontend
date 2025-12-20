@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { DollarSign, TrendingUp } from 'lucide-react';
 import { useSettings } from '../../hooks/useSettings';
@@ -19,7 +19,7 @@ export default function RevenueCard({ data }: RevenueCardProps) {
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Revenue Overview</h3>
         <DollarSign className="w-6 h-6 text-green-600" />
       </div>
-      
+
       <div className="space-y-4">
         <div>
           <p className="text-sm text-gray-600 dark:text-gray-400">Total Revenue</p>
@@ -27,7 +27,7 @@ export default function RevenueCard({ data }: RevenueCardProps) {
             {formatCurrency(data.total)}
           </p>
         </div>
-        
+
         <div className="flex items-center space-x-2">
           <TrendingUp className="w-4 h-4 text-green-600" />
           <div>

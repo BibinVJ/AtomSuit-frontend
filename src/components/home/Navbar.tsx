@@ -10,7 +10,7 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { tenant } = useTenant();
-  
+
   // Only render marketing navbar on central domain
   if (!tenant.isCentral) {
     return null;
@@ -35,7 +35,10 @@ const Navbar = () => {
 
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center space-x-8">
-            <Link href="#features" className="text-gray-700 hover:text-brand-500 px-3 py-2 text-sm font-medium">
+            <Link
+              href="#features"
+              className="text-gray-700 hover:text-brand-500 px-3 py-2 text-sm font-medium"
+            >
               Features
             </Link>
             <div className="relative">
@@ -49,29 +52,50 @@ const Navbar = () => {
               {isDropdownOpen && (
                 <div className="absolute left-0 mt-2 w-48 rounded-md shadow-theme-lg bg-white ring-1 ring-gray-900/5">
                   <div className="py-1">
-                    <Link href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                    <Link
+                      href="#"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    >
                       Inventory Management
                     </Link>
-                    <Link href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                    <Link
+                      href="#"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    >
                       Financial Management
                     </Link>
-                    <Link href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                    <Link
+                      href="#"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    >
                       HR Management
                     </Link>
-                    <Link href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                    <Link
+                      href="#"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    >
                       CRM
                     </Link>
                   </div>
                 </div>
               )}
             </div>
-            <Link href="/pricing" className="text-gray-700 hover:text-brand-500 px-3 py-2 text-sm font-medium">
+            <Link
+              href="/pricing"
+              className="text-gray-700 hover:text-brand-500 px-3 py-2 text-sm font-medium"
+            >
               Pricing
             </Link>
-            <Link href="#about" className="text-gray-700 hover:text-brand-500 px-3 py-2 text-sm font-medium">
+            <Link
+              href="#about"
+              className="text-gray-700 hover:text-brand-500 px-3 py-2 text-sm font-medium"
+            >
               About
             </Link>
-            <Link href="#contact" className="text-gray-700 hover:text-brand-500 px-3 py-2 text-sm font-medium">
+            <Link
+              href="#contact"
+              className="text-gray-700 hover:text-brand-500 px-3 py-2 text-sm font-medium"
+            >
               Contact
             </Link>
           </div>
@@ -108,19 +132,34 @@ const Navbar = () => {
       {isOpen && (
         <div className="md:hidden">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t border-gray-200">
-            <Link href="#features" className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-brand-500">
+            <Link
+              href="#features"
+              className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-brand-500"
+            >
               Features
             </Link>
-            <Link href="#solutions" className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-brand-500">
+            <Link
+              href="#solutions"
+              className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-brand-500"
+            >
               Solutions
             </Link>
-            <Link href="/pricing" className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-brand-500">
+            <Link
+              href="/pricing"
+              className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-brand-500"
+            >
               Pricing
             </Link>
-            <Link href="#about" className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-brand-500">
+            <Link
+              href="#about"
+              className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-brand-500"
+            >
               About
             </Link>
-            <Link href="#contact" className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-brand-500">
+            <Link
+              href="#contact"
+              className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-brand-500"
+            >
               Contact
             </Link>
             <div className="border-t border-gray-200 pt-4">

@@ -1,5 +1,4 @@
-"use client";
-
+'use client';
 
 import { useEffect, useState } from 'react';
 import PageBreadcrumb from '../../components/common/PageBreadCrumb';
@@ -13,7 +12,12 @@ import Button from '../../components/ui/button/Button';
 import Tooltip from '../../components/ui/tooltip/Tooltip';
 import Select from '../../components/form/Select';
 
-import { getCustomers, exportCustomers, importCustomers, downloadSampleCustomerExcel } from '../../services/CustomerService';
+import {
+  getCustomers,
+  exportCustomers,
+  importCustomers,
+  downloadSampleCustomerExcel,
+} from '../../services/CustomerService';
 import ImportModal from '../../components/common/ImportModal';
 import { Download, Upload } from 'lucide-react';
 import { toast } from 'sonner';
@@ -30,7 +34,11 @@ export default function Customers() {
   const { hasPermission } = usePermissions();
   const [customers, setCustomers] = useState<Customer[]>([]);
   const { isOpen, openModal, closeModal } = useModal();
-  const { isOpen: isImportModalOpen, openModal: openImportModal, closeModal: closeImportModal } = useModal();
+  const {
+    isOpen: isImportModalOpen,
+    openModal: openImportModal,
+    closeModal: closeImportModal,
+  } = useModal();
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
@@ -60,14 +68,26 @@ export default function Customers() {
         from: debouncedRangeFrom !== '' ? Number(debouncedRangeFrom) : undefined,
         to: debouncedRangeTo !== '' ? Number(debouncedRangeTo) : undefined,
         search: debouncedSearchTerm,
-        trashed: viewMode === 'trashed' ? 'only' : undefined
+        trashed: viewMode === 'trashed' ? 'only' : undefined,
       });
       setCustomers(response.data);
       if (response.meta) {
         setTotalPages(response.meta.last_page || 1);
         setCurrentPage(response.meta.current_page || 1);
-        setFrom(response.meta.from !== undefined ? response.meta.from : (debouncedRangeFrom !== '' ? Number(debouncedRangeFrom) : 0));
-        setTo(response.meta.to !== undefined ? response.meta.to : (debouncedRangeTo !== '' ? Number(debouncedRangeTo) : 0));
+        setFrom(
+          response.meta.from !== undefined
+            ? response.meta.from
+            : debouncedRangeFrom !== ''
+              ? Number(debouncedRangeFrom)
+              : 0
+        );
+        setTo(
+          response.meta.to !== undefined
+            ? response.meta.to
+            : debouncedRangeTo !== ''
+              ? Number(debouncedRangeTo)
+              : 0
+        );
         setTotal(response.meta.total || 0);
       }
     } catch (error) {
@@ -77,7 +97,16 @@ export default function Customers() {
 
   useEffect(() => {
     fetchCustomers(currentPage, perPage, sortBy, sortDirection);
-  }, [currentPage, perPage, sortBy, sortDirection, debouncedSearchTerm, debouncedRangeFrom, debouncedRangeTo, viewMode]);
+  }, [
+    currentPage,
+    perPage,
+    sortBy,
+    sortDirection,
+    debouncedSearchTerm,
+    debouncedRangeFrom,
+    debouncedRangeTo,
+    viewMode,
+  ]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -117,10 +146,7 @@ export default function Customers() {
 
   return (
     <>
-      <PageMeta
-        title="Customers"
-        description="List of customers"
-      />
+      <PageMeta title="Customers" description="List of customers" />
       <PageBreadcrumb pageTitle="Customers" />
 
       <div className="space-y-6">
@@ -150,16 +176,26 @@ export default function Customers() {
             <div className="flex flex-wrap items-center gap-2">
               <ViewModeTabs viewMode={viewMode} setViewMode={setViewMode} />
               <Tooltip text="Import Customers">
-                <Button variant="outline" size="sm" onClick={openImportModal} startIcon={<Upload className="w-4 h-4" />}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={openImportModal}
+                  startIcon={<Upload className="w-4 h-4" />}
+                >
                   Import
                 </Button>
               </Tooltip>
               <Tooltip text="Export Customers">
-                <Button variant="outline" size="sm" onClick={handleExport} startIcon={<Download className="w-4 h-4" />}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleExport}
+                  startIcon={<Download className="w-4 h-4" />}
+                >
                   Export
                 </Button>
               </Tooltip>
-              {hasPermission("create-customer") && (
+              {hasPermission('create-customer') && (
                 <Tooltip text="Add New Customer">
                   <Button onClick={openModal} size="sm" startIcon={<Plus className="w-4 h-4" />}>
                     Add Customer
@@ -190,7 +226,11 @@ export default function Customers() {
           />
         </ComponentCard>
       </div>
-      <AddCustomerModal isOpen={isOpen} onClose={closeModal} onCustomerAdded={() => fetchCustomers(1, perPage)} />
+      <AddCustomerModal
+        isOpen={isOpen}
+        onClose={closeModal}
+        onCustomerAdded={() => fetchCustomers(1, perPage)}
+      />
       <ImportModal
         isOpen={isImportModalOpen}
         onClose={closeImportModal}
@@ -202,4 +242,3 @@ export default function Customers() {
     </>
   );
 }
-

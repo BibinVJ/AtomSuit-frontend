@@ -1,23 +1,17 @@
-"use client";
+'use client';
 
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHeader,
-  TableRow,
-} from "../ui/table";
-import { useState } from "react";
-import Badge from "../ui/badge/Badge";
-import EditPlanModal from "./EditPlanModal";
-import DeletePlanModal from "./DeletePlanModal";
+import { Table, TableBody, TableCell, TableHeader, TableRow } from '../ui/table';
+import { useState } from 'react';
+import Badge from '../ui/badge/Badge';
+import EditPlanModal from './EditPlanModal';
+import DeletePlanModal from './DeletePlanModal';
 import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide, Edit, Trash2 } from 'lucide-react';
-import Button from "../ui/button/Button";
-import Tooltip from "../ui/tooltip/Tooltip";
+import Button from '../ui/button/Button';
+import Tooltip from '../ui/tooltip/Tooltip';
 
 import { Plan } from '../../types';
-import { usePermissions } from "../../hooks/usePermissions";
-import { useSettings } from "../../hooks/useSettings";
+import { usePermissions } from '../../hooks/usePermissions';
+import { useSettings } from '../../hooks/useSettings';
 import { getPlan } from '../../services/PlanService';
 import { toast } from 'sonner';
 
@@ -31,7 +25,15 @@ interface Props {
   perPage: number;
 }
 
-export default function PlanTable({ data, onAction, onSort, sortBy, sortDirection, currentPage, perPage }: Props) {
+export default function PlanTable({
+  data,
+  onAction,
+  onSort,
+  sortBy,
+  sortDirection,
+  currentPage,
+  perPage,
+}: Props) {
   const { hasPermission } = usePermissions();
   const { formatCurrency } = useSettings();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -78,13 +80,50 @@ export default function PlanTable({ data, onAction, onSort, sortBy, sortDirectio
         <Table>
           <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
             <TableRow>
-              <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">#</TableCell>
-              <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400" onClick={() => onSort('name')}>Name {renderSortIcon('name')}</TableCell>
-              <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400" onClick={() => onSort('price')}>Price {renderSortIcon('price')}</TableCell>
-              <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">Interval</TableCell>
-              <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">Trial</TableCell>
-              <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">Tenants</TableCell>
-              <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">Actions</TableCell>
+              <TableCell
+                isHeader
+                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+              >
+                #
+              </TableCell>
+              <TableCell
+                isHeader
+                className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400"
+                onClick={() => onSort('name')}
+              >
+                Name {renderSortIcon('name')}
+              </TableCell>
+              <TableCell
+                isHeader
+                className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400"
+                onClick={() => onSort('price')}
+              >
+                Price {renderSortIcon('price')}
+              </TableCell>
+              <TableCell
+                isHeader
+                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+              >
+                Interval
+              </TableCell>
+              <TableCell
+                isHeader
+                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+              >
+                Trial
+              </TableCell>
+              <TableCell
+                isHeader
+                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+              >
+                Tenants
+              </TableCell>
+              <TableCell
+                isHeader
+                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+              >
+                Actions
+              </TableCell>
             </TableRow>
           </TableHeader>
 
@@ -97,11 +136,18 @@ export default function PlanTable({ data, onAction, onSort, sortBy, sortDirectio
                   </p>
                 </TableCell>
                 <TableCell className="px-4 py-3 text-start">
-                  <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">{plan.name}</p>
+                  <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
+                    {plan.name}
+                  </p>
                 </TableCell>
-                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">{formatCurrency(plan.price)}</TableCell>
                 <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
-                  <span className="capitalize">{plan.interval_count} {plan.interval}{plan.interval_count > 1 ? 's' : ''}</span>
+                  {formatCurrency(plan.price)}
+                </TableCell>
+                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
+                  <span className="capitalize">
+                    {plan.interval_count} {plan.interval}
+                    {plan.interval_count > 1 ? 's' : ''}
+                  </span>
                 </TableCell>
                 <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
                   {plan.is_trial_plan ? `${plan.trial_duration_in_days} days` : 'No'}
@@ -111,7 +157,7 @@ export default function PlanTable({ data, onAction, onSort, sortBy, sortDirectio
                 </TableCell>
                 <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
                   <div className="flex items-center gap-2">
-                    {hasPermission("update-plan") && (
+                    {hasPermission('update-plan') && (
                       <Tooltip text="Edit">
                         <Button
                           size="xs"
@@ -122,7 +168,7 @@ export default function PlanTable({ data, onAction, onSort, sortBy, sortDirectio
                         </Button>
                       </Tooltip>
                     )}
-                    {hasPermission("delete-plan") && (
+                    {hasPermission('delete-plan') && (
                       <Tooltip text="Delete">
                         <Button
                           size="xs"

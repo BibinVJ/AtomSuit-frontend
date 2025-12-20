@@ -1,17 +1,19 @@
 import { Role, RoleApiResponse } from '../types/Role';
 import api from './api';
 
-export const getRoles = async (params: {
-  page?: number;
-  limit?: number;
-  sortCol?: string;
-  sortDir?: string;
-  from?: number;
-  to?: number;
-  search?: string;
-  unpaginated?: boolean;
-  trashed?: 'only' | 'with';
-} = {}): Promise<RoleApiResponse> => {
+export const getRoles = async (
+  params: {
+    page?: number;
+    limit?: number;
+    sortCol?: string;
+    sortDir?: string;
+    from?: number;
+    to?: number;
+    search?: string;
+    unpaginated?: boolean;
+    trashed?: 'only' | 'with';
+  } = {}
+): Promise<RoleApiResponse> => {
   const {
     page = 1,
     limit = 10,
@@ -36,11 +38,11 @@ export const getRoles = async (params: {
 };
 
 export const getRole = async (id: string): Promise<Role> => {
-    const response = await api.get(`/role/${id}`);
-    return response.data.data;
+  const response = await api.get(`/role/${id}`);
+  return response.data.data;
 };
 
-export const createRole = async (roleData: { name: string; permissions: number[]}) => {
+export const createRole = async (roleData: { name: string; permissions: number[] }) => {
   const response = await api.post('/role', roleData);
   return response.data;
 };

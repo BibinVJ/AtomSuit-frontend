@@ -1,5 +1,4 @@
-"use client";
-
+'use client';
 
 import { useState, useEffect } from 'react';
 import { Modal } from '../ui/modal';
@@ -83,51 +82,81 @@ export default function EditVendorModal({ isOpen, onClose, onVendorUpdated, vend
   return (
     <Modal isOpen={isOpen} onClose={onClose} className="max-w-[700px] p-6 md:p-10">
       <div className="relative w-full">
-          <div className="px-2 pr-14">
-            <h4 className="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90">
-              Edit Vendor
-            </h4>
-            <p className="mb-6 text-sm text-gray-500 dark:text-gray-400 lg:mb-7">
-              Update the details of the vendor.
-            </p>
-          </div>
-          <form className="flex flex-col" onSubmit={handleSubmit}>
-            <div className="px-2 overflow-y-auto custom-scrollbar">
-              <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
-                <div>
-                  <Label>Name <span className="text-red-500">*</span></Label>
-                  <Input type="text" value={name} onChange={(e) => {setName(e.target.value); setErrors({...errors, name: ''})}} error={!!errors.name} hint={errors.name} />
-                </div>
-                <div>
-                  <Label>Email</Label>
-                  <Input type="email" value={email} onChange={(e) => {setEmail(e.target.value); setErrors({...errors, email: ''})}} error={!!errors.email} hint={errors.email} />
-                </div>
-                <div>
-                  <Label>Phone</Label>
-                  <Input type="text" value={phone} onChange={(e) => {setPhone(e.target.value); setErrors({...errors, phone: ''})}} error={!!errors.phone} hint={errors.phone} />
-                </div>
-                <div className="lg:col-span-2">
-                  <Label>Address</Label>
-                  <TextArea placeholder="Enter address" value={address} onChange={(value) => {setAddress(value); setErrors({...errors, address: ''})}} error={!!errors.address} hint={errors.address} />
-              </div>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 px-2 mt-6 lg:justify-end">
-                <Button
-                    type="button"
-                    variant='outline'
-                    onClick={onClose}
-                >
-                    Close
-                </Button>
-                <Button
-                    type="submit"
-                >
-                    Save Changes
-                </Button>
-            </div>
-          </form>
+        <div className="px-2 pr-14">
+          <h4 className="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90">
+            Edit Vendor
+          </h4>
+          <p className="mb-6 text-sm text-gray-500 dark:text-gray-400 lg:mb-7">
+            Update the details of the vendor.
+          </p>
         </div>
+        <form className="flex flex-col" onSubmit={handleSubmit}>
+          <div className="px-2 overflow-y-auto custom-scrollbar">
+            <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
+              <div>
+                <Label>
+                  Name <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  type="text"
+                  value={name}
+                  onChange={(e) => {
+                    setName(e.target.value);
+                    setErrors({ ...errors, name: '' });
+                  }}
+                  error={!!errors.name}
+                  hint={errors.name}
+                />
+              </div>
+              <div>
+                <Label>Email</Label>
+                <Input
+                  type="email"
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    setErrors({ ...errors, email: '' });
+                  }}
+                  error={!!errors.email}
+                  hint={errors.email}
+                />
+              </div>
+              <div>
+                <Label>Phone</Label>
+                <Input
+                  type="text"
+                  value={phone}
+                  onChange={(e) => {
+                    setPhone(e.target.value);
+                    setErrors({ ...errors, phone: '' });
+                  }}
+                  error={!!errors.phone}
+                  hint={errors.phone}
+                />
+              </div>
+              <div className="lg:col-span-2">
+                <Label>Address</Label>
+                <TextArea
+                  placeholder="Enter address"
+                  value={address}
+                  onChange={(value) => {
+                    setAddress(value);
+                    setErrors({ ...errors, address: '' });
+                  }}
+                  error={!!errors.address}
+                  hint={errors.address}
+                />
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center gap-3 px-2 mt-6 lg:justify-end">
+            <Button type="button" variant="outline" onClick={onClose}>
+              Close
+            </Button>
+            <Button type="submit">Save Changes</Button>
+          </div>
+        </form>
+      </div>
     </Modal>
   );
 }

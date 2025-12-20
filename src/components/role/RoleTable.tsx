@@ -1,24 +1,24 @@
-"use client";
+'use client';
 
-
+import { Table, TableBody, TableCell, TableHeader, TableRow } from '../ui/table';
+import { useState } from 'react';
+import DeleteRoleModal from './DeleteRoleModal';
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHeader,
-  TableRow,
-} from "../ui/table";
-import { useState } from "react";
-import DeleteRoleModal from "./DeleteRoleModal";
-import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide, Edit, Trash2, RefreshCw } from 'lucide-react';
-import { restoreRole } from "../../services/RoleService";
-import { toast } from "sonner";
-import Button from "../ui/button/Button";
-import Tooltip from "../ui/tooltip/Tooltip";
-import { Role } from "../../types";
-import { useRouter } from "next/navigation";
+  ChevronsUpDown,
+  ArrowUpWideNarrow,
+  ArrowDownNarrowWide,
+  Edit,
+  Trash2,
+  RefreshCw,
+} from 'lucide-react';
+import { restoreRole } from '../../services/RoleService';
+import { toast } from 'sonner';
+import Button from '../ui/button/Button';
+import Tooltip from '../ui/tooltip/Tooltip';
+import { Role } from '../../types';
+import { useRouter } from 'next/navigation';
 
-import { formatKebabCase } from "../../utils/string";
+import { formatKebabCase } from '../../utils/string';
 
 interface Props {
   data: Role[];
@@ -32,11 +32,19 @@ interface Props {
   viewMode?: 'active' | 'trashed';
 }
 
-export default function RoleTable({ data, onAction, onSort, sortBy, sortDirection, currentPage, perPage, startIndex, viewMode = 'active' }: Props) {
+export default function RoleTable({
+  data,
+  onAction,
+  onSort,
+  sortBy,
+  sortDirection,
+  currentPage,
+  perPage,
+  startIndex,
+  viewMode = 'active',
+}: Props) {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [selectedRole, setSelectedRole] = useState<Role | null>(
-    null
-  );
+  const [selectedRole, setSelectedRole] = useState<Role | null>(null);
   const router = useRouter();
 
   const handleEdit = (role: Role) => {
@@ -81,9 +89,25 @@ export default function RoleTable({ data, onAction, onSort, sortBy, sortDirectio
         <Table>
           <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
             <TableRow>
-              <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">#</TableCell>
-              <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400" onClick={() => onSort('name')}>Name {renderSortIcon('name')}</TableCell>
-              <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">Actions</TableCell>
+              <TableCell
+                isHeader
+                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+              >
+                #
+              </TableCell>
+              <TableCell
+                isHeader
+                className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400"
+                onClick={() => onSort('name')}
+              >
+                Name {renderSortIcon('name')}
+              </TableCell>
+              <TableCell
+                isHeader
+                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+              >
+                Actions
+              </TableCell>
             </TableRow>
           </TableHeader>
 
@@ -92,12 +116,16 @@ export default function RoleTable({ data, onAction, onSort, sortBy, sortDirectio
               <TableRow key={role.id}>
                 <TableCell className="px-5 py-4 sm:px-6 text-start">
                   <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                    {startIndex !== undefined ? startIndex + index : (currentPage - 1) * perPage + index + 1}
+                    {startIndex !== undefined
+                      ? startIndex + index
+                      : (currentPage - 1) * perPage + index + 1}
                   </p>
                 </TableCell>
-                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">{formatKebabCase(role.name)}</TableCell>
+                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
+                  {formatKebabCase(role.name)}
+                </TableCell>
                 <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                  {role.name !== "admin" && (
+                  {role.name !== 'admin' && (
                     <div className="flex items-center gap-2">
                       {viewMode === 'active' ? (
                         <>

@@ -1,5 +1,4 @@
-"use client";
-
+'use client';
 
 import { useEffect, useState } from 'react';
 import PageBreadcrumb from '../../components/common/PageBreadCrumb';
@@ -12,7 +11,12 @@ import Pagination from '../../components/common/Pagination';
 import Button from '../../components/ui/button/Button';
 import Tooltip from '../../components/ui/tooltip/Tooltip';
 import Select from '../../components/form/Select';
-import { getVendors, exportVendors, importVendors, downloadSampleVendorExcel } from '../../services/VendorService';
+import {
+  getVendors,
+  exportVendors,
+  importVendors,
+  downloadSampleVendorExcel,
+} from '../../services/VendorService';
 import { Vendor } from '../../types';
 import ImportModal from '../../components/common/ImportModal';
 import { Download, Upload } from 'lucide-react';
@@ -29,7 +33,11 @@ export default function Vendors() {
   const { hasPermission } = usePermissions();
   const [vendors, setVendors] = useState<Vendor[]>([]);
   const { isOpen, openModal, closeModal } = useModal();
-  const { isOpen: isImportModalOpen, openModal: openImportModal, closeModal: closeImportModal } = useModal();
+  const {
+    isOpen: isImportModalOpen,
+    openModal: openImportModal,
+    closeModal: closeImportModal,
+  } = useModal();
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
@@ -59,14 +67,26 @@ export default function Vendors() {
         from: debouncedRangeFrom !== '' ? Number(debouncedRangeFrom) : undefined,
         to: debouncedRangeTo !== '' ? Number(debouncedRangeTo) : undefined,
         search: debouncedSearchTerm,
-        trashed: viewMode === 'trashed' ? 'only' : undefined
+        trashed: viewMode === 'trashed' ? 'only' : undefined,
       });
       setVendors(response.data);
       if (response.meta) {
         setTotalPages(response.meta.last_page || 1);
         setCurrentPage(response.meta.current_page || 1);
-        setFrom(response.meta.from !== undefined ? response.meta.from : (debouncedRangeFrom !== '' ? Number(debouncedRangeFrom) : 0));
-        setTo(response.meta.to !== undefined ? response.meta.to : (debouncedRangeTo !== '' ? Number(debouncedRangeTo) : 0));
+        setFrom(
+          response.meta.from !== undefined
+            ? response.meta.from
+            : debouncedRangeFrom !== ''
+              ? Number(debouncedRangeFrom)
+              : 0
+        );
+        setTo(
+          response.meta.to !== undefined
+            ? response.meta.to
+            : debouncedRangeTo !== ''
+              ? Number(debouncedRangeTo)
+              : 0
+        );
         setTotal(response.meta.total || 0);
       }
     } catch (error) {
@@ -76,7 +96,16 @@ export default function Vendors() {
 
   useEffect(() => {
     fetchVendors(currentPage, perPage, sortBy, sortDirection);
-  }, [currentPage, perPage, sortBy, sortDirection, debouncedSearchTerm, debouncedRangeFrom, debouncedRangeTo, viewMode]);
+  }, [
+    currentPage,
+    perPage,
+    sortBy,
+    sortDirection,
+    debouncedSearchTerm,
+    debouncedRangeFrom,
+    debouncedRangeTo,
+    viewMode,
+  ]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -116,10 +145,7 @@ export default function Vendors() {
 
   return (
     <>
-      <PageMeta
-        title="Vendors"
-        description="List of vendors"
-      />
+      <PageMeta title="Vendors" description="List of vendors" />
       <PageBreadcrumb pageTitle="Vendors" />
 
       <div className="space-y-6">
@@ -149,16 +175,26 @@ export default function Vendors() {
             <div className="flex flex-wrap items-center gap-2">
               <ViewModeTabs viewMode={viewMode} setViewMode={setViewMode} />
               <Tooltip text="Import Vendors">
-                <Button variant="outline" size="sm" onClick={openImportModal} startIcon={<Upload className="w-4 h-4" />}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={openImportModal}
+                  startIcon={<Upload className="w-4 h-4" />}
+                >
                   Import
                 </Button>
               </Tooltip>
               <Tooltip text="Export Vendors">
-                <Button variant="outline" size="sm" onClick={handleExport} startIcon={<Download className="w-4 h-4" />}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleExport}
+                  startIcon={<Download className="w-4 h-4" />}
+                >
                   Export
                 </Button>
               </Tooltip>
-              {hasPermission("create-vendor") && (
+              {hasPermission('create-vendor') && (
                 <Tooltip text="Add New Vendor">
                   <Button onClick={openModal} size="sm" startIcon={<Plus className="w-4 h-4" />}>
                     Add Vendor
@@ -189,7 +225,11 @@ export default function Vendors() {
           />
         </ComponentCard>
       </div>
-      <AddVendorModal isOpen={isOpen} onClose={closeModal} onVendorAdded={() => fetchVendors(1, perPage)} />
+      <AddVendorModal
+        isOpen={isOpen}
+        onClose={closeModal}
+        onVendorAdded={() => fetchVendors(1, perPage)}
+      />
       <ImportModal
         isOpen={isImportModalOpen}
         onClose={closeImportModal}
@@ -201,4 +241,3 @@ export default function Vendors() {
     </>
   );
 }
-

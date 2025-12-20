@@ -1,17 +1,17 @@
-"use client";
+'use client';
 
-import { useEffect, useCallback } from "react";
-import flatpickr from "flatpickr";
-import "flatpickr/dist/flatpickr.css";
-import Label from "./Label";
-import { Calendar } from "lucide-react";
-import { useSettings } from "../../hooks/useSettings";
+import { useEffect, useCallback } from 'react';
+import flatpickr from 'flatpickr';
+import 'flatpickr/dist/flatpickr.css';
+import Label from './Label';
+import { Calendar } from 'lucide-react';
+import { useSettings } from '../../hooks/useSettings';
 import Hook = flatpickr.Options.Hook;
 import DateOption = flatpickr.Options.DateOption;
 
 type PropsType = {
   id: string;
-  mode?: "single" | "multiple" | "range" | "time";
+  mode?: 'single' | 'multiple' | 'range' | 'time';
   onChange?: Hook | Hook[];
   defaultDate?: DateOption;
   label?: string | React.ReactNode;
@@ -47,11 +47,11 @@ export default function DatePicker({
 
   useEffect(() => {
     const flatPickr = flatpickr(`#${id}`, {
-      mode: mode || "single",
+      mode: mode || 'single',
       static: true,
-      monthSelectorType: "static",
-      dateFormat: "Y-m-d", // Internal format
-      altInput: true,       // Enable display format
+      monthSelectorType: 'static',
+      dateFormat: 'Y-m-d', // Internal format
+      altInput: true, // Enable display format
       altFormat: mapPhpDateFormatToFlatpickr(phpFormat), // Display format from settings
       defaultDate,
       onChange,
@@ -77,20 +77,14 @@ export default function DatePicker({
       {label && <Label htmlFor={id}>{label}</Label>}
 
       <div className="relative">
-        <input
-          id={id}
-          placeholder={placeholder}
-          className={inputClasses}
-        />
+        <input id={id} placeholder={placeholder} className={inputClasses} />
 
         <span className="absolute text-gray-500 -translate-y-1/2 pointer-events-none right-3 top-1/2 dark:text-gray-400">
           <Calendar className="size-6" />
         </span>
       </div>
       {hint && (
-        <p className={`mt-1.5 text-xs ${error ? "text-error-500" : "text-gray-500"}`}>
-          {hint}
-        </p>
+        <p className={`mt-1.5 text-xs ${error ? 'text-error-500' : 'text-gray-500'}`}>{hint}</p>
       )}
     </div>
   );

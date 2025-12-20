@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useEffect, useState } from 'react';
 import PageBreadcrumb from '../../components/common/PageBreadCrumb';
@@ -51,7 +51,7 @@ export default function Settings() {
     <>
       <PageMeta title="Settings" description="Application settings" />
       <PageBreadcrumb pageTitle="Settings" />
-      
+
       <div className="flex flex-col lg:flex-row gap-8">
         {/* Sidebar Navigation */}
         <aside className="lg:w-64 flex-shrink-0">
@@ -60,10 +60,11 @@ export default function Settings() {
               <button
                 key={groupName}
                 onClick={() => setActiveGroup(groupName)}
-                className={`whitespace-nowrap px-4 py-3 text-sm font-medium rounded-xl transition-all text-left ${activeGroup === groupName
+                className={`whitespace-nowrap px-4 py-3 text-sm font-medium rounded-xl transition-all text-left ${
+                  activeGroup === groupName
                     ? 'bg-brand-500 text-white shadow-lg shadow-brand-200 dark:shadow-none'
                     : 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800'
-                  }`}
+                }`}
               >
                 {formatLabel(groupName) || 'General'}
               </button>
@@ -84,7 +85,9 @@ export default function Settings() {
           ) : (
             <ComponentCard title="Settings">
               <div className="text-center py-8 text-gray-500">
-                {groupNames.length === 0 ? 'No settings found' : 'Select a category to view settings'}
+                {groupNames.length === 0
+                  ? 'No settings found'
+                  : 'Select a category to view settings'}
               </div>
             </ComponentCard>
           )}

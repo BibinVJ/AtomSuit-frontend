@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useEffect, useState } from 'react';
 import PageBreadcrumb from '../../components/common/PageBreadCrumb';
@@ -71,10 +71,7 @@ export default function Plans() {
 
   return (
     <>
-      <PageMeta
-        title="Plans"
-        description="List of plans"
-      />
+      <PageMeta title="Plans" description="List of plans" />
       <PageBreadcrumb pageTitle="Plans" />
       <div className="space-y-6">
         <div className="p-5 border border-gray-200 rounded-2xl bg-gray-50 dark:bg-white/[0.03] dark:border-gray-800 shadow-sm">
@@ -95,7 +92,7 @@ export default function Plans() {
         <ComponentCard
           title="Plans"
           action={
-            hasPermission("create-plan") && (
+            hasPermission('create-plan') && (
               <Tooltip text="Add New Plan">
                 <Button onClick={openModal} size="sm">
                   Add Plan
@@ -123,7 +120,11 @@ export default function Plans() {
           />
         </ComponentCard>
       </div>
-      <AddPlanModal isOpen={isOpen} onClose={closeModal} onPlanAdded={() => fetchPlans(1, perPage)} />
+      <AddPlanModal
+        isOpen={isOpen}
+        onClose={closeModal}
+        onPlanAdded={() => fetchPlans(1, perPage)}
+      />
     </>
   );
 }

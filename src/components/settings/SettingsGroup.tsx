@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { Setting } from '../../types';
 import { formatLabel } from '../../utils/string';
@@ -13,14 +13,9 @@ interface Props {
 export default function SettingsGroup({ groupName, settings, onUpdate }: Props) {
   return (
     <div className="space-y-4">
-
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {settings.map((setting) => (
-          <SettingField
-            key={setting.id}
-            setting={setting}
-            onUpdate={onUpdate}
-          />
+          <SettingField key={setting.id} setting={setting} onUpdate={onUpdate} />
         ))}
       </div>
     </div>

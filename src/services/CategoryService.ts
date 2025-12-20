@@ -1,17 +1,19 @@
 import { CategoryApiResponse } from '../types';
 import api from './api';
 
-export const getCategories = async (params: {
-  page?: number;
-  limit?: number;
-  sortCol?: string;
-  sortDir?: string;
-  from?: number;
-  to?: number;
-  search?: string;
-  unpaginated?: boolean;
-  trashed?: 'only' | 'with';
-} = {}): Promise<CategoryApiResponse> => {
+export const getCategories = async (
+  params: {
+    page?: number;
+    limit?: number;
+    sortCol?: string;
+    sortDir?: string;
+    from?: number;
+    to?: number;
+    search?: string;
+    unpaginated?: boolean;
+    trashed?: 'only' | 'with';
+  } = {}
+): Promise<CategoryApiResponse> => {
   const {
     page = 1,
     limit = 10,
@@ -40,7 +42,10 @@ export const addCategory = async (category: { name: string; description: string 
   return response.data;
 };
 
-export const updateCategory = async (id: number, category: { name: string; description: string }) => {
+export const updateCategory = async (
+  id: number,
+  category: { name: string; description: string }
+) => {
   const response = await api.put(`/category/${id}`, category);
   return response.data;
 };

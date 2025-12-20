@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
@@ -27,11 +27,10 @@ export default function BillingPlans() {
       setLoading(true);
       const [plansResponse, subscriptionData] = await Promise.all([
         getPlans(undefined, undefined, undefined, undefined, true),
-        getCurrentSubscription().catch(() => null)
+        getCurrentSubscription().catch(() => null),
       ]);
       setPlans(plansResponse.data as Plan[]);
       setSubscription(subscriptionData);
-
     } catch (error) {
       toast.error('Failed to load plans');
     } finally {
@@ -70,27 +69,30 @@ export default function BillingPlans() {
       </div>
     );
   }
-  
+
   // Filter plans based on billing interval and active status
-  const monthlyPlans = plans.filter(plan => 
-    plan.interval === 'month' && 
-    !plan.name.toLowerCase().includes('trial') &&
-    !plan.name.toLowerCase().includes('expired') &&
-    !plan.is_expired_user_plan
+  const monthlyPlans = plans.filter(
+    (plan) =>
+      plan.interval === 'month' &&
+      !plan.name.toLowerCase().includes('trial') &&
+      !plan.name.toLowerCase().includes('expired') &&
+      !plan.is_expired_user_plan
   );
-  
-  const yearlyPlans = plans.filter(plan => 
-    plan.interval === 'year' && 
-    !plan.name.toLowerCase().includes('trial') &&
-    !plan.name.toLowerCase().includes('expired') &&
-    !plan.is_expired_user_plan
+
+  const yearlyPlans = plans.filter(
+    (plan) =>
+      plan.interval === 'year' &&
+      !plan.name.toLowerCase().includes('trial') &&
+      !plan.name.toLowerCase().includes('expired') &&
+      !plan.is_expired_user_plan
   );
-  
-  const lifetimePlans = plans.filter(plan => 
-    (plan.interval === 'lifetime' || plan.name.toLowerCase().includes('lifetime')) &&
-    !plan.is_expired_user_plan
+
+  const lifetimePlans = plans.filter(
+    (plan) =>
+      (plan.interval === 'lifetime' || plan.name.toLowerCase().includes('lifetime')) &&
+      !plan.is_expired_user_plan
   );
-  
+
   const displayPlans = billingInterval === 'monthly' ? monthlyPlans : yearlyPlans;
 
   return (
@@ -98,7 +100,9 @@ export default function BillingPlans() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Choose Your Plan</h1>
-          <p className="text-gray-600 dark:text-gray-400">Select the perfect plan for your business needs</p>
+          <p className="text-gray-600 dark:text-gray-400">
+            Select the perfect plan for your business needs
+          </p>
         </div>
         <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
           <button

@@ -1,18 +1,18 @@
-import { Item } from "./Item";
-import { Vendor } from "./Vendor";
+import { Item } from './Item';
+import { Vendor } from './Vendor';
 
 export interface PurchaseItemDetail {
-    id: number;
-    item: Item;
-    description: string;
-    batch: {
-        batch_number: string;
-        expiry_date: string;
-        manufacture_date: string;
-    };
-    quantity: number;
-    unit_cost: number;
-    total_cost: number;
+  id: number;
+  item: Item;
+  description: string;
+  batch: {
+    batch_number: string;
+    expiry_date: string;
+    manufacture_date: string;
+  };
+  quantity: number;
+  unit_cost: number;
+  total_cost: number;
 }
 export interface Purchase {
   id: number;

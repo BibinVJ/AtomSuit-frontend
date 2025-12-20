@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useEffect, useState } from 'react';
 import PageBreadcrumb from '../../components/common/PageBreadCrumb';
@@ -57,17 +57,29 @@ export default function Tenants() {
         debouncedRangeTo !== '' ? Number(debouncedRangeTo) : undefined,
         debouncedSearchTerm,
         selectedPlan
-      );      
+      );
       // Ensure data is always an array
       const tenantsData = Array.isArray(response.data) ? response.data : [];
       setTenants(tenantsData);
-      
+
       // Safely handle meta data
       if (response.meta) {
         setTotalPages(response.meta.last_page || 1);
         setCurrentPage(response.meta.current_page || 1);
-        setFrom(response.meta.from !== undefined ? response.meta.from : (debouncedRangeFrom !== '' ? Number(debouncedRangeFrom) : 0));
-        setTo(response.meta.to !== undefined ? response.meta.to : (debouncedRangeTo !== '' ? Number(debouncedRangeTo) : 0));
+        setFrom(
+          response.meta.from !== undefined
+            ? response.meta.from
+            : debouncedRangeFrom !== ''
+              ? Number(debouncedRangeFrom)
+              : 0
+        );
+        setTo(
+          response.meta.to !== undefined
+            ? response.meta.to
+            : debouncedRangeTo !== ''
+              ? Number(debouncedRangeTo)
+              : 0
+        );
         setTotal(response.meta.total || 0);
       }
     } catch (error) {
@@ -91,7 +103,16 @@ export default function Tenants() {
 
   useEffect(() => {
     fetchTenants(currentPage, perPage, sortBy, sortDirection);
-  }, [currentPage, perPage, sortBy, sortDirection, debouncedSearchTerm, debouncedRangeFrom, debouncedRangeTo, selectedPlan]);
+  }, [
+    currentPage,
+    perPage,
+    sortBy,
+    sortDirection,
+    debouncedSearchTerm,
+    debouncedRangeFrom,
+    debouncedRangeTo,
+    selectedPlan,
+  ]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -113,10 +134,7 @@ export default function Tenants() {
 
   return (
     <>
-      <PageMeta
-        title="Tenants"
-        description="List of tenants"
-      />
+      <PageMeta title="Tenants" description="List of tenants" />
       <PageBreadcrumb pageTitle="Tenants" />
 
       <div className="space-y-6">
@@ -161,7 +179,7 @@ export default function Tenants() {
           title="Tenants"
           action={
             <div className="flex flex-wrap items-center gap-2">
-              {hasPermission("create-tenant") && (
+              {hasPermission('create-tenant') && (
                 <Tooltip text="Add New Tenant">
                   <Button onClick={openModal} size="sm" startIcon={<Plus className="w-4 h-4" />}>
                     Add Tenant
@@ -191,8 +209,11 @@ export default function Tenants() {
           />
         </ComponentCard>
       </div>
-      <AddTenantModal isOpen={isOpen} onClose={closeModal} onTenantAdded={() => fetchTenants(1, perPage)} />
+      <AddTenantModal
+        isOpen={isOpen}
+        onClose={closeModal}
+        onTenantAdded={() => fetchTenants(1, perPage)}
+      />
     </>
   );
 }
-

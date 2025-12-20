@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { Modal } from '../../ui/modal';
 import Button from '../../ui/button/Button';
@@ -15,13 +15,20 @@ interface Props {
   force?: boolean;
 }
 
-export default function DeleteExchangeRateModal({ isOpen, onClose, onExchangeRateDeleted, exchangeRate, force = false }: Props) {
-
+export default function DeleteExchangeRateModal({
+  isOpen,
+  onClose,
+  onExchangeRateDeleted,
+  exchangeRate,
+  force = false,
+}: Props) {
   const handleDelete = async () => {
     try {
       await deleteExchangeRate(exchangeRate.id, force);
       onExchangeRateDeleted();
-      toast.success(force ? 'Exchange rate permanently deleted' : 'Exchange rate deleted successfully');
+      toast.success(
+        force ? 'Exchange rate permanently deleted' : 'Exchange rate deleted successfully'
+      );
       onClose();
     } catch (error: unknown) {
       if (isApiError(error)) {
@@ -58,7 +65,10 @@ export default function DeleteExchangeRateModal({ isOpen, onClose, onExchangeRat
             {force ? 'Permanently Delete Exchange Rate' : 'Delete Exchange Rate'}
           </h4>
           <p className="mb-6 text-gray-500 dark:text-gray-400">
-            Are you sure you want to {force ? 'permanently ' : ''}delete the exchange rate from &quot;{exchangeRate?.base_currency?.code}&quot; to &quot;{exchangeRate?.target_currency?.code}&quot;? {force ? 'This action cannot be undone.' : 'You can restore it later from the trash.'}
+            Are you sure you want to {force ? 'permanently ' : ''}delete the exchange rate from
+            &quot;{exchangeRate?.base_currency?.code}&quot; to &quot;
+            {exchangeRate?.target_currency?.code}&quot;?{' '}
+            {force ? 'This action cannot be undone.' : 'You can restore it later from the trash.'}
           </p>
           <div className="flex items-center justify-center gap-4">
             <Button type="button" variant="outline" onClick={onClose}>

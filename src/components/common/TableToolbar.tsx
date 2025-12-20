@@ -1,4 +1,3 @@
-
 import React from 'react';
 import Select from '../form/Select';
 import Tooltip from '../ui/tooltip/Tooltip';
@@ -34,7 +33,7 @@ interface TableToolbarProps {
 const TableToolbar: React.FC<TableToolbarProps> = ({
   searchTerm,
   onSearchChange,
-  searchPlaceholder = "Search...",
+  searchPlaceholder = 'Search...',
   showSearch = true,
   rangeFrom,
   onRangeFromChange,
@@ -46,7 +45,7 @@ const TableToolbar: React.FC<TableToolbarProps> = ({
   showPerPage = true,
   extraFilters,
   onReset,
-  className = "mb-6",
+  className = 'mb-6',
 }) => {
   return (
     <div className={`flex flex-col gap-4 ${className}`}>
@@ -55,7 +54,21 @@ const TableToolbar: React.FC<TableToolbarProps> = ({
         {showSearch && onSearchChange && (
           <div className="relative w-full md:w-64">
             <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-search"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="lucide lucide-search"
+              >
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.3-4.3" />
+              </svg>
             </span>
             <input
               type="text"
@@ -69,9 +82,7 @@ const TableToolbar: React.FC<TableToolbarProps> = ({
 
         {/* Extra Filters (Role, Status, etc.) */}
         {extraFilters && (
-          <div className="flex flex-wrap items-center gap-4 w-full md:w-auto">
-            {extraFilters}
-          </div>
+          <div className="flex flex-wrap items-center gap-4 w-full md:w-auto">{extraFilters}</div>
         )}
 
         {/* Spacer for desktop layout */}
@@ -83,7 +94,9 @@ const TableToolbar: React.FC<TableToolbarProps> = ({
           {showRange && onRangeFromChange && onRangeToChange && (
             <div className="flex items-center gap-0 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden h-11">
               <div className="flex items-center px-2 bg-gray-50 dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 h-full">
-                <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Min</span>
+                <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">
+                  Min
+                </span>
               </div>
               <input
                 type="number"
@@ -94,7 +107,9 @@ const TableToolbar: React.FC<TableToolbarProps> = ({
               />
               <div className="h-full w-px bg-gray-200 dark:bg-gray-700"></div>
               <div className="flex items-center px-2 bg-gray-50 dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 border-l h-full">
-                <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Max</span>
+                <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">
+                  Max
+                </span>
               </div>
               <input
                 type="number"
@@ -134,7 +149,21 @@ const TableToolbar: React.FC<TableToolbarProps> = ({
                 onClick={onReset}
                 className="h-[42px] px-3 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-x"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="lucide lucide-x"
+                >
+                  <path d="M18 6 6 18" />
+                  <path d="m6 6 12 12" />
+                </svg>
               </button>
             </Tooltip>
           )}

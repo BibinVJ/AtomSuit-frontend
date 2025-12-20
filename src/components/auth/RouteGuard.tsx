@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { useAuth } from "@/hooks/useAuth";
-import { useTenant } from "@/hooks/useTenant";
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/hooks/useAuth';
+import { useTenant } from '@/hooks/useTenant';
 
 interface RouteGuardProps {
   children: React.ReactNode;
@@ -11,11 +11,7 @@ interface RouteGuardProps {
   redirectTo?: string;
 }
 
-const RouteGuard: React.FC<RouteGuardProps> = ({ 
-  children, 
-  requireAuth = true, 
-  redirectTo 
-}) => {
+const RouteGuard: React.FC<RouteGuardProps> = ({ children, requireAuth = true, redirectTo }) => {
   const { user, loading } = useAuth();
   const { tenant } = useTenant();
   const router = useRouter();

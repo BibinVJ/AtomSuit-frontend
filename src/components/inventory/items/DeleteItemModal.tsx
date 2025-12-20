@@ -1,4 +1,3 @@
-
 import { Modal } from '../../ui/modal';
 import Button from '../../ui/button/Button';
 import { toast } from 'sonner';
@@ -14,8 +13,13 @@ interface Props {
   isForceDelete?: boolean;
 }
 
-export default function DeleteItemModal({ isOpen, onClose, onItemDeleted, item, isForceDelete = false }: Props) {
-
+export default function DeleteItemModal({
+  isOpen,
+  onClose,
+  onItemDeleted,
+  item,
+  isForceDelete = false,
+}: Props) {
   const handleDelete = async () => {
     try {
       await deleteItem(item.id, isForceDelete);

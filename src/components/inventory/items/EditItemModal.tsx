@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useState, useEffect } from 'react';
 import { Modal } from '../../ui/modal';
@@ -32,7 +32,14 @@ export default function EditItemModal({ isOpen, onClose, onItemUpdated, item }: 
   const [selling_price, setSellingPrice] = useState('');
   const [categories, setCategories] = useState<Category[]>([]);
   const [units, setUnits] = useState<Unit[]>([]);
-  const [errors, setErrors] = useState({ sku: '', name: '', category_id: '', unit_id: '', type: '', selling_price: '' });
+  const [errors, setErrors] = useState({
+    sku: '',
+    name: '',
+    category_id: '',
+    unit_id: '',
+    type: '',
+    selling_price: '',
+  });
 
   useEffect(() => {
     if (item) {
@@ -55,7 +62,13 @@ export default function EditItemModal({ isOpen, onClose, onItemUpdated, item }: 
 
   const fetchCategories = async () => {
     try {
-      const response = await getCategories({ page: 1, limit: 10, sortCol: 'created_at', sortDir: 'desc', unpaginated: true });
+      const response = await getCategories({
+        page: 1,
+        limit: 10,
+        sortCol: 'created_at',
+        sortDir: 'desc',
+        unpaginated: true,
+      });
       setCategories(response.data);
     } catch (error) {
       console.error('Error fetching categories:', error);
@@ -64,7 +77,13 @@ export default function EditItemModal({ isOpen, onClose, onItemUpdated, item }: 
 
   const fetchUnits = async () => {
     try {
-      const response = await getUnits({ page: 1, limit: 10, sortCol: 'created_at', sortDir: 'desc', unpaginated: true });
+      const response = await getUnits({
+        page: 1,
+        limit: 10,
+        sortCol: 'created_at',
+        sortDir: 'desc',
+        unpaginated: true,
+      });
       setUnits(response.data);
     } catch (error) {
       console.error('Error fetching units:', error);
@@ -74,7 +93,14 @@ export default function EditItemModal({ isOpen, onClose, onItemUpdated, item }: 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const newErrors = { sku: '', name: '', category_id: '', unit_id: '', type: '', selling_price: '' };
+    const newErrors = {
+      sku: '',
+      name: '',
+      category_id: '',
+      unit_id: '',
+      type: '',
+      selling_price: '',
+    };
     let hasError = false;
 
     if (!sku) {
@@ -147,18 +173,45 @@ export default function EditItemModal({ isOpen, onClose, onItemUpdated, item }: 
           <div className="px-2 overflow-y-auto custom-scrollbar">
             <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
               <div>
-                <Label>SKU <span className="text-red-500">*</span></Label>
-                <Input type="text" value={sku} onChange={(e) => {setSku(e.target.value); setErrors({...errors, sku: ''})}} error={!!errors.sku} hint={errors.sku} />
+                <Label>
+                  SKU <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  type="text"
+                  value={sku}
+                  onChange={(e) => {
+                    setSku(e.target.value);
+                    setErrors({ ...errors, sku: '' });
+                  }}
+                  error={!!errors.sku}
+                  hint={errors.sku}
+                />
               </div>
               <div>
-                <Label>Name <span className="text-red-500">*</span></Label>
-                <Input type="text" value={name} onChange={(e) => {setName(e.target.value); setErrors({...errors, name: ''})}} error={!!errors.name} hint={errors.name} />
+                <Label>
+                  Name <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  type="text"
+                  value={name}
+                  onChange={(e) => {
+                    setName(e.target.value);
+                    setErrors({ ...errors, name: '' });
+                  }}
+                  error={!!errors.name}
+                  hint={errors.name}
+                />
               </div>
               <div>
-                <Label>Category <span className="text-red-500">*</span></Label>
+                <Label>
+                  Category <span className="text-red-500">*</span>
+                </Label>
                 <Select
-                  options={categories.map(cat => ({ value: String(cat.id), label: cat.name }))}
-                  onChange={(value) => {setCategoryId(value); setErrors({...errors, category_id: ''})}}
+                  options={categories.map((cat) => ({ value: String(cat.id), label: cat.name }))}
+                  onChange={(value) => {
+                    setCategoryId(value);
+                    setErrors({ ...errors, category_id: '' });
+                  }}
                   defaultValue={categoryId}
                   placeholder="Select a category"
                   error={!!errors.category_id}
@@ -166,10 +219,18 @@ export default function EditItemModal({ isOpen, onClose, onItemUpdated, item }: 
                 />
               </div>
               <div>
-                <Label>Unit <span className="text-red-500">*</span></Label>
+                <Label>
+                  Unit <span className="text-red-500">*</span>
+                </Label>
                 <Select
-                  options={units.map(unit => ({ value: String(unit.id), label: `${unit.name} (${unit.code})` }))}
-                  onChange={(value) => {setUnitId(value); setErrors({...errors, unit_id: ''})}}
+                  options={units.map((unit) => ({
+                    value: String(unit.id),
+                    label: `${unit.name} (${unit.code})`,
+                  }))}
+                  onChange={(value) => {
+                    setUnitId(value);
+                    setErrors({ ...errors, unit_id: '' });
+                  }}
                   defaultValue={unitId}
                   placeholder="Select a unit"
                   error={!!errors.unit_id}
@@ -177,17 +238,37 @@ export default function EditItemModal({ isOpen, onClose, onItemUpdated, item }: 
                 />
               </div>
               <div>
-                <Label>Selling Price <span className="text-red-500">*</span></Label>
-                <Input type="number" value={selling_price} onChange={(e) => { setSellingPrice(e.target.value); setErrors({ ...errors, selling_price: '' }) }} error={!!errors.selling_price} hint={errors.selling_price} />
+                <Label>
+                  Selling Price <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  type="number"
+                  value={selling_price}
+                  onChange={(e) => {
+                    setSellingPrice(e.target.value);
+                    setErrors({ ...errors, selling_price: '' });
+                  }}
+                  error={!!errors.selling_price}
+                  hint={errors.selling_price}
+                />
               </div>
               <div className="lg:col-span-2">
                 <Label>Description</Label>
-                <TextArea placeholder="Enter description" value={description} onChange={setDescription} />
+                <TextArea
+                  placeholder="Enter description"
+                  value={description}
+                  onChange={setDescription}
+                />
               </div>
               <div>
-                <Label>Type <span className="text-red-500">*</span></Label>
+                <Label>
+                  Type <span className="text-red-500">*</span>
+                </Label>
                 <Select
-                  options={[{ value: 'product', label: 'Product' }, { value: 'service', label: 'Service' }]}
+                  options={[
+                    { value: 'product', label: 'Product' },
+                    { value: 'service', label: 'Service' },
+                  ]}
                   onChange={setType}
                   defaultValue={type}
                   error={!!errors.type}
@@ -200,9 +281,7 @@ export default function EditItemModal({ isOpen, onClose, onItemUpdated, item }: 
             <Button type="button" variant="outline" onClick={onClose}>
               Close
             </Button>
-            <Button type="submit">
-              Save Changes
-            </Button>
+            <Button type="submit">Save Changes</Button>
           </div>
         </form>
       </div>

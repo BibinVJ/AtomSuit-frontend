@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useState } from 'react';
 import { Modal } from '../ui/modal';
@@ -17,13 +17,13 @@ interface Props {
   entityName: string; // e.g., "Items", "Categories"
 }
 
-export default function ImportModal({ 
-  isOpen, 
-  onClose, 
-  onImport, 
-  onDownloadSample, 
+export default function ImportModal({
+  isOpen,
+  onClose,
+  onImport,
+  onDownloadSample,
   onSuccess,
-  entityName 
+  entityName,
 }: Props) {
   const [file, setFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -103,19 +103,16 @@ export default function ImportModal({
               <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 Select Excel File (.xlsx, .xls, .csv)
               </label>
-              <FileInput
-                accept=".xlsx, .xls, .csv"
-                onChange={handleFileChange}
-              />
+              <FileInput accept=".xlsx, .xls, .csv" onChange={handleFileChange} />
             </div>
 
             <div className="flex items-center gap-3 mt-6 lg:justify-end">
               <Button type="button" variant="outline" onClick={onClose} disabled={isUploading}>
                 Cancel
               </Button>
-              <Button 
-                type="submit" 
-                disabled={isUploading || !file} 
+              <Button
+                type="submit"
+                disabled={isUploading || !file}
                 startIcon={!isUploading && <Upload className="w-4 h-4" />}
               >
                 {isUploading ? 'Uploading...' : 'Upload & Import'}

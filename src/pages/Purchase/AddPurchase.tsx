@@ -1,5 +1,4 @@
-"use client";
-
+'use client';
 
 import { useState, useEffect } from 'react';
 import PageBreadcrumb from '../../components/common/PageBreadCrumb';
@@ -43,7 +42,15 @@ export default function AddPurchase() {
   const [invoiceNumber, setInvoiceNumber] = useState('');
   const [purchaseDate, setPurchaseDate] = useState(new Date().toISOString().split('T')[0]);
   const [purchaseItems, setPurchaseItems] = useState<PurchaseItem[]>([
-    { item_id: '', description: '', batch_number: '', expiry_date: '', manufacture_date: '', quantity: 1, unit_cost: 0 }
+    {
+      item_id: '',
+      description: '',
+      batch_number: '',
+      expiry_date: '',
+      manufacture_date: '',
+      quantity: 1,
+      unit_cost: 0,
+    },
   ]);
   const [errors, setErrors] = useState<ApiError>({});
 
@@ -56,7 +63,7 @@ export default function AddPurchase() {
       const [vendorResponse, itemResponse, invoiceResponse] = await Promise.all([
         getVendors(1, 10, 'created_at', 'desc', true),
         getItems({ page: 1, limit: 10, sortCol: 'created_at', sortDir: 'desc', unpaginated: true }),
-        getNextPurchaseInvoiceNumber()
+        getNextPurchaseInvoiceNumber(),
       ]);
       setVendors(vendorResponse.data || vendorResponse);
       setItems(itemResponse.data || itemResponse);
@@ -69,7 +76,18 @@ export default function AddPurchase() {
   };
 
   const handleAddItem = () => {
-    setPurchaseItems([...purchaseItems, { item_id: '', description: '', batch_number: '', expiry_date: '', manufacture_date: '', quantity: 1, unit_cost: 0 }]);
+    setPurchaseItems([
+      ...purchaseItems,
+      {
+        item_id: '',
+        description: '',
+        batch_number: '',
+        expiry_date: '',
+        manufacture_date: '',
+        quantity: 1,
+        unit_cost: 0,
+      },
+    ]);
   };
 
   const handleItemChange = (index: number, field: keyof PurchaseItem, value: string | number) => {
@@ -97,14 +115,19 @@ export default function AddPurchase() {
     if (purchaseItems.length === 0) newErrors.items = ['At least one item is required.'];
 
     purchaseItems.forEach((item, index) => {
-        const selectedItem = items.find(i => i.id === Number(item.item_id));
+      const selectedItem = items.find((i) => i.id === Number(item.item_id));
       if (!item.item_id) newErrors[`items.${index}.item_id`] = ['Item is required.'];
-      if (!item.batch_number.trim()) newErrors[`items.${index}.batch_number`] = ['Batch number is required.'];
-      if (item.quantity <= 0) newErrors[`items.${index}.quantity`] = ['Quantity must be greater than 0.'];
-      if (item.unit_cost < 0) newErrors[`items.${index}.unit_cost`] = ['Unit cost cannot be negative.'];
+      if (!item.batch_number.trim())
+        newErrors[`items.${index}.batch_number`] = ['Batch number is required.'];
+      if (item.quantity <= 0)
+        newErrors[`items.${index}.quantity`] = ['Quantity must be greater than 0.'];
+      if (item.unit_cost < 0)
+        newErrors[`items.${index}.unit_cost`] = ['Unit cost cannot be negative.'];
       if (selectedItem && selectedItem.type === 'product') {
-        if (!item.manufacture_date) newErrors[`items.${index}.manufacture_date`] = ['MFG date is required.'];
-        if (!item.expiry_date) newErrors[`items.${index}.expiry_date`] = ['Expiry date is required.'];
+        if (!item.manufacture_date)
+          newErrors[`items.${index}.manufacture_date`] = ['MFG date is required.'];
+        if (!item.expiry_date)
+          newErrors[`items.${index}.expiry_date`] = ['Expiry date is required.'];
       }
     });
 
@@ -124,7 +147,7 @@ export default function AddPurchase() {
         vendor_id: vendorId,
         invoice_number: invoiceNumber,
         purchase_date: purchaseDate,
-        items: purchaseItems.map(item => ({ ...item, unit_price: item.unit_cost })),
+        items: purchaseItems.map((item) => ({ ...item, unit_price: item.unit_cost })),
       });
       toast.success('Purchase created successfully');
       router.push('/purchases');
@@ -141,7 +164,7 @@ export default function AddPurchase() {
 
   const clearError = (field: string) => {
     if (errors[field]) {
-      setErrors(prev => {
+      setErrors((prev) => {
         const next = { ...prev };
         delete next[field];
         return next;
@@ -152,17 +175,18 @@ export default function AddPurchase() {
   const getErrorMessage = (field: string) => errors[field]?.[0] || '';
 
   const isProduct = (itemId: string) => {
-    const item = items.find(i => i.id === Number(itemId));
+    const item = items.find((i) => i.id === Number(itemId));
     return item?.type === 'product';
-  }
+  };
 
   return (
     <>
-      <PageMeta
-        title="Add Purchase"
-        description="Add a new purchase"
+      <PageMeta title="Add Purchase" description="Add a new purchase" />
+      <PageBreadcrumb
+        pageTitle="Add Purchase"
+        breadcrumbs={[{ label: 'Purchases', path: '/purchases' }]}
+        backButton={true}
       />
-      <PageBreadcrumb pageTitle="Add Purchase" breadcrumbs={[{ label: 'Purchases', path: '/purchases' }]} backButton={true}/>
 
       <ComponentCard>
         <form onSubmit={handleSubmit}>
@@ -170,8 +194,11 @@ export default function AddPurchase() {
             <div>
               <Label>Vendor</Label>
               <Select
-                options={vendors.map(v => ({ value: String(v.id), label: v.name }))}
-                onChange={(value) => { setVendorId(value); clearError('vendor_id'); }}
+                options={vendors.map((v) => ({ value: String(v.id), label: v.name }))}
+                onChange={(value) => {
+                  setVendorId(value);
+                  clearError('vendor_id');
+                }}
                 defaultValue={vendorId}
                 placeholder="Select a vendor"
                 error={!!getErrorMessage('vendor_id')}
@@ -183,7 +210,10 @@ export default function AddPurchase() {
               <Input
                 type="text"
                 value={invoiceNumber}
-                onChange={(e) => { setInvoiceNumber(e.target.value); clearError('invoice_number'); }}
+                onChange={(e) => {
+                  setInvoiceNumber(e.target.value);
+                  clearError('invoice_number');
+                }}
                 error={!!getErrorMessage('invoice_number')}
                 hint={getErrorMessage('invoice_number')}
               />
@@ -192,7 +222,10 @@ export default function AddPurchase() {
               <DatePicker
                 id="purchase_date"
                 label="Purchase Date"
-                onChange={(_, dateStr) => { setPurchaseDate(dateStr); clearError('purchase_date'); }}
+                onChange={(_, dateStr) => {
+                  setPurchaseDate(dateStr);
+                  clearError('purchase_date');
+                }}
                 defaultDate={purchaseDate}
                 error={!!getErrorMessage('purchase_date')}
                 hint={getErrorMessage('purchase_date')}
@@ -202,12 +235,14 @@ export default function AddPurchase() {
 
           <div className="flex items-center justify-between mt-6 mb-4">
             <h3 className="text-lg font-semibold dark:text-gray-400">Items</h3>
-            
+
             <Button type="button" variant="outline" onClick={handleAddItem}>
               Add Item
             </Button>
           </div>
-          {getErrorMessage('items') && <p className="text-sm text-red-500 mb-4">{getErrorMessage('items')}</p>}
+          {getErrorMessage('items') && (
+            <p className="text-sm text-red-500 mb-4">{getErrorMessage('items')}</p>
+          )}
 
           {purchaseItems.map((item, index) => (
             <div key={index} className="relative p-4 mb-4 border rounded-lg">
@@ -216,14 +251,30 @@ export default function AddPurchase() {
                 onClick={() => handleRemoveItem(index)}
                 className="absolute p-1 text-red-500 bg-red-100 rounded-full -top-2 -right-2 hover:bg-red-300"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M6 18L18 6M6 6l12 12"
+                  ></path>
+                </svg>
               </button>
               <div className="grid grid-cols-1 gap-4 md:grid-cols-5">
                 <div className="md:col-span-2">
                   <Label>Item</Label>
                   <Select
-                    options={items.map(i => ({ value: String(i.id), label: i.name }))}
-                    onChange={(value) => { handleItemChange(index, 'item_id', value); clearError(`items.${index}.item_id`); }}
+                    options={items.map((i) => ({ value: String(i.id), label: i.name }))}
+                    onChange={(value) => {
+                      handleItemChange(index, 'item_id', value);
+                      clearError(`items.${index}.item_id`);
+                    }}
                     defaultValue={item.item_id}
                     placeholder="Select an item"
                     error={!!getErrorMessage(`items.${index}.item_id`)}
@@ -235,7 +286,10 @@ export default function AddPurchase() {
                   <Input
                     type="text"
                     value={item.batch_number}
-                    onChange={(e) => { handleItemChange(index, 'batch_number', e.target.value); clearError(`items.${index}.batch_number`); }}
+                    onChange={(e) => {
+                      handleItemChange(index, 'batch_number', e.target.value);
+                      clearError(`items.${index}.batch_number`);
+                    }}
                     error={!!getErrorMessage(`items.${index}.batch_number`)}
                     hint={getErrorMessage(`items.${index}.batch_number`)}
                   />
@@ -245,10 +299,17 @@ export default function AddPurchase() {
                   <Input
                     type="number"
                     value={item.quantity}
-                    onChange={(e) => { handleItemChange(index, 'quantity', Number(e.target.value)); clearError(`items.${index}.quantity`); }}
+                    onChange={(e) => {
+                      handleItemChange(index, 'quantity', Number(e.target.value));
+                      clearError(`items.${index}.quantity`);
+                    }}
                     error={!!getErrorMessage(`items.${index}.quantity`)}
                     hint={getErrorMessage(`items.${index}.quantity`)}
-                    suffix={item.item_id ? items.find(i => i.id === Number(item.item_id))?.unit.code : undefined}
+                    suffix={
+                      item.item_id
+                        ? items.find((i) => i.id === Number(item.item_id))?.unit.code
+                        : undefined
+                    }
                   />
                 </div>
                 <div>
@@ -256,11 +317,22 @@ export default function AddPurchase() {
                   <Input
                     type="number"
                     value={item.unit_cost}
-                    onChange={(e) => { handleItemChange(index, 'unit_cost', Number(e.target.value)); clearError(`items.${index}.unit_cost`); }}
+                    onChange={(e) => {
+                      handleItemChange(index, 'unit_cost', Number(e.target.value));
+                      clearError(`items.${index}.unit_cost`);
+                    }}
                     error={!!getErrorMessage(`items.${index}.unit_cost`)}
                     hint={getErrorMessage(`items.${index}.unit_cost`)}
-                    prefix={getSetting('currency_position') === 'before' ? getSetting('currency_symbol') : undefined}
-                    suffix={getSetting('currency_position') === 'after' ? getSetting('currency_symbol') : undefined}
+                    prefix={
+                      getSetting('currency_position') === 'before'
+                        ? getSetting('currency_symbol')
+                        : undefined
+                    }
+                    suffix={
+                      getSetting('currency_position') === 'after'
+                        ? getSetting('currency_symbol')
+                        : undefined
+                    }
                   />
                 </div>
               </div>
@@ -276,11 +348,15 @@ export default function AddPurchase() {
                   <DatePicker
                     id={`manufacture_date_${index}`}
                     label={
-                        <>
-                          MFG Date {isProduct(item.item_id) && <span className="text-red-500">*</span>}
-                        </>
-                      }
-                    onChange={(_, dateStr) => { handleItemChange(index, 'manufacture_date', dateStr); clearError(`items.${index}.manufacture_date`); }}
+                      <>
+                        MFG Date{' '}
+                        {isProduct(item.item_id) && <span className="text-red-500">*</span>}
+                      </>
+                    }
+                    onChange={(_, dateStr) => {
+                      handleItemChange(index, 'manufacture_date', dateStr);
+                      clearError(`items.${index}.manufacture_date`);
+                    }}
                     defaultDate={item.manufacture_date}
                     error={!!getErrorMessage(`items.${index}.manufacture_date`)}
                     hint={getErrorMessage(`items.${index}.manufacture_date`)}
@@ -290,17 +366,20 @@ export default function AddPurchase() {
                   <DatePicker
                     id={`expiry_date_${index}`}
                     label={
-                        <>
-                          Expiry Date {isProduct(item.item_id) && <span className="text-red-500">*</span>}
-                        </>
-                      }
-                    onChange={(_, dateStr) => { handleItemChange(index, 'expiry_date', dateStr); clearError(`items.${index}.expiry_date`); }}
+                      <>
+                        Expiry Date{' '}
+                        {isProduct(item.item_id) && <span className="text-red-500">*</span>}
+                      </>
+                    }
+                    onChange={(_, dateStr) => {
+                      handleItemChange(index, 'expiry_date', dateStr);
+                      clearError(`items.${index}.expiry_date`);
+                    }}
                     defaultDate={item.expiry_date}
                     error={!!getErrorMessage(`items.${index}.expiry_date`)}
                     hint={getErrorMessage(`items.${index}.expiry_date`)}
                   />
                 </div>
-                
               </div>
               <div className="flex justify-end mt-4">
                 <div className="flex items-center space-x-4">
@@ -317,19 +396,18 @@ export default function AddPurchase() {
             <div className="flex items-center space-x-4">
               <span className="text-lg font-semibold dark:text-gray-400">Net Total:</span>
               <span className="text-lg font-bold dark:text-white">
-                {purchaseItems.reduce((acc, item) => acc + (item.quantity * item.unit_cost), 0).toFixed(2)}
+                {purchaseItems
+                  .reduce((acc, item) => acc + item.quantity * item.unit_cost, 0)
+                  .toFixed(2)}
               </span>
             </div>
           </div>
 
           <div className="flex justify-end mt-6">
-            <Button type="submit">
-              Save Purchase
-            </Button>
+            <Button type="submit">Save Purchase</Button>
           </div>
         </form>
       </ComponentCard>
     </>
   );
 }
-

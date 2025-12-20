@@ -11,8 +11,12 @@ interface Props {
   subscription: Subscription;
 }
 
-export default function CancelSubscriptionModal({ isOpen, onClose, onSubscriptionCanceled, subscription }: Props) {
-
+export default function CancelSubscriptionModal({
+  isOpen,
+  onClose,
+  onSubscriptionCanceled,
+  subscription,
+}: Props) {
   const handleCancel = async () => {
     try {
       await cancelSubscription(subscription.id);
@@ -52,8 +56,10 @@ export default function CancelSubscriptionModal({ isOpen, onClose, onSubscriptio
             Cancel Subscription
           </h4>
           <p className="mb-6 text-gray-500 dark:text-gray-400">
-            Are you sure you want to cancel the subscription &quot;{subscription?.name}&quot;? 
-            {subscription.is_on_grace_period ? ' The subscription will continue until the end of the billing period.' : ' This action cannot be undone.'}
+            Are you sure you want to cancel the subscription &quot;{subscription?.name}&quot;?
+            {subscription.is_on_grace_period
+              ? ' The subscription will continue until the end of the billing period.'
+              : ' This action cannot be undone.'}
           </p>
           <div className="flex items-center justify-center gap-4">
             <Button type="button" variant="outline" onClick={onClose}>

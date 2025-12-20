@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import dynamic from "next/dynamic";
-import { ApexOptions } from "apexcharts";
+import { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
+import { ApexOptions } from 'apexcharts';
 
 // Dynamically import Chart with no SSR
-const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
+const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
 interface MonthlySalesChartProps {
   data: {
@@ -22,10 +22,10 @@ export default function MonthlySalesChart({ data }: MonthlySalesChartProps) {
   }, []);
 
   const options: ApexOptions = {
-    colors: ["#465fff"],
+    colors: ['#465fff'],
     chart: {
-      fontFamily: "Outfit, sans-serif",
-      type: "bar",
+      fontFamily: 'Outfit, sans-serif',
+      type: 'bar',
       height: '100%',
       toolbar: {
         show: false,
@@ -34,9 +34,9 @@ export default function MonthlySalesChart({ data }: MonthlySalesChartProps) {
     plotOptions: {
       bar: {
         horizontal: false,
-        columnWidth: "39%",
+        columnWidth: '39%',
         borderRadius: 5,
-        borderRadiusApplication: "end",
+        borderRadiusApplication: 'end',
       },
     },
     dataLabels: {
@@ -45,22 +45,22 @@ export default function MonthlySalesChart({ data }: MonthlySalesChartProps) {
     stroke: {
       show: true,
       width: 4,
-      colors: ["transparent"],
+      colors: ['transparent'],
     },
     xaxis: {
       categories: [
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-        "Sep",
-        "Oct",
-        "Nov",
-        "Dec",
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'May',
+        'Jun',
+        'Jul',
+        'Aug',
+        'Sep',
+        'Oct',
+        'Nov',
+        'Dec',
       ],
       axisBorder: {
         show: false,
@@ -71,9 +71,9 @@ export default function MonthlySalesChart({ data }: MonthlySalesChartProps) {
     },
     legend: {
       show: true,
-      position: "top",
-      horizontalAlign: "left",
-      fontFamily: "Outfit",
+      position: 'top',
+      horizontalAlign: 'left',
+      fontFamily: 'Outfit',
     },
     yaxis: {
       title: {
@@ -111,7 +111,7 @@ export default function MonthlySalesChart({ data }: MonthlySalesChartProps) {
 
   const series = [
     {
-      name: "Sales",
+      name: 'Sales',
       data: monthlySales,
     },
   ];
@@ -121,9 +121,7 @@ export default function MonthlySalesChart({ data }: MonthlySalesChartProps) {
     return (
       <div className="flex flex-col h-full overflow-hidden rounded-2xl border border-gray-200 custom-card-bg p-5 dark:border-gray-800">
         <div className="flex items-center justify-between flex-shrink-0">
-          <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">
-            Monthly Sales
-          </h3>
+          <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">Monthly Sales</h3>
         </div>
         <div className="flex-grow w-full h-full flex items-center justify-center">
           <div className="text-gray-500">Loading chart...</div>
@@ -135,9 +133,7 @@ export default function MonthlySalesChart({ data }: MonthlySalesChartProps) {
   return (
     <div className="flex flex-col h-full overflow-hidden rounded-2xl border border-gray-200 custom-card-bg p-5 dark:border-gray-800">
       <div className="flex items-center justify-between flex-shrink-0">
-        <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">
-          Monthly Sales
-        </h3>
+        <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">Monthly Sales</h3>
       </div>
 
       <div className="flex-grow w-full h-full">

@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -41,28 +41,31 @@ export default function SubscriptionWidget() {
 
   const getStatusInfo = () => {
     if (!subscription) return { color: 'text-gray-500', icon: CreditCard, text: 'No Subscription' };
-    
-    if (subscription.stripe_status === 'past_due') return { 
-      color: 'text-red-600', 
-      icon: AlertTriangle, 
-      text: 'Payment Overdue' 
+
+    if (subscription.stripe_status === 'past_due')
+      return {
+        color: 'text-red-600',
+        icon: AlertTriangle,
+        text: 'Payment Overdue',
+      };
+    if (subscription.is_canceled)
+      return {
+        color: 'text-orange-600',
+        icon: AlertTriangle,
+        text: 'Cancelled',
+      };
+    if (subscription.is_on_trial)
+      return {
+        color: 'text-blue-600',
+        icon: CheckCircle,
+        text: 'Free Trial',
+      };
+    return {
+      color: 'text-green-600',
+      icon: CheckCircle,
+      text: 'Active',
     };
-    if (subscription.is_canceled) return { 
-      color: 'text-orange-600', 
-      icon: AlertTriangle, 
-      text: 'Cancelled' 
-    };
-    if (subscription.is_on_trial) return { 
-      color: 'text-blue-600', 
-      icon: CheckCircle, 
-      text: 'Free Trial' 
-    };
-    return { 
-      color: 'text-green-600', 
-      icon: CheckCircle, 
-      text: 'Active' 
-    };
-    
+
     return { color: 'text-gray-500', icon: CreditCard, text: 'Inactive' };
   };
 

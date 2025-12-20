@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import Link from "next/link";
-import { EyeOff, Eye } from "lucide-react";
-import Label from "../form/Label";
-import Input from "../form/input/InputField";
-import Checkbox from "../form/input/Checkbox";
+import { useState } from 'react';
+import Link from 'next/link';
+import { EyeOff, Eye } from 'lucide-react';
+import Label from '../form/Label';
+import Input from '../form/input/InputField';
+import Checkbox from '../form/input/Checkbox';
 
 export default function SignUpForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -95,12 +95,7 @@ export default function SignUpForm() {
                     <Label>
                       Last Name<span className="text-error-500">*</span>
                     </Label>
-                    <Input
-                      type="text"
-                      id="lname"
-                      name="lname"
-                      placeholder="Enter your last name"
-                    />
+                    <Input type="text" id="lname" name="lname" placeholder="Enter your last name" />
                   </div>
                 </div>
                 {/* <!-- Email --> */}
@@ -108,12 +103,7 @@ export default function SignUpForm() {
                   <Label>
                     Email<span className="text-error-500">*</span>
                   </Label>
-                  <Input
-                    type="email"
-                    id="email"
-                    name="email"
-                    placeholder="Enter your email"
-                  />
+                  <Input type="email" id="email" name="email" placeholder="Enter your email" />
                 </div>
                 {/* <!-- Password --> */}
                 <div>
@@ -123,7 +113,7 @@ export default function SignUpForm() {
                   <div className="relative">
                     <Input
                       placeholder="Enter your password"
-                      type={showPassword ? "text" : "password"}
+                      type={showPassword ? 'text' : 'password'}
                     />
                     <span
                       onClick={() => setShowPassword(!showPassword)}
@@ -139,20 +129,11 @@ export default function SignUpForm() {
                 </div>
                 {/* <!-- Checkbox --> */}
                 <div className="flex items-center gap-3">
-                  <Checkbox
-                    className="w-5 h-5"
-                    checked={isChecked}
-                    onChange={setIsChecked}
-                  />
+                  <Checkbox className="w-5 h-5" checked={isChecked} onChange={setIsChecked} />
                   <p className="inline-block font-normal text-gray-500 dark:text-gray-400">
-                    By creating an account means you agree to the{" "}
-                    <span className="text-gray-800 dark:text-white/90">
-                      Terms and Conditions,
-                    </span>{" "}
-                    and our{" "}
-                    <span className="text-gray-800 dark:text-white">
-                      Privacy Policy
-                    </span>
+                    By creating an account means you agree to the{' '}
+                    <span className="text-gray-800 dark:text-white/90">Terms and Conditions,</span>{' '}
+                    and our <span className="text-gray-800 dark:text-white">Privacy Policy</span>
                   </p>
                 </div>
                 {/* <!-- Button --> */}
@@ -166,7 +147,7 @@ export default function SignUpForm() {
 
             <div className="mt-5">
               <p className="text-sm font-normal text-center text-gray-700 dark:text-gray-400 sm:text-start">
-                Already have an account? {""}
+                Already have an account? {''}
                 <Link
                   href="/signin"
                   className="text-brand-500 hover:text-brand-600 dark:text-brand-400"

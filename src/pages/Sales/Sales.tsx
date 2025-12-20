@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useEffect, useState } from 'react';
 import PageBreadcrumb from '../../components/common/PageBreadCrumb';
@@ -56,8 +56,20 @@ export default function Sales() {
       if (response.meta) {
         setTotalPages(response.meta.last_page || 1);
         setCurrentPage(response.meta.current_page || 1);
-        setFrom(response.meta.from !== undefined ? response.meta.from : (debouncedRangeFrom !== '' ? Number(debouncedRangeFrom) : 0));
-        setTo(response.meta.to !== undefined ? response.meta.to : (debouncedRangeTo !== '' ? Number(debouncedRangeTo) : 0));
+        setFrom(
+          response.meta.from !== undefined
+            ? response.meta.from
+            : debouncedRangeFrom !== ''
+              ? Number(debouncedRangeFrom)
+              : 0
+        );
+        setTo(
+          response.meta.to !== undefined
+            ? response.meta.to
+            : debouncedRangeTo !== ''
+              ? Number(debouncedRangeTo)
+              : 0
+        );
         setTotal(response.meta.total || 0);
       }
     } catch (error) {
@@ -67,7 +79,15 @@ export default function Sales() {
 
   useEffect(() => {
     fetchSales(currentPage, perPage, sortBy, sortDirection);
-  }, [currentPage, perPage, sortBy, sortDirection, debouncedSearchTerm, debouncedRangeFrom, debouncedRangeTo]);
+  }, [
+    currentPage,
+    perPage,
+    sortBy,
+    sortDirection,
+    debouncedSearchTerm,
+    debouncedRangeFrom,
+    debouncedRangeTo,
+  ]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -89,10 +109,7 @@ export default function Sales() {
 
   return (
     <>
-      <PageMeta
-        title="Sales"
-        description="List of sales"
-      />
+      <PageMeta title="Sales" description="List of sales" />
       <PageBreadcrumb pageTitle="Sales" />
 
       <div className="space-y-6">
@@ -120,9 +137,13 @@ export default function Sales() {
           title="Sales"
           action={
             <div className="flex flex-wrap items-center gap-2">
-              {hasPermission("create-sale") && (
+              {hasPermission('create-sale') && (
                 <Tooltip text="Add New Sale">
-                  <Button onClick={() => router.push('/sales/add')} size="sm" startIcon={<Plus className="w-4 h-4" />}>
+                  <Button
+                    onClick={() => router.push('/sales/add')}
+                    size="sm"
+                    startIcon={<Plus className="w-4 h-4" />}
+                  >
                     Add Sale
                   </Button>
                 </Tooltip>

@@ -1,6 +1,6 @@
-import { User } from "../../types";
-import { formatDate } from "../../utils/date";
-import { Pencil } from "lucide-react";
+import { User } from '../../types';
+import { formatDate } from '../../utils/date';
+import { Pencil } from 'lucide-react';
 
 interface UserInfoCardProps {
   user: User | null;
@@ -20,24 +20,18 @@ export default function UserInfoCard({ user, onEdit }: UserInfoCardProps) {
               <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">
                 Full Name
               </p>
-              <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                {user?.name}
-              </p>
+              <p className="text-sm font-medium text-gray-800 dark:text-white/90">{user?.name}</p>
             </div>
             <div>
               <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">
                 Email address
               </p>
-              <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                {user?.email}
-              </p>
+              <p className="text-sm font-medium text-gray-800 dark:text-white/90">{user?.email}</p>
             </div>
             <div>
-              <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">
-                Phone
-              </p>
+              <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Phone</p>
               <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                {user?.phone || "-"}
+                {user?.phone || '-'}
               </p>
             </div>
             <div>
@@ -45,7 +39,7 @@ export default function UserInfoCard({ user, onEdit }: UserInfoCardProps) {
                 Alternate Email
               </p>
               <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                {user?.alternate_email || "-"}
+                {user?.alternate_email || '-'}
               </p>
             </div>
             <div>
@@ -53,7 +47,7 @@ export default function UserInfoCard({ user, onEdit }: UserInfoCardProps) {
                 Alternate Phone
               </p>
               <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                {user?.alternate_phone || "-"}
+                {user?.alternate_phone || '-'}
               </p>
             </div>
             <div>
@@ -61,15 +55,13 @@ export default function UserInfoCard({ user, onEdit }: UserInfoCardProps) {
                 Date of Birth
               </p>
               <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                {user?.dob ? formatDate(new Date(user.dob)) : "-"}
+                {user?.dob ? formatDate(new Date(user.dob)) : '-'}
               </p>
             </div>
             <div>
-              <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">
-                Gender
-              </p>
+              <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Gender</p>
               <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                {user?.gender || "-"}
+                {user?.gender || '-'}
               </p>
             </div>
             <div>

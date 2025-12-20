@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useState } from 'react';
 import { Subscription } from '../../types';
@@ -51,7 +51,9 @@ export default function SubscriptionCard({ subscription }: Props) {
             Subscription ID: {subscription.stripe_id}
           </p>
         </div>
-        <div className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${getStatusColor()}`}>
+        <div
+          className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${getStatusColor()}`}
+        >
           {getStatusIcon()}
           {getStatusText()}
         </div>
@@ -67,9 +69,7 @@ export default function SubscriptionCard({ subscription }: Props) {
               per {subscription.plan.interval}
             </span>
           </div>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-            {subscription.plan.name}
-          </p>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{subscription.plan.name}</p>
         </div>
       )}
 
@@ -93,8 +93,6 @@ export default function SubscriptionCard({ subscription }: Props) {
           <span>Created: {formatDate(subscription.created_at)}</span>
         </div>
       </div>
-
-
     </div>
   );
 }

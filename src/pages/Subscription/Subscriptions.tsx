@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useEffect, useState } from 'react';
 import PageBreadcrumb from '../../components/common/PageBreadCrumb';
@@ -25,7 +25,12 @@ export default function Subscriptions() {
   const [sortDirection, setSortDirection] = useState('desc');
   const [searchTerm, setSearchTerm] = useState('');
 
-  const fetchSubscriptions = async (page = 1, limit = 10, sortCol = 'created_at', sortDir = 'desc') => {
+  const fetchSubscriptions = async (
+    page = 1,
+    limit = 10,
+    sortCol = 'created_at',
+    sortDir = 'desc'
+  ) => {
     try {
       const response = await getSubscriptions(page, limit, sortCol, sortDir);
       setSubscriptions(Array.isArray(response.data) ? response.data : []);
@@ -65,10 +70,7 @@ export default function Subscriptions() {
 
   return (
     <>
-      <PageMeta
-        title="Subscriptions"
-        description="List of subscriptions"
-      />
+      <PageMeta title="Subscriptions" description="List of subscriptions" />
       <PageBreadcrumb pageTitle="Subscriptions" />
       <div className="space-y-6">
         <div className="p-5 border border-gray-200 rounded-2xl bg-gray-50 dark:bg-white/[0.03] dark:border-gray-800 shadow-sm">

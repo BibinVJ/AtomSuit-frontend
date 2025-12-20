@@ -1,10 +1,10 @@
-import type { FC } from "react";
+import type { FC } from 'react';
 
 interface DividerProps {
   text?: string;
 }
 
-const Divider: FC<DividerProps> = ({ text = "Or" }) => {
+const Divider: FC<DividerProps> = ({ text = 'Or' }) => {
   return (
     <div className="relative py-3 sm:py-5">
       <div className="absolute inset-0 flex items-center">

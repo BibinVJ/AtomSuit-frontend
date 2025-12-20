@@ -1,15 +1,15 @@
-"use client";
-import React from "react";
-import ComponentCard from "../../common/ComponentCard";
-import { Modal } from "../../ui/modal";
-import { useModal } from "@/hooks/useModal";
+'use client';
+import React from 'react';
+import ComponentCard from '../../common/ComponentCard';
+import { Modal } from '../../ui/modal';
+import { useModal } from '@/hooks/useModal';
 
 export default function ModalBasedAlerts() {
   const successModal = useModal();
   const infoModal = useModal();
   const warningModal = useModal();
   const errorModal = useModal();
-  
+
   return (
     <ComponentCard title="Modal Based Alerts">
       <div className="flex flex-wrap items-center gap-3">
@@ -38,7 +38,7 @@ export default function ModalBasedAlerts() {
           Danger Alert
         </button>
       </div>
-      
+
       {/* Success Modal */}
       <Modal
         isOpen={successModal.isOpen}
@@ -46,9 +46,7 @@ export default function ModalBasedAlerts() {
         className="max-w-[600px] p-5 lg:p-10"
       >
         <div className="text-center">
-          <h4 className="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90">
-            Success!
-          </h4>
+          <h4 className="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90">Success!</h4>
           <p className="text-sm leading-6 text-gray-500 dark:text-gray-400 mb-6">
             Operation completed successfully.
           </p>
@@ -61,7 +59,7 @@ export default function ModalBasedAlerts() {
           </button>
         </div>
       </Modal>
-      
+
       {/* Info Modal */}
       <Modal
         isOpen={infoModal.isOpen}
@@ -84,7 +82,7 @@ export default function ModalBasedAlerts() {
           </button>
         </div>
       </Modal>
-      
+
       {/* Warning Modal */}
       <Modal
         isOpen={warningModal.isOpen}
@@ -92,9 +90,7 @@ export default function ModalBasedAlerts() {
         className="max-w-[600px] p-5 lg:p-10"
       >
         <div className="text-center">
-          <h4 className="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90">
-            Warning!
-          </h4>
+          <h4 className="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90">Warning!</h4>
           <p className="text-sm leading-6 text-gray-500 dark:text-gray-400 mb-6">
             Please be careful with this action.
           </p>
@@ -107,7 +103,7 @@ export default function ModalBasedAlerts() {
           </button>
         </div>
       </Modal>
-      
+
       {/* Error Modal */}
       <Modal
         isOpen={errorModal.isOpen}
@@ -115,9 +111,7 @@ export default function ModalBasedAlerts() {
         className="max-w-[600px] p-5 lg:p-10"
       >
         <div className="text-center">
-          <h4 className="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90">
-            Error!
-          </h4>
+          <h4 className="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90">Error!</h4>
           <p className="text-sm leading-6 text-gray-500 dark:text-gray-400 mb-6">
             Something went wrong. Please try again.
           </p>

@@ -1,22 +1,22 @@
-"use client";
+'use client';
 
-
+import { Table, TableBody, TableCell, TableHeader, TableRow } from '../ui/table';
+import { useState } from 'react';
+import Badge from '../ui/badge/Badge';
+import EditVendorModal from './EditVendorModal';
+import DeleteVendorModal from './DeleteVendorModal';
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHeader,
-  TableRow,
-} from "../ui/table";
-import { useState } from "react";
-import Badge from "../ui/badge/Badge";
-import EditVendorModal from "./EditVendorModal";
-import DeleteVendorModal from "./DeleteVendorModal";
-import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide, Edit, Trash2, RefreshCw } from 'lucide-react';
-import { restoreVendor } from "../../services/VendorService";
-import { toast } from "sonner";
-import Button from "../ui/button/Button";
-import Tooltip from "../ui/tooltip/Tooltip";
+  ChevronsUpDown,
+  ArrowUpWideNarrow,
+  ArrowDownNarrowWide,
+  Edit,
+  Trash2,
+  RefreshCw,
+} from 'lucide-react';
+import { restoreVendor } from '../../services/VendorService';
+import { toast } from 'sonner';
+import Button from '../ui/button/Button';
+import Tooltip from '../ui/tooltip/Tooltip';
 
 import { Vendor } from '../../types';
 
@@ -32,15 +32,23 @@ interface Props {
   viewMode?: 'active' | 'trashed';
 }
 
-import { usePermissions } from "../../hooks/usePermissions";
+import { usePermissions } from '../../hooks/usePermissions';
 
-export default function VendorTable({ data, onAction, onSort, sortBy, sortDirection, currentPage, perPage, startIndex, viewMode = 'active' }: Props) {
+export default function VendorTable({
+  data,
+  onAction,
+  onSort,
+  sortBy,
+  sortDirection,
+  currentPage,
+  perPage,
+  startIndex,
+  viewMode = 'active',
+}: Props) {
   const { hasPermission } = usePermissions();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [selectedVendor, setSelectedVendor] = useState<Vendor | null>(
-    null
-  );
+  const [selectedVendor, setSelectedVendor] = useState<Vendor | null>(null);
 
   const handleEdit = (vendor: Vendor) => {
     setSelectedVendor(vendor);
@@ -86,12 +94,45 @@ export default function VendorTable({ data, onAction, onSort, sortBy, sortDirect
         <Table>
           <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
             <TableRow>
-              <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">#</TableCell>
-              <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400" onClick={() => onSort('name')}>Name {renderSortIcon('name')}</TableCell>
-              <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400" onClick={() => onSort('email')}>Email {renderSortIcon('email')}</TableCell>
-              <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400" onClick={() => onSort('phone')}>Phone {renderSortIcon('phone')}</TableCell>
-              <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">Address</TableCell>
-              <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">Actions</TableCell>
+              <TableCell
+                isHeader
+                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+              >
+                #
+              </TableCell>
+              <TableCell
+                isHeader
+                className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400"
+                onClick={() => onSort('name')}
+              >
+                Name {renderSortIcon('name')}
+              </TableCell>
+              <TableCell
+                isHeader
+                className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400"
+                onClick={() => onSort('email')}
+              >
+                Email {renderSortIcon('email')}
+              </TableCell>
+              <TableCell
+                isHeader
+                className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400"
+                onClick={() => onSort('phone')}
+              >
+                Phone {renderSortIcon('phone')}
+              </TableCell>
+              <TableCell
+                isHeader
+                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+              >
+                Address
+              </TableCell>
+              <TableCell
+                isHeader
+                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+              >
+                Actions
+              </TableCell>
             </TableRow>
           </TableHeader>
 
@@ -100,18 +141,28 @@ export default function VendorTable({ data, onAction, onSort, sortBy, sortDirect
               <TableRow key={vendor.id}>
                 <TableCell className="px-5 py-4 sm:px-6 text-start">
                   <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                    {startIndex !== undefined ? startIndex + index : (currentPage - 1) * perPage + index + 1}
+                    {startIndex !== undefined
+                      ? startIndex + index
+                      : (currentPage - 1) * perPage + index + 1}
                   </p>
                 </TableCell>
-                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">{vendor.name}</TableCell>
-                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">{vendor.email}</TableCell>
-                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">{vendor.phone}</TableCell>
-                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">{vendor.address}</TableCell>
+                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
+                  {vendor.name}
+                </TableCell>
+                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
+                  {vendor.email}
+                </TableCell>
+                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
+                  {vendor.phone}
+                </TableCell>
+                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
+                  {vendor.address}
+                </TableCell>
                 <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
                   <div className="flex items-center gap-2">
                     {viewMode === 'active' ? (
                       <>
-                        {hasPermission("update-vendor") && (
+                        {hasPermission('update-vendor') && (
                           <Tooltip text="Edit">
                             <Button
                               size="xs"
@@ -122,7 +173,7 @@ export default function VendorTable({ data, onAction, onSort, sortBy, sortDirect
                             </Button>
                           </Tooltip>
                         )}
-                        {hasPermission("delete-vendor") && (
+                        {hasPermission('delete-vendor') && (
                           <Tooltip text="Delete">
                             <Button
                               size="xs"
@@ -136,7 +187,7 @@ export default function VendorTable({ data, onAction, onSort, sortBy, sortDirect
                       </>
                     ) : (
                       <>
-                        {hasPermission("update-vendor") && (
+                        {hasPermission('update-vendor') && (
                           <Tooltip text="Restore">
                             <Button
                               size="xs"
@@ -147,7 +198,7 @@ export default function VendorTable({ data, onAction, onSort, sortBy, sortDirect
                             </Button>
                           </Tooltip>
                         )}
-                        {hasPermission("delete-vendor") && (
+                        {hasPermission('delete-vendor') && (
                           <Tooltip text="Delete Permanently">
                             <Button
                               size="xs"

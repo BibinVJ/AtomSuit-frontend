@@ -12,7 +12,7 @@ import { SettingsProvider } from '@/context/SettingsProvider';
 import { Toaster } from 'sonner';
 
 const outfit = Outfit({
-  subsets: ["latin"],
+  subsets: ['latin'],
 });
 
 export const metadata: Metadata = {

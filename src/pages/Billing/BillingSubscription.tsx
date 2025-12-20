@@ -1,8 +1,12 @@
-"use client";
+'use client';
 
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
-import { getCurrentSubscription, changePlan, cancelSubscription } from '../../services/TenantSubscriptionService';
+import {
+  getCurrentSubscription,
+  changePlan,
+  cancelSubscription,
+} from '../../services/TenantSubscriptionService';
 import { getPlans } from '../../services/PlanService';
 import { RefreshCw, Star, Calendar, CreditCard, AlertTriangle, CheckCircle } from 'lucide-react';
 import { Plan, Subscription } from '@/types';
@@ -26,7 +30,7 @@ export default function BillingSubscription() {
       setLoading(true);
       const [subscriptionData, plansResponse] = await Promise.all([
         getCurrentSubscription().catch(() => null),
-        getPlans(undefined, undefined, undefined, undefined, true)
+        getPlans(undefined, undefined, undefined, undefined, true),
       ]);
       setSubscription(subscriptionData);
       setPlans(plansResponse.data as Plan[]);
@@ -104,8 +108,12 @@ export default function BillingSubscription() {
     return (
       <div className="text-center p-8">
         <AlertTriangle className="w-12 h-12 text-orange-500 mx-auto mb-4" />
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">No Active Subscription</h3>
-        <p className="text-gray-600 dark:text-gray-400 mb-4">You don't have an active subscription.</p>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+          No Active Subscription
+        </h3>
+        <p className="text-gray-600 dark:text-gray-400 mb-4">
+          You don't have an active subscription.
+        </p>
         <button
           onClick={() => setShowPlansModal(true)}
           className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
@@ -121,7 +129,9 @@ export default function BillingSubscription() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">My Subscription</h1>
-          <p className="text-gray-600 dark:text-gray-400">Manage your current subscription and billing</p>
+          <p className="text-gray-600 dark:text-gray-400">
+            Manage your current subscription and billing
+          </p>
         </div>
         <button
           onClick={loadData}
@@ -145,7 +155,9 @@ export default function BillingSubscription() {
                   Subscription ID: {subscription.stripe_id}
                 </p>
               </div>
-              <div className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${getStatusColor()}`}>
+              <div
+                className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${getStatusColor()}`}
+              >
                 {getStatusIcon()}
                 {getStatusText()}
               </div>
@@ -187,17 +199,13 @@ export default function BillingSubscription() {
                 <span>Created: {formatDate(subscription.created_at)}</span>
               </div>
             </div>
-
-
           </div>
         </div>
-        
+
         <div className="space-y-4">
           <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
             <h3 className="font-semibold text-gray-900 dark:text-white mb-3">Quick Actions</h3>
             <div className="space-y-2">
-
-              
               {!subscription.is_canceled && (
                 <button
                   onClick={() => setShowCancelModal(true)}
@@ -237,12 +245,16 @@ export default function BillingSubscription() {
                       onClick={() => handlePlanChange(plan.id.toString())}
                       disabled={isCurrentPlan || actionLoading}
                       className={`w-full py-2 px-4 rounded ${
-                        isCurrentPlan 
-                          ? 'bg-gray-100 text-gray-500 cursor-not-allowed' 
+                        isCurrentPlan
+                          ? 'bg-gray-100 text-gray-500 cursor-not-allowed'
                           : 'bg-blue-600 hover:bg-blue-700 text-white'
                       }`}
                     >
-                      {isCurrentPlan ? 'Current Plan' : actionLoading ? 'Changing...' : 'Select Plan'}
+                      {isCurrentPlan
+                        ? 'Current Plan'
+                        : actionLoading
+                          ? 'Changing...'
+                          : 'Select Plan'}
                     </button>
                   </div>
                 );
@@ -256,7 +268,9 @@ export default function BillingSubscription() {
       {showCancelModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full p-6">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Cancel Subscription</h2>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+              Cancel Subscription
+            </h2>
             <div className="space-y-4">
               <div className="flex items-start gap-3">
                 <AlertTriangle className="w-6 h-6 text-orange-500 mt-1" />
@@ -265,12 +279,12 @@ export default function BillingSubscription() {
                     Are you sure you want to cancel?
                   </h3>
                   <p className="text-gray-600 dark:text-gray-300 text-sm">
-                    Your subscription will remain active until the end of your current billing period. 
-                    You can resume your subscription at any time before it expires.
+                    Your subscription will remain active until the end of your current billing
+                    period. You can resume your subscription at any time before it expires.
                   </p>
                 </div>
               </div>
-              
+
               <div className="flex gap-3 pt-4">
                 <button
                   onClick={() => setShowCancelModal(false)}

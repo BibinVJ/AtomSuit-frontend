@@ -1,8 +1,12 @@
-"use client";
+'use client';
 
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
-import { getCurrentSubscription, changePlan, cancelSubscription } from '../../services/TenantSubscriptionService';
+import {
+  getCurrentSubscription,
+  changePlan,
+  cancelSubscription,
+} from '../../services/TenantSubscriptionService';
 import { getPlans } from '../../services/PlanService';
 import { Plan, Subscription } from '../../types';
 import SubscriptionCard from './SubscriptionCard';
@@ -28,7 +32,7 @@ export default function SubscriptionManagement() {
       setLoading(true);
       const [subscriptionData, plansResponse] = await Promise.all([
         getCurrentSubscription().catch(() => null),
-        getPlans(undefined, undefined, undefined, undefined, true)
+        getPlans(undefined, undefined, undefined, undefined, true),
       ]);
       setSubscription(subscriptionData);
       setPlans(plansResponse.data as Plan[]);
@@ -91,7 +95,10 @@ export default function SubscriptionManagement() {
         <AlertTriangle className="w-12 h-12 text-orange-500 mx-auto mb-4" />
         <h3 className="text-lg font-semibold text-gray-900 mb-2">No Active Subscription</h3>
         <p className="text-gray-600 mb-4">You don't have an active subscription.</p>
-        <Button onClick={() => setShowPlansModal(true)} className="bg-blue-600 hover:bg-blue-700 text-white">
+        <Button
+          onClick={() => setShowPlansModal(true)}
+          className="bg-blue-600 hover:bg-blue-700 text-white"
+        >
           View Plans
         </Button>
       </div>
@@ -118,17 +125,13 @@ export default function SubscriptionManagement() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
-          <SubscriptionCard 
-            subscription={subscription}
-          />
+          <SubscriptionCard subscription={subscription} />
         </div>
-        
+
         <div className="space-y-4">
           <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
             <h3 className="font-semibold text-gray-900 dark:text-white mb-3">Quick Actions</h3>
             <div className="space-y-2">
-
-              
               {subscription.is_canceled ? (
                 <Button
                   onClick={handleResumeSubscription}
@@ -172,8 +175,8 @@ export default function SubscriptionManagement() {
                   onClick={() => handlePlanChange(plan.id.toString())}
                   disabled={isCurrentPlan || actionLoading}
                   className={`w-full py-2 px-4 rounded ${
-                    isCurrentPlan 
-                      ? 'bg-gray-100 text-gray-500 cursor-not-allowed' 
+                    isCurrentPlan
+                      ? 'bg-gray-100 text-gray-500 cursor-not-allowed'
                       : 'bg-blue-600 hover:bg-blue-700 text-white'
                   }`}
                 >
@@ -191,7 +194,9 @@ export default function SubscriptionManagement() {
         onClose={() => setShowCancelModal(false)}
         className="max-w-md mx-4 p-6"
       >
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Cancel Subscription</h2>
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+          Cancel Subscription
+        </h2>
         <div className="space-y-4">
           <div className="flex items-start gap-3">
             <AlertTriangle className="w-6 h-6 text-orange-500 mt-1" />
@@ -200,12 +205,12 @@ export default function SubscriptionManagement() {
                 Are you sure you want to cancel?
               </h3>
               <p className="text-gray-600 dark:text-gray-300 text-sm">
-                Your subscription will remain active until the end of your current billing period. 
+                Your subscription will remain active until the end of your current billing period.
                 You can resume your subscription at any time before it expires.
               </p>
             </div>
           </div>
-          
+
           <div className="flex gap-3 pt-4">
             <Button
               onClick={() => setShowCancelModal(false)}

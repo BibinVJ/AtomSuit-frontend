@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import type React from "react";
-import { useState, useEffect, useRef } from "react";
+import type React from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { ChevronsUpDown, Check, X } from 'lucide-react';
 
 interface Option {
@@ -25,13 +25,12 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
   defaultSelected = [],
   onChange,
   disabled = false,
-  placeholder = "Select options",
+  placeholder = 'Select options',
   searchable = true,
 }) => {
-  const [selectedOptions, setSelectedOptions] =
-    useState<string[]>(defaultSelected);
+  const [selectedOptions, setSelectedOptions] = useState<string[]>(defaultSelected);
   const [isOpen, setIsOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
   const dropdownRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
@@ -74,9 +73,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
   };
 
   const filteredOptions = searchable
-    ? options.filter(option =>
-        option.text.toLowerCase().includes(searchTerm.toLowerCase())
-      )
+    ? options.filter((option) => option.text.toLowerCase().includes(searchTerm.toLowerCase()))
     : options;
 
   return (
@@ -95,7 +92,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
           <div className="flex flex-wrap gap-1 flex-1">
             {selectedOptions.length > 0 ? (
               selectedOptions.map((value, index) => {
-                const option = options.find(opt => opt.value === value);
+                const option = options.find((opt) => opt.value === value);
                 return (
                   <span
                     key={value}

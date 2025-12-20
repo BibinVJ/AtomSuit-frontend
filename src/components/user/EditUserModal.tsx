@@ -1,5 +1,4 @@
-"use client";
-
+'use client';
 
 import { useState, useEffect } from 'react';
 import { Modal } from '../ui/modal';
@@ -36,7 +35,13 @@ export default function EditUserModal({ isOpen, onClose, onUserUpdated, user }: 
     if (isOpen) {
       const fetchRoles = async () => {
         try {
-          const rolesData = await getRoles({ page: 1, limit: 10, sortCol: 'created_at', sortDir: 'desc', unpaginated: true });
+          const rolesData = await getRoles({
+            page: 1,
+            limit: 10,
+            sortCol: 'created_at',
+            sortDir: 'desc',
+            unpaginated: true,
+          });
           setRoles(rolesData.data);
         } catch (error) {
           console.error('Error fetching roles:', error);
@@ -101,7 +106,7 @@ export default function EditUserModal({ isOpen, onClose, onUserUpdated, user }: 
     }
   };
 
-  const roleOptions = roles.map(r => ({ value: String(r.id), label: formatKebabCase(r.name) }));
+  const roleOptions = roles.map((r) => ({ value: String(r.id), label: formatKebabCase(r.name) }));
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} className="max-w-[700px] p-6 md:p-10">
@@ -118,40 +123,74 @@ export default function EditUserModal({ isOpen, onClose, onUserUpdated, user }: 
           <div className="px-2 overflow-y-auto custom-scrollbar">
             <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
               <div>
-                <Label>Name <span className="text-red-500">*</span></Label>
-                <Input type="text" value={name} onChange={(e) => { setName(e.target.value); setErrors({ ...errors, name: '' }) }} error={!!errors.name} hint={errors.name} />
+                <Label>
+                  Name <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  type="text"
+                  value={name}
+                  onChange={(e) => {
+                    setName(e.target.value);
+                    setErrors({ ...errors, name: '' });
+                  }}
+                  error={!!errors.name}
+                  hint={errors.name}
+                />
               </div>
               <div>
                 <Label>Email</Label>
-                <Input type="email" value={email} onChange={(e) => { setEmail(e.target.value); setErrors({ ...errors, email: '' }) }} error={!!errors.email} hint={errors.email} />
+                <Input
+                  type="email"
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    setErrors({ ...errors, email: '' });
+                  }}
+                  error={!!errors.email}
+                  hint={errors.email}
+                />
               </div>
               <div>
                 <Label>Phone</Label>
-                <Input type="text" value={phone} onChange={(e) => { setPhone(e.target.value); setErrors({ ...errors, phone: '' }) }} error={!!errors.phone} hint={errors.phone} />
+                <Input
+                  type="text"
+                  value={phone}
+                  onChange={(e) => {
+                    setPhone(e.target.value);
+                    setErrors({ ...errors, phone: '' });
+                  }}
+                  error={!!errors.phone}
+                  hint={errors.phone}
+                />
               </div>
               <div>
                 <Label>Role</Label>
-                <Select options={roleOptions} defaultValue={String(roleId)} onChange={(value) => { setRoleId(Number(value)); setErrors({ ...errors, role_id: '' }) }} error={!!errors.role_id} hint={errors.role_id} />
+                <Select
+                  options={roleOptions}
+                  defaultValue={String(roleId)}
+                  onChange={(value) => {
+                    setRoleId(Number(value));
+                    setErrors({ ...errors, role_id: '' });
+                  }}
+                  error={!!errors.role_id}
+                  hint={errors.role_id}
+                />
               </div>
               <div>
                 <Label>Status</Label>
-                <Switch label={status === 'active' ? 'Active' : 'Inactive'} checked={status === 'active'} onChange={(checked) => setStatus(checked ? 'active' : 'inactive')} />
+                <Switch
+                  label={status === 'active' ? 'Active' : 'Inactive'}
+                  checked={status === 'active'}
+                  onChange={(checked) => setStatus(checked ? 'active' : 'inactive')}
+                />
               </div>
             </div>
           </div>
           <div className="flex items-center gap-3 px-2 mt-6 lg:justify-end">
-            <Button
-              type="button"
-              variant='outline'
-              onClick={onClose}
-            >
+            <Button type="button" variant="outline" onClick={onClose}>
               Close
             </Button>
-            <Button
-              type="submit"
-            >
-              Save Changes
-            </Button>
+            <Button type="submit">Save Changes</Button>
           </div>
         </form>
       </div>

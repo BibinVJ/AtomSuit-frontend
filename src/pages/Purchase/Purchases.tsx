@@ -1,5 +1,4 @@
-"use client";
-
+'use client';
 
 import { useEffect, useState } from 'react';
 import PageBreadcrumb from '../../components/common/PageBreadCrumb';
@@ -57,8 +56,20 @@ export default function Purchases() {
       if (response.meta) {
         setTotalPages(response.meta.last_page || 1);
         setCurrentPage(response.meta.current_page || 1);
-        setFrom(response.meta.from !== undefined ? response.meta.from : (debouncedRangeFrom !== '' ? Number(debouncedRangeFrom) : 0));
-        setTo(response.meta.to !== undefined ? response.meta.to : (debouncedRangeTo !== '' ? Number(debouncedRangeTo) : 0));
+        setFrom(
+          response.meta.from !== undefined
+            ? response.meta.from
+            : debouncedRangeFrom !== ''
+              ? Number(debouncedRangeFrom)
+              : 0
+        );
+        setTo(
+          response.meta.to !== undefined
+            ? response.meta.to
+            : debouncedRangeTo !== ''
+              ? Number(debouncedRangeTo)
+              : 0
+        );
         setTotal(response.meta.total || 0);
       }
     } catch (error) {
@@ -68,7 +79,15 @@ export default function Purchases() {
 
   useEffect(() => {
     fetchPurchases(currentPage, perPage, sortBy, sortDirection);
-  }, [currentPage, perPage, sortBy, sortDirection, debouncedSearchTerm, debouncedRangeFrom, debouncedRangeTo]);
+  }, [
+    currentPage,
+    perPage,
+    sortBy,
+    sortDirection,
+    debouncedSearchTerm,
+    debouncedRangeFrom,
+    debouncedRangeTo,
+  ]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -90,10 +109,7 @@ export default function Purchases() {
 
   return (
     <>
-      <PageMeta
-        title="Purchases"
-        description="List of purchases"
-      />
+      <PageMeta title="Purchases" description="List of purchases" />
       <PageBreadcrumb pageTitle="Purchases" />
 
       <div className="space-y-6">
@@ -121,9 +137,13 @@ export default function Purchases() {
           title="Purchases"
           action={
             <div className="flex flex-wrap items-center gap-2">
-              {hasPermission("create-purchase") && (
+              {hasPermission('create-purchase') && (
                 <Tooltip text="Add New Purchase">
-                  <Button onClick={() => router.push('/purchases/add')} size="sm" startIcon={<Plus className="w-4 h-4" />}>
+                  <Button
+                    onClick={() => router.push('/purchases/add')}
+                    size="sm"
+                    startIcon={<Plus className="w-4 h-4" />}
+                  >
                     Add Purchase
                   </Button>
                 </Tooltip>
@@ -154,4 +174,3 @@ export default function Purchases() {
     </>
   );
 }
-

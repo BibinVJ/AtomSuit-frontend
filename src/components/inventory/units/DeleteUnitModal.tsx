@@ -12,8 +12,13 @@ interface Props {
   force?: boolean;
 }
 
-export default function DeleteUnitModal({ isOpen, onClose, onUnitDeleted, unit, force = false }: Props) {
-
+export default function DeleteUnitModal({
+  isOpen,
+  onClose,
+  onUnitDeleted,
+  unit,
+  force = false,
+}: Props) {
   const handleDelete = async () => {
     try {
       await deleteUnit(unit.id, force);
@@ -53,7 +58,9 @@ export default function DeleteUnitModal({ isOpen, onClose, onUnitDeleted, unit, 
             {force ? 'Permanently Delete Unit' : 'Delete Unit'}
           </h4>
           <p className="mb-6 text-gray-500 dark:text-gray-400">
-            Are you sure you want to {force ? 'permanently ' : ''}delete the unit &quot;{unit?.name}&quot;? {force ? 'This action cannot be undone.' : 'You can restore it later from the trash.'}
+            Are you sure you want to {force ? 'permanently ' : ''}delete the unit &quot;{unit?.name}
+            &quot;?{' '}
+            {force ? 'This action cannot be undone.' : 'You can restore it later from the trash.'}
           </p>
           <div className="flex items-center justify-center gap-4">
             <Button type="button" variant="outline" onClick={onClose}>

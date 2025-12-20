@@ -1,18 +1,18 @@
-"use client";
+'use client';
 
-import { useEffect, useState, useCallback } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { useEffect, useState, useCallback } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
 import {
   getUser,
   storeUser,
   logout as logoutService,
   login as loginService,
-} from "../services/AuthService";
-import api from "../services/api";
-import { useTenant } from "../hooks/useTenant";
+} from '../services/AuthService';
+import api from '../services/api';
+import { useTenant } from '../hooks/useTenant';
 
-import { User } from "../types";
-import { AuthContext } from "./AuthContext";
+import { User } from '../types';
+import { AuthContext } from './AuthContext';
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -24,7 +24,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const fetchProfile = useCallback(async () => {
     try {
-      const { data } = await api.get("/profile");
+      const { data } = await api.get('/profile');
       setUser(data.data);
       return true;
     } catch {
@@ -42,7 +42,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       // Silently handle logout errors
     }
     setUser(null);
-    
+
     // Always redirect to signin after logout
     if (pathname !== '/signin' && pathname !== '/signup') {
       router.push('/signin');
@@ -52,14 +52,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const initializeAuth = async () => {
       const storedUser = getUser();
-      
+
       if (storedUser && storedUser.data.token.access_token) {
         // User has stored credentials, set them up
-        api.defaults.headers.common[
-          "Authorization"
-        ] = `Bearer ${storedUser.data.token.access_token}`;
+        api.defaults.headers.common['Authorization'] =
+          `Bearer ${storedUser.data.token.access_token}`;
         setUser(storedUser.data.user);
-        
+
         // In production or when using real API, verify token validity
         try {
           await fetchProfile();
@@ -71,29 +70,29 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         // User is not authenticated
         setUser(null);
       }
-      
+
       setLoading(false);
       setIsInitialized(true);
     };
-    
+
     // Only run on mount
     if (!isInitialized) {
       initializeAuth();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isInitialized]); // Intentionally omitting 'fetchProfile' dependency to prevent unnecessary re-renders
-  
+
   // Separate useEffect to handle route protection
   useEffect(() => {
     // Don't do redirects while still loading
     if (loading || !isInitialized) return;
-    
+
     // Define public routes differently for central vs tenant domains
     const centralPublicRoutes = ['/signin', '/signup', '/', '/pricing'];
     const tenantPublicRoutes = ['/signin', '/signup'];
     const publicRoutes = tenant.isCentral ? centralPublicRoutes : tenantPublicRoutes;
     const isPublicRoute = pathname ? publicRoutes.includes(pathname) : false;
-    
+
     if (user) {
       // User is authenticated - redirect away from auth pages
       if (pathname === '/signin' || pathname === '/signup') {
@@ -122,23 +121,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
   }, [handleLogout]);
 
-  const login = useCallback(
-    async (identifier: string, password: string, stayLoggedIn: boolean) => {
-      const data = await loginService(identifier, password);
-      storeUser(data, stayLoggedIn);
-      api.defaults.headers.common[
-        "Authorization"
-      ] = `Bearer ${data.data.token.access_token}`;
-      setUser(data.data.user);
-      
-      // Set as initialized to prevent re-running auth checks
-      setIsInitialized(true);
-      setLoading(false);
-      
-      return data.data.user;
-    },
-    []
-  );
+  const login = useCallback(async (identifier: string, password: string, stayLoggedIn: boolean) => {
+    const data = await loginService(identifier, password);
+    storeUser(data, stayLoggedIn);
+    api.defaults.headers.common['Authorization'] = `Bearer ${data.data.token.access_token}`;
+    setUser(data.data.user);
+
+    // Set as initialized to prevent re-running auth checks
+    setIsInitialized(true);
+    setLoading(false);
+
+    return data.data.user;
+  }, []);
 
   const logout = useCallback(async () => {
     await handleLogout();
@@ -153,11 +147,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   );
 
   return (
-    <AuthContext.Provider
-      value={{ user, login, logout, loading, fetchProfile, hasPermission }}
-    >
+    <AuthContext.Provider value={{ user, login, logout, loading, fetchProfile, hasPermission }}>
       {children}
     </AuthContext.Provider>
   );
 };
-

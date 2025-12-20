@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode } from 'react';
 
 // Props for Table
 interface TableProps {
@@ -61,7 +61,7 @@ const TableCell: React.FC<TableCellProps> = ({
   onClick,
   colSpan,
 }) => {
-  const CellTag = isHeader ? "th" : "td";
+  const CellTag = isHeader ? 'th' : 'td';
   return (
     <CellTag className={` ${className}`} onClick={onClick} colSpan={colSpan}>
       {children}

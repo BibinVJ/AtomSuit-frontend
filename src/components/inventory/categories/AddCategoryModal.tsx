@@ -1,5 +1,4 @@
-"use client";
-
+'use client';
 
 import { useState } from 'react';
 import { Modal } from '../../ui/modal';
@@ -40,7 +39,7 @@ export default function AddCategoryModal({ isOpen, onClose, onCategoryAdded }: P
       setErrors({ name: 'Name is required' });
       return;
     }
-    
+
     try {
       await addCategory({ name, description });
       onCategoryAdded();
@@ -64,59 +63,53 @@ export default function AddCategoryModal({ isOpen, onClose, onCategoryAdded }: P
   return (
     <Modal isOpen={isOpen} onClose={handleClose} className="max-w-[700px] p-6 md:p-10">
       <div className="relative w-full">
-          <div className="px-2 pr-14">
-            <h4 className="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90">
-              Add New Category
-            </h4>
-            <p className="mb-6 text-sm text-gray-500 dark:text-gray-400 lg:mb-7">
-              Fill in the details to add a new category.
-            </p>
-          </div>
-          <form className="flex flex-col" onSubmit={handleSubmit}>
-            <div className="px-2 overflow-y-auto custom-scrollbar">
-              <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-1">
-                <div>
-                  <Label>Name <span className="text-red-500">*</span></Label>
-                  <Input
-                    type="text"
-                    id="name"
-                    value={name}
-                    onChange={(e) => {
-                      setName(e.target.value);
-                      setErrors({ name: '' });
-                    }}
-                    error={!!errors.name}
-                    hint={errors.name}
-                  />
-                </div>
-
-                <div>
-                  <Label>Description</Label>
-                  <TextArea
-                    placeholder="Enter description"
-                    value={description}
-                    onChange={setDescription}
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  />
-              </div>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 px-2 mt-6 lg:justify-end">
-                <Button
-                    type="button"
-                    variant='outline'
-                    onClick={handleClose}
-                >
-                    Close
-                </Button>
-                <Button
-                    type="submit"
-                >
-                    Save Changes
-                </Button>
-            </div>
-          </form>
+        <div className="px-2 pr-14">
+          <h4 className="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90">
+            Add New Category
+          </h4>
+          <p className="mb-6 text-sm text-gray-500 dark:text-gray-400 lg:mb-7">
+            Fill in the details to add a new category.
+          </p>
         </div>
+        <form className="flex flex-col" onSubmit={handleSubmit}>
+          <div className="px-2 overflow-y-auto custom-scrollbar">
+            <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-1">
+              <div>
+                <Label>
+                  Name <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  type="text"
+                  id="name"
+                  value={name}
+                  onChange={(e) => {
+                    setName(e.target.value);
+                    setErrors({ name: '' });
+                  }}
+                  error={!!errors.name}
+                  hint={errors.name}
+                />
+              </div>
+
+              <div>
+                <Label>Description</Label>
+                <TextArea
+                  placeholder="Enter description"
+                  value={description}
+                  onChange={setDescription}
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                />
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center gap-3 px-2 mt-6 lg:justify-end">
+            <Button type="button" variant="outline" onClick={handleClose}>
+              Close
+            </Button>
+            <Button type="submit">Save Changes</Button>
+          </div>
+        </form>
+      </div>
     </Modal>
   );
 }

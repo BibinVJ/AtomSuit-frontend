@@ -16,11 +16,10 @@ export interface TenantInfo {
 export function extractTenant(hostname: string): TenantInfo {
   // Remove port if present
   const cleanHostname = hostname.split(':')[0];
-  
+
   // Get base domain from environment or default
   const baseDomain = process.env.NEXT_PUBLIC_BASE_DOMAIN || 'atomsuit.test';
-  
-  
+
   // Check if it's the main domain (central login)
   if (cleanHostname === baseDomain || cleanHostname === `www.${baseDomain}`) {
     return {
@@ -28,30 +27,30 @@ export function extractTenant(hostname: string): TenantInfo {
       isCentral: true,
     };
   }
-  
+
   // Check if it's a subdomain
   const subdomainPattern = new RegExp(`^([^.]+)\\.${baseDomain.replace('.', '\\.')}$`);
   const subdomainMatch = cleanHostname.match(subdomainPattern);
-  
+
   if (subdomainMatch) {
     const subdomain = subdomainMatch[1];
-    
+
     // Reserved subdomains that should redirect to central
     const reservedSubdomains = ['www', 'api', 'admin', 'mail', 'ftp'];
-    
+
     if (reservedSubdomains.includes(subdomain)) {
       return {
         subdomain: '',
         isCentral: true,
       };
     }
-    
+
     return {
       subdomain,
       isCentral: false,
     };
   }
-  
+
   // If hostname doesn't match expected pattern, treat as central
   return {
     subdomain: '',
@@ -67,7 +66,7 @@ export function getTenantFromBrowser(): TenantInfo {
   if (typeof window === 'undefined') {
     return { subdomain: '', isCentral: true };
   }
-  
+
   return extractTenant(window.location.hostname);
 }
 
@@ -81,7 +80,7 @@ export function getTenantFromHeaders(headers: Headers): TenantInfo {
   if (!host) {
     return { subdomain: '', isCentral: true };
   }
-  
+
   return extractTenant(host);
 }
 
@@ -94,14 +93,14 @@ export function getTenantFromHeaders(headers: Headers): TenantInfo {
 export function buildTenantUrl(path: string = '', tenant?: TenantInfo): string {
   const baseDomain = process.env.NEXT_PUBLIC_BASE_DOMAIN || 'atomsuit.test';
   const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http';
-  
+
   if (!tenant) {
     tenant = getTenantFromBrowser();
   }
-  
+
   const domain = tenant.isCentral ? baseDomain : `${tenant.subdomain}.${baseDomain}`;
   const cleanPath = path.startsWith('/') ? path : `/${path}`;
-  
+
   return `${protocol}://${domain}${cleanPath}`;
 }
 

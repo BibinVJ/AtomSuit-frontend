@@ -1,5 +1,5 @@
-import { useTheme } from "../../context/ThemeContext";
-import Tooltip from "../ui/tooltip/Tooltip";
+import { useTheme } from '../../context/ThemeContext';
+import Tooltip from '../ui/tooltip/Tooltip';
 
 export const ThemeToggleButton: React.FC = () => {
   const { toggleTheme } = useTheme();

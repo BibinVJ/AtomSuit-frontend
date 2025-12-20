@@ -1,19 +1,20 @@
-"use client";
+'use client';
 
+import { Table, TableBody, TableCell, TableHeader, TableRow } from '../ui/table';
+import { useState } from 'react';
+import Badge from '../ui/badge/Badge';
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHeader,
-  TableRow,
-} from "../ui/table";
-import { useState } from "react";
-import Badge from "../ui/badge/Badge";
-import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide, View, Edit, Trash2 } from 'lucide-react';
-import Button from "../ui/button/Button";
-import Tooltip from "../ui/tooltip/Tooltip";
-import { useRouter } from "next/navigation";
-import VoidPurchaseModal from "./VoidPurchaseModal";
+  ChevronsUpDown,
+  ArrowUpWideNarrow,
+  ArrowDownNarrowWide,
+  View,
+  Edit,
+  Trash2,
+} from 'lucide-react';
+import Button from '../ui/button/Button';
+import Tooltip from '../ui/tooltip/Tooltip';
+import { useRouter } from 'next/navigation';
+import VoidPurchaseModal from './VoidPurchaseModal';
 
 import { Purchase } from '../../types';
 
@@ -28,10 +29,19 @@ interface Props {
   startIndex?: number;
 }
 
-import { usePermissions } from "../../hooks/usePermissions";
-import { useSettings } from "../../hooks/useSettings";
+import { usePermissions } from '../../hooks/usePermissions';
+import { useSettings } from '../../hooks/useSettings';
 
-export default function PurchaseTable({ data, onAction, onSort, sortBy, sortDirection, currentPage, perPage, startIndex }: Props) {
+export default function PurchaseTable({
+  data,
+  onAction,
+  onSort,
+  sortBy,
+  sortDirection,
+  currentPage,
+  perPage,
+  startIndex,
+}: Props) {
   const { hasPermission } = usePermissions();
   const { formatCurrency, formatDate } = useSettings();
   const router = useRouter();
@@ -73,13 +83,53 @@ export default function PurchaseTable({ data, onAction, onSort, sortBy, sortDire
         <Table>
           <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
             <TableRow>
-              <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">#</TableCell>
-              <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400" onClick={() => onSort('invoice_number')}>Invoice # {renderSortIcon('invoice_number')}</TableCell>
-              <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400" onClick={() => onSort('purchase_date')}>Purchase Date {renderSortIcon('purchase_date')}</TableCell>
-              <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400" onClick={() => onSort('vendor_id')}>Vendor {renderSortIcon('vendor_id')}</TableCell>
-              <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400" onClick={() => onSort('total_amount')}>Total Amount {renderSortIcon('total_amount')}</TableCell>
-              <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400" onClick={() => onSort('payment_status')}>Payment Status {renderSortIcon('payment_status')}</TableCell>
-              <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">Actions</TableCell>
+              <TableCell
+                isHeader
+                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+              >
+                #
+              </TableCell>
+              <TableCell
+                isHeader
+                className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400"
+                onClick={() => onSort('invoice_number')}
+              >
+                Invoice # {renderSortIcon('invoice_number')}
+              </TableCell>
+              <TableCell
+                isHeader
+                className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400"
+                onClick={() => onSort('purchase_date')}
+              >
+                Purchase Date {renderSortIcon('purchase_date')}
+              </TableCell>
+              <TableCell
+                isHeader
+                className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400"
+                onClick={() => onSort('vendor_id')}
+              >
+                Vendor {renderSortIcon('vendor_id')}
+              </TableCell>
+              <TableCell
+                isHeader
+                className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400"
+                onClick={() => onSort('total_amount')}
+              >
+                Total Amount {renderSortIcon('total_amount')}
+              </TableCell>
+              <TableCell
+                isHeader
+                className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400"
+                onClick={() => onSort('payment_status')}
+              >
+                Payment Status {renderSortIcon('payment_status')}
+              </TableCell>
+              <TableCell
+                isHeader
+                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+              >
+                Actions
+              </TableCell>
             </TableRow>
           </TableHeader>
 
@@ -88,21 +138,34 @@ export default function PurchaseTable({ data, onAction, onSort, sortBy, sortDire
               <TableRow key={purchase.id}>
                 <TableCell className="px-5 py-4 sm:px-6 text-start">
                   <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                    {startIndex !== undefined ? startIndex + index : (currentPage - 1) * perPage + index + 1}
+                    {startIndex !== undefined
+                      ? startIndex + index
+                      : (currentPage - 1) * perPage + index + 1}
                   </p>
                 </TableCell>
-                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">{purchase.invoice_number}</TableCell>
-                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">{formatDate(purchase.purchase_date)}</TableCell>
-                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">{purchase.vendor.name}</TableCell>
-                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">{formatCurrency(purchase.total_amount)}</TableCell>
+                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
+                  {purchase.invoice_number}
+                </TableCell>
+                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
+                  {formatDate(purchase.purchase_date)}
+                </TableCell>
+                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
+                  {purchase.vendor.name}
+                </TableCell>
+                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
+                  {formatCurrency(purchase.total_amount)}
+                </TableCell>
                 <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                  <Badge size="sm" color={purchase.payment_status === 'paid' ? "success" : "warning"}>
+                  <Badge
+                    size="sm"
+                    color={purchase.payment_status === 'paid' ? 'success' : 'warning'}
+                  >
                     {purchase.payment_status}
                   </Badge>
                 </TableCell>
                 <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
                   <div className="flex items-center gap-2">
-                    {hasPermission("view-purchase") && (
+                    {hasPermission('view-purchase') && (
                       <Tooltip text="View">
                         <Button
                           size="xs"
@@ -113,7 +176,7 @@ export default function PurchaseTable({ data, onAction, onSort, sortBy, sortDire
                         </Button>
                       </Tooltip>
                     )}
-                    {hasPermission("update-purchase") && (
+                    {hasPermission('update-purchase') && (
                       <Tooltip text="Edit">
                         <Button
                           size="xs"
@@ -124,7 +187,7 @@ export default function PurchaseTable({ data, onAction, onSort, sortBy, sortDire
                         </Button>
                       </Tooltip>
                     )}
-                    {hasPermission("delete-purchase") && (
+                    {hasPermission('delete-purchase') && (
                       <Tooltip text="Void">
                         <Button
                           size="xs"

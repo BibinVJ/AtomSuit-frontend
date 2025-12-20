@@ -1,4 +1,4 @@
-import type { FC, ReactNode } from "react";
+import type { FC, ReactNode } from 'react';
 
 interface SocialButtonProps {
   icon: ReactNode;
@@ -7,7 +7,7 @@ interface SocialButtonProps {
   className?: string;
 }
 
-const SocialButton: FC<SocialButtonProps> = ({ icon, label, onClick, className = "" }) => {
+const SocialButton: FC<SocialButtonProps> = ({ icon, label, onClick, className = '' }) => {
   return (
     <button
       type="button"

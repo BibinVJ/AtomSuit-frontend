@@ -1,5 +1,4 @@
-"use client";
-
+'use client';
 
 import { useEffect, useState } from 'react';
 import PageBreadcrumb from '../../components/common/PageBreadCrumb';
@@ -51,14 +50,26 @@ export default function Roles() {
         from: debouncedRangeFrom !== '' ? Number(debouncedRangeFrom) : undefined,
         to: debouncedRangeTo !== '' ? Number(debouncedRangeTo) : undefined,
         search: debouncedSearchTerm,
-        trashed: viewMode === 'trashed' ? 'only' : undefined
+        trashed: viewMode === 'trashed' ? 'only' : undefined,
       });
       setRoles(response.data);
       if (response.meta) {
         setTotalPages(response.meta.last_page || 1);
         setCurrentPage(response.meta.current_page || 1);
-        setFrom(response.meta.from !== undefined ? response.meta.from : (debouncedRangeFrom !== '' ? Number(debouncedRangeFrom) : 0));
-        setTo(response.meta.to !== undefined ? response.meta.to : (debouncedRangeTo !== '' ? Number(debouncedRangeTo) : 0));
+        setFrom(
+          response.meta.from !== undefined
+            ? response.meta.from
+            : debouncedRangeFrom !== ''
+              ? Number(debouncedRangeFrom)
+              : 0
+        );
+        setTo(
+          response.meta.to !== undefined
+            ? response.meta.to
+            : debouncedRangeTo !== ''
+              ? Number(debouncedRangeTo)
+              : 0
+        );
         setTotal(response.meta.total || 0);
       }
     } catch (error) {
@@ -68,7 +79,16 @@ export default function Roles() {
 
   useEffect(() => {
     fetchRoles(currentPage, perPage, sortBy, sortDirection);
-  }, [currentPage, perPage, sortBy, sortDirection, debouncedSearchTerm, debouncedRangeFrom, debouncedRangeTo, viewMode]);
+  }, [
+    currentPage,
+    perPage,
+    sortBy,
+    sortDirection,
+    debouncedSearchTerm,
+    debouncedRangeFrom,
+    debouncedRangeTo,
+    viewMode,
+  ]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -90,10 +110,7 @@ export default function Roles() {
 
   return (
     <>
-      <PageMeta
-        title="Roles"
-        description="List of roles"
-      />
+      <PageMeta title="Roles" description="List of roles" />
       <PageBreadcrumb pageTitle="Roles" />
 
       <div className="space-y-6">
@@ -123,7 +140,11 @@ export default function Roles() {
             <div className="flex flex-wrap items-center gap-2">
               <ViewModeTabs viewMode={viewMode} setViewMode={setViewMode} />
               <Tooltip text="Add New Role">
-                <Button onClick={() => router.push('/roles/add')} size="sm" startIcon={<Plus className="w-4 h-4" />}>
+                <Button
+                  onClick={() => router.push('/roles/add')}
+                  size="sm"
+                  startIcon={<Plus className="w-4 h-4" />}
+                >
                   Add Role
                 </Button>
               </Tooltip>
@@ -154,4 +175,3 @@ export default function Roles() {
     </>
   );
 }
-

@@ -47,7 +47,8 @@ export default function Tooltip({ children, text, position = 'top' }: TooltipPro
     top: `top-full border-t-gray-900 dark:border-t-gray-700 ${arrowAlignmentClasses}`,
     bottom: `bottom-full border-b-gray-900 dark:border-b-gray-700 border-x-4 border-x-transparent border-b-4 ${arrowAlignmentClasses}`,
     left: 'left-full top-1/2 -translate-y-1/2 border-l-gray-900 dark:border-l-gray-700 border-y-4 border-y-transparent border-l-4',
-    right: 'right-full top-1/2 -translate-y-1/2 border-r-gray-900 dark:border-r-gray-700 border-y-4 border-y-transparent border-r-4',
+    right:
+      'right-full top-1/2 -translate-y-1/2 border-r-gray-900 dark:border-r-gray-700 border-y-4 border-y-transparent border-r-4',
   };
 
   return (
@@ -63,7 +64,9 @@ export default function Tooltip({ children, text, position = 'top' }: TooltipPro
           className={`absolute z-[9999] px-3 py-1.5 text-xs font-medium text-white bg-gray-900 rounded-lg shadow-lg whitespace-nowrap dark:bg-gray-700 transition-opacity duration-200 ${positionClasses[position]} ${alignmentClasses}`}
         >
           {text}
-          <span className={`absolute w-0 h-0 border-4 border-transparent ${arrowClasses[position]}`}></span>
+          <span
+            className={`absolute w-0 h-0 border-4 border-transparent ${arrowClasses[position]}`}
+          ></span>
         </div>
       )}
     </div>

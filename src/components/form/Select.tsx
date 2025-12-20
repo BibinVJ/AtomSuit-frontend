@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from 'react';
 import { ChevronsUpDown, Check } from 'lucide-react';
 
 interface Option {
@@ -22,17 +22,17 @@ interface SelectProps {
 
 const Select: React.FC<SelectProps> = ({
   options,
-  placeholder = "Select an option",
+  placeholder = 'Select an option',
   onChange,
-  className = "",
-  defaultValue = "",
+  className = '',
+  defaultValue = '',
   showPlaceholder = true,
   error = false,
-  hint = "",
+  hint = '',
   searchable = true,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
   const [selectedValue, setSelectedValue] = useState<string>(defaultValue);
   const [focusedOptionIndex, setFocusedOptionIndex] = useState<number>(-1);
   const selectRef = useRef<HTMLDivElement>(null);
@@ -59,9 +59,9 @@ const Select: React.FC<SelectProps> = ({
   };
 
   useEffect(() => {
-    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside);
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
 
@@ -72,9 +72,7 @@ const Select: React.FC<SelectProps> = ({
   };
 
   const filteredOptions = searchable
-    ? options.filter(option =>
-        option.label.toLowerCase().includes(searchTerm.toLowerCase())
-      )
+    ? options.filter((option) => option.label.toLowerCase().includes(searchTerm.toLowerCase()))
     : options;
 
   useEffect(() => {
@@ -82,7 +80,7 @@ const Select: React.FC<SelectProps> = ({
       const optionElement = optionsListRef.current.children[focusedOptionIndex] as HTMLLIElement;
       if (optionElement) {
         optionElement.scrollIntoView({
-          block: "nearest",
+          block: 'nearest',
         });
       }
     }
@@ -92,25 +90,25 @@ const Select: React.FC<SelectProps> = ({
     if (!isOpen) return;
 
     switch (e.key) {
-      case "ArrowDown":
+      case 'ArrowDown':
         e.preventDefault();
-        setFocusedOptionIndex(prevIndex =>
+        setFocusedOptionIndex((prevIndex) =>
           prevIndex < filteredOptions.length - 1 ? prevIndex + 1 : 0
         );
         break;
-      case "ArrowUp":
+      case 'ArrowUp':
         e.preventDefault();
-        setFocusedOptionIndex(prevIndex =>
+        setFocusedOptionIndex((prevIndex) =>
           prevIndex > 0 ? prevIndex - 1 : filteredOptions.length - 1
         );
         break;
-      case "Enter":
+      case 'Enter':
         e.preventDefault();
         if (focusedOptionIndex !== -1) {
           handleSelect(filteredOptions[focusedOptionIndex].value);
         }
         break;
-      case "Escape":
+      case 'Escape':
         setIsOpen(false);
         break;
       default:
@@ -118,19 +116,18 @@ const Select: React.FC<SelectProps> = ({
     }
   };
 
-  const selectedLabel = options.find(option => option.value === selectedValue)?.label || placeholder;
+  const selectedLabel =
+    options.find((option) => option.value === selectedValue)?.label || placeholder;
 
   return (
     <div className={`relative ${className}`} ref={selectRef} onKeyDown={handleKeyDown} tabIndex={0}>
       <div
         className={`h-11 w-full flex items-center justify-between rounded-lg border bg-transparent px-4 py-2.5 text-sm shadow-theme-xs cursor-pointer ${
-          error
-            ? "border-red-500"
-            : "border-gray-300 dark:border-gray-700"
+          error ? 'border-red-500' : 'border-gray-300 dark:border-gray-700'
         }`}
         onClick={() => setIsOpen(!isOpen)}
       >
-        <span className={selectedValue ? "text-gray-800 dark:text-white/90" : "text-gray-400"}>
+        <span className={selectedValue ? 'text-gray-800 dark:text-white/90' : 'text-gray-400'}>
           {selectedLabel}
         </span>
         <ChevronsUpDown className="h-4 w-4 text-gray-400" />
@@ -151,17 +148,13 @@ const Select: React.FC<SelectProps> = ({
           )}
           <ul className="max-h-60 overflow-y-auto" ref={optionsListRef}>
             {showPlaceholder && !searchTerm && (
-              <li
-                className="px-4 py-2 text-sm text-gray-500 cursor-default"
-              >
-                {placeholder}
-              </li>
+              <li className="px-4 py-2 text-sm text-gray-500 cursor-default">{placeholder}</li>
             )}
             {filteredOptions.map((option, index) => (
               <li
                 key={option.value}
                 className={`flex items-center justify-between px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer ${
-                  index === focusedOptionIndex ? "bg-gray-100 dark:bg-gray-700" : ""
+                  index === focusedOptionIndex ? 'bg-gray-100 dark:bg-gray-700' : ''
                 }`}
                 onClick={() => handleSelect(option.value)}
                 onMouseMove={() => setFocusedOptionIndex(index)}
@@ -177,7 +170,7 @@ const Select: React.FC<SelectProps> = ({
         </div>
       )}
       {hint && (
-        <span className={`mt-1.5 block text-xs ${error ? "text-red-500" : "text-gray-500"}`}>
+        <span className={`mt-1.5 block text-xs ${error ? 'text-red-500' : 'text-gray-500'}`}>
           {hint}
         </span>
       )}

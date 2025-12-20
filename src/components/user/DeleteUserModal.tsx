@@ -12,8 +12,13 @@ interface Props {
   force?: boolean;
 }
 
-export default function DeleteUserModal({ isOpen, onClose, onUserDeleted, user, force = false }: Props) {
-
+export default function DeleteUserModal({
+  isOpen,
+  onClose,
+  onUserDeleted,
+  user,
+  force = false,
+}: Props) {
   const handleDelete = async () => {
     try {
       await deleteUser(user.id, force);
@@ -53,7 +58,9 @@ export default function DeleteUserModal({ isOpen, onClose, onUserDeleted, user, 
             {force ? 'Permanently Delete User' : 'Delete User'}
           </h4>
           <p className="mb-6 text-gray-500 dark:text-gray-400">
-            Are you sure you want to {force ? 'permanently ' : ''}delete the user &quot;{user?.name}&quot;? {force ? 'This action cannot be undone.' : 'You can restore it later from the trash.'}
+            Are you sure you want to {force ? 'permanently ' : ''}delete the user &quot;{user?.name}
+            &quot;?{' '}
+            {force ? 'This action cannot be undone.' : 'You can restore it later from the trash.'}
           </p>
           <div className="flex items-center justify-center gap-4">
             <Button type="button" variant="outline" onClick={onClose}>

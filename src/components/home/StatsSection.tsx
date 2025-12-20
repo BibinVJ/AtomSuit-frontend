@@ -4,49 +4,52 @@ const StatsSection = () => {
   const stats = [
     {
       icon: Building2,
-      value: "10,000+",
-      label: "Active Companies",
-      description: "Businesses trust us worldwide"
+      value: '10,000+',
+      label: 'Active Companies',
+      description: 'Businesses trust us worldwide',
     },
     {
       icon: Users,
-      value: "500K+",
-      label: "Daily Users",
-      description: "Processing millions of transactions"
+      value: '500K+',
+      label: 'Daily Users',
+      description: 'Processing millions of transactions',
     },
     {
       icon: Globe,
-      value: "150+",
-      label: "Countries",
-      description: "Global presence and support"
+      value: '150+',
+      label: 'Countries',
+      description: 'Global presence and support',
     },
     {
       icon: TrendingUp,
-      value: "99.9%",
-      label: "Uptime",
-      description: "Reliable and always available"
-    }
+      value: '99.9%',
+      label: 'Uptime',
+      description: 'Reliable and always available',
+    },
   ];
 
   const testimonials = [
     {
-      quote: "Atom Suit transformed our operations completely. We've seen a 40% increase in efficiency since implementation.",
-      author: "Sarah Johnson",
-      role: "Operations Director",
-      company: "TechFlow Industries"
+      quote:
+        "Atom Suit transformed our operations completely. We've seen a 40% increase in efficiency since implementation.",
+      author: 'Sarah Johnson',
+      role: 'Operations Director',
+      company: 'TechFlow Industries',
     },
     {
-      quote: "The best ERP solution we've used. Intuitive interface and powerful features that scale with our growth.",
-      author: "Michael Chen",
-      role: "CEO",
-      company: "GreenTech Solutions"
+      quote:
+        "The best ERP solution we've used. Intuitive interface and powerful features that scale with our growth.",
+      author: 'Michael Chen',
+      role: 'CEO',
+      company: 'GreenTech Solutions',
     },
     {
-      quote: "Outstanding customer support and a platform that just works. Highly recommended for any growing business.",
-      author: "Emily Rodriguez",
-      role: "Finance Manager",
-      company: "Retail Plus"
-    }
+      quote:
+        'Outstanding customer support and a platform that just works. Highly recommended for any growing business.',
+      author: 'Emily Rodriguez',
+      role: 'Finance Manager',
+      company: 'Retail Plus',
+    },
   ];
 
   return (
@@ -54,28 +57,21 @@ const StatsSection = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Stats Section */}
         <div className="text-center mb-20">
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">
-            Trusted by Industry Leaders
-          </h2>
+          <h2 className="text-4xl font-bold text-gray-900 mb-4">Trusted by Industry Leaders</h2>
           <p className="text-xl text-gray-600 mb-12">
-            Join thousands of successful businesses that have transformed their operations with Atom Suit
+            Join thousands of successful businesses that have transformed their operations with Atom
+            Suit
           </p>
-          
+
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {stats.map((stat, index) => (
               <div key={index} className="text-center group">
                 <div className="w-16 h-16 bg-brand-100 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-brand-200 transition-colors">
                   <stat.icon className="h-8 w-8 text-brand-600" />
                 </div>
-                <div className="text-4xl font-bold text-gray-900 mb-2">
-                  {stat.value}
-                </div>
-                <div className="text-lg font-semibold text-gray-700 mb-1">
-                  {stat.label}
-                </div>
-                <div className="text-sm text-gray-500">
-                  {stat.description}
-                </div>
+                <div className="text-4xl font-bold text-gray-900 mb-2">{stat.value}</div>
+                <div className="text-lg font-semibold text-gray-700 mb-1">{stat.label}</div>
+                <div className="text-sm text-gray-500">{stat.description}</div>
               </div>
             ))}
           </div>
@@ -84,14 +80,12 @@ const StatsSection = () => {
         {/* Testimonials Section */}
         <div className="bg-gray-50 rounded-3xl p-8 lg:p-12">
           <div className="text-center mb-12">
-            <h3 className="text-3xl font-bold text-gray-900 mb-4">
-              What Our Customers Say
-            </h3>
+            <h3 className="text-3xl font-bold text-gray-900 mb-4">What Our Customers Say</h3>
             <p className="text-lg text-gray-600">
               Real feedback from businesses using Atom Suit ERP
             </p>
           </div>
-          
+
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {testimonials.map((testimonial, index) => (
               <div key={index} className="bg-white rounded-2xl p-6 shadow-theme-sm">
@@ -124,9 +118,7 @@ const StatsSection = () => {
 
         {/* Trust Badges */}
         <div className="mt-20 text-center">
-          <p className="text-lg font-semibold text-gray-900 mb-8">
-            Certified and Compliant
-          </p>
+          <p className="text-lg font-semibold text-gray-900 mb-8">Certified and Compliant</p>
           <div className="flex flex-wrap justify-center items-center gap-8 opacity-60">
             <div className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-gray-300 rounded"></div>

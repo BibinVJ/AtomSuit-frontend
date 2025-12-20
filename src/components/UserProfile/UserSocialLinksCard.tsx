@@ -1,15 +1,12 @@
-import { User } from "../../types";
-import { Pencil } from "lucide-react";
+import { User } from '../../types';
+import { Pencil } from 'lucide-react';
 
 interface UserSocialLinksCardProps {
   user: User | null;
   onEdit: () => void;
 }
 
-export default function UserSocialLinksCard({
-  user,
-  onEdit,
-}: UserSocialLinksCardProps) {
+export default function UserSocialLinksCard({ user, onEdit }: UserSocialLinksCardProps) {
   const getSocialLink = (platform: string) => {
     if (!user?.social_links || !Array.isArray(user.social_links)) {
       return undefined;
@@ -30,25 +27,23 @@ export default function UserSocialLinksCard({
                 Facebook
               </p>
               <a
-                href={getSocialLink("facebook") || "#"}
+                href={getSocialLink('facebook') || '#'}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-sm font-medium text-gray-800 dark:text-white/90"
               >
-                {getSocialLink("facebook") || "-"}
+                {getSocialLink('facebook') || '-'}
               </a>
             </div>
             <div>
-              <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">
-                X
-              </p>
+              <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">X</p>
               <a
-                href={getSocialLink("x") || "#"}
+                href={getSocialLink('x') || '#'}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-sm font-medium text-gray-800 dark:text-white/90"
               >
-                {getSocialLink("x") || "-"}
+                {getSocialLink('x') || '-'}
               </a>
             </div>
             <div>
@@ -56,12 +51,12 @@ export default function UserSocialLinksCard({
                 LinkedIn
               </p>
               <a
-                href={getSocialLink("linkedin") || "#"}
+                href={getSocialLink('linkedin') || '#'}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-sm font-medium text-gray-800 dark:text-white/90"
               >
-                {getSocialLink("linkedin") || "-"}
+                {getSocialLink('linkedin') || '-'}
               </a>
             </div>
           </div>

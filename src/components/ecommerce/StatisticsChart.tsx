@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import dynamic from "next/dynamic";
-import { ApexOptions } from "apexcharts";
-import ChartTab from "../common/ChartTab";
-import { useState, useEffect } from "react";
+import dynamic from 'next/dynamic';
+import { ApexOptions } from 'apexcharts';
+import ChartTab from '../common/ChartTab';
+import { useState, useEffect } from 'react';
 
 // Dynamically import Chart with no SSR
-const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
+const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
-type Period = "monthly" | "quarterly" | "annually";
+type Period = 'monthly' | 'quarterly' | 'annually';
 
 interface StatisticsChartProps {
   data: {
@@ -19,7 +19,7 @@ interface StatisticsChartProps {
 
 export default function StatisticsChart({ data }: StatisticsChartProps) {
   const [isClient, setIsClient] = useState(false);
-  const [period, setPeriod] = useState<Period>("monthly");
+  const [period, setPeriod] = useState<Period>('monthly');
   const [chartSeries, setChartSeries] = useState<{ name: string; data: number[] }[]>([]);
   const [chartOptions, setChartOptions] = useState<ApexOptions>({});
 
@@ -37,16 +37,32 @@ export default function StatisticsChart({ data }: StatisticsChartProps) {
       let purchasesData: number[] = [];
 
       if (period === 'annually') {
-        const allDates = [...new Set([...sales.map((s) => s.date), ...purchases.map((p) => p.date)])].sort();
+        const allDates = [
+          ...new Set([...sales.map((s) => s.date), ...purchases.map((p) => p.date)]),
+        ].sort();
         const salesMap = new Map(sales.map((s) => [s.date, s.total]));
         const purchasesMap = new Map(purchases.map((p) => [p.date, p.total]));
-        
-        categories = allDates.map(date => new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
-        salesData = allDates.map(date => salesMap.get(date) || 0);
-        purchasesData = allDates.map(date => purchasesMap.get(date) || 0);
 
+        categories = allDates.map((date) =>
+          new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+        );
+        salesData = allDates.map((date) => salesMap.get(date) || 0);
+        purchasesData = allDates.map((date) => purchasesMap.get(date) || 0);
       } else if (period === 'monthly') {
-        categories = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        categories = [
+          'Jan',
+          'Feb',
+          'Mar',
+          'Apr',
+          'May',
+          'Jun',
+          'Jul',
+          'Aug',
+          'Sep',
+          'Oct',
+          'Nov',
+          'Dec',
+        ];
         const monthlySales: number[] = new Array(12).fill(0);
         const monthlyPurchases: number[] = new Array(12).fill(0);
 
@@ -60,9 +76,8 @@ export default function StatisticsChart({ data }: StatisticsChartProps) {
         });
         salesData = monthlySales;
         purchasesData = monthlyPurchases;
-
       } else if (period === 'quarterly') {
-        categories = ["Q1", "Q2", "Q3", "Q4"];
+        categories = ['Q1', 'Q2', 'Q3', 'Q4'];
         const quarterlySales: number[] = new Array(4).fill(0);
         const quarterlyPurchases: number[] = new Array(4).fill(0);
 
@@ -81,32 +96,32 @@ export default function StatisticsChart({ data }: StatisticsChartProps) {
       }
 
       setChartSeries([
-        { name: "Sales", data: salesData },
-        { name: "Purchases", data: purchasesData },
+        { name: 'Sales', data: salesData },
+        { name: 'Purchases', data: purchasesData },
       ]);
 
       setChartOptions({
         legend: {
           show: true,
-          position: "top",
-          horizontalAlign: "left",
-          fontFamily: "Outfit, sans-serif",
+          position: 'top',
+          horizontalAlign: 'left',
+          fontFamily: 'Outfit, sans-serif',
         },
-        colors: ["#465FFF", "#9CB9FF"],
+        colors: ['#465FFF', '#9CB9FF'],
         chart: {
-          fontFamily: "Outfit, sans-serif",
+          fontFamily: 'Outfit, sans-serif',
           height: '100%',
-          type: "area",
+          type: 'area',
           toolbar: { show: false },
         },
-        stroke: { curve: "smooth", width: [2, 2] },
+        stroke: { curve: 'smooth', width: [2, 2] },
         fill: {
-          type: "gradient",
+          type: 'gradient',
           gradient: { opacityFrom: 0.55, opacityTo: 0 },
         },
         markers: {
           size: 0,
-          strokeColors: "#fff",
+          strokeColors: '#fff',
           strokeWidth: 2,
           hover: { size: 6 },
         },
@@ -115,16 +130,16 @@ export default function StatisticsChart({ data }: StatisticsChartProps) {
           yaxis: { lines: { show: true } },
         },
         dataLabels: { enabled: false },
-        tooltip: { enabled: true, x: { format: "dd MMM yyyy" } },
+        tooltip: { enabled: true, x: { format: 'dd MMM yyyy' } },
         xaxis: {
-          type: "category",
+          type: 'category',
           categories: categories,
           axisBorder: { show: false },
           axisTicks: { show: false },
           tooltip: { enabled: false },
         },
         yaxis: {
-          labels: { style: { fontSize: "12px", colors: ["#6B7280"] } },
+          labels: { style: { fontSize: '12px', colors: ['#6B7280'] } },
         },
       });
     };
@@ -138,9 +153,7 @@ export default function StatisticsChart({ data }: StatisticsChartProps) {
       <div className="flex flex-col h-full rounded-2xl border border-gray-200 custom-card-bg p-5 dark:border-gray-800">
         <div className="flex flex-col gap-5 mb-6 sm:flex-row sm:justify-between flex-shrink-0">
           <div className="w-full">
-            <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">
-              Statistics
-            </h3>
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">Statistics</h3>
             <p className="mt-1 text-gray-500 text-theme-sm dark:text-gray-400">
               Sale and purchase comparison chart
             </p>
@@ -160,9 +173,7 @@ export default function StatisticsChart({ data }: StatisticsChartProps) {
     <div className="flex flex-col h-full rounded-2xl border border-gray-200 custom-card-bg p-5 dark:border-gray-800">
       <div className="flex flex-col gap-5 mb-6 sm:flex-row sm:justify-between flex-shrink-0">
         <div className="w-full">
-          <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">
-            Statistics
-          </h3>
+          <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">Statistics</h3>
           <p className="mt-1 text-gray-500 text-theme-sm dark:text-gray-400">
             Sale and purchase comparison chart
           </p>

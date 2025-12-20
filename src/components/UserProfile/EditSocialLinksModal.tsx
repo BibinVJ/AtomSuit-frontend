@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { Modal } from "../ui/modal";
-import Button from "../ui/button/Button";
-import Input from "../form/input/InputField";
-import Label from "../form/Label";
-import { User } from "../../types";
-import { updateSocialLinks } from "../../services/ProfileService";
-import { useAuth } from "../../hooks/useAuth";
-import { toast } from "sonner";
-import { isApiError } from "../../utils/errors";
+import { useState, useEffect } from 'react';
+import { Modal } from '../ui/modal';
+import Button from '../ui/button/Button';
+import Input from '../form/input/InputField';
+import Label from '../form/Label';
+import { User } from '../../types';
+import { updateSocialLinks } from '../../services/ProfileService';
+import { useAuth } from '../../hooks/useAuth';
+import { toast } from 'sonner';
+import { isApiError } from '../../utils/errors';
 
 interface EditSocialLinksModalProps {
   isOpen: boolean;
@@ -23,35 +23,27 @@ interface SocialLinksData {
   linkedin: string;
 }
 
-export default function EditSocialLinksModal({
-  isOpen,
-  onClose,
-  user,
-}: EditSocialLinksModalProps) {
+export default function EditSocialLinksModal({ isOpen, onClose, user }: EditSocialLinksModalProps) {
   const { fetchProfile } = useAuth();
   const [formData, setFormData] = useState<SocialLinksData>({
-    facebook: "",
-    x: "",
-    linkedin: "",
+    facebook: '',
+    x: '',
+    linkedin: '',
   });
 
   useEffect(() => {
     if (user && user.social_links && Array.isArray(user.social_links)) {
       setFormData({
-        facebook:
-          user.social_links.find((link) => link.platform === "facebook")?.url ||
-          "",
-        x: user.social_links.find((link) => link.platform === "x")?.url || "",
-        linkedin:
-          user.social_links.find((link) => link.platform === "linkedin")
-            ?.url || "",
+        facebook: user.social_links.find((link) => link.platform === 'facebook')?.url || '',
+        x: user.social_links.find((link) => link.platform === 'x')?.url || '',
+        linkedin: user.social_links.find((link) => link.platform === 'linkedin')?.url || '',
       });
     } else {
       // Reset form data if user doesn't have social_links
       setFormData({
-        facebook: "",
-        x: "",
-        linkedin: "",
+        facebook: '',
+        x: '',
+        linkedin: '',
       });
     }
   }, [user]);
@@ -76,7 +68,7 @@ export default function EditSocialLinksModal({
       if (isApiError(error)) {
         toast.error(error.response?.data?.message);
       } else {
-        toast.error("An unexpected error occurred.");
+        toast.error('An unexpected error occurred.');
       }
     }
   };
@@ -97,11 +89,7 @@ export default function EditSocialLinksModal({
             <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
               <div>
                 <Label>Facebook</Label>
-                <Input
-                  name="facebook"
-                  value={formData.facebook}
-                  onChange={handleChange}
-                />
+                <Input name="facebook" value={formData.facebook} onChange={handleChange} />
               </div>
               <div>
                 <Label>X</Label>
@@ -109,11 +97,7 @@ export default function EditSocialLinksModal({
               </div>
               <div>
                 <Label>LinkedIn</Label>
-                <Input
-                  name="linkedin"
-                  value={formData.linkedin}
-                  onChange={handleChange}
-                />
+                <Input name="linkedin" value={formData.linkedin} onChange={handleChange} />
               </div>
             </div>
           </div>

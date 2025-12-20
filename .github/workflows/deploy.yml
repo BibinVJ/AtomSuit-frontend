@@ -41,7 +41,7 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          source: ".next,package.json,package-lock.json,public,next.config.js,.env"
+          source: '.next,package.json,package-lock.json,public,next.config.js,.env'
           target: ${{ github.ref == 'refs/heads/main' && '/var/www/atomsuit/production/frontend' || '/var/www/atomsuit/staging/frontend' }}
           strip_components: 0
 

@@ -1,14 +1,14 @@
-                                                                                                "use client";
+'use client';
 
-import { useEffect, useRef, useState } from "react";
-import Image from "next/image";
+import { useEffect, useRef, useState } from 'react';
+import Image from 'next/image';
 
-import Link from "next/link";
-import { useSidebar } from "../hooks/useSidebar";
-import { ThemeToggleButton } from "../components/common/ThemeToggleButton";
+import Link from 'next/link';
+import { useSidebar } from '../hooks/useSidebar';
+import { ThemeToggleButton } from '../components/common/ThemeToggleButton';
 // import NotificationDropdown from "../components/header/NotificationDropdown";
-import UserDropdown from "../components/header/UserDropdown";
-import Tooltip from "../components/ui/tooltip/Tooltip";
+import UserDropdown from '../components/header/UserDropdown';
+import Tooltip from '../components/ui/tooltip/Tooltip';
 
 const AppHeader: React.FC = () => {
   const [isApplicationMenuOpen, setApplicationMenuOpen] = useState(false);
@@ -31,16 +31,16 @@ const AppHeader: React.FC = () => {
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if ((event.metaKey || event.ctrlKey) && event.key === "k") {
+      if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
         event.preventDefault();
         inputRef.current?.focus();
       }
     };
 
-    document.addEventListener("keydown", handleKeyDown);
+    document.addEventListener('keydown', handleKeyDown);
 
     return () => {
-      document.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener('keydown', handleKeyDown);
     };
   }, []);
 
@@ -156,7 +156,7 @@ const AppHeader: React.FC = () => {
         </div>
         <div
           className={`${
-            isApplicationMenuOpen ? "flex" : "hidden"
+            isApplicationMenuOpen ? 'flex' : 'hidden'
           } items-center justify-between w-full gap-4 px-4 py-3 lg:flex shadow-theme-md lg:justify-end lg:px-0 lg:py-4 lg:shadow-none`}
         >
           <div className="flex items-center gap-2 2xsm:gap-3">

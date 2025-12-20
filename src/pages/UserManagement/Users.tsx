@@ -1,5 +1,4 @@
-"use client";
-
+'use client';
 
 import { useEffect, useState } from 'react';
 import PageBreadcrumb from '../../components/common/PageBreadCrumb';
@@ -61,7 +60,7 @@ export default function Users() {
         search: debouncedSearchTerm,
         role: selectedRole,
         status: selectedStatus,
-        trashed: viewMode === 'trashed' ? 'only' : undefined
+        trashed: viewMode === 'trashed' ? 'only' : undefined,
       });
 
       setUsers(response.data);
@@ -74,11 +73,18 @@ export default function Users() {
         setCurrentPage(meta.current_page || 1);
 
         // Use meta values if available, otherwise fallback to range values
-        setFrom(meta.from !== undefined ? meta.from : (debouncedRangeFrom !== '' ? Number(debouncedRangeFrom) : 0));
-        setTo(meta.to !== undefined ? meta.to : (debouncedRangeTo !== '' ? Number(debouncedRangeTo) : 0));
+        setFrom(
+          meta.from !== undefined
+            ? meta.from
+            : debouncedRangeFrom !== ''
+              ? Number(debouncedRangeFrom)
+              : 0
+        );
+        setTo(
+          meta.to !== undefined ? meta.to : debouncedRangeTo !== '' ? Number(debouncedRangeTo) : 0
+        );
         setTotal(meta.total || 0);
       }
-
     } catch (error) {
       console.error('Error fetching users:', error);
     }
@@ -99,7 +105,18 @@ export default function Users() {
 
   useEffect(() => {
     fetchUsers(currentPage, perPage, sortBy, sortDirection);
-  }, [currentPage, perPage, sortBy, sortDirection, selectedRole, selectedStatus, debouncedSearchTerm, debouncedRangeFrom, debouncedRangeTo, viewMode]);
+  }, [
+    currentPage,
+    perPage,
+    sortBy,
+    sortDirection,
+    selectedRole,
+    selectedStatus,
+    debouncedSearchTerm,
+    debouncedRangeFrom,
+    debouncedRangeTo,
+    viewMode,
+  ]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -121,10 +138,7 @@ export default function Users() {
 
   return (
     <>
-      <PageMeta
-        title="Users"
-        description="List of users"
-      />
+      <PageMeta title="Users" description="List of users" />
       <PageBreadcrumb pageTitle="Users" />
 
       <div className="space-y-6">
@@ -218,7 +232,11 @@ export default function Users() {
           />
         </ComponentCard>
       </div>
-      <AddUserModal isOpen={isOpen} onClose={closeModal} onUserAdded={() => fetchUsers(1, perPage)} />
+      <AddUserModal
+        isOpen={isOpen}
+        onClose={closeModal}
+        onUserAdded={() => fetchUsers(1, perPage)}
+      />
     </>
   );
 }

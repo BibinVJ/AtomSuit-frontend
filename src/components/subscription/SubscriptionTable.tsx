@@ -1,23 +1,17 @@
-"use client";
+'use client';
 
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHeader,
-  TableRow,
-} from "../ui/table";
-import { useState } from "react";
-import Badge from "../ui/badge/Badge";
-import ViewSubscriptionModal from "./ViewSubscriptionModal";
-import CancelSubscriptionModal from "./CancelSubscriptionModal";
+import { Table, TableBody, TableCell, TableHeader, TableRow } from '../ui/table';
+import { useState } from 'react';
+import Badge from '../ui/badge/Badge';
+import ViewSubscriptionModal from './ViewSubscriptionModal';
+import CancelSubscriptionModal from './CancelSubscriptionModal';
 import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide, Eye, XCircle } from 'lucide-react';
-import Button from "../ui/button/Button";
-import Tooltip from "../ui/tooltip/Tooltip";
+import Button from '../ui/button/Button';
+import Tooltip from '../ui/tooltip/Tooltip';
 
 import { Subscription } from '../../types';
-import { usePermissions } from "../../hooks/usePermissions";
-import { useSettings } from "../../hooks/useSettings";
+import { usePermissions } from '../../hooks/usePermissions';
+import { useSettings } from '../../hooks/useSettings';
 import { getSubscription } from '../../services/SubscriptionService';
 import { toast } from 'sonner';
 
@@ -31,7 +25,15 @@ interface Props {
   perPage: number;
 }
 
-export default function SubscriptionTable({ data, onAction, onSort, sortBy, sortDirection, currentPage, perPage }: Props) {
+export default function SubscriptionTable({
+  data,
+  onAction,
+  onSort,
+  sortBy,
+  sortDirection,
+  currentPage,
+  perPage,
+}: Props) {
   const { hasPermission } = usePermissions();
   const { formatCurrency, formatDate: globalFormatDate } = useSettings();
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
@@ -79,13 +81,29 @@ export default function SubscriptionTable({ data, onAction, onSort, sortBy, sort
 
   const getStatusBadge = (subscription: Subscription) => {
     if (subscription.is_canceled) {
-      return <Badge size="sm" color="error">Canceled</Badge>;
+      return (
+        <Badge size="sm" color="error">
+          Canceled
+        </Badge>
+      );
     }
     if (subscription.is_on_trial) {
-      return <Badge size="sm" color="warning">Trial</Badge>;
+      return (
+        <Badge size="sm" color="warning">
+          Trial
+        </Badge>
+      );
     }
-    return <Badge size="sm" color="success">Active</Badge>;
-    return <Badge size="sm" color="secondary">Inactive</Badge>;
+    return (
+      <Badge size="sm" color="success">
+        Active
+      </Badge>
+    );
+    return (
+      <Badge size="sm" color="secondary">
+        Inactive
+      </Badge>
+    );
   };
 
   return (
@@ -94,14 +112,56 @@ export default function SubscriptionTable({ data, onAction, onSort, sortBy, sort
         <Table>
           <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
             <TableRow>
-              <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">#</TableCell>
-              <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400" onClick={() => onSort('name')}>Subscription {renderSortIcon('name')}</TableCell>
-              <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">Tenant</TableCell>
-              <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">Plan</TableCell>
-              <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">Price</TableCell>
-              <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400" onClick={() => onSort('created_at')}>Start Date {renderSortIcon('created_at')}</TableCell>
-              <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">Status</TableCell>
-              <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">Actions</TableCell>
+              <TableCell
+                isHeader
+                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+              >
+                #
+              </TableCell>
+              <TableCell
+                isHeader
+                className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400"
+                onClick={() => onSort('name')}
+              >
+                Subscription {renderSortIcon('name')}
+              </TableCell>
+              <TableCell
+                isHeader
+                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+              >
+                Tenant
+              </TableCell>
+              <TableCell
+                isHeader
+                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+              >
+                Plan
+              </TableCell>
+              <TableCell
+                isHeader
+                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+              >
+                Price
+              </TableCell>
+              <TableCell
+                isHeader
+                className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400"
+                onClick={() => onSort('created_at')}
+              >
+                Start Date {renderSortIcon('created_at')}
+              </TableCell>
+              <TableCell
+                isHeader
+                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+              >
+                Status
+              </TableCell>
+              <TableCell
+                isHeader
+                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+              >
+                Actions
+              </TableCell>
             </TableRow>
           </TableHeader>
 
@@ -114,8 +174,12 @@ export default function SubscriptionTable({ data, onAction, onSort, sortBy, sort
                   </p>
                 </TableCell>
                 <TableCell className="px-4 py-3 text-start">
-                  <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">{subscription.name}</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">{subscription.stripe_id}</p>
+                  <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
+                    {subscription.name}
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    {subscription.stripe_id}
+                  </p>
                 </TableCell>
                 <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
                   {subscription.tenant?.name || 'N/A'}
@@ -143,7 +207,7 @@ export default function SubscriptionTable({ data, onAction, onSort, sortBy, sort
                         <Eye className="w-4 h-4" />
                       </Button>
                     </Tooltip>
-                    {hasPermission("delete-subscription") && !subscription.is_canceled && (
+                    {hasPermission('delete-subscription') && !subscription.is_canceled && (
                       <Tooltip text="Cancel">
                         <Button
                           size="xs"

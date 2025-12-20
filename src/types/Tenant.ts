@@ -18,7 +18,6 @@ export interface Tenant {
   updated_at?: string;
 }
 
-
 export interface TenantApiResponse {
   message: string;
   error: boolean;

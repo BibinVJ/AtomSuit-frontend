@@ -1,6 +1,6 @@
-"use client";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+'use client';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 interface BreadcrumbProps {
   pageTitle: string;
@@ -8,24 +8,31 @@ interface BreadcrumbProps {
   backButton?: boolean;
 }
 
-const PageBreadcrumb: React.FC<BreadcrumbProps> = ({ pageTitle, breadcrumbs, backButton = false }) => {
+const PageBreadcrumb: React.FC<BreadcrumbProps> = ({
+  pageTitle,
+  breadcrumbs,
+  backButton = false,
+}) => {
   const router = useRouter();
 
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
       <div className="flex items-center gap-4">
         {backButton && (
-          <button onClick={() => router.back()} className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 dark:text-gray-400">
+          <button
+            onClick={() => router.back()}
+            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 dark:text-gray-400"
+          >
             <svg className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
+              <path
+                fillRule="evenodd"
+                d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+                clipRule="evenodd"
+              />
             </svg>
           </button>
         )}
-        <h2
-          className="text-xl font-semibold text-gray-800 dark:text-white/90"
-        >
-          {pageTitle}
-        </h2>
+        <h2 className="text-xl font-semibold text-gray-800 dark:text-white/90">{pageTitle}</h2>
       </div>
 
       <nav>
@@ -39,7 +46,10 @@ const PageBreadcrumb: React.FC<BreadcrumbProps> = ({ pageTitle, breadcrumbs, bac
             </Link>
           </li>
           {breadcrumbs?.map((breadcrumb, index) => (
-            <li key={index} className="flex items-center gap-1.5 text-sm text-gray-800 dark:text-gray-400">
+            <li
+              key={index}
+              className="flex items-center gap-1.5 text-sm text-gray-800 dark:text-gray-400"
+            >
               <svg
                 className="stroke-current"
                 width="17"

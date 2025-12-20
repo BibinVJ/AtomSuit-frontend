@@ -6,16 +6,16 @@ export function middleware(request: NextRequest) {
 
   // Public routes that don't require authentication
   const publicRoutes = ['/signin', '/signup', '/_next', '/api'];
-  
+
   // Check if current path is public
-  const isPublicRoute = publicRoutes.some(route => pathname.startsWith(route));
-  
+  const isPublicRoute = publicRoutes.some((route) => pathname.startsWith(route));
+
   // For now, let the client-side handle authentication checks
   // since we're using localStorage/sessionStorage for tokens
   if (isPublicRoute) {
     return NextResponse.next();
   }
-  
+
   // Let all requests through - client-side AuthProvider will handle redirects
   return NextResponse.next();
 }

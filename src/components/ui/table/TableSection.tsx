@@ -1,6 +1,6 @@
-import { ReactNode } from "react";
-import { Filter } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { ReactNode } from 'react';
+import { Filter } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 interface Props {
   title: string;
@@ -28,9 +28,7 @@ export default function TableSection({
   return (
     <div className="overflow-hidden rounded-2xl border border-gray-200 custom-card-bg px-4 pb-3 pt-4 dark:border-gray-800 sm:px-6 h-full flex flex-col">
       <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between flex-shrink-0">
-        <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">
-          {title}
-        </h3>
+        <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">{title}</h3>
 
         {(showFilter || showSeeAll) && (
           <div className="flex items-center gap-3">

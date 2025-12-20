@@ -1,5 +1,4 @@
-"use client";
-
+'use client';
 
 import { useState, useEffect } from 'react';
 import { Modal } from '../ui/modal';
@@ -27,13 +26,25 @@ export default function AddUserModal({ isOpen, onClose, onUserAdded }: Props) {
   const [password, setPassword] = useState('');
   const [roleId, setRoleId] = useState<number | undefined>(undefined);
   const [roles, setRoles] = useState<Role[]>([]);
-  const [errors, setErrors] = useState({ name: '', email: '', phone: '', password: '', role_id: '' });
+  const [errors, setErrors] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    password: '',
+    role_id: '',
+  });
 
   useEffect(() => {
     if (isOpen) {
       const fetchRoles = async () => {
         try {
-          const rolesData = await getRoles({ page: 1, limit: 10, sortCol: 'created_at', sortDir: 'desc', unpaginated: true });
+          const rolesData = await getRoles({
+            page: 1,
+            limit: 10,
+            sortCol: 'created_at',
+            sortDir: 'desc',
+            unpaginated: true,
+          });
           if (rolesData && Array.isArray(rolesData.data)) {
             setRoles(rolesData.data);
           } else {
@@ -98,7 +109,22 @@ export default function AddUserModal({ isOpen, onClose, onUserAdded }: Props) {
     }
 
     try {
-      await addUser({ name, email, phone, password, role_id: roleId, profile_image: null, alternate_email: null, alternate_phone: null, id_proof_type: null, id_proof_number: null, dob: null, gender: null, addresses: [], social_links: [] });
+      await addUser({
+        name,
+        email,
+        phone,
+        password,
+        role_id: roleId,
+        profile_image: null,
+        alternate_email: null,
+        alternate_phone: null,
+        id_proof_type: null,
+        id_proof_number: null,
+        dob: null,
+        gender: null,
+        addresses: [],
+        social_links: [],
+      });
       onUserAdded();
       toast.success('User added successfully');
       handleClose();
@@ -121,7 +147,7 @@ export default function AddUserModal({ isOpen, onClose, onUserAdded }: Props) {
     }
   };
 
-  const roleOptions = roles.map(r => ({ value: String(r.id), label: formatKebabCase(r.name) }));
+  const roleOptions = roles.map((r) => ({ value: String(r.id), label: formatKebabCase(r.name) }));
 
   return (
     <Modal isOpen={isOpen} onClose={handleClose} className="max-w-[700px] p-6 md:p-10">
@@ -138,40 +164,85 @@ export default function AddUserModal({ isOpen, onClose, onUserAdded }: Props) {
           <div className="px-2 overflow-y-auto custom-scrollbar">
             <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
               <div>
-                <Label>Name <span className="text-red-500">*</span></Label>
-                <Input type="text" value={name} onChange={(e) => { setName(e.target.value); setErrors({ ...errors, name: '' }) }} error={!!errors.name} hint={errors.name} autoComplete="off" />
+                <Label>
+                  Name <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  type="text"
+                  value={name}
+                  onChange={(e) => {
+                    setName(e.target.value);
+                    setErrors({ ...errors, name: '' });
+                  }}
+                  error={!!errors.name}
+                  hint={errors.name}
+                  autoComplete="off"
+                />
               </div>
               <div>
                 <Label>Email</Label>
-                <Input type="email" value={email} onChange={(e) => { setEmail(e.target.value); setErrors({ ...errors, email: '' }) }} error={!!errors.email} hint={errors.email} autoComplete="off" />
+                <Input
+                  type="email"
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    setErrors({ ...errors, email: '' });
+                  }}
+                  error={!!errors.email}
+                  hint={errors.email}
+                  autoComplete="off"
+                />
               </div>
               <div>
                 <Label>Phone</Label>
-                <Input type="text" value={phone} onChange={(e) => { setPhone(e.target.value); setErrors({ ...errors, phone: '' }) }} error={!!errors.phone} hint={errors.phone} />
+                <Input
+                  type="text"
+                  value={phone}
+                  onChange={(e) => {
+                    setPhone(e.target.value);
+                    setErrors({ ...errors, phone: '' });
+                  }}
+                  error={!!errors.phone}
+                  hint={errors.phone}
+                />
               </div>
               <div>
-                <Label>Password <span className="text-red-500">*</span></Label>
-                <Input type="password" value={password} onChange={(e) => { setPassword(e.target.value); setErrors({ ...errors, password: '' }) }} error={!!errors.password} hint={errors.password} autoComplete="new-password" />
+                <Label>
+                  Password <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  type="password"
+                  value={password}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    setErrors({ ...errors, password: '' });
+                  }}
+                  error={!!errors.password}
+                  hint={errors.password}
+                  autoComplete="new-password"
+                />
               </div>
               <div>
-                <Label>Role <span className="text-red-500">*</span></Label>
-                <Select options={roleOptions} onChange={(value) => { setRoleId(Number(value)); setErrors({ ...errors, role_id: '' }) }} error={!!errors.role_id} hint={errors.role_id} />
+                <Label>
+                  Role <span className="text-red-500">*</span>
+                </Label>
+                <Select
+                  options={roleOptions}
+                  onChange={(value) => {
+                    setRoleId(Number(value));
+                    setErrors({ ...errors, role_id: '' });
+                  }}
+                  error={!!errors.role_id}
+                  hint={errors.role_id}
+                />
               </div>
             </div>
           </div>
           <div className="flex items-center gap-3 px-2 mt-6 lg:justify-end">
-            <Button
-              type="button"
-              variant='outline'
-              onClick={handleClose}
-            >
+            <Button type="button" variant="outline" onClick={handleClose}>
               Close
             </Button>
-            <Button
-              type="submit"
-            >
-              Save Changes
-            </Button>
+            <Button type="submit">Save Changes</Button>
           </div>
         </form>
       </div>

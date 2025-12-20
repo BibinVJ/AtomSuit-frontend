@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import { ArrowDown, ArrowUp } from "lucide-react";
-import Badge from "../ui/badge/Badge";
-import { ReactNode, useState, useRef, useEffect } from "react";
+import { ArrowDown, ArrowUp } from 'lucide-react';
+import Badge from '../ui/badge/Badge';
+import { ReactNode, useState, useRef, useEffect } from 'react';
 
 interface MetricCardProps {
   icon: ReactNode;
   title: string;
   value: string | number;
   percentage?: number;
-  trend?: "up" | "down";
+  trend?: 'up' | 'down';
 }
 
 const MetricCard = ({ icon, title, value, percentage, trend }: MetricCardProps) => {
@@ -19,7 +19,7 @@ const MetricCard = ({ icon, title, value, percentage, trend }: MetricCardProps) 
   useEffect(() => {
     if (!ref.current) return;
 
-    const observer = new ResizeObserver(entries => {
+    const observer = new ResizeObserver((entries) => {
       if (entries[0]) {
         setHeight(entries[0].contentRect.height);
       }
@@ -45,22 +45,16 @@ const MetricCard = ({ icon, title, value, percentage, trend }: MetricCardProps) 
       <div className="flex-shrink-0 flex items-center justify-center w-10 h-10 md:w-12 md:h-12 bg-gray-100 rounded-xl dark:bg-gray-800">
         {icon}
       </div>
-      <div
-        className={`flex items-end justify-between w-full ${
-          isCompact ? 'ml-4' : 'mt-auto'
-        }`}
-      >
+      <div className={`flex items-end justify-between w-full ${isCompact ? 'ml-4' : 'mt-auto'}`}>
         <div>
-          <span className="text-xs md:text-sm text-gray-500 dark:text-gray-400">
-            {title}
-          </span>
+          <span className="text-xs md:text-sm text-gray-500 dark:text-gray-400">{title}</span>
           <h4 className="mt-1 font-bold text-gray-800 text-lg md:text-xl dark:text-white/90">
             {value}
           </h4>
         </div>
         {trend && percentage && (
-          <Badge color={trend === "up" ? "success" : "error"}>
-            {trend === "up" ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />}
+          <Badge color={trend === 'up' ? 'success' : 'error'}>
+            {trend === 'up' ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />}
             {percentage}%
           </Badge>
         )}

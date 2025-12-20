@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useEffect, useState } from 'react';
 import PageBreadcrumb from '../../../components/common/PageBreadCrumb';
@@ -39,7 +39,14 @@ export default function Currencies() {
   const debouncedRangeFrom = useDebounce(rangeFrom, 1000);
   const debouncedRangeTo = useDebounce(rangeTo, 1000);
 
-  const fetchCurrencies = async (page = 1, limit = 10, search = '', trashed = false, sortCol = 'created_at', sortDir = 'desc') => {
+  const fetchCurrencies = async (
+    page = 1,
+    limit = 10,
+    search = '',
+    trashed = false,
+    sortCol = 'created_at',
+    sortDir = 'desc'
+  ) => {
     try {
       const response = await getCurrencies({
         page,
@@ -66,8 +73,24 @@ export default function Currencies() {
   };
 
   useEffect(() => {
-    fetchCurrencies(currentPage, perPage, debouncedSearchTerm, viewMode === 'trashed', sortBy, sortDirection);
-  }, [currentPage, perPage, debouncedSearchTerm, viewMode, debouncedRangeFrom, debouncedRangeTo, sortBy, sortDirection]);
+    fetchCurrencies(
+      currentPage,
+      perPage,
+      debouncedSearchTerm,
+      viewMode === 'trashed',
+      sortBy,
+      sortDirection
+    );
+  }, [
+    currentPage,
+    perPage,
+    debouncedSearchTerm,
+    viewMode,
+    debouncedRangeFrom,
+    debouncedRangeTo,
+    sortBy,
+    sortDirection,
+  ]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -107,10 +130,7 @@ export default function Currencies() {
 
   return (
     <>
-      <PageMeta
-        title="Currencies"
-        description="Manage system currencies"
-      />
+      <PageMeta title="Currencies" description="Manage system currencies" />
       <PageBreadcrumb pageTitle="Currencies" />
 
       <div className="space-y-6">
@@ -140,17 +160,18 @@ export default function Currencies() {
             <div className="flex flex-wrap items-center gap-3">
               <ViewModeTabs viewMode={viewMode} setViewMode={setViewMode} />
               <Tooltip text="Export Currencies">
-                <Button variant="outline" size="sm" onClick={handleExport} className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleExport}
+                  className="flex items-center gap-2"
+                >
                   <Download size={16} />
                   Export
                 </Button>
               </Tooltip>
               <Tooltip text="Add New Currency">
-                <Button
-                  onClick={openModal}
-                  size="sm"
-                  className="flex items-center gap-2"
-                >
+                <Button onClick={openModal} size="sm" className="flex items-center gap-2">
                   <Plus size={16} />
                   Add Currency
                 </Button>
@@ -160,7 +181,16 @@ export default function Currencies() {
         >
           <CurrencyTable
             data={currencies}
-            onAction={() => fetchCurrencies(currentPage, perPage, debouncedSearchTerm, viewMode === 'trashed', sortBy, sortDirection)}
+            onAction={() =>
+              fetchCurrencies(
+                currentPage,
+                perPage,
+                debouncedSearchTerm,
+                viewMode === 'trashed',
+                sortBy,
+                sortDirection
+              )
+            }
             onSort={handleSort}
             sortBy={sortBy}
             sortDirection={sortDirection}
@@ -182,7 +212,16 @@ export default function Currencies() {
       <AddCurrencyModal
         isOpen={isOpen}
         onClose={closeModal}
-        onSuccess={() => fetchCurrencies(1, perPage, debouncedSearchTerm, viewMode === 'trashed', sortBy, sortDirection)}
+        onSuccess={() =>
+          fetchCurrencies(
+            1,
+            perPage,
+            debouncedSearchTerm,
+            viewMode === 'trashed',
+            sortBy,
+            sortDirection
+          )
+        }
       />
     </>
   );

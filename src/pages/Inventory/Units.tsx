@@ -1,5 +1,4 @@
-"use client";
-
+'use client';
 
 import { useEffect, useState } from 'react';
 import PageBreadcrumb from '../../components/common/PageBreadCrumb';
@@ -12,7 +11,12 @@ import Pagination from '../../components/common/Pagination';
 import Button from '../../components/ui/button/Button';
 import Tooltip from '../../components/ui/tooltip/Tooltip';
 import Select from '../../components/form/Select';
-import { getUnits, exportUnits, importUnits, downloadSampleUnitExcel } from '../../services/UnitService';
+import {
+  getUnits,
+  exportUnits,
+  importUnits,
+  downloadSampleUnitExcel,
+} from '../../services/UnitService';
 import { Unit } from '../../types';
 import ImportModal from '../../components/common/ImportModal';
 import { Download, Upload } from 'lucide-react';
@@ -29,7 +33,11 @@ export default function Units() {
   const { hasPermission } = usePermissions();
   const [units, setUnits] = useState<Unit[]>([]);
   const { isOpen, openModal, closeModal } = useModal();
-  const { isOpen: isImportModalOpen, openModal: openImportModal, closeModal: closeImportModal } = useModal();
+  const {
+    isOpen: isImportModalOpen,
+    openModal: openImportModal,
+    closeModal: closeImportModal,
+  } = useModal();
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
@@ -59,14 +67,26 @@ export default function Units() {
         from: debouncedRangeFrom !== '' ? Number(debouncedRangeFrom) : undefined,
         to: debouncedRangeTo !== '' ? Number(debouncedRangeTo) : undefined,
         search: debouncedSearchTerm,
-        trashed: viewMode === 'trashed' ? 'only' : undefined
+        trashed: viewMode === 'trashed' ? 'only' : undefined,
       });
       setUnits(response.data);
       if (response.meta) {
         setTotalPages(response.meta.last_page || 1);
         setCurrentPage(response.meta.current_page || 1);
-        setFrom(response.meta.from !== undefined ? response.meta.from : (debouncedRangeFrom !== '' ? Number(debouncedRangeFrom) : 0));
-        setTo(response.meta.to !== undefined ? response.meta.to : (debouncedRangeTo !== '' ? Number(debouncedRangeTo) : 0));
+        setFrom(
+          response.meta.from !== undefined
+            ? response.meta.from
+            : debouncedRangeFrom !== ''
+              ? Number(debouncedRangeFrom)
+              : 0
+        );
+        setTo(
+          response.meta.to !== undefined
+            ? response.meta.to
+            : debouncedRangeTo !== ''
+              ? Number(debouncedRangeTo)
+              : 0
+        );
         setTotal(response.meta.total || 0);
       }
     } catch (error) {
@@ -76,7 +96,16 @@ export default function Units() {
 
   useEffect(() => {
     fetchUnits(currentPage, perPage, sortBy, sortDirection);
-  }, [currentPage, perPage, sortBy, sortDirection, debouncedSearchTerm, debouncedRangeFrom, debouncedRangeTo, viewMode]);
+  }, [
+    currentPage,
+    perPage,
+    sortBy,
+    sortDirection,
+    debouncedSearchTerm,
+    debouncedRangeFrom,
+    debouncedRangeTo,
+    viewMode,
+  ]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -116,10 +145,7 @@ export default function Units() {
 
   return (
     <>
-      <PageMeta
-        title="Units"
-        description="List of units"
-      />
+      <PageMeta title="Units" description="List of units" />
       <PageBreadcrumb pageTitle="Units" />
 
       <div className="space-y-6">
@@ -149,16 +175,26 @@ export default function Units() {
             <div className="flex flex-wrap items-center gap-2">
               <ViewModeTabs viewMode={viewMode} setViewMode={setViewMode} />
               <Tooltip text="Import Units">
-                <Button variant="outline" size="sm" onClick={openImportModal} startIcon={<Upload className="w-4 h-4" />}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={openImportModal}
+                  startIcon={<Upload className="w-4 h-4" />}
+                >
                   Import
                 </Button>
               </Tooltip>
               <Tooltip text="Export Units">
-                <Button variant="outline" size="sm" onClick={handleExport} startIcon={<Download className="w-4 h-4" />}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleExport}
+                  startIcon={<Download className="w-4 h-4" />}
+                >
                   Export
                 </Button>
               </Tooltip>
-              {hasPermission("create-unit") && (
+              {hasPermission('create-unit') && (
                 <Tooltip text="Add New Unit">
                   <Button onClick={openModal} size="sm" startIcon={<Plus className="w-4 h-4" />}>
                     Add Unit
@@ -189,7 +225,11 @@ export default function Units() {
           />
         </ComponentCard>
       </div>
-      <AddUnitModal isOpen={isOpen} onClose={closeModal} onUnitAdded={() => fetchUnits(1, perPage)} />
+      <AddUnitModal
+        isOpen={isOpen}
+        onClose={closeModal}
+        onUnitAdded={() => fetchUnits(1, perPage)}
+      />
       <ImportModal
         isOpen={isImportModalOpen}
         onClose={closeImportModal}
@@ -201,4 +241,3 @@ export default function Units() {
     </>
   );
 }
-

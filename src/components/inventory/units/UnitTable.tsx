@@ -1,22 +1,22 @@
-"use client";
+'use client';
 
-
+import { Table, TableBody, TableCell, TableHeader, TableRow } from '../../ui/table';
+import { useState } from 'react';
+import Badge from '../../ui/badge/Badge';
+import EditUnitModal from './EditUnitModal';
+import DeleteUnitModal from './DeleteUnitModal';
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHeader,
-  TableRow,
-} from "../../ui/table";
-import { useState } from "react";
-import Badge from "../../ui/badge/Badge";
-import EditUnitModal from "./EditUnitModal";
-import DeleteUnitModal from "./DeleteUnitModal";
-import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide, Edit, Trash2, RefreshCw } from 'lucide-react';
-import { restoreUnit } from "../../../services/UnitService";
-import { toast } from "sonner";
-import Button from "../../ui/button/Button";
-import Tooltip from "../../ui/tooltip/Tooltip";
+  ChevronsUpDown,
+  ArrowUpWideNarrow,
+  ArrowDownNarrowWide,
+  Edit,
+  Trash2,
+  RefreshCw,
+} from 'lucide-react';
+import { restoreUnit } from '../../../services/UnitService';
+import { toast } from 'sonner';
+import Button from '../../ui/button/Button';
+import Tooltip from '../../ui/tooltip/Tooltip';
 
 import { Unit } from '../../../types';
 
@@ -32,15 +32,23 @@ interface Props {
   viewMode?: 'active' | 'trashed';
 }
 
-import { usePermissions } from "../../../hooks/usePermissions";
+import { usePermissions } from '../../../hooks/usePermissions';
 
-export default function UnitTable({ data, onAction, onSort, sortBy, sortDirection, currentPage, perPage, startIndex, viewMode = 'active' }: Props) {
+export default function UnitTable({
+  data,
+  onAction,
+  onSort,
+  sortBy,
+  sortDirection,
+  currentPage,
+  perPage,
+  startIndex,
+  viewMode = 'active',
+}: Props) {
   const { hasPermission } = usePermissions();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [selectedUnit, setSelectedUnit] = useState<Unit | null>(
-    null
-  );
+  const [selectedUnit, setSelectedUnit] = useState<Unit | null>(null);
 
   const handleEdit = (unit: Unit) => {
     setSelectedUnit(unit);
@@ -127,7 +135,9 @@ export default function UnitTable({ data, onAction, onSort, sortBy, sortDirectio
               <TableRow key={unit.id}>
                 <TableCell className="px-5 py-4 sm:px-6 text-start">
                   <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                    {startIndex !== undefined ? startIndex + index : (currentPage - 1) * perPage + index + 1}
+                    {startIndex !== undefined
+                      ? startIndex + index
+                      : (currentPage - 1) * perPage + index + 1}
                   </p>
                 </TableCell>
                 <TableCell className="px-5 py-4 sm:px-6 text-start">
@@ -145,7 +155,7 @@ export default function UnitTable({ data, onAction, onSort, sortBy, sortDirectio
                   <div className="flex items-center gap-2">
                     {viewMode === 'active' ? (
                       <>
-                        {hasPermission("update-unit") && (
+                        {hasPermission('update-unit') && (
                           <Tooltip text="Edit">
                             <Button
                               size="xs"
@@ -156,7 +166,7 @@ export default function UnitTable({ data, onAction, onSort, sortBy, sortDirectio
                             </Button>
                           </Tooltip>
                         )}
-                        {hasPermission("delete-unit") && (
+                        {hasPermission('delete-unit') && (
                           <Tooltip text="Delete">
                             <Button
                               size="xs"
@@ -170,7 +180,7 @@ export default function UnitTable({ data, onAction, onSort, sortBy, sortDirectio
                       </>
                     ) : (
                       <>
-                        {hasPermission("update-unit") && (
+                        {hasPermission('update-unit') && (
                           <Tooltip text="Restore">
                             <Button
                               size="xs"
@@ -181,7 +191,7 @@ export default function UnitTable({ data, onAction, onSort, sortBy, sortDirectio
                             </Button>
                           </Tooltip>
                         )}
-                        {hasPermission("delete-unit") && (
+                        {hasPermission('delete-unit') && (
                           <Tooltip text="Delete Permanently">
                             <Button
                               size="xs"

@@ -1,4 +1,4 @@
-import '@testing-library/jest-dom'
+import '@testing-library/jest-dom';
 
 // Mock Next.js router
 jest.mock('next/router', () => ({
@@ -19,9 +19,9 @@ jest.mock('next/router', () => ({
         off: jest.fn(),
         emit: jest.fn(),
       },
-    }
+    };
   },
-}))
+}));
 
 // Mock Next.js navigation
 jest.mock('next/navigation', () => ({
@@ -32,27 +32,27 @@ jest.mock('next/navigation', () => ({
       refresh: jest.fn(),
       back: jest.fn(),
       forward: jest.fn(),
-    }
+    };
   },
   useSearchParams() {
-    return new URLSearchParams()
+    return new URLSearchParams();
   },
   usePathname() {
-    return '/'
+    return '/';
   },
-}))
+}));
 
 // Mock environment variables
-process.env.NEXT_PUBLIC_BASE_DOMAIN = 'atomsuit.test'
-process.env.NEXT_PUBLIC_API_BASE_URL = 'http://api.atomsuit.test/api'
-process.env.NEXT_PUBLIC_REDIRECT_INVALID_TENANTS = 'false'
+process.env.NEXT_PUBLIC_BASE_DOMAIN = 'atomsuit.test';
+process.env.NEXT_PUBLIC_API_BASE_URL = 'http://api.atomsuit.test/api';
+process.env.NEXT_PUBLIC_REDIRECT_INVALID_TENANTS = 'false';
 
 // Note: window.location mocking is handled per test as needed
 
 // Mock fetch globally
-global.fetch = jest.fn()
+global.fetch = jest.fn();
 
 // Clean up after each test
 afterEach(() => {
-  jest.clearAllMocks()
-})
+  jest.clearAllMocks();
+});

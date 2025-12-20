@@ -1,24 +1,23 @@
-"use client";
+'use client';
 
-
+import { Table, TableBody, TableCell, TableHeader, TableRow } from '../../ui/table';
+import { useState } from 'react';
+import Badge from '../../ui/badge/Badge';
+import EditCategoryModal from './EditCategoryModal';
+import DeleteCategoryModal from './DeleteCategoryModal';
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHeader,
-  TableRow,
-} from "../../ui/table";
-import { useState } from "react";
-import Badge from "../../ui/badge/Badge";
-import EditCategoryModal from "./EditCategoryModal";
-import DeleteCategoryModal from "./DeleteCategoryModal";
-import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide, Edit, Trash2, RefreshCw } from 'lucide-react';
-import { restoreCategory } from "../../../services/CategoryService";
-import { toast } from "sonner";
-import Button from "../../ui/button/Button";
-import Tooltip from "../../ui/tooltip/Tooltip";
-import { Category } from "../../../types";
-
+  ChevronsUpDown,
+  ArrowUpWideNarrow,
+  ArrowDownNarrowWide,
+  Edit,
+  Trash2,
+  RefreshCw,
+} from 'lucide-react';
+import { restoreCategory } from '../../../services/CategoryService';
+import { toast } from 'sonner';
+import Button from '../../ui/button/Button';
+import Tooltip from '../../ui/tooltip/Tooltip';
+import { Category } from '../../../types';
 
 interface Props {
   data: Category[];
@@ -32,12 +31,20 @@ interface Props {
   viewMode?: 'active' | 'trashed';
 }
 
-export default function CategoryTable({ data, onAction, onSort, sortBy, sortDirection, currentPage, perPage, startIndex, viewMode = 'active' }: Props) {
+export default function CategoryTable({
+  data,
+  onAction,
+  onSort,
+  sortBy,
+  sortDirection,
+  currentPage,
+  perPage,
+  startIndex,
+  viewMode = 'active',
+}: Props) {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<Category | null>(
-    null
-  );
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
 
   const handleEdit = (category: Category) => {
     setSelectedCategory(category);
@@ -117,7 +124,9 @@ export default function CategoryTable({ data, onAction, onSort, sortBy, sortDire
               <TableRow key={category.id}>
                 <TableCell className="px-5 py-4 sm:px-6 text-start">
                   <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                    {startIndex !== undefined ? startIndex + index : (currentPage - 1) * perPage + index + 1}
+                    {startIndex !== undefined
+                      ? startIndex + index
+                      : (currentPage - 1) * perPage + index + 1}
                   </p>
                 </TableCell>
                 <TableCell className="px-5 py-4 sm:px-6 text-start">

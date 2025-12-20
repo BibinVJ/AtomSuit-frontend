@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useState } from 'react';
 import { Setting } from '../../types';
@@ -121,7 +121,7 @@ export default function SettingField({ setting, onUpdate }: Props) {
       return (
         <MultiSelect
           label=""
-          options={DAY_OPTIONS.map(day => ({ value: day.value, text: day.label }))}
+          options={DAY_OPTIONS.map((day) => ({ value: day.value, text: day.label }))}
           defaultSelected={currentValues}
           onChange={(selected) => setValue(selected.map(Number))}
         />
@@ -142,11 +142,7 @@ export default function SettingField({ setting, onUpdate }: Props) {
     switch (setting.type) {
       case 'boolean':
         return (
-          <Switch
-            label=""
-            checked={Boolean(value)}
-            onChange={(checked) => setValue(checked)}
-          />
+          <Switch label="" checked={Boolean(value)} onChange={(checked) => setValue(checked)} />
         );
       case 'integer':
         return (
@@ -157,7 +153,8 @@ export default function SettingField({ setting, onUpdate }: Props) {
           />
         );
       case 'file':
-        const isImage = setting.file_url && /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(setting.file_url);
+        const isImage =
+          setting.file_url && /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(setting.file_url);
         return (
           <div className="space-y-2">
             <FileInput onChange={handleFileChange} />
@@ -252,11 +249,7 @@ export default function SettingField({ setting, onUpdate }: Props) {
         if (isTimeField) {
           return (
             <div className="relative">
-              <Input
-                type="time"
-                value={value || ''}
-                onChange={(e) => setValue(e.target.value)}
-              />
+              <Input type="time" value={value || ''} onChange={(e) => setValue(e.target.value)} />
               <span className="absolute text-gray-500 -translate-y-1/2 pointer-events-none right-3 top-1/2 dark:text-gray-400">
                 <Clock className="size-6" />
               </span>
@@ -312,7 +305,7 @@ export default function SettingField({ setting, onUpdate }: Props) {
           )}
         </div>
       </div>
-      
+
       <div className="space-y-2">
         {renderInput()}
         {setting.type !== 'file' && (

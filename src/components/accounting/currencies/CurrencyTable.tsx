@@ -1,21 +1,22 @@
-"use client";
+'use client';
 
+import { Table, TableBody, TableCell, TableHeader, TableRow } from '../../ui/table';
+import { useState } from 'react';
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHeader,
-  TableRow,
-} from "../../ui/table";
-import { useState } from "react";
-import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide, Edit, Trash2, RefreshCw } from 'lucide-react';
-import { restoreCurrency } from "../../../services/CurrencyService";
-import { toast } from "sonner";
-import Button from "../../ui/button/Button";
-import Tooltip from "../../ui/tooltip/Tooltip";
-import { Currency } from "../../../types/Currency";
-import EditCurrencyModal from "./EditCurrencyModal";
-import DeleteCurrencyModal from "./DeleteCurrencyModal";
+  ChevronsUpDown,
+  ArrowUpWideNarrow,
+  ArrowDownNarrowWide,
+  Edit,
+  Trash2,
+  RefreshCw,
+} from 'lucide-react';
+import { restoreCurrency } from '../../../services/CurrencyService';
+import { toast } from 'sonner';
+import Button from '../../ui/button/Button';
+import Tooltip from '../../ui/tooltip/Tooltip';
+import { Currency } from '../../../types/Currency';
+import EditCurrencyModal from './EditCurrencyModal';
+import DeleteCurrencyModal from './DeleteCurrencyModal';
 
 interface Props {
   data: Currency[];
@@ -38,7 +39,7 @@ export default function CurrencyTable({
   currentPage,
   perPage,
   startIndex,
-  viewMode = 'active'
+  viewMode = 'active',
 }: Props) {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -88,7 +89,12 @@ export default function CurrencyTable({
         <Table>
           <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
             <TableRow>
-              <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">#</TableCell>
+              <TableCell
+                isHeader
+                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+              >
+                #
+              </TableCell>
               <TableCell
                 isHeader
                 className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400"
@@ -110,15 +116,28 @@ export default function CurrencyTable({
               >
                 Symbol {renderSortIcon('symbol')}
               </TableCell>
-              <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">Formatting</TableCell>
-              <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">Actions</TableCell>
+              <TableCell
+                isHeader
+                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+              >
+                Formatting
+              </TableCell>
+              <TableCell
+                isHeader
+                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+              >
+                Actions
+              </TableCell>
             </TableRow>
           </TableHeader>
 
           <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
             {data.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="px-6 py-4 text-center text-gray-500 text-theme-sm">
+                <TableCell
+                  colSpan={6}
+                  className="px-6 py-4 text-center text-gray-500 text-theme-sm"
+                >
                   No currencies found.
                 </TableCell>
               </TableRow>
@@ -127,7 +146,9 @@ export default function CurrencyTable({
                 <TableRow key={currency.id}>
                   <TableCell className="px-5 py-4 sm:px-6 text-start">
                     <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                      {startIndex !== undefined ? startIndex + index : (currentPage - 1) * perPage + index + 1}
+                      {startIndex !== undefined
+                        ? startIndex + index
+                        : (currentPage - 1) * perPage + index + 1}
                     </p>
                   </TableCell>
                   <TableCell className="px-5 py-4 sm:px-6 text-start">
@@ -136,7 +157,9 @@ export default function CurrencyTable({
                         {currency.code}
                       </p>
                       {currency.is_default && (
-                        <span className="px-2 py-0.5 text-xs font-medium text-brand-600 bg-brand-50 border border-brand-200 rounded-full">Default</span>
+                        <span className="px-2 py-0.5 text-xs font-medium text-brand-600 bg-brand-50 border border-brand-200 rounded-full">
+                          Default
+                        </span>
                       )}
                     </div>
                   </TableCell>
@@ -148,8 +171,8 @@ export default function CurrencyTable({
                   </TableCell>
                   <TableCell className="px-5 py-4 sm:px-6 text-start text-gray-500 dark:text-gray-400 text-theme-sm">
                     {currency.precision !== null ? `${currency.precision} dec` : 'Global'} |
-                    {currency.thousand_separator ? ` '${currency.thousand_separator}'` : ' Global'} |
-                    {currency.decimal_separator ? ` '${currency.decimal_separator}'` : ' Global'}
+                    {currency.thousand_separator ? ` '${currency.thousand_separator}'` : ' Global'}{' '}
+                    |{currency.decimal_separator ? ` '${currency.decimal_separator}'` : ' Global'}
                   </TableCell>
                   <TableCell className="px-5 py-4 sm:px-6 text-start text-gray-500 dark:text-gray-400 text-theme-sm">
                     <div className="flex items-center gap-2">

@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useState, useEffect } from 'react';
 import { Modal } from '../../ui/modal';
@@ -81,7 +81,9 @@ export default function EditUnitModal({ isOpen, onClose, onUnitUpdated, unit }: 
           <div className="px-2 overflow-y-auto custom-scrollbar">
             <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
               <div>
-                <Label>Name <span className="text-red-500">*</span></Label>
+                <Label>
+                  Name <span className="text-red-500">*</span>
+                </Label>
                 <Input
                   type="text"
                   id="name"
@@ -95,7 +97,9 @@ export default function EditUnitModal({ isOpen, onClose, onUnitUpdated, unit }: 
                 />
               </div>
               <div>
-                <Label>Code <span className="text-red-500">*</span></Label>
+                <Label>
+                  Code <span className="text-red-500">*</span>
+                </Label>
                 <Input
                   type="text"
                   id="code"
@@ -120,18 +124,10 @@ export default function EditUnitModal({ isOpen, onClose, onUnitUpdated, unit }: 
             </div>
           </div>
           <div className="flex items-center gap-3 px-2 mt-6 lg:justify-end">
-            <Button
-              type="button"
-              variant='outline'
-              onClick={onClose}
-            >
+            <Button type="button" variant="outline" onClick={onClose}>
               Close
             </Button>
-            <Button
-              type="submit"
-            >
-              Save Changes
-            </Button>
+            <Button type="submit">Save Changes</Button>
           </div>
         </form>
       </div>

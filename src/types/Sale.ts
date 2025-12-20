@@ -1,6 +1,6 @@
-import { Customer } from "./Customer";
-import { Item } from "./Item";
-import { User } from "./User";
+import { Customer } from './Customer';
+import { Item } from './Item';
+import { User } from './User';
 
 export interface SaleItem {
   id: number;

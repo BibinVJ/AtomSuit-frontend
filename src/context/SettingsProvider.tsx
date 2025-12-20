@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { SettingsContext, SettingsContextType } from './SettingsContext';
@@ -58,8 +58,14 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     if (settings.primary_color) {
       document.documentElement.style.setProperty('--color-primary', settings.primary_color);
       // Set a slightly darker version for hover states (simulated)
-      document.documentElement.style.setProperty('--color-primary-dark', settings.primary_color + 'dd');
-      document.documentElement.style.setProperty('--color-primary-darker', settings.primary_color + 'bb');
+      document.documentElement.style.setProperty(
+        '--color-primary-dark',
+        settings.primary_color + 'dd'
+      );
+      document.documentElement.style.setProperty(
+        '--color-primary-darker',
+        settings.primary_color + 'bb'
+      );
     }
     if (settings.secondary_color) {
       document.documentElement.style.setProperty('--color-secondary', settings.secondary_color);
@@ -85,48 +91,61 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   }, [settings]);
 
-  const getSetting = useCallback((key: string, defaultValue?: any) => {
-    return settings[key] !== undefined ? settings[key] : defaultValue;
-  }, [settings]);
+  const getSetting = useCallback(
+    (key: string, defaultValue?: any) => {
+      return settings[key] !== undefined ? settings[key] : defaultValue;
+    },
+    [settings]
+  );
 
-  const formatCurrency = useCallback((amount: number | string) => {
-    const num = typeof amount === 'string' ? parseFloat(amount) : amount;
-    const symbol = getSetting('currency_symbol', '$');
-    const position = getSetting('currency_position', 'before');
-    const decimalSeparator = getSetting('decimal_separator', '.');
-    const thousandSeparator = getSetting('thousand_separator', ',');
-    const decimalPlaces = parseInt(getSetting('decimal_places', '2'));
+  const formatCurrency = useCallback(
+    (amount: number | string) => {
+      const num = typeof amount === 'string' ? parseFloat(amount) : amount;
+      const symbol = getSetting('currency_symbol', '$');
+      const position = getSetting('currency_position', 'before');
+      const decimalSeparator = getSetting('decimal_separator', '.');
+      const thousandSeparator = getSetting('thousand_separator', ',');
+      const decimalPlaces = parseInt(getSetting('decimal_places', '2'));
 
-    let formatted = (num !== null && num !== undefined) ? num.toFixed(decimalPlaces) : (0).toFixed(decimalPlaces);
+      let formatted =
+        num !== null && num !== undefined ? num.toFixed(decimalPlaces) : (0).toFixed(decimalPlaces);
 
-    // Replace default separators with custom ones
-    const parts = formatted.split('.');
-    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, thousandSeparator);
-    formatted = parts.join(decimalSeparator);
+      // Replace default separators with custom ones
+      const parts = formatted.split('.');
+      parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, thousandSeparator);
+      formatted = parts.join(decimalSeparator);
 
-    return position === 'before' ? `${symbol}${formatted}` : `${formatted}${symbol}`;
-  }, [getSetting]);
+      return position === 'before' ? `${symbol}${formatted}` : `${formatted}${symbol}`;
+    },
+    [getSetting]
+  );
 
-  const formatDate = useCallback((date: string | Date) => {
-    const d = new Date(date);
-    const phpFormat = getSetting('date_format', 'Y-m-d');
+  const formatDate = useCallback(
+    (date: string | Date) => {
+      const d = new Date(date);
+      const phpFormat = getSetting('date_format', 'Y-m-d');
 
-    // Basic mapping of PHP date formats to JS date strings
-    // In a real app, you'd use a library like date-fns or a more robust mapper
-    const map: Record<string, string> = {
-      'Y-m-d': d.toISOString().split('T')[0],
-      'd/m/Y': `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`,
-      'm/d/Y': `${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}/${d.getFullYear()}`,
-    };
+      // Basic mapping of PHP date formats to JS date strings
+      // In a real app, you'd use a library like date-fns or a more robust mapper
+      const map: Record<string, string> = {
+        'Y-m-d': d.toISOString().split('T')[0],
+        'd/m/Y': `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`,
+        'm/d/Y': `${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}/${d.getFullYear()}`,
+      };
 
-    return map[phpFormat] || d.toLocaleDateString();
-  }, [getSetting]);
+      return map[phpFormat] || d.toLocaleDateString();
+    },
+    [getSetting]
+  );
 
-  const formatDateTime = useCallback((date: string | Date) => {
-    const d = new Date(date);
-    const timeFormat = getSetting('time_format', 'H:i:s');
-    return `${formatDate(date)} ${d.toLocaleTimeString([], { hour12: timeFormat.includes('g') || timeFormat.includes('A') })}`;
-  }, [getSetting, formatDate]);
+  const formatDateTime = useCallback(
+    (date: string | Date) => {
+      const d = new Date(date);
+      const timeFormat = getSetting('time_format', 'H:i:s');
+      return `${formatDate(date)} ${d.toLocaleTimeString([], { hour12: timeFormat.includes('g') || timeFormat.includes('A') })}`;
+    },
+    [getSetting, formatDate]
+  );
 
   const mapPhpDateFormatToFlatpickr = useCallback((phpFormat: string) => {
     const map: Record<string, string> = {
@@ -140,19 +159,18 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     return map[phpFormat] || 'Y-m-d';
   }, []);
 
-  const contextValue = useMemo<SettingsContextType>(() => ({
-    settings,
-    isLoading,
-    getSetting,
-    formatCurrency,
-    formatDate,
-    formatDateTime,
-    refreshSettings: fetchSettings,
-  }), [settings, isLoading, getSetting, formatCurrency, formatDate, formatDateTime, fetchSettings]);
-
-  return (
-    <SettingsContext.Provider value={contextValue}>
-      {children}
-    </SettingsContext.Provider>
+  const contextValue = useMemo<SettingsContextType>(
+    () => ({
+      settings,
+      isLoading,
+      getSetting,
+      formatCurrency,
+      formatDate,
+      formatDateTime,
+      refreshSettings: fetchSettings,
+    }),
+    [settings, isLoading, getSetting, formatCurrency, formatDate, formatDateTime, fetchSettings]
   );
+
+  return <SettingsContext.Provider value={contextValue}>{children}</SettingsContext.Provider>;
 };

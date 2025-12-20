@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useEffect, useState } from 'react';
 import PageBreadcrumb from '../../components/common/PageBreadCrumb';
@@ -31,7 +31,11 @@ export default function Items() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [units, setUnits] = useState<Unit[]>([]);
   const { isOpen: isAddOpen, openModal: openAddModal, closeModal: closeAddModal } = useModal();
-  const { isOpen: isImportOpen, openModal: openImportModal, closeModal: closeImportModal } = useModal();
+  const {
+    isOpen: isImportOpen,
+    openModal: openImportModal,
+    closeModal: closeImportModal,
+  } = useModal();
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
@@ -69,14 +73,26 @@ export default function Items() {
         category_id: selectedCategory,
         unit_id: selectedUnit,
         type: selectedType,
-        trashed: viewMode === 'trashed' ? 'only' : undefined
+        trashed: viewMode === 'trashed' ? 'only' : undefined,
       });
       setItems(response.data);
       if (response.meta) {
         setTotalPages(response.meta.last_page || 1);
         setCurrentPage(response.meta.current_page || 1);
-        setFrom(response.meta.from !== undefined ? response.meta.from : (debouncedRangeFrom !== '' ? Number(debouncedRangeFrom) : 0));
-        setTo(response.meta.to !== undefined ? response.meta.to : (debouncedRangeTo !== '' ? Number(debouncedRangeTo) : 0));
+        setFrom(
+          response.meta.from !== undefined
+            ? response.meta.from
+            : debouncedRangeFrom !== ''
+              ? Number(debouncedRangeFrom)
+              : 0
+        );
+        setTo(
+          response.meta.to !== undefined
+            ? response.meta.to
+            : debouncedRangeTo !== ''
+              ? Number(debouncedRangeTo)
+              : 0
+        );
         setTotal(response.meta.total || 0);
       }
     } catch (error) {
@@ -88,7 +104,7 @@ export default function Items() {
     try {
       const [categoriesRes, unitsRes] = await Promise.all([
         getCategories({ page: 1, limit: 10, sortCol: 'name', sortDir: 'asc', unpaginated: true }),
-        getUnits({ page: 1, limit: 10, sortCol: 'name', sortDir: 'asc', unpaginated: true })
+        getUnits({ page: 1, limit: 10, sortCol: 'name', sortDir: 'asc', unpaginated: true }),
       ]);
       setCategories(categoriesRes.data || []);
       setUnits(unitsRes.data || []);
@@ -103,7 +119,19 @@ export default function Items() {
 
   useEffect(() => {
     fetchItems(currentPage, perPage, sortBy, sortDirection);
-  }, [currentPage, perPage, sortBy, sortDirection, debouncedSearchTerm, debouncedRangeFrom, debouncedRangeTo, selectedCategory, selectedUnit, selectedType, viewMode]);
+  }, [
+    currentPage,
+    perPage,
+    sortBy,
+    sortDirection,
+    debouncedSearchTerm,
+    debouncedRangeFrom,
+    debouncedRangeTo,
+    selectedCategory,
+    selectedUnit,
+    selectedType,
+    viewMode,
+  ]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -143,10 +171,7 @@ export default function Items() {
 
   return (
     <>
-      <PageMeta
-        title="Items"
-        description="List of items"
-      />
+      <PageMeta title="Items" description="List of items" />
       <PageBreadcrumb pageTitle="Items" />
 
       <div className="space-y-6">
@@ -228,18 +253,28 @@ export default function Items() {
               <ViewModeTabs viewMode={viewMode} setViewMode={setViewMode} />
 
               <div className="flex flex-wrap items-center gap-2">
-                {hasPermission("view-item") && (
+                {hasPermission('view-item') && (
                   <Tooltip text="Export Items">
-                    <Button variant="outline" size="sm" onClick={handleExport} className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleExport}
+                      className="flex items-center gap-2"
+                    >
                       <Download className="w-4 h-4" />
                       Export
                     </Button>
                   </Tooltip>
                 )}
-                {hasPermission("create-item") && (
+                {hasPermission('create-item') && (
                   <>
                     <Tooltip text="Import Items">
-                      <Button variant="outline" size="sm" onClick={openImportModal} className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={openImportModal}
+                        className="flex items-center gap-2"
+                      >
                         <Upload className="w-4 h-4" />
                         Import
                       </Button>
@@ -277,8 +312,16 @@ export default function Items() {
           />
         </ComponentCard>
       </div>
-      <AddItemModal isOpen={isAddOpen} onClose={closeAddModal} onItemAdded={() => fetchItems(1, perPage)} />
-      <ImportItemModal isOpen={isImportOpen} onClose={closeImportModal} onItemsImported={() => fetchItems(1, perPage)} />
+      <AddItemModal
+        isOpen={isAddOpen}
+        onClose={closeAddModal}
+        onItemAdded={() => fetchItems(1, perPage)}
+      />
+      <ImportItemModal
+        isOpen={isImportOpen}
+        onClose={closeImportModal}
+        onItemsImported={() => fetchItems(1, perPage)}
+      />
     </>
   );
 }

@@ -1,17 +1,19 @@
 import api from './api';
 import { UnitApiResponse } from '../types';
 
-export const getUnits = async (params: {
-  page?: number;
-  limit?: number;
-  sortCol?: string;
-  sortDir?: string;
-  from?: number;
-  to?: number;
-  search?: string;
-  unpaginated?: boolean;
-  trashed?: 'only' | 'with';
-} = {}): Promise<UnitApiResponse> => {
+export const getUnits = async (
+  params: {
+    page?: number;
+    limit?: number;
+    sortCol?: string;
+    sortDir?: string;
+    from?: number;
+    to?: number;
+    search?: string;
+    unpaginated?: boolean;
+    trashed?: 'only' | 'with';
+  } = {}
+): Promise<UnitApiResponse> => {
   const {
     page = 1,
     limit = 10,
@@ -40,7 +42,10 @@ export const addUnit = async (unit: { name: string; code: string; description: s
   return response.data;
 };
 
-export const updateUnit = async (id: number, unit: { name: string; code: string; description: string }) => {
+export const updateUnit = async (
+  id: number,
+  unit: { name: string; code: string; description: string }
+) => {
   const response = await api.put(`/unit/${id}`, unit);
   return response.data;
 };

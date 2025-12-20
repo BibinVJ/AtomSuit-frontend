@@ -1,12 +1,6 @@
-import TableSection from "../ui/table/TableSection";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHeader,
-  TableRow,
-} from "../ui/table";
-import Badge from "../ui/badge/Badge";
+import TableSection from '../ui/table/TableSection';
+import { Table, TableBody, TableCell, TableHeader, TableRow } from '../ui/table';
+import Badge from '../ui/badge/Badge';
 
 interface ExpiringItem {
   id: number;
@@ -22,11 +16,8 @@ interface Props {
   title?: string;
 }
 
-export default function ExpiryItems({
-  items,
-  title = "Expiring Items",
-}: Props) {
-  const itemsArray = Array.isArray(items) ? items : (items ? [items] : []);
+export default function ExpiryItems({ items, title = 'Expiring Items' }: Props) {
+  const itemsArray = Array.isArray(items) ? items : items ? [items] : [];
 
   if (itemsArray.length === 0) {
     return (
@@ -82,7 +73,7 @@ export default function ExpiryItems({
           {itemsArray.map((item) => {
             const expiryDate = new Date(item.expiry_date);
             const isExpired = expiryDate < now;
-            const badgeColor = isExpired ? "error" : "warning";
+            const badgeColor = isExpired ? 'error' : 'warning';
 
             return (
               <TableRow key={`${item.id}-${item.batch_number}`}>

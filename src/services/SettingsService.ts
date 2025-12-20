@@ -22,7 +22,7 @@ export const getSetting = async (key: string) => {
 
 export const updateSetting = async (key: string, value: any, type?: string, group?: string) => {
   const formData = new FormData();
-  
+
   if (value instanceof File) {
     formData.append('value', value);
   } else if (typeof value === 'object' && value !== null) {
@@ -30,10 +30,10 @@ export const updateSetting = async (key: string, value: any, type?: string, grou
   } else {
     formData.append('value', value);
   }
-  
+
   if (type) formData.append('type', type);
   if (group) formData.append('group', group);
-  
+
   const response = await api.post(`/settings/${key}`, formData, {
     headers: {
       'Content-Type': 'multipart/form-data',

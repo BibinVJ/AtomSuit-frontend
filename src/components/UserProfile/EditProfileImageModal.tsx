@@ -1,26 +1,20 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useRef } from "react";
-import { Modal } from "../ui/modal";
-import Button from "../ui/button/Button";
-import {
-  updateProfileImage,
-  deleteProfileImage,
-} from "../../services/ProfileService";
-import { useAuth } from "../../hooks/useAuth";
-import FileInput from "../form/input/FileInput";
-import { toast } from "sonner";
-import { isApiError } from "../../utils/errors";
+import { useState, useEffect, useRef } from 'react';
+import { Modal } from '../ui/modal';
+import Button from '../ui/button/Button';
+import { updateProfileImage, deleteProfileImage } from '../../services/ProfileService';
+import { useAuth } from '../../hooks/useAuth';
+import FileInput from '../form/input/FileInput';
+import { toast } from 'sonner';
+import { isApiError } from '../../utils/errors';
 
 interface EditProfileImageModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-export default function EditProfileImageModal({
-  isOpen,
-  onClose,
-}: EditProfileImageModalProps) {
+export default function EditProfileImageModal({ isOpen, onClose }: EditProfileImageModalProps) {
   const { fetchProfile } = useAuth();
   const [file, setFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -29,7 +23,7 @@ export default function EditProfileImageModal({
     if (!isOpen) {
       setFile(null);
       if (fileInputRef.current) {
-        fileInputRef.current.value = "";
+        fileInputRef.current.value = '';
       }
     }
   }, [isOpen]);
@@ -51,7 +45,7 @@ export default function EditProfileImageModal({
         if (isApiError(error)) {
           toast.error(error.response?.data?.message);
         } else {
-          toast.error("An unexpected error occurred.");
+          toast.error('An unexpected error occurred.');
         }
       }
     }
@@ -67,7 +61,7 @@ export default function EditProfileImageModal({
       if (isApiError(error)) {
         toast.error(error.response?.data?.message);
       } else {
-        toast.error("An unexpected error occurred.");
+        toast.error('An unexpected error occurred.');
       }
     }
   };
@@ -91,12 +85,7 @@ export default function EditProfileImageModal({
             <Button size="sm" variant="outline" onClick={onClose}>
               Close
             </Button>
-            <Button
-              size="sm"
-              variant="primary"
-              onClick={handleSubmit}
-              disabled={!file}
-            >
+            <Button size="sm" variant="primary" onClick={handleSubmit} disabled={!file}>
               Upload
             </Button>
             <Button size="sm" variant="danger" onClick={handleDelete}>
