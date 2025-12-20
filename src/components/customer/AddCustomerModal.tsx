@@ -1,15 +1,13 @@
-"use client";
-
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Modal } from '../ui/modal';
 import Input from '../form/input/InputField';
 import Label from '../form/Label';
-import Switch from '../form/switch/Switch';
+import Select from '../form/Select';
 import TextArea from '../form/input/TextArea';
-import Button from '../ui/button/Button';
+import { Button } from '../ui/button/Button';
 import { toast } from 'sonner';
 import { addCustomer } from '../../services/CustomerService';
+import { getCurrencies } from '../../services/CurrencyService';
 import { isApiError } from '../../utils/errors';
 import { Customer } from '../../types/Customer';
 
@@ -24,14 +22,37 @@ export default function AddCustomerModal({ isOpen, onClose, onCustomerAdded }: P
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
-  const [errors, setErrors] = useState({ name: '', email: '', phone: '', address: '' });
+  const [currencyId, setCurrencyId] = useState<string>('');
+  const [currencyOptions, setCurrencyOptions] = useState<{ value: string; label: string }[]>([]);
+  const [errors, setErrors] = useState({ name: '', email: '', phone: '', address: '', currency_id: '' });
+
+  useEffect(() => {
+    if (isOpen) {
+      fetchCurrencyOptions();
+    }
+  }, [isOpen]);
+
+  const fetchCurrencyOptions = async () => {
+    try {
+      const response = await getCurrencies(1, 100, '', false);
+      const options = response.data.map((currency: any) => ({
+        value: currency.id.toString(),
+        label: `${currency.code} - ${currency.name}`,
+      }));
+      setCurrencyOptions(options);
+    } catch (error) {
+      console.error('Failed to fetch currencies:', error);
+      toast.error('Failed to load currencies');
+    }
+  };
 
   const resetForm = () => {
     setName('');
     setEmail('');
     setPhone('');
     setAddress('');
-    setErrors({ name: '', email: '', phone: '', address: '' });
+    setCurrencyId('');
+    setErrors({ name: '', email: '', phone: '', address: '', currency_id: '' });
   };
 
   const handleClose = () => {
@@ -42,7 +63,7 @@ export default function AddCustomerModal({ isOpen, onClose, onCustomerAdded }: P
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const newErrors = { name: '', email: '', phone: '', address: '' };
+    const newErrors = { name: '', email: '', phone: '', address: '', currency_id: '' };
     let hasError = false;
 
     if (!name) {
@@ -61,7 +82,13 @@ export default function AddCustomerModal({ isOpen, onClose, onCustomerAdded }: P
     }
 
     try {
-      const response = await addCustomer({ name, email, phone, address });
+      const response = await addCustomer({
+        name,
+        email,
+        phone,
+        address,
+        currency_id: currencyId ? parseInt(currencyId) : undefined
+      });
       onCustomerAdded(response.data);
       toast.success('Customer added successfully');
       handleClose();
@@ -73,6 +100,7 @@ export default function AddCustomerModal({ isOpen, onClose, onCustomerAdded }: P
           email: apiErrors?.email?.[0] || '',
           phone: apiErrors?.phone?.[0] || '',
           address: apiErrors?.address?.[0] || '',
+          currency_id: apiErrors?.currency_id?.[0] || '',
         };
         setErrors(newErrors);
         toast.error('Please correct the errors in the form');
@@ -109,6 +137,17 @@ export default function AddCustomerModal({ isOpen, onClose, onCustomerAdded }: P
                   <Label>Phone</Label>
                   <Input type="text" value={phone} onChange={(e) => {setPhone(e.target.value); setErrors({...errors, phone: ''})}} error={!!errors.phone} hint={errors.phone} />
                 </div>
+              <div>
+                <Label>Currency</Label>
+                <Select
+                  options={currencyOptions}
+                  onChange={(value) => { setCurrencyId(value); setErrors({ ...errors, currency_id: '' }) }}
+                  placeholder="Select Currency"
+                  defaultValue={currencyId}
+                  error={!!errors.currency_id}
+                  hint={errors.currency_id}
+                />
+              </div>
                 <div className="lg:col-span-2">
                   <Label>Address</Label>
                   <TextArea placeholder="Enter address" value={address} onChange={(value) => {setAddress(value); setErrors({...errors, address: ''})}} error={!!errors.address} hint={errors.address} />

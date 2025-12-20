@@ -40,6 +40,14 @@ const navItems: NavItem[] = [
     permission: "view-dashboard",
   },
   {
+    name: "Accounting",
+    icon: <Receipt size={20} />,
+    subItems: [
+      { name: "Currencies", path: "/accounting/currencies", permission: "view-currency" },
+      { name: "Exchange Rates", path: "/accounting/exchange-rates", permission: "view-exchange-rate" },
+    ],
+  },
+  {
     name: "Inventory",
     icon: <Package size={20} />,
     subItems: [

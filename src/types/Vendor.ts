@@ -4,6 +4,12 @@ export interface Vendor {
   email: string;
   phone: string;
   address: string;
+  currency_id?: number;
+  currency?: {
+    id: number;
+    code: string;
+    symbol: string;
+  };
 }
 
 export interface VendorApiResponse {

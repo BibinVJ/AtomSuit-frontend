@@ -4,6 +4,12 @@ export interface Customer {
   email: string;
   phone: string;
   address: string;
+  currency_id?: number;
+  currency?: {
+    id: number;
+    code: string;
+    symbol: string;
+  };
   profile_image?: string;
   total_spent?: number;
 }
