@@ -82,7 +82,7 @@ export default function AddCurrencyModal({ isOpen, onClose, onSuccess }: Props) 
           toast.error(error.response?.data?.message || 'Failed to add currency');
         }
       } else {
-        console.error('Error adding currency skjdfnk:', error);
+        console.error('Error adding currency:', error);
         toast.error('Failed to add currency');
       }
     }
