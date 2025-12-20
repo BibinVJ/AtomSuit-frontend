@@ -85,7 +85,11 @@ git checkout -b enhancement/optimize-export-performance
   ```
 - Run **Tests** before pushing code:
   ```bash
-  npm run test -- --run
+  npm run test
+  ```
+- Run **Prettier** to fix formatting:
+  ```bash
+  npm run format
   ```
 - Maintain UI consistency by following patterns defined in `/components` and `/layouts`.
 
