@@ -1,7 +1,7 @@
 export interface Setting {
   id: number;
   key: string;
-  value: any;
+  value: unknown;
   type: 'string' | 'integer' | 'boolean' | 'json' | 'file';
   group: string;
   description?: string;

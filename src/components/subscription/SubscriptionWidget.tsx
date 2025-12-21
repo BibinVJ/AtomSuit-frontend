@@ -20,18 +20,11 @@ export default function SubscriptionWidget() {
     try {
       const data = await TenantSubscriptionService.getCurrentSubscription();
       setSubscription(data);
-    } catch (error) {
+    } catch {
       // Subscription not found or error - handle gracefully
     } finally {
       setLoading(false);
     }
-  };
-
-  const formatAmount = (amount: number, currency: string) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: currency.toUpperCase(),
-    }).format(amount / 100);
   };
 
   const formatDate = (dateString: string | null) => {

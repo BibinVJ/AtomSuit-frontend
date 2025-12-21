@@ -14,6 +14,14 @@ export interface Customer {
   total_spent?: number;
 }
 
+export interface CustomerInput {
+  name: string;
+  email: string;
+  phone: string;
+  address: string;
+  currency_id?: number;
+}
+
 export interface CustomerApiResponse {
   data: Customer[];
   meta: {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import PageMeta from '../../components/common/PageMeta';
 import PageBreadcrumb from '../../components/common/PageBreadCrumb';
@@ -22,19 +22,20 @@ export default function ViewSale() {
   const [sale, setSale] = useState<Sale | null>(null);
   const [isVoidModalOpen, setIsVoidModalOpen] = useState(false);
 
-  useEffect(() => {
-    const fetchSaleDetails = async () => {
-      try {
-        if (id) {
-          const response = await getSale(id);
-          setSale(response.data);
-        }
-      } catch (error) {
-        console.error('Error fetching sale details:', error);
+  const fetchSaleDetails = useCallback(async () => {
+    try {
+      if (id) {
+        const response = await getSale(id);
+        setSale(response);
       }
-    };
-    fetchSaleDetails();
+    } catch (error) {
+      console.error('Error fetching sale details:', error);
+    }
   }, [id]);
+
+  useEffect(() => {
+    fetchSaleDetails();
+  }, [fetchSaleDetails]);
 
   const handlePrint = () => {
     window.print();

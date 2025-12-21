@@ -1,6 +1,6 @@
 'use client';
 
-import { Plan } from '../../services/TenantSubscriptionService';
+import { Plan } from '../../types/Plan';
 import Button from '../ui/button/Button';
 import { Check, Star } from 'lucide-react';
 
@@ -62,19 +62,19 @@ export default function PlanCard({
         <p className="text-gray-500 dark:text-gray-400 text-sm mb-4">{plan.description}</p>
         <div className="mb-4">
           <span className="text-3xl font-bold text-gray-900 dark:text-white">
-            {formatAmount(plan.price, plan.currency)}
+            {formatAmount(plan.price, plan.currency || 'USD')}
           </span>
           <span className="text-gray-500 dark:text-gray-400 ml-1">/{plan.interval}</span>
         </div>
       </div>
 
       <div className="space-y-3 mb-6">
-        {plan.features.map((feature) => (
+        {plan.features?.map((feature) => (
           <div key={feature.id} className="flex items-start gap-2">
             <Check className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
             <div>
               <span className="text-sm text-gray-900 dark:text-white font-medium">
-                {feature.name}
+                {feature.display_name}
               </span>
               {feature.description && (
                 <p className="text-xs text-gray-500 dark:text-gray-400">{feature.description}</p>
@@ -85,7 +85,7 @@ export default function PlanCard({
       </div>
 
       <Button
-        onClick={() => onSelect(plan.id)}
+        onClick={() => onSelect(String(plan.id))}
         disabled={isCurrentPlan || loading}
         className={`w-full ${getButtonStyle()}`}
       >

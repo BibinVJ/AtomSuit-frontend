@@ -11,7 +11,9 @@ import { Download, Upload } from 'lucide-react';
 interface Props {
   isOpen: boolean;
   onClose: () => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onImport: (file: File) => Promise<any>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onDownloadSample: () => Promise<any>;
   onSuccess: () => void;
   entityName: string; // e.g., "Items", "Categories"

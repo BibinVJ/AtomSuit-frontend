@@ -23,6 +23,7 @@ interface Props {
   sortDirection: string;
   currentPage: number;
   perPage: number;
+  loading?: boolean;
 }
 
 export default function SubscriptionTable({
@@ -33,6 +34,7 @@ export default function SubscriptionTable({
   sortDirection,
   currentPage,
   perPage,
+  loading,
 }: Props) {
   const { hasPermission } = usePermissions();
   const { formatCurrency, formatDate: globalFormatDate } = useSettings();
@@ -44,7 +46,7 @@ export default function SubscriptionTable({
     try {
       // Fetch full subscription details with relations
       const response = await getSubscription(subscription.id);
-      setSelectedSubscription(response.data as Subscription);
+      setSelectedSubscription(response);
       setIsViewModalOpen(true);
     } catch (error) {
       console.error('Error fetching subscription details:', error);
@@ -166,62 +168,79 @@ export default function SubscriptionTable({
           </TableHeader>
 
           <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-            {data.map((subscription, index) => (
-              <TableRow key={subscription.id}>
-                <TableCell className="px-5 py-4 sm:px-6 text-start">
-                  <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                    {(currentPage - 1) * perPage + index + 1}
-                  </p>
-                </TableCell>
-                <TableCell className="px-4 py-3 text-start">
-                  <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                    {subscription.name}
-                  </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
-                    {subscription.stripe_id}
-                  </p>
-                </TableCell>
-                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
-                  {subscription.tenant?.name || 'N/A'}
-                </TableCell>
-                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
-                  {subscription.plan?.name || 'N/A'}
-                </TableCell>
-                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
-                  {formatCurrency(subscription.stripe_price)} x {subscription.quantity}
-                </TableCell>
-                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
-                  {formatDate(subscription.created_at)}
-                </TableCell>
-                <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                  {getStatusBadge(subscription)}
-                </TableCell>
-                <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                  <div className="flex items-center gap-2">
-                    <Tooltip text="View">
-                      <Button
-                        size="xs"
-                        onClick={() => handleView(subscription)}
-                        className="bg-blue-600 hover:bg-blue-700 text-white"
-                      >
-                        <Eye className="w-4 h-4" />
-                      </Button>
-                    </Tooltip>
-                    {hasPermission('delete-subscription') && !subscription.is_canceled && (
-                      <Tooltip text="Cancel">
-                        <Button
-                          size="xs"
-                          onClick={() => handleCancel(subscription)}
-                          className="bg-red-600 hover:bg-red-700 text-white"
-                        >
-                          <XCircle className="w-4 h-4" />
-                        </Button>
-                      </Tooltip>
-                    )}
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={8} className="px-5 py-10 text-center">
+                  <div className="flex flex-col items-center justify-center space-y-2">
+                    <div className="w-10 h-10 border-4 border-brand-500 border-t-transparent rounded-full animate-spin"></div>
+                    <p className="text-gray-500">Loading subscriptions...</p>
                   </div>
                 </TableCell>
               </TableRow>
-            ))}
+            ) : data.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={8} className="px-5 py-10 text-center text-gray-500">
+                  No subscriptions found.
+                </TableCell>
+              </TableRow>
+            ) : (
+              data.map((subscription, index) => (
+                <TableRow key={subscription.id}>
+                  <TableCell className="px-5 py-4 sm:px-6 text-start">
+                    <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
+                      {(currentPage - 1) * perPage + index + 1}
+                    </p>
+                  </TableCell>
+                  <TableCell className="px-4 py-3 text-start">
+                    <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
+                      {subscription.name}
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      {subscription.stripe_id}
+                    </p>
+                  </TableCell>
+                  <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
+                    {subscription.tenant?.name || 'N/A'}
+                  </TableCell>
+                  <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
+                    {subscription.plan?.name || 'N/A'}
+                  </TableCell>
+                  <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
+                    {formatCurrency(subscription.stripe_price)} x {subscription.quantity}
+                  </TableCell>
+                  <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
+                    {formatDate(subscription.created_at)}
+                  </TableCell>
+                  <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
+                    {getStatusBadge(subscription)}
+                  </TableCell>
+                  <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
+                    <div className="flex items-center gap-2">
+                      <Tooltip text="View">
+                        <Button
+                          size="xs"
+                          onClick={() => handleView(subscription)}
+                          className="bg-blue-600 hover:bg-blue-700 text-white"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                      </Tooltip>
+                      {hasPermission('delete-subscription') && !subscription.is_canceled && (
+                        <Tooltip text="Cancel">
+                          <Button
+                            size="xs"
+                            onClick={() => handleCancel(subscription)}
+                            className="bg-red-600 hover:bg-red-700 text-white"
+                          >
+                            <XCircle className="w-4 h-4" />
+                          </Button>
+                        </Tooltip>
+                      )}
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>

@@ -2,21 +2,14 @@
 
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '../../ui/table';
 import { useState } from 'react';
-import {
-  ChevronsUpDown,
-  ArrowUpWideNarrow,
-  ArrowDownNarrowWide,
-  Edit,
-  Trash2,
-  RefreshCw,
-} from 'lucide-react';
+import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide } from 'lucide-react';
 import { restoreExchangeRate } from '../../../services/ExchangeRateService';
 import { toast } from 'sonner';
-import Button from '../../ui/button/Button';
-import Tooltip from '../../ui/tooltip/Tooltip';
-import { ExchangeRate } from '../../../types/ExchangeRate';
+import { ExchangeRate } from '../../../types';
 import EditExchangeRateModal from './EditExchangeRateModal';
 import DeleteExchangeRateModal from './DeleteExchangeRateModal';
+import { TableActions } from '../../common/TableActions';
+import { usePermissions } from '../../../hooks/usePermissions';
 
 interface Props {
   data: ExchangeRate[];
@@ -41,6 +34,7 @@ export default function ExchangeRateTable({
   startIndex,
   viewMode = 'active',
 }: Props) {
+  const { hasPermission } = usePermissions();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedExchangeRate, setSelectedExchangeRate] = useState<ExchangeRate | null>(null);
@@ -125,7 +119,7 @@ export default function ExchangeRateTable({
               </TableCell>
               <TableCell
                 isHeader
-                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                className="px-5 py-3 font-medium text-gray-500 text-end text-theme-xs dark:text-gray-400"
               >
                 Actions
               </TableCell>
@@ -164,52 +158,21 @@ export default function ExchangeRateTable({
                   <TableCell className="px-5 py-4 sm:px-6 text-start text-gray-500 dark:text-gray-400 text-theme-sm">
                     {rate.effective_date}
                   </TableCell>
-                  <TableCell className="px-5 py-4 sm:px-6 text-start text-gray-500 dark:text-gray-400 text-theme-sm">
-                    <div className="flex items-center gap-2">
-                      {viewMode === 'active' ? (
-                        <>
-                          <Tooltip text="Edit">
-                            <Button
-                              size="xs"
-                              onClick={() => handleEdit(rate)}
-                              className="bg-blue-600 hover:bg-blue-700 text-white"
-                            >
-                              <Edit className="w-4 h-4" />
-                            </Button>
-                          </Tooltip>
-                          <Tooltip text="Delete">
-                            <Button
-                              size="xs"
-                              onClick={() => handleDelete(rate)}
-                              className="bg-red-600 hover:bg-red-700 text-white"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          </Tooltip>
-                        </>
-                      ) : (
-                        <>
-                          <Tooltip text="Restore">
-                            <Button
-                              size="xs"
-                              onClick={() => handleRestore(rate.id)}
-                              className="bg-green-600 hover:bg-green-700 text-white"
-                            >
-                              <RefreshCw className="w-4 h-4" />
-                            </Button>
-                          </Tooltip>
-                          <Tooltip text="Delete Permanently">
-                            <Button
-                              size="xs"
-                              onClick={() => handleDelete(rate)}
-                              className="bg-red-600 hover:bg-red-700 text-white"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          </Tooltip>
-                        </>
-                      )}
-                    </div>
+                  <TableCell className="px-5 py-4 sm:px-6 text-end text-gray-500 dark:text-gray-400 text-theme-sm">
+                    <TableActions
+                      isTrashed={viewMode === 'trashed'}
+                      onEdit={
+                        hasPermission('update-exchange-rate') ? () => handleEdit(rate) : undefined
+                      }
+                      onDelete={
+                        hasPermission('delete-exchange-rate') ? () => handleDelete(rate) : undefined
+                      }
+                      onRestore={
+                        hasPermission('update-exchange-rate')
+                          ? () => handleRestore(rate.id)
+                          : undefined
+                      }
+                    />
                   </TableCell>
                 </TableRow>
               ))

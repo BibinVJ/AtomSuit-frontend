@@ -8,8 +8,8 @@ export interface AuditEntry {
   causer_id: number;
   event: string;
   properties: {
-    attributes?: Record<string, any>;
-    old?: Record<string, any>;
+    attributes?: Record<string, unknown>;
+    old?: Record<string, unknown>;
   };
   created_at: string;
   updated_at: string;

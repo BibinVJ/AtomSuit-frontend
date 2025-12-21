@@ -1,7 +1,6 @@
 'use client';
 
 import { Setting } from '../../types';
-import { formatLabel } from '../../utils/string';
 import SettingField from './SettingField';
 
 interface Props {
@@ -10,7 +9,7 @@ interface Props {
   onUpdate: () => void;
 }
 
-export default function SettingsGroup({ groupName, settings, onUpdate }: Props) {
+export default function SettingsGroup({ settings, onUpdate }: Props) {
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

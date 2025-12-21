@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { createRole } from '../../services/RoleService';
+import { addRole } from '../../services/RoleService';
 import { getPermissions } from '../../services/PermissionService';
 import PageMeta from '../../components/common/PageMeta';
 import PageBreadcrumb from '../../components/common/PageBreadCrumb';
@@ -24,18 +24,19 @@ export default function AddRole() {
   const [errors, setErrors] = useState({ name: '', permissions: '' });
   const router = useRouter();
 
-  useEffect(() => {
-    const fetchPermissions = async () => {
-      try {
-        const perms = await getPermissions();
-        setAvailablePermissions(perms.data);
-      } catch (error) {
-        console.error('Error fetching permissions:', error);
-        toast.error('Failed to fetch permissions');
-      }
-    };
-    fetchPermissions();
+  const fetchPermissions = useCallback(async () => {
+    try {
+      const perms = await getPermissions();
+      setAvailablePermissions(perms.data);
+    } catch (error) {
+      console.error('Error fetching permissions:', error);
+      toast.error('Failed to fetch permissions');
+    }
   }, []);
+
+  useEffect(() => {
+    fetchPermissions();
+  }, [fetchPermissions]);
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -118,7 +119,7 @@ export default function AddRole() {
     e.preventDefault();
     // Validation logic...
     try {
-      await createRole({ name, permissions: selectedPermissions });
+      await addRole({ name, permissions: selectedPermissions });
       toast.success('Role added successfully');
       router.push('/roles');
     } catch (error: unknown) {

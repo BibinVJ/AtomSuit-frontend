@@ -10,7 +10,6 @@ import {
 import { getPlans } from '../../services/PlanService';
 import { Plan, Subscription } from '../../types';
 import SubscriptionCard from './SubscriptionCard';
-import PlanCard from './PlanCard';
 import Button from '../ui/button/Button';
 import { Modal } from '../ui/modal';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
@@ -32,11 +31,11 @@ export default function SubscriptionManagement() {
       setLoading(true);
       const [subscriptionData, plansResponse] = await Promise.all([
         getCurrentSubscription().catch(() => null),
-        getPlans(undefined, undefined, undefined, undefined, true),
+        getPlans({ unpaginated: true }),
       ]);
       setSubscription(subscriptionData);
       setPlans(plansResponse.data as Plan[]);
-    } catch (error) {
+    } catch {
       toast.error('Failed to load subscription data');
     } finally {
       setLoading(false);
@@ -54,8 +53,9 @@ export default function SubscriptionManagement() {
       toast.success('Plan changed successfully!');
       await loadData();
       setShowPlansModal(false);
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Failed to change plan');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Failed to change plan';
+      toast.error(message);
     } finally {
       setActionLoading(false);
     }
@@ -68,8 +68,9 @@ export default function SubscriptionManagement() {
       await loadData();
       setShowCancelModal(false);
       toast.success('Subscription cancelled. Access will continue until end of billing period.');
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Failed to cancel subscription');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Failed to cancel subscription';
+      toast.error(message);
     } finally {
       setActionLoading(false);
     }
@@ -94,7 +95,7 @@ export default function SubscriptionManagement() {
       <div className="text-center p-8">
         <AlertTriangle className="w-12 h-12 text-orange-500 mx-auto mb-4" />
         <h3 className="text-lg font-semibold text-gray-900 mb-2">No Active Subscription</h3>
-        <p className="text-gray-600 mb-4">You don't have an active subscription.</p>
+        <p className="text-gray-600 mb-4">You don&apos;t have an active subscription.</p>
         <Button
           onClick={() => setShowPlansModal(true)}
           className="bg-blue-600 hover:bg-blue-700 text-white"

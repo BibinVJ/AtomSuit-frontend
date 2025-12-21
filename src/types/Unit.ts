@@ -3,6 +3,8 @@ export interface Unit {
   name: string;
   code: string;
   description: string;
+  is_active?: boolean;
+  short_name?: string; // Add as alias for compatibility if needed, but we'll try to use code
 }
 
 export interface UnitApiResponse {
@@ -15,3 +17,5 @@ export interface UnitApiResponse {
     to: number;
   };
 }
+
+export type UnitInput = Partial<Unit>;

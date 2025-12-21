@@ -98,7 +98,7 @@ export default function EditPlanModal({ isOpen, onClose, onPlanUpdated, plan }: 
     }
 
     try {
-      const payload: any = {
+      const payload: Record<string, unknown> = {
         name,
         price: Number(price),
         interval,
@@ -165,7 +165,7 @@ export default function EditPlanModal({ isOpen, onClose, onPlanUpdated, plan }: 
     setFeatures(features.filter((_, i) => i !== index));
   };
 
-  const updateFeature = (index: number, field: keyof PlanFeature, value: any) => {
+  const updateFeature = (index: number, field: keyof PlanFeature, value: unknown) => {
     const updated = [...features];
     updated[index] = { ...updated[index], [field]: value };
     setFeatures(updated);
@@ -227,7 +227,9 @@ export default function EditPlanModal({ isOpen, onClose, onPlanUpdated, plan }: 
                     { value: 'year', label: 'Year' },
                     { value: 'lifetime', label: 'Lifetime' },
                   ]}
-                  onChange={(value) => setInterval(value as any)}
+                  onChange={(value) =>
+                    setInterval(value as 'day' | 'week' | 'month' | 'year' | 'lifetime')
+                  }
                   defaultValue={interval}
                   showPlaceholder={false}
                 />
@@ -343,7 +345,9 @@ export default function EditPlanModal({ isOpen, onClose, onPlanUpdated, plan }: 
                           { value: 'integer', label: 'Integer' },
                           { value: 'boolean', label: 'Boolean' },
                         ]}
-                        onChange={(value) => updateFeature(index, 'type', value as any)}
+                        onChange={(value) =>
+                          updateFeature(index, 'type', value as 'string' | 'integer' | 'boolean')
+                        }
                         defaultValue={feature.type}
                         showPlaceholder={false}
                       />

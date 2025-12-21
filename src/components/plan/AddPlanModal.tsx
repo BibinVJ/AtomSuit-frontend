@@ -91,7 +91,7 @@ export default function AddPlanModal({ isOpen, onClose, onPlanAdded }: Props) {
     }
 
     try {
-      const payload: any = {
+      const payload: Record<string, unknown> = {
         name,
         price: Number(price),
         interval,
@@ -110,7 +110,7 @@ export default function AddPlanModal({ isOpen, onClose, onPlanAdded }: Props) {
       };
 
       const response = await createPlan(payload);
-      onPlanAdded(response.data);
+      onPlanAdded(response);
       toast.success('Plan added successfully');
       handleClose();
     } catch (error: unknown) {
@@ -157,7 +157,7 @@ export default function AddPlanModal({ isOpen, onClose, onPlanAdded }: Props) {
     setFeatures(features.filter((_, i) => i !== index));
   };
 
-  const updateFeature = (index: number, field: keyof Omit<PlanFeature, 'id'>, value: any) => {
+  const updateFeature = (index: number, field: keyof Omit<PlanFeature, 'id'>, value: unknown) => {
     const updated = [...features];
     updated[index] = { ...updated[index], [field]: value };
     setFeatures(updated);
@@ -219,7 +219,9 @@ export default function AddPlanModal({ isOpen, onClose, onPlanAdded }: Props) {
                     { value: 'year', label: 'Year' },
                     { value: 'lifetime', label: 'Lifetime' },
                   ]}
-                  onChange={(value) => setInterval(value as any)}
+                  onChange={(value) =>
+                    setInterval(value as 'day' | 'week' | 'month' | 'year' | 'lifetime')
+                  }
                   defaultValue={interval}
                   showPlaceholder={false}
                 />
@@ -335,7 +337,9 @@ export default function AddPlanModal({ isOpen, onClose, onPlanAdded }: Props) {
                           { value: 'integer', label: 'Integer' },
                           { value: 'boolean', label: 'Boolean' },
                         ]}
-                        onChange={(value) => updateFeature(index, 'type', value as any)}
+                        onChange={(value) =>
+                          updateFeature(index, 'type', value as 'string' | 'integer' | 'boolean')
+                        }
                         defaultValue={feature.type}
                         showPlaceholder={false}
                       />

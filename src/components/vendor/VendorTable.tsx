@@ -2,23 +2,14 @@
 
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '../ui/table';
 import { useState } from 'react';
-import Badge from '../ui/badge/Badge';
 import EditVendorModal from './EditVendorModal';
 import DeleteVendorModal from './DeleteVendorModal';
-import {
-  ChevronsUpDown,
-  ArrowUpWideNarrow,
-  ArrowDownNarrowWide,
-  Edit,
-  Trash2,
-  RefreshCw,
-} from 'lucide-react';
+import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide } from 'lucide-react';
 import { restoreVendor } from '../../services/VendorService';
 import { toast } from 'sonner';
-import Button from '../ui/button/Button';
-import Tooltip from '../ui/tooltip/Tooltip';
-
 import { Vendor } from '../../types';
+import { usePermissions } from '../../hooks/usePermissions';
+import { TableActions } from '../common/TableActions';
 
 interface Props {
   data: Vendor[];
@@ -31,8 +22,6 @@ interface Props {
   startIndex?: number;
   viewMode?: 'active' | 'trashed';
 }
-
-import { usePermissions } from '../../hooks/usePermissions';
 
 export default function VendorTable({
   data,
@@ -129,7 +118,7 @@ export default function VendorTable({
               </TableCell>
               <TableCell
                 isHeader
-                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                className="px-5 py-3 font-medium text-gray-500 text-end text-theme-xs dark:text-gray-400"
               >
                 Actions
               </TableCell>
@@ -158,60 +147,17 @@ export default function VendorTable({
                 <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
                   {vendor.address}
                 </TableCell>
-                <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                  <div className="flex items-center gap-2">
-                    {viewMode === 'active' ? (
-                      <>
-                        {hasPermission('update-vendor') && (
-                          <Tooltip text="Edit">
-                            <Button
-                              size="xs"
-                              onClick={() => handleEdit(vendor)}
-                              className="bg-blue-600 hover:bg-blue-700 text-white"
-                            >
-                              <Edit className="w-4 h-4" />
-                            </Button>
-                          </Tooltip>
-                        )}
-                        {hasPermission('delete-vendor') && (
-                          <Tooltip text="Delete">
-                            <Button
-                              size="xs"
-                              onClick={() => handleDelete(vendor)}
-                              className="bg-red-600 hover:bg-red-700 text-white"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          </Tooltip>
-                        )}
-                      </>
-                    ) : (
-                      <>
-                        {hasPermission('update-vendor') && (
-                          <Tooltip text="Restore">
-                            <Button
-                              size="xs"
-                              onClick={() => handleRestore(vendor.id)}
-                              className="bg-green-600 hover:bg-green-700 text-white"
-                            >
-                              <RefreshCw className="w-4 h-4" />
-                            </Button>
-                          </Tooltip>
-                        )}
-                        {hasPermission('delete-vendor') && (
-                          <Tooltip text="Delete Permanently">
-                            <Button
-                              size="xs"
-                              onClick={() => handleDelete(vendor)}
-                              className="bg-red-600 hover:bg-red-700 text-white"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          </Tooltip>
-                        )}
-                      </>
-                    )}
-                  </div>
+                <TableCell className="px-4 py-3 text-end">
+                  <TableActions
+                    isTrashed={viewMode === 'trashed'}
+                    onEdit={hasPermission('update-vendor') ? () => handleEdit(vendor) : undefined}
+                    onDelete={
+                      hasPermission('delete-vendor') ? () => handleDelete(vendor) : undefined
+                    }
+                    onRestore={
+                      hasPermission('update-vendor') ? () => handleRestore(vendor.id) : undefined
+                    }
+                  />
                 </TableCell>
               </TableRow>
             ))}
@@ -223,13 +169,13 @@ export default function VendorTable({
           <EditVendorModal
             isOpen={isEditModalOpen}
             onClose={handleCloseModals}
-            onVendorUpdated={onAction}
+            onSuccess={onAction}
             vendor={selectedVendor}
           />
           <DeleteVendorModal
             isOpen={isDeleteModalOpen}
             onClose={handleCloseModals}
-            onVendorDeleted={onAction}
+            onSuccess={onAction}
             vendor={selectedVendor}
             force={viewMode === 'trashed'}
           />

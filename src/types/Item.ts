@@ -16,6 +16,17 @@ export interface Item {
   expired_stock?: number;
   is_expired_sale_enabled?: boolean;
 }
+
+export interface ItemInput {
+  sku: string;
+  name: string;
+  category_id: string | number;
+  unit_id: string | number;
+  description: string;
+  type: string;
+  selling_price: number;
+}
+
 export interface ItemApiResponse {
   data: Item[];
   meta: {

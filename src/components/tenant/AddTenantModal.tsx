@@ -11,7 +11,7 @@ import { toast } from 'sonner';
 import { createTenant } from '../../services/TenantService';
 import { getPlans } from '../../services/PlanService';
 import { isApiError } from '../../utils/errors';
-import { Plan, Tenant } from '../../types';
+import { Plan, Tenant, TenantInput } from '../../types';
 
 interface Props {
   isOpen: boolean;
@@ -38,7 +38,7 @@ export default function AddTenantModal({ isOpen, onClose, onTenantAdded }: Props
 
   const fetchPlans = async () => {
     try {
-      const response = await getPlans(1, 100, 'name', 'asc', true);
+      const response = await getPlans({ unpaginated: true });
       setPlans(Array.isArray(response.data) ? response.data : [response.data]);
     } catch (error) {
       console.error('Error fetching plans:', error);
@@ -108,18 +108,18 @@ export default function AddTenantModal({ isOpen, onClose, onTenantAdded }: Props
     }
 
     try {
-      const payload = {
+      const payload: TenantInput = {
         name,
         email,
         phone,
         password,
         domain_name: domainName,
-        plan_id: planId,
+        plan_id: Number(planId),
         load_sample_data: loadSampleData,
       };
 
       const response = await createTenant(payload);
-      onTenantAdded(response.data);
+      onTenantAdded(response);
       toast.success('Tenant created successfully');
       handleClose();
     } catch (error: unknown) {

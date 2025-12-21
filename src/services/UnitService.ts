@@ -1,81 +1,25 @@
-import api from './api';
-import { UnitApiResponse } from '../types';
+import { Unit, UnitInput } from '../types';
+import { createBaseService, QueryParams, PaginatedResponse } from './BaseService';
 
-export const getUnits = async (
-  params: {
-    page?: number;
-    limit?: number;
-    sortCol?: string;
-    sortDir?: string;
-    from?: number;
-    to?: number;
-    search?: string;
-    unpaginated?: boolean;
-    trashed?: 'only' | 'with';
-  } = {}
-): Promise<UnitApiResponse> => {
-  const {
-    page = 1,
-    limit = 10,
-    sortCol = 'created_at',
-    sortDir = 'desc',
-    from,
-    to,
-    search,
-    unpaginated = false,
-    trashed,
-  } = params;
+const unitService = createBaseService<Unit, UnitInput>('/unit');
 
-  const requestParams: any = { perPage: limit, page, sort_by: sortCol, sort_direction: sortDir };
-  if (unpaginated) requestParams.unpaginated = 1;
-  if (from !== undefined) requestParams.from = from;
-  if (to !== undefined) requestParams.to = to;
-  if (search) requestParams.search = search;
-  if (trashed) requestParams.trashed = trashed;
+export const getUnits = (params: QueryParams = {}): Promise<PaginatedResponse<Unit>> =>
+  unitService.list(params);
 
-  const response = await api.get(`/unit`, { params: requestParams });
-  return response.data;
+export const getUnit = (id: number): Promise<Unit> => unitService.get(id);
+
+export const addUnit = (data: UnitInput) => unitService.create(data);
+
+export const updateUnit = (id: number, data: UnitInput) => unitService.update(id, data);
+
+export const deleteUnit = (id: number, force: boolean = false) => unitService.delete(id, force);
+
+export const restoreUnit = (id: number) => unitService.restore(id);
+
+export const exportUnits = () => unitService.export('/unit/export');
+
+const UnitService = {
+  ...unitService,
 };
 
-export const addUnit = async (unit: { name: string; code: string; description: string }) => {
-  const response = await api.post('/unit', unit);
-  return response.data;
-};
-
-export const updateUnit = async (
-  id: number,
-  unit: { name: string; code: string; description: string }
-) => {
-  const response = await api.put(`/unit/${id}`, unit);
-  return response.data;
-};
-
-export const deleteUnit = async (id: number, force = false) => {
-  const response = await api.delete(`/unit/${id}${force ? '?force=1' : ''}`);
-  return response.data;
-};
-
-export const restoreUnit = async (id: number) => {
-  const response = await api.post(`/unit/${id}/restore`);
-  return response.data;
-};
-
-export const exportUnits = async () => {
-  const response = await api.get('/unit/export', { responseType: 'blob' });
-  return response;
-};
-
-export const importUnits = async (file: File) => {
-  const formData = new FormData();
-  formData.append('file', file);
-  return await api.post('/unit/import', formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  });
-};
-
-export const downloadSampleUnitExcel = async () => {
-  const response = await api.get('/unit/sample-excel', { responseType: 'blob' });
-  return response;
-};
+export default UnitService;

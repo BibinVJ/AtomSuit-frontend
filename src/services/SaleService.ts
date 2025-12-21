@@ -1,49 +1,30 @@
 import api from './api';
-import { SaleApiResponse } from '../types';
+import { Sale, SaleInput } from '../types';
+import { createBaseService } from './BaseService';
 
-export const getSales = async (
-  page = 1,
-  limit = 10,
-  sortCol = 'created_at',
-  sortDir = 'desc',
-  from?: number,
-  to?: number,
-  search?: string
-): Promise<SaleApiResponse> => {
-  const params: any = { perPage: limit, page, sort_by: sortCol, sort_direction: sortDir };
-  if (from !== undefined) params.from = from;
-  if (to !== undefined) params.to = to;
-  if (search) params.search = search;
-  const response = await api.get(`/sale`, { params });
-  return response.data;
-};
+const baseService = createBaseService<Sale, SaleInput>('/sale');
 
-export const getSale = async (id: string) => {
-  const response = await api.get(`/sale/${id}`);
-  return response.data.data;
-};
-
-export const addSale = async (sale: any) => {
-  const response = await api.post('/sale', sale);
-  return response.data;
-};
-
-export const updateSale = async (id: number | string, sale: any) => {
-  const response = await api.put(`/sale/${id}`, sale);
-  return response.data;
-};
+export const getSales = baseService.list;
+export const getSale = baseService.get;
+export const addSale = baseService.create;
+export const updateSale = baseService.update;
+export const deleteSale = baseService.delete;
+export const exportSales = baseService.export;
 
 export const getNextInvoiceNumber = async () => {
   const response = await api.get('/sale/next-invoice-number');
   return response.data;
 };
 
-export const deleteSale = async (id: number) => {
-  const response = await api.delete(`/sale/${id}`);
+export const voidSale = async (id: number) => {
+  const response = await api.post(`/sale/${id}/void`);
   return response.data;
 };
 
-export const exportSales = async () => {
-  const response = await api.get('/sale/export', { responseType: 'blob' });
-  return response;
+const SaleService = {
+  ...baseService,
+  getNextInvoiceNumber,
+  voidSale,
 };
+
+export default SaleService;

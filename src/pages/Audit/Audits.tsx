@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState, useMemo } from 'react';
 import PageBreadcrumb from '../../components/common/PageBreadCrumb';
 import ComponentCard from '../../components/common/ComponentCard';
 import PageMeta from '../../components/common/PageMeta';
@@ -9,106 +9,43 @@ import AuditDetailsModal from '../../components/audit/AuditDetailsModal';
 import { useModal } from '../../hooks/useModal';
 import Pagination from '../../components/common/Pagination';
 import Select from '../../components/form/Select';
-import { AuditService } from '../../services/AuditService';
+import AuditService from '../../services/AuditService';
 import { AuditEntry } from '../../types';
-import { useDebounce } from '../../hooks/useDebounce';
+import { useDataTable } from '../../hooks/useDataTable';
 import TableToolbar from '../../components/common/TableToolbar';
 
 export default function Audits() {
-  const [activities, setActivities] = useState<AuditEntry[]>([]);
   const { isOpen, openModal, closeModal } = useModal();
   const [selectedEntry, setSelectedEntry] = useState<AuditEntry | null>(null);
-
-  const [currentPage, setCurrentPage] = useState(1);
-  const [perPage, setPerPage] = useState(20);
-  const [totalPages, setTotalPages] = useState(1);
-  const [from, setFrom] = useState(0);
-  const [to, setTo] = useState(0);
-  const [total, setTotal] = useState(0);
-
-  /* State for Range Fetching & Search */
-  const [rangeFrom, setRangeFrom] = useState<number | ''>('');
-  const [rangeTo, setRangeTo] = useState<number | ''>('');
-  const [searchTerm, setSearchTerm] = useState('');
-
-  const debouncedSearchTerm = useDebounce(searchTerm, 1000);
-  const debouncedRangeFrom = useDebounce(rangeFrom, 1000);
-  const debouncedRangeTo = useDebounce(rangeTo, 1000);
-
-  /* State for Advanced Filters */
   const [selectedEvent, setSelectedEvent] = useState('');
   const [selectedSubjectType, setSelectedSubjectType] = useState('');
 
-  const fetchActivities = async (page = 1, limit = 20) => {
-    try {
-      const params: any = { page, limit };
-      if (debouncedRangeFrom !== '' && debouncedRangeTo !== '') {
-        params.from = Number(debouncedRangeFrom);
-        params.to = Number(debouncedRangeTo);
-      }
-      if (debouncedSearchTerm) {
-        params.search = debouncedSearchTerm;
-      }
-      if (selectedEvent) {
-        params.event = selectedEvent;
-      }
-      if (selectedSubjectType) {
-        params.subject_type = selectedSubjectType;
-      }
+  const extraParams = useMemo(
+    () => ({
+      event: selectedEvent,
+      subject_type: selectedSubjectType,
+    }),
+    [selectedEvent, selectedSubjectType]
+  );
 
-      const response = await AuditService.getActivities(params);
-
-      setActivities(response.data);
-      if (response.meta) {
-        setTotalPages(response.meta.last_page || 1);
-        setCurrentPage(response.meta.current_page || 1);
-        setFrom(
-          response.meta.from !== undefined
-            ? response.meta.from
-            : debouncedRangeFrom !== ''
-              ? Number(debouncedRangeFrom)
-              : 0
-        );
-        setTo(
-          response.meta.to !== undefined
-            ? response.meta.to
-            : debouncedRangeTo !== ''
-              ? Number(debouncedRangeTo)
-              : 0
-        );
-        setTotal(response.meta.total !== undefined ? response.meta.total : 0);
-      } else {
-        setTotalPages(1);
-        setCurrentPage(1);
-        setFrom(debouncedRangeFrom !== '' ? Number(debouncedRangeFrom) : 0);
-        setTo(debouncedRangeTo !== '' ? Number(debouncedRangeTo) : 0);
-        setTotal(response.data?.length || 0);
-      }
-    } catch (error) {
-      console.error('Error fetching audits:', error);
-    }
-  };
-
-  useEffect(() => {
-    fetchActivities(currentPage, perPage);
-  }, [
+  const {
+    data: activities,
     currentPage,
     perPage,
-    selectedEvent,
-    selectedSubjectType,
-    debouncedSearchTerm,
-    debouncedRangeFrom,
-    debouncedRangeTo,
-  ]);
-
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
-
-  const handlePerPageChange = (value: string) => {
-    setPerPage(parseInt(value, 10));
-    setCurrentPage(1);
-  };
+    totalPages,
+    total,
+    from,
+    to,
+    searchTerm,
+    setSearchTerm,
+    handlePageChange,
+    handlePerPageChange,
+    resetFilters,
+  } = useDataTable<AuditEntry>({
+    fetchData: (params) => AuditService.getActivities(params),
+    initialPerPage: 20,
+    extraParams,
+  });
 
   const handleViewDetails = (entry: AuditEntry) => {
     setSelectedEntry(entry);
@@ -127,18 +64,12 @@ export default function Audits() {
             searchTerm={searchTerm}
             onSearchChange={setSearchTerm}
             searchPlaceholder="Search logs..."
-            rangeFrom={rangeFrom}
-            onRangeFromChange={(val) => setRangeFrom(val as number | '')}
-            rangeTo={rangeTo}
-            onRangeToChange={(val) => setRangeTo(val as number | '')}
             perPage={perPage}
             onPerPageChange={handlePerPageChange}
             onReset={() => {
-              setSearchTerm('');
+              resetFilters();
               setSelectedEvent('');
               setSelectedSubjectType('');
-              setRangeFrom('');
-              setRangeTo('');
             }}
             extraFilters={
               <>
@@ -191,7 +122,6 @@ export default function Audits() {
             currentPage={currentPage}
             perPage={perPage}
             onViewDetails={handleViewDetails}
-            startIndex={debouncedRangeFrom !== '' ? Number(debouncedRangeFrom) : undefined}
           />
           <Pagination
             currentPage={currentPage}

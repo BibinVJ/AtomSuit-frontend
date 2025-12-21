@@ -2,7 +2,6 @@
 
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '../ui/table';
 import Badge from '../ui/badge/Badge';
-import { formatLabel } from '../../utils/string';
 import { Eye } from 'lucide-react';
 import Button from '../ui/button/Button';
 import Tooltip from '../ui/tooltip/Tooltip';
@@ -18,7 +17,10 @@ interface AuditEntry {
   causer_type: string;
   causer_id: number;
   event: string;
-  properties: any;
+  properties: {
+    attributes?: Record<string, unknown>;
+    old?: Record<string, unknown>;
+  };
   created_at: string;
   updated_at: string;
   causer?: {

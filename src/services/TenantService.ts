@@ -1,46 +1,16 @@
 import api from './api';
-import { TenantApiResponse } from '../types';
+import { Tenant, TenantInput } from '../types';
+import { createBaseService } from './BaseService';
 
-export const getTenants = async (
-  page = 1,
-  limit = 10,
-  sortCol = 'created_at',
-  sortDir = 'desc',
-  from?: number,
-  to?: number,
-  search?: string,
-  plan_id?: string | number
-): Promise<TenantApiResponse> => {
-  const params: any = { perPage: limit, page, sort_by: sortCol, sort_direction: sortDir };
-  if (from !== undefined) params.from = from;
-  if (to !== undefined) params.to = to;
-  if (search) params.search = search;
-  if (plan_id) params.plan_id = plan_id;
-  const response = await api.get(`/tenant`, { params });
-  return response.data;
-};
+const baseService = createBaseService<Tenant, TenantInput>('/tenant');
 
-export const getTenant = async (id: number) => {
-  const response = await api.get(`/tenant/${id}`);
-  return response.data;
-};
+export const getTenants = baseService.list;
+export const getTenant = baseService.get;
+export const createTenant = baseService.create;
+export const updateTenant = baseService.update;
+export const deleteTenant = baseService.delete;
 
-export const createTenant = async (tenant: any) => {
-  const response = await api.post('/tenant', tenant);
-  return response.data;
-};
-
-export const updateTenant = async (id: number, tenant: any) => {
-  const response = await api.put(`/tenant/${id}`, tenant);
-  return response.data;
-};
-
-export const deleteTenant = async (id: number) => {
-  const response = await api.delete(`/tenant/${id}`);
-  return response.data;
-};
-
-export const sendTenantMail = async (id: number, mailData: any) => {
+export const sendTenantMail = async (id: number, mailData: Record<string, unknown>) => {
   const response = await api.post(`/tenant/${id}/send-mail`, mailData);
   return response.data;
 };
@@ -49,3 +19,11 @@ export const getTenantStats = async () => {
   const response = await api.get('/tenant-stats');
   return response.data;
 };
+
+const TenantService = {
+  ...baseService,
+  sendTenantMail,
+  getTenantStats,
+};
+
+export default TenantService;

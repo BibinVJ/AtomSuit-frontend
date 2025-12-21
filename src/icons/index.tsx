@@ -51,6 +51,11 @@ import HorizontaLDots from './horizontal-dots.svg';
 import ChatIcon from './chat.svg';
 import MoreDotIcon from './more-dot.svg';
 import BellIcon from './bell.svg';
+import AngleLeftIcon from './angle-left.svg';
+import AngleRightIcon from './angle-right.svg';
+import AlertHexaIcon from './alert-hexa.svg';
+import InfoErrorIcon from './info-error.svg';
+import InfoHexaIcon from './info-hexa.svg';
 
 export {
   DownloadIcon,
@@ -106,4 +111,9 @@ export {
   HorizontaLDots,
   ChevronUpIcon,
   ChatIcon,
+  AngleLeftIcon,
+  AngleRightIcon,
+  AlertHexaIcon,
+  InfoErrorIcon,
+  InfoHexaIcon,
 };

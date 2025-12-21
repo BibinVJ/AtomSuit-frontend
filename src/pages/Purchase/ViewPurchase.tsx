@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import PageMeta from '../../components/common/PageMeta';
 import PageBreadcrumb from '../../components/common/PageBreadCrumb';
@@ -22,19 +22,20 @@ export default function ViewPurchase() {
   const [purchase, setPurchase] = useState<Purchase | null>(null);
   const [isVoidModalOpen, setIsVoidModalOpen] = useState(false);
 
-  useEffect(() => {
-    const fetchPurchaseDetails = async () => {
-      try {
-        if (id) {
-          const response = await getPurchase(id);
-          setPurchase(response.data);
-        }
-      } catch (error) {
-        console.error('Error fetching purchase details:', error);
+  const fetchPurchaseDetails = useCallback(async () => {
+    try {
+      if (id) {
+        const response = await getPurchase(id);
+        setPurchase(response);
       }
-    };
-    fetchPurchaseDetails();
+    } catch (error) {
+      console.error('Error fetching purchase details:', error);
+    }
   }, [id]);
+
+  useEffect(() => {
+    fetchPurchaseDetails();
+  }, [fetchPurchaseDetails]);
 
   const handlePrint = () => {
     window.print();

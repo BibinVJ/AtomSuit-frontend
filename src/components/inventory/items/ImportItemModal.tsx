@@ -12,10 +12,10 @@ import { Download, Upload } from 'lucide-react';
 interface Props {
   isOpen: boolean;
   onClose: () => void;
-  onItemsImported: () => void;
+  onSuccess: () => void;
 }
 
-export default function ImportItemModal({ isOpen, onClose, onItemsImported }: Props) {
+export default function ImportItemModal({ isOpen, onClose, onSuccess }: Props) {
   const [file, setFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
 
@@ -52,7 +52,7 @@ export default function ImportItemModal({ isOpen, onClose, onItemsImported }: Pr
     try {
       await importItems(file);
       toast.success('Items imported successfully');
-      onItemsImported();
+      onSuccess();
       onClose();
       setFile(null);
     } catch (error) {

@@ -7,7 +7,7 @@ import { Customer } from '../../types';
 interface Props {
   isOpen: boolean;
   onClose: () => void;
-  onCustomerDeleted: () => void;
+  onSuccess: () => void;
   customer: Customer;
   force?: boolean;
 }
@@ -15,14 +15,14 @@ interface Props {
 export default function DeleteCustomerModal({
   isOpen,
   onClose,
-  onCustomerDeleted,
+  onSuccess,
   customer,
   force = false,
 }: Props) {
   const handleDelete = async () => {
     try {
       await deleteCustomer(customer.id, force);
-      onCustomerDeleted();
+      onSuccess();
       toast.success(force ? 'Customer permanently deleted' : 'Customer deleted successfully');
       onClose();
     } catch (error) {

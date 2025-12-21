@@ -1,9 +1,9 @@
 import { createContext } from 'react';
 
 export interface SettingsContextType {
-  settings: Record<string, any>;
+  settings: Record<string, unknown>;
   isLoading: boolean;
-  getSetting: (key: string, defaultValue?: any) => any;
+  getSetting: <T>(key: string, defaultValue?: T) => T;
   formatCurrency: (amount: number | string) => string;
   formatDate: (date: string | Date) => string;
   formatDateTime: (date: string | Date) => string;

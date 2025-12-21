@@ -47,14 +47,20 @@ export default function EditSale() {
   const fetchInitialData = useCallback(async () => {
     try {
       const [customerResponse, itemResponse, saleResponse] = await Promise.all([
-        getCustomers(1, 10, 'created_at', 'desc', true),
+        getCustomers({
+          page: 1,
+          limit: 10,
+          sortCol: 'created_at',
+          sortDir: 'desc',
+          unpaginated: true,
+        }),
         getItems({ page: 1, limit: 10, sortCol: 'created_at', sortDir: 'desc', unpaginated: true }),
         getSale(id!),
       ]);
-      setCustomers(customerResponse.data || customerResponse);
-      setItems(itemResponse.data || itemResponse);
+      setCustomers(customerResponse.data);
+      setItems(itemResponse.data);
 
-      const { customer, invoice_number, sale_date, items } = saleResponse.data;
+      const { customer, invoice_number, sale_date, items } = saleResponse;
       setCustomerId(String(customer.id));
       setInvoiceNumber(invoice_number);
       setSaleDate(sale_date);

@@ -16,12 +16,18 @@ export default function Pricing() {
   useEffect(() => {
     const fetchPlans = async () => {
       try {
-        const response = await getPlans(1, 10, 'created_at', 'desc', true);
+        const response = await getPlans({
+          page: 1,
+          limit: 10,
+          sortCol: 'created_at',
+          sortDir: 'desc',
+          unpaginated: true,
+        });
         if (Array.isArray(response.data)) {
           setPlans(response.data);
-        } else if (response.data && typeof response.data === 'object') {
+        } else if (response.data && typeof response.data === 'object' && 'id' in response.data) {
           // If it's a single plan (unlikely here but for safety)
-          setPlans([response.data as any]);
+          setPlans([response.data as Plan]);
         }
       } catch (error) {
         console.error('Failed to fetch plans:', error);

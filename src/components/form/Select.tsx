@@ -18,6 +18,7 @@ interface SelectProps {
   error?: boolean;
   hint?: string;
   searchable?: boolean;
+  value?: string;
 }
 
 const Select: React.FC<SelectProps> = ({
@@ -30,10 +31,11 @@ const Select: React.FC<SelectProps> = ({
   error = false,
   hint = '',
   searchable = true,
+  value,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedValue, setSelectedValue] = useState<string>(defaultValue);
+  const [selectedValue, setSelectedValue] = useState<string>(value || defaultValue);
   const [focusedOptionIndex, setFocusedOptionIndex] = useState<number>(-1);
   const selectRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -49,8 +51,8 @@ const Select: React.FC<SelectProps> = ({
   }, [isOpen, searchable]);
 
   useEffect(() => {
-    setSelectedValue(defaultValue);
-  }, [defaultValue]);
+    setSelectedValue(value || defaultValue);
+  }, [value, defaultValue]);
 
   const handleClickOutside = (event: MouseEvent) => {
     if (selectRef.current && !selectRef.current.contains(event.target as Node)) {
@@ -65,9 +67,9 @@ const Select: React.FC<SelectProps> = ({
     };
   }, []);
 
-  const handleSelect = (value: string) => {
-    setSelectedValue(value);
-    onChange(value);
+  const handleSelect = (optionValue: string) => {
+    setSelectedValue(optionValue);
+    onChange(optionValue);
     setIsOpen(false);
   };
 

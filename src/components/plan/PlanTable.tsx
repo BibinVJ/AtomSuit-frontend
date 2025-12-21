@@ -2,7 +2,6 @@
 
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '../ui/table';
 import { useState } from 'react';
-import Badge from '../ui/badge/Badge';
 import EditPlanModal from './EditPlanModal';
 import DeletePlanModal from './DeletePlanModal';
 import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide, Edit, Trash2 } from 'lucide-react';
@@ -44,7 +43,7 @@ export default function PlanTable({
     try {
       // Fetch full plan details with features
       const response = await getPlan(plan.id);
-      setSelectedPlan(response.data);
+      setSelectedPlan(response);
       setIsEditModalOpen(true);
     } catch (error) {
       console.error('Error fetching plan details:', error);

@@ -1,14 +1,16 @@
 export interface Plan {
   id: number;
   name: string;
+  description?: string;
   price: number;
   interval: 'day' | 'week' | 'month' | 'year' | 'lifetime';
   interval_count: number;
   is_trial_plan: boolean;
   trial_duration_in_days?: number;
   is_expired_user_plan: boolean;
+  currency?: string;
   features?: PlanFeature[];
-  subscribed_tenants?: any[];
+  subscribed_tenants?: unknown[];
 }
 
 export interface PlanFeature {
@@ -41,3 +43,5 @@ export interface PlanApiResponse {
     next: string | null;
   };
 }
+
+export type PlanInput = Partial<Plan>;

@@ -43,3 +43,5 @@ export interface SalePayload {
     unit_price: number;
   }[];
 }
+
+export type SaleInput = SalePayload;

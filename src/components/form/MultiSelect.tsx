@@ -91,7 +91,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
         >
           <div className="flex flex-wrap gap-1 flex-1">
             {selectedOptions.length > 0 ? (
-              selectedOptions.map((value, index) => {
+              selectedOptions.map((value) => {
                 const option = options.find((opt) => opt.value === value);
                 return (
                   <span

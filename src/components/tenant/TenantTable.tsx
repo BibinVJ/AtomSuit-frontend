@@ -10,8 +10,6 @@ import Tooltip from '../ui/tooltip/Tooltip';
 
 import { Tenant } from '../../types';
 import { usePermissions } from '../../hooks/usePermissions';
-import { getTenant } from '../../services/TenantService';
-import { toast } from 'sonner';
 
 interface Props {
   data: Tenant[];
@@ -22,6 +20,7 @@ interface Props {
   currentPage: number;
   perPage: number;
   startIndex?: number;
+  loading?: boolean;
 }
 
 export default function TenantTable({
@@ -33,6 +32,7 @@ export default function TenantTable({
   currentPage,
   perPage,
   startIndex,
+  loading,
 }: Props) {
   const { hasPermission } = usePermissions();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -147,52 +147,73 @@ export default function TenantTable({
           </TableHeader>
 
           <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-            {data.map((tenant, index) => (
-              <TableRow key={tenant.id}>
-                <TableCell className="px-5 py-4 sm:px-6 text-start">
-                  <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                    {startIndex !== undefined
-                      ? startIndex + index
-                      : (currentPage - 1) * perPage + index + 1}
-                  </p>
-                </TableCell>
-                <TableCell className="px-4 py-3 text-start">
-                  <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                    {tenant.name}
-                  </p>
-                </TableCell>
-                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
-                  {tenant.email}
-                </TableCell>
-                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
-                  <span className="font-mono text-xs">{tenant.domain_name?.domain || 'N/A'}</span>
-                </TableCell>
-                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
-                  {tenant.current_plan?.name || 'N/A'}
-                </TableCell>
-                <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                  {getStatusBadge(tenant.status)}
-                </TableCell>
-                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
-                  {formatDate(tenant.created_at)}
-                </TableCell>
-                <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                  <div className="flex items-center gap-2">
-                    {hasPermission('delete-tenant') && (
-                      <Tooltip text="Delete">
-                        <Button
-                          size="xs"
-                          onClick={() => handleDelete(tenant)}
-                          className="bg-red-600 hover:bg-red-700 text-white"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </Tooltip>
-                    )}
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={8} className="px-5 py-10 text-center">
+                  <div className="flex flex-col items-center justify-center space-y-2">
+                    <div className="w-10 h-10 border-4 border-brand-500 border-t-transparent rounded-full animate-spin"></div>
+                    <p className="text-gray-500">Loading tenants...</p>
                   </div>
                 </TableCell>
               </TableRow>
-            ))}
+            ) : data.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={8} className="px-5 py-10 text-center text-gray-500">
+                  No tenants found.
+                </TableCell>
+              </TableRow>
+            ) : (
+              data.map((tenant, index) => (
+                <TableRow key={tenant.id}>
+                  <TableCell className="px-5 py-4 sm:px-6 text-start">
+                    <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
+                      {startIndex !== undefined
+                        ? startIndex + index
+                        : (currentPage - 1) * perPage + index + 1}
+                    </p>
+                  </TableCell>
+                  <TableCell className="px-4 py-3 text-start">
+                    <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
+                      {tenant.name}
+                    </p>
+                  </TableCell>
+                  <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
+                    {tenant.email}
+                  </TableCell>
+                  <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
+                    <span className="font-mono text-xs">
+                      {typeof tenant.domain_name === 'object'
+                        ? tenant.domain_name?.domain
+                        : tenant.domain_name || 'N/A'}
+                    </span>
+                  </TableCell>
+                  <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
+                    {tenant.current_plan?.name || 'N/A'}
+                  </TableCell>
+                  <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
+                    {getStatusBadge(tenant.status)}
+                  </TableCell>
+                  <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
+                    {formatDate(tenant.created_at)}
+                  </TableCell>
+                  <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
+                    <div className="flex items-center gap-2">
+                      {hasPermission('delete-tenant') && (
+                        <Tooltip text="Delete">
+                          <Button
+                            size="xs"
+                            onClick={() => handleDelete(tenant)}
+                            className="bg-red-600 hover:bg-red-700 text-white"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </Tooltip>
+                      )}
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>

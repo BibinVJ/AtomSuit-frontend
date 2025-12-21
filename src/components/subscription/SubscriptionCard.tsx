@@ -1,8 +1,6 @@
 'use client';
 
-import { useState } from 'react';
 import { Subscription } from '../../types';
-import Button from '../ui/button/Button';
 import { Calendar, CreditCard, AlertTriangle, CheckCircle } from 'lucide-react';
 
 interface Props {

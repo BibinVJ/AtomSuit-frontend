@@ -17,3 +17,5 @@ export * from './Tenant';
 export * from './Subscription';
 export * from './Settings';
 export * from './Audit';
+export * from './Currency';
+export * from './ExchangeRate';

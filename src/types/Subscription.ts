@@ -33,7 +33,7 @@ export interface SubscriptionInvoice {
   invoice_date: string;
   due_date?: string;
   paid_at?: string;
-  metadata?: any;
+  metadata?: unknown;
 }
 
 export interface SubscriptionItem {

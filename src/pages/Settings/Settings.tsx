@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import PageBreadcrumb from '../../components/common/PageBreadCrumb';
 import ComponentCard from '../../components/common/ComponentCard';
 import PageMeta from '../../components/common/PageMeta';
@@ -14,7 +14,7 @@ export default function Settings() {
   const [isLoading, setIsLoading] = useState(true);
   const [activeGroup, setActiveGroup] = useState<string>('');
 
-  const fetchSettings = async () => {
+  const fetchSettings = useCallback(async () => {
     try {
       setIsLoading(true);
       const response = await getSettings();
@@ -27,11 +27,11 @@ export default function Settings() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [activeGroup]);
 
   useEffect(() => {
     fetchSettings();
-  }, []);
+  }, [fetchSettings]);
 
   if (isLoading) {
     return (

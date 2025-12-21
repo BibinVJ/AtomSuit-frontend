@@ -8,7 +8,7 @@ import {
   cancelSubscription,
 } from '../../services/TenantSubscriptionService';
 import { getPlans } from '../../services/PlanService';
-import { RefreshCw, Star, Calendar, CreditCard, AlertTriangle, CheckCircle } from 'lucide-react';
+import { RefreshCw, Calendar, CreditCard, AlertTriangle, CheckCircle } from 'lucide-react';
 import { Plan, Subscription } from '@/types';
 import { useSettings } from '../../hooks/useSettings';
 
@@ -30,11 +30,11 @@ export default function BillingSubscription() {
       setLoading(true);
       const [subscriptionData, plansResponse] = await Promise.all([
         getCurrentSubscription().catch(() => null),
-        getPlans(undefined, undefined, undefined, undefined, true),
+        getPlans({ unpaginated: true }),
       ]);
       setSubscription(subscriptionData);
       setPlans(plansResponse.data as Plan[]);
-    } catch (error) {
+    } catch {
       toast.error('Failed to load subscription data');
     } finally {
       setLoading(false);
@@ -48,8 +48,9 @@ export default function BillingSubscription() {
       toast.success('Plan changed successfully!');
       await loadData();
       setShowPlansModal(false);
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Failed to change plan');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Failed to change plan';
+      toast.error(message);
     } finally {
       setActionLoading(false);
     }
@@ -62,8 +63,9 @@ export default function BillingSubscription() {
       await loadData();
       setShowCancelModal(false);
       toast.success('Subscription cancelled. Access will continue until end of billing period.');
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Failed to cancel subscription');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Failed to cancel subscription';
+      toast.error(message);
     } finally {
       setActionLoading(false);
     }
@@ -112,7 +114,7 @@ export default function BillingSubscription() {
           No Active Subscription
         </h3>
         <p className="text-gray-600 dark:text-gray-400 mb-4">
-          You don't have an active subscription.
+          You don&apos;t have an active subscription.
         </p>
         <button
           onClick={() => setShowPlansModal(true)}

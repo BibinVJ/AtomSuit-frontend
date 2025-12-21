@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import PageBreadcrumb from '../../components/common/PageBreadCrumb';
 import ComponentCard from '../../components/common/ComponentCard';
 import PageMeta from '../../components/common/PageMeta';
@@ -36,7 +36,7 @@ interface ApiError {
 }
 
 export default function AddSale() {
-  const { formatDate, getSetting } = useSettings();
+  const { getSetting } = useSettings();
   const {
     isOpen: isCustomerModalOpen,
     openModal: openCustomerModal,
@@ -53,26 +53,32 @@ export default function AddSale() {
   ]);
   const [errors, setErrors] = useState<ApiError>({});
 
-  useEffect(() => {
-    fetchInitialData();
-  }, []);
-
-  const fetchInitialData = async () => {
+  const fetchInitialData = useCallback(async () => {
     try {
       const [customerResponse, itemResponse, invoiceResponse] = await Promise.all([
-        getCustomers(1, 10, 'created_at', 'desc', true),
+        getCustomers({
+          page: 1,
+          limit: 10,
+          sortCol: 'created_at',
+          sortDir: 'desc',
+          unpaginated: true,
+        }),
         getItems({ page: 1, limit: 10, sortCol: 'created_at', sortDir: 'desc', unpaginated: true }),
         getNextInvoiceNumber(),
       ]);
-      setCustomers(customerResponse.data || customerResponse);
-      setItems(itemResponse.data || itemResponse);
+      setCustomers(customerResponse.data);
+      setItems(itemResponse.data);
       if (invoiceResponse) {
         setInvoiceNumber(invoiceResponse.data.invoice_number);
       }
     } catch (error) {
       console.error('Error fetching initial data:', error);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchInitialData();
+  }, [fetchInitialData]);
 
   const handleAddItem = () => {
     setSaleItems([
@@ -169,12 +175,6 @@ export default function AddSale() {
   };
 
   const getErrorMessage = (field: string) => errors[field]?.[0] || '';
-
-  const handleCustomerAdded = (newCustomer: Customer) => {
-    setCustomers((prev) => [...prev, newCustomer]);
-    setCustomerId(String(newCustomer.id));
-    closeCustomerModal();
-  };
 
   return (
     <>
@@ -326,13 +326,13 @@ export default function AddSale() {
                     error={!!getErrorMessage(`items.${index}.unit_price`)}
                     hint={getErrorMessage(`items.${index}.unit_price`)}
                     prefix={
-                      getSetting('currency_position') === 'before'
-                        ? getSetting('currency_symbol')
+                      getSetting<string>('currency_position') === 'before'
+                        ? getSetting<string>('currency_symbol')
                         : undefined
                     }
                     suffix={
-                      getSetting('currency_position') === 'after'
-                        ? getSetting('currency_symbol')
+                      getSetting<string>('currency_position') === 'after'
+                        ? getSetting<string>('currency_symbol')
                         : undefined
                     }
                   />
@@ -374,7 +374,7 @@ export default function AddSale() {
       <AddCustomerModal
         isOpen={isCustomerModalOpen}
         onClose={closeCustomerModal}
-        onCustomerAdded={handleCustomerAdded}
+        onSuccess={fetchInitialData}
       />
     </>
   );

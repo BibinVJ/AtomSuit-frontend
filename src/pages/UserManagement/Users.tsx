@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import PageBreadcrumb from '../../components/common/PageBreadCrumb';
 import ComponentCard from '../../components/common/ComponentCard';
 import PageMeta from '../../components/common/PageMeta';
@@ -48,60 +48,70 @@ export default function Users() {
   const [selectedRole, setSelectedRole] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
 
-  const fetchUsers = async (page = 1, limit = 10, sortCol = 'created_at', sortDir = 'desc') => {
-    try {
-      const response = await getUsers({
-        page,
-        limit,
-        sortCol,
-        sortDir,
-        from: debouncedRangeFrom !== '' ? Number(debouncedRangeFrom) : undefined,
-        to: debouncedRangeTo !== '' ? Number(debouncedRangeTo) : undefined,
-        search: debouncedSearchTerm,
-        role: selectedRole,
-        status: selectedStatus,
-        trashed: viewMode === 'trashed' ? 'only' : undefined,
-      });
+  const fetchUsers = useCallback(
+    async (page = 1, limit = 10, sortCol = 'created_at', sortDir = 'desc') => {
+      try {
+        const response = await getUsers({
+          page,
+          limit,
+          sortCol,
+          sortDir,
+          from: debouncedRangeFrom !== '' ? Number(debouncedRangeFrom) : undefined,
+          to: debouncedRangeTo !== '' ? Number(debouncedRangeTo) : undefined,
+          search: debouncedSearchTerm,
+          role: selectedRole,
+          status: selectedStatus,
+          trashed: viewMode === 'trashed' ? 'only' : undefined,
+        });
 
-      setUsers(response.data);
+        setUsers(response.data);
 
-      // Cast meta to any to handle potential missing fields in range-fetch mode
-      const meta = response.meta as any;
+        // Cast meta to any or specific PaginatedMeta to handle potential missing fields in range-fetch mode
+        const meta = response.meta;
 
-      if (meta) {
-        setTotalPages(meta.last_page || 1);
-        setCurrentPage(meta.current_page || 1);
+        if (meta) {
+          setTotalPages(meta.last_page || 1);
+          setCurrentPage(meta.current_page || 1);
 
-        // Use meta values if available, otherwise fallback to range values
-        setFrom(
-          meta.from !== undefined
-            ? meta.from
-            : debouncedRangeFrom !== ''
-              ? Number(debouncedRangeFrom)
-              : 0
-        );
-        setTo(
-          meta.to !== undefined ? meta.to : debouncedRangeTo !== '' ? Number(debouncedRangeTo) : 0
-        );
-        setTotal(meta.total || 0);
+          // Use meta values if available, otherwise fallback to range values
+          setFrom(
+            meta.from !== undefined
+              ? meta.from
+              : debouncedRangeFrom !== ''
+                ? Number(debouncedRangeFrom)
+                : 0
+          );
+          setTo(
+            meta.to !== undefined ? meta.to : debouncedRangeTo !== '' ? Number(debouncedRangeTo) : 0
+          );
+          setTotal(meta.total || 0);
+        }
+      } catch (error) {
+        console.error('Error fetching users:', error);
       }
-    } catch (error) {
-      console.error('Error fetching users:', error);
-    }
-  };
+    },
+    [
+      debouncedRangeFrom,
+      debouncedRangeTo,
+      debouncedSearchTerm,
+      selectedRole,
+      selectedStatus,
+      viewMode,
+    ]
+  );
 
-  const fetchRoles = async () => {
+  const fetchRoles = useCallback(async () => {
     try {
       const fetchedRoles = await getRoles({ unpaginated: true, sortCol: 'name', sortDir: 'asc' });
       setRoles(fetchedRoles.data);
     } catch (error) {
       console.error('Error fetching roles:', error);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchRoles();
-  }, []);
+  }, [fetchRoles]);
 
   useEffect(() => {
     fetchUsers(currentPage, perPage, sortBy, sortDirection);
@@ -116,6 +126,7 @@ export default function Users() {
     debouncedRangeFrom,
     debouncedRangeTo,
     viewMode,
+    fetchUsers,
   ]);
 
   const handlePageChange = (page: number) => {
@@ -232,11 +243,7 @@ export default function Users() {
           />
         </ComponentCard>
       </div>
-      <AddUserModal
-        isOpen={isOpen}
-        onClose={closeModal}
-        onUserAdded={() => fetchUsers(1, perPage)}
-      />
+      <AddUserModal isOpen={isOpen} onClose={closeModal} onSuccess={() => fetchUsers(1, perPage)} />
     </>
   );
 }

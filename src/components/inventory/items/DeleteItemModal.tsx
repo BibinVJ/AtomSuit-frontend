@@ -2,13 +2,12 @@ import { Modal } from '../../ui/modal';
 import Button from '../../ui/button/Button';
 import { toast } from 'sonner';
 import { deleteItem } from '../../../services/ItemService';
-
 import { Item } from '../../../types';
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
-  onItemDeleted: () => void;
+  onSuccess: () => void;
   item: Item;
   isForceDelete?: boolean;
 }
@@ -16,19 +15,20 @@ interface Props {
 export default function DeleteItemModal({
   isOpen,
   onClose,
-  onItemDeleted,
+  onSuccess,
   item,
   isForceDelete = false,
 }: Props) {
   const handleDelete = async () => {
     try {
       await deleteItem(item.id, isForceDelete);
-      onItemDeleted();
+      onSuccess();
       toast.success(isForceDelete ? 'Item permanently deleted' : 'Item deleted successfully');
       onClose();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error deleting item:', error);
-      toast.error(error.response?.data?.message || 'Failed to delete item');
+      const message = error instanceof Error ? error.message : 'Failed to delete item';
+      toast.error(message);
     }
   };
 

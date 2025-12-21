@@ -46,3 +46,5 @@ export interface PurchasePayload {
     quantity?: number;
   }[];
 }
+
+export type PurchaseInput = PurchasePayload;

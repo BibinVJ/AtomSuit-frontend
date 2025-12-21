@@ -14,3 +14,5 @@ export interface CategoryApiResponse {
     to: number;
   };
 }
+
+export type CategoryInput = Partial<Category>;

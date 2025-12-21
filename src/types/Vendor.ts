@@ -12,6 +12,14 @@ export interface Vendor {
   };
 }
 
+export interface VendorInput {
+  name: string;
+  email: string;
+  phone: string;
+  address: string;
+  currency_id?: number;
+}
+
 export interface VendorApiResponse {
   data: Vendor[];
   meta: {

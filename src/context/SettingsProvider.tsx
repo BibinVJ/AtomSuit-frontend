@@ -10,7 +10,7 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const authContext = useContext(AuthContext);
   const user = authContext?.user;
 
-  const [settings, setSettings] = useState<Record<string, any>>(() => {
+  const [settings, setSettings] = useState<Record<string, unknown>>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('app_settings');
       return saved ? JSON.parse(saved) : {};
@@ -31,12 +31,14 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       const response = await getSettings();
 
       // Flatten settings groups into a single key-value record
-      const flattened: Record<string, any> = {};
-      Object.values(response.data as Record<string, any[]>).forEach((group) => {
-        group.forEach((setting) => {
-          flattened[setting.key] = setting.value;
-        });
-      });
+      const flattened: Record<string, unknown> = {};
+      Object.values(response.data as Record<string, { key: string; value: unknown }[]>).forEach(
+        (group) => {
+          group.forEach((setting) => {
+            flattened[setting.key] = setting.value;
+          });
+        }
+      );
 
       setSettings(flattened);
       if (typeof window !== 'undefined') {
@@ -56,31 +58,34 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   // Apply Appearance settings globally
   useEffect(() => {
     if (settings.primary_color) {
-      document.documentElement.style.setProperty('--color-primary', settings.primary_color);
+      document.documentElement.style.setProperty('--color-primary', String(settings.primary_color));
       // Set a slightly darker version for hover states (simulated)
       document.documentElement.style.setProperty(
         '--color-primary-dark',
-        settings.primary_color + 'dd'
+        String(settings.primary_color) + 'dd'
       );
       document.documentElement.style.setProperty(
         '--color-primary-darker',
-        settings.primary_color + 'bb'
+        String(settings.primary_color) + 'bb'
       );
     }
     if (settings.secondary_color) {
-      document.documentElement.style.setProperty('--color-secondary', settings.secondary_color);
+      document.documentElement.style.setProperty(
+        '--color-secondary',
+        String(settings.secondary_color)
+      );
     }
     if (settings.success_color) {
-      document.documentElement.style.setProperty('--color-success', settings.success_color);
+      document.documentElement.style.setProperty('--color-success', String(settings.success_color));
     }
     if (settings.error_color) {
-      document.documentElement.style.setProperty('--color-error', settings.error_color);
+      document.documentElement.style.setProperty('--color-error', String(settings.error_color));
     }
     if (settings.warning_color) {
-      document.documentElement.style.setProperty('--color-warning', settings.warning_color);
+      document.documentElement.style.setProperty('--color-warning', String(settings.warning_color));
     }
     if (settings.info_color) {
-      document.documentElement.style.setProperty('--color-info', settings.info_color);
+      document.documentElement.style.setProperty('--color-info', String(settings.info_color));
     }
     if (settings.theme) {
       if (settings.theme === 'dark') {
@@ -92,8 +97,8 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   }, [settings]);
 
   const getSetting = useCallback(
-    (key: string, defaultValue?: any) => {
-      return settings[key] !== undefined ? settings[key] : defaultValue;
+    <T,>(key: string, defaultValue?: T): T => {
+      return settings[key] !== undefined ? (settings[key] as T) : (defaultValue as T);
     },
     [settings]
   );
@@ -146,18 +151,6 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     },
     [getSetting, formatDate]
   );
-
-  const mapPhpDateFormatToFlatpickr = useCallback((phpFormat: string) => {
-    const map: Record<string, string> = {
-      'Y-m-d': 'Y-m-d',
-      'd/m/Y': 'd/m/Y',
-      'm/d/Y': 'm/d/Y',
-      'd-m-Y': 'd-m-Y',
-      'F j, Y': 'F j, Y',
-      'j F Y': 'j F Y',
-    };
-    return map[phpFormat] || 'Y-m-d';
-  }, []);
 
   const contextValue = useMemo<SettingsContextType>(
     () => ({

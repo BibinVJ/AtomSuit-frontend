@@ -1,163 +1,165 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Modal } from '../ui/modal';
+import FormModal from '../common/FormModal';
 import Input from '../form/input/InputField';
 import Label from '../form/Label';
-import Switch from '../form/switch/Switch';
+import Select from '../form/Select';
 import TextArea from '../form/input/TextArea';
-import Button from '../ui/button/Button';
 import { toast } from 'sonner';
 import { updateCustomer } from '../../services/CustomerService';
-
-import { Customer } from '../../types';
+import { getCurrencies } from '../../services/CurrencyService';
 import { isApiError } from '../../utils/errors';
+import { Customer, CustomerInput, Currency } from '../../types';
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
-  onCustomerUpdated: () => void;
+  onSuccess: () => void;
   customer: Customer;
 }
 
-export default function EditCustomerModal({ isOpen, onClose, onCustomerUpdated, customer }: Props) {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
-  const [address, setAddress] = useState('');
-  const [errors, setErrors] = useState({ name: '', email: '', phone: '', address: '' });
+export default function EditCustomerModal({ isOpen, onClose, onSuccess, customer }: Props) {
+  const [formData, setFormData] = useState<CustomerInput>({
+    name: '',
+    email: '',
+    phone: '',
+    address: '',
+    currency_id: undefined,
+  });
+
+  const [currencies, setCurrencies] = useState<Currency[]>([]);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (customer) {
-      setName(customer.name);
-      setEmail(customer.email);
-      setPhone(customer.phone);
-      setAddress(customer.address || '');
+      setFormData({
+        name: customer.name || '',
+        email: customer.email || '',
+        phone: customer.phone || '',
+        address: customer.address || '',
+        currency_id: customer.currency_id,
+      });
     }
   }, [customer]);
 
+  useEffect(() => {
+    if (isOpen) {
+      fetchCurrencies();
+    }
+  }, [isOpen]);
+
+  const fetchCurrencies = async () => {
+    try {
+      const response = await getCurrencies({ unpaginated: true });
+      setCurrencies(response.data);
+    } catch (error) {
+      console.error('Failed to fetch currencies:', error);
+      toast.error('Failed to load currencies');
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    const newErrors = { name: '', email: '', phone: '', address: '' };
-    let hasError = false;
-
-    if (!name) {
-      newErrors.name = 'Name is required';
-      hasError = true;
-    }
-
-    if (email && !/^\S+@\S+\.\S+$/.test(email)) {
-      newErrors.email = 'Please enter a valid email address';
-      hasError = true;
-    }
-
-    if (hasError) {
-      setErrors(newErrors);
-      return;
-    }
+    setIsSubmitting(true);
 
     try {
-      await updateCustomer(customer.id, { name, email, phone, address });
-      onCustomerUpdated();
+      await updateCustomer(customer.id, formData);
+      onSuccess();
       toast.success('Customer updated successfully');
       onClose();
     } catch (error: unknown) {
       if (isApiError(error) && error.response?.status === 422) {
         const apiErrors = error.response.data.errors;
-        const newErrors = {
-          name: apiErrors?.name?.[0] || '',
-          email: apiErrors?.email?.[0] || '',
-          phone: apiErrors?.phone?.[0] || '',
-          address: apiErrors?.address?.[0] || '',
-        };
-        setErrors(newErrors);
+        if (apiErrors) {
+          setErrors(
+            Object.keys(apiErrors).reduce(
+              (acc, key) => {
+                acc[key] = apiErrors[key][0];
+                return acc;
+              },
+              {} as Record<string, string>
+            )
+          );
+        }
         toast.error('Please correct the errors in the form');
       } else {
-        console.error('Error updating customer:', error);
         toast.error('Failed to update customer');
       }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} className="max-w-[700px] p-6 md:p-10">
-      <div className="relative w-full">
-        <div className="px-2 pr-14">
-          <h4 className="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90">
-            Edit Customer
-          </h4>
-          <p className="mb-6 text-sm text-gray-500 dark:text-gray-400 lg:mb-7">
-            Update the details of the customer.
-          </p>
+    <FormModal
+      isOpen={isOpen}
+      onClose={onClose}
+      onSubmit={handleSubmit}
+      title="Edit Customer"
+      description="Update the details of the customer."
+      isSubmitting={isSubmitting}
+      size="lg"
+    >
+      <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
+        <div>
+          <Label>
+            Name <span className="text-red-500">*</span>
+          </Label>
+          <Input
+            type="text"
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            error={!!errors.name}
+            hint={errors.name}
+          />
         </div>
-        <form className="flex flex-col" onSubmit={handleSubmit}>
-          <div className="px-2 overflow-y-auto custom-scrollbar">
-            <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
-              <div>
-                <Label>
-                  Name <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  type="text"
-                  value={name}
-                  onChange={(e) => {
-                    setName(e.target.value);
-                    setErrors({ ...errors, name: '' });
-                  }}
-                  error={!!errors.name}
-                  hint={errors.name}
-                />
-              </div>
-              <div>
-                <Label>Email</Label>
-                <Input
-                  type="email"
-                  value={email}
-                  onChange={(e) => {
-                    setEmail(e.target.value);
-                    setErrors({ ...errors, email: '' });
-                  }}
-                  error={!!errors.email}
-                  hint={errors.email}
-                />
-              </div>
-              <div>
-                <Label>Phone</Label>
-                <Input
-                  type="text"
-                  value={phone}
-                  onChange={(e) => {
-                    setPhone(e.target.value);
-                    setErrors({ ...errors, phone: '' });
-                  }}
-                  error={!!errors.phone}
-                  hint={errors.phone}
-                />
-              </div>
-              <div className="lg:col-span-2">
-                <Label>Address</Label>
-                <TextArea
-                  placeholder="Enter address"
-                  value={address}
-                  onChange={(value) => {
-                    setAddress(value);
-                    setErrors({ ...errors, address: '' });
-                  }}
-                  error={!!errors.address}
-                  hint={errors.address}
-                />
-              </div>
-            </div>
-          </div>
-          <div className="flex items-center gap-3 px-2 mt-6 lg:justify-end">
-            <Button type="button" variant="outline" onClick={onClose}>
-              Close
-            </Button>
-            <Button type="submit">Save Changes</Button>
-          </div>
-        </form>
+        <div>
+          <Label>Email</Label>
+          <Input
+            type="email"
+            value={formData.email || ''}
+            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+            error={!!errors.email}
+            hint={errors.email}
+          />
+        </div>
+        <div>
+          <Label>Phone</Label>
+          <Input
+            type="text"
+            value={formData.phone || ''}
+            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+            error={!!errors.phone}
+            hint={errors.phone}
+          />
+        </div>
+        <div>
+          <Label>Currency</Label>
+          <Select
+            options={currencies.map((c) => ({
+              value: String(c.id),
+              label: `${c.code} - ${c.name}`,
+            }))}
+            value={formData.currency_id ? String(formData.currency_id) : ''}
+            onChange={(val) => setFormData({ ...formData, currency_id: Number(val) })}
+            placeholder="Select Currency"
+            error={!!errors.currency_id}
+          />
+          {errors.currency_id && <p className="mt-1 text-xs text-red-500">{errors.currency_id}</p>}
+        </div>
+        <div className="lg:col-span-2">
+          <Label>Address</Label>
+          <TextArea
+            placeholder="Enter address"
+            value={formData.address || ''}
+            onChange={(val) => setFormData({ ...formData, address: val })}
+            error={!!errors.address}
+            hint={errors.address}
+          />
+        </div>
       </div>
-    </Modal>
+    </FormModal>
   );
 }

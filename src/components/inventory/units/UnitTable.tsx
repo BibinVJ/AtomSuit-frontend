@@ -2,23 +2,14 @@
 
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '../../ui/table';
 import { useState } from 'react';
-import Badge from '../../ui/badge/Badge';
 import EditUnitModal from './EditUnitModal';
 import DeleteUnitModal from './DeleteUnitModal';
-import {
-  ChevronsUpDown,
-  ArrowUpWideNarrow,
-  ArrowDownNarrowWide,
-  Edit,
-  Trash2,
-  RefreshCw,
-} from 'lucide-react';
+import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide } from 'lucide-react';
 import { restoreUnit } from '../../../services/UnitService';
 import { toast } from 'sonner';
-import Button from '../../ui/button/Button';
-import Tooltip from '../../ui/tooltip/Tooltip';
-
+import { TableActions } from '../../common/TableActions';
 import { Unit } from '../../../types';
+import { usePermissions } from '../../../hooks/usePermissions';
 
 interface Props {
   data: Unit[];
@@ -31,8 +22,6 @@ interface Props {
   startIndex?: number;
   viewMode?: 'active' | 'trashed';
 }
-
-import { usePermissions } from '../../../hooks/usePermissions';
 
 export default function UnitTable({
   data,
@@ -110,9 +99,9 @@ export default function UnitTable({
               <TableCell
                 isHeader
                 className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400"
-                onClick={() => onSort('code')}
+                onClick={() => onSort('short_name')}
               >
-                Code {renderSortIcon('code')}
+                Short Name {renderSortIcon('short_name')}
               </TableCell>
               <TableCell
                 isHeader
@@ -123,7 +112,7 @@ export default function UnitTable({
               </TableCell>
               <TableCell
                 isHeader
-                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                className="px-5 py-3 font-medium text-gray-500 text-end text-theme-xs dark:text-gray-400"
               >
                 Actions
               </TableCell>
@@ -146,65 +135,20 @@ export default function UnitTable({
                   </p>
                 </TableCell>
                 <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                  {unit.code}
+                  {unit.short_name}
                 </TableCell>
                 <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
                   {unit.description}
                 </TableCell>
-                <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                  <div className="flex items-center gap-2">
-                    {viewMode === 'active' ? (
-                      <>
-                        {hasPermission('update-unit') && (
-                          <Tooltip text="Edit">
-                            <Button
-                              size="xs"
-                              onClick={() => handleEdit(unit)}
-                              className="bg-blue-600 hover:bg-blue-700 text-white"
-                            >
-                              <Edit className="w-4 h-4" />
-                            </Button>
-                          </Tooltip>
-                        )}
-                        {hasPermission('delete-unit') && (
-                          <Tooltip text="Delete">
-                            <Button
-                              size="xs"
-                              onClick={() => handleDelete(unit)}
-                              className="bg-red-600 hover:bg-red-700 text-white"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          </Tooltip>
-                        )}
-                      </>
-                    ) : (
-                      <>
-                        {hasPermission('update-unit') && (
-                          <Tooltip text="Restore">
-                            <Button
-                              size="xs"
-                              onClick={() => handleRestore(unit.id)}
-                              className="bg-green-600 hover:bg-green-700 text-white"
-                            >
-                              <RefreshCw className="w-4 h-4" />
-                            </Button>
-                          </Tooltip>
-                        )}
-                        {hasPermission('delete-unit') && (
-                          <Tooltip text="Delete Permanently">
-                            <Button
-                              size="xs"
-                              onClick={() => handleDelete(unit)}
-                              className="bg-red-600 hover:bg-red-700 text-white"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          </Tooltip>
-                        )}
-                      </>
-                    )}
-                  </div>
+                <TableCell className="px-4 py-3 text-gray-500 text-end text-theme-sm dark:text-gray-400">
+                  <TableActions
+                    isTrashed={viewMode === 'trashed'}
+                    onEdit={hasPermission('update-unit') ? () => handleEdit(unit) : undefined}
+                    onDelete={hasPermission('delete-unit') ? () => handleDelete(unit) : undefined}
+                    onRestore={
+                      hasPermission('update-unit') ? () => handleRestore(unit.id) : undefined
+                    }
+                  />
                 </TableCell>
               </TableRow>
             ))}
@@ -216,7 +160,7 @@ export default function UnitTable({
           <EditUnitModal
             isOpen={isEditModalOpen}
             onClose={handleCloseModals}
-            onUnitUpdated={onAction}
+            onSuccess={onAction}
             unit={selectedUnit}
           />
           <DeleteUnitModal

@@ -14,6 +14,7 @@ import { updateSetting, deleteSettingFile } from '../../services/SettingsService
 import { toast } from 'sonner';
 import { formatLabel } from '../../utils/string';
 import { useSettings } from '../../hooks/useSettings';
+import Image from 'next/image';
 
 interface Props {
   setting: Setting;
@@ -59,7 +60,8 @@ const DAY_OPTIONS = [
 
 export default function SettingField({ setting, onUpdate }: Props) {
   const { refreshSettings } = useSettings();
-  const [value, setValue] = useState(setting.value);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [value, setValue] = useState<any>(setting.value);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSave = async () => {
@@ -69,7 +71,7 @@ export default function SettingField({ setting, onUpdate }: Props) {
       toast.success('Setting updated successfully');
       await refreshSettings();
       onUpdate();
-    } catch (error) {
+    } catch {
       toast.error('Failed to update setting');
     } finally {
       setIsLoading(false);
@@ -85,7 +87,7 @@ export default function SettingField({ setting, onUpdate }: Props) {
       await updateSetting(setting.key, file, 'file', setting.group);
       toast.success('File uploaded successfully');
       onUpdate();
-    } catch (error) {
+    } catch {
       toast.error('Failed to upload file');
     } finally {
       setIsLoading(false);
@@ -98,7 +100,7 @@ export default function SettingField({ setting, onUpdate }: Props) {
       await deleteSettingFile(setting.key);
       toast.success('File deleted successfully');
       onUpdate();
-    } catch (error) {
+    } catch {
       toast.error('Failed to delete file');
     } finally {
       setIsLoading(false);
@@ -161,11 +163,12 @@ export default function SettingField({ setting, onUpdate }: Props) {
             {setting.file_url && (
               <div className="space-y-2">
                 {isImage ? (
-                  <div className="relative">
-                    <img
+                  <div className="relative w-full max-w-xs h-32">
+                    <Image
                       src={setting.file_url}
                       alt={setting.key}
-                      className="max-w-xs max-h-32 object-contain border border-gray-200 rounded-lg dark:border-gray-700"
+                      fill
+                      className="object-contain border border-gray-200 rounded-lg dark:border-gray-700"
                     />
                   </div>
                 ) : null}
@@ -273,10 +276,10 @@ export default function SettingField({ setting, onUpdate }: Props) {
                   placeholder="#000000"
                   className="flex-1"
                 />
-                {setting.value && (
+                {setting.value !== null && setting.value !== undefined && (
                   <div
                     className="w-10 h-10 rounded border border-gray-300 flex-shrink-0"
-                    style={{ backgroundColor: setting.value }}
+                    style={{ backgroundColor: String(setting.value) }}
                     title={`Original: ${setting.value}`}
                   />
                 )}

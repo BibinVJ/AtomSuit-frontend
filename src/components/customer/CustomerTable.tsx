@@ -2,24 +2,14 @@
 
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '../ui/table';
 import { useState } from 'react';
-import Badge from '../ui/badge/Badge';
 import EditCustomerModal from './EditCustomerModal';
 import DeleteCustomerModal from './DeleteCustomerModal';
-import {
-  ChevronsUpDown,
-  ArrowUpWideNarrow,
-  ArrowDownNarrowWide,
-  Edit,
-  Trash2,
-  RefreshCw,
-} from 'lucide-react';
+import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide } from 'lucide-react';
 import { restoreCustomer } from '../../services/CustomerService';
 import { toast } from 'sonner';
-import Button from '../ui/button/Button';
-import Tooltip from '../ui/tooltip/Tooltip';
-
 import { Customer } from '../../types';
 import { usePermissions } from '../../hooks/usePermissions';
+import { TableActions } from '../common/TableActions';
 
 interface Props {
   data: Customer[];
@@ -128,7 +118,7 @@ export default function CustomerTable({
               </TableCell>
               <TableCell
                 isHeader
-                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                className="px-5 py-3 font-medium text-gray-500 text-end text-theme-xs dark:text-gray-400"
               >
                 Actions
               </TableCell>
@@ -157,60 +147,21 @@ export default function CustomerTable({
                 <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
                   {customer.address}
                 </TableCell>
-                <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                  <div className="flex items-center gap-2">
-                    {viewMode === 'active' ? (
-                      <>
-                        {hasPermission('update-customer') && (
-                          <Tooltip text="Edit">
-                            <Button
-                              size="xs"
-                              onClick={() => handleEdit(customer)}
-                              className="bg-blue-600 hover:bg-blue-700 text-white"
-                            >
-                              <Edit className="w-4 h-4" />
-                            </Button>
-                          </Tooltip>
-                        )}
-                        {hasPermission('delete-customer') && (
-                          <Tooltip text="Delete">
-                            <Button
-                              size="xs"
-                              onClick={() => handleDelete(customer)}
-                              className="bg-red-600 hover:bg-red-700 text-white"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          </Tooltip>
-                        )}
-                      </>
-                    ) : (
-                      <>
-                        {hasPermission('update-customer') && (
-                          <Tooltip text="Restore">
-                            <Button
-                              size="xs"
-                              onClick={() => handleRestore(customer.id)}
-                              className="bg-green-600 hover:bg-green-700 text-white"
-                            >
-                              <RefreshCw className="w-4 h-4" />
-                            </Button>
-                          </Tooltip>
-                        )}
-                        {hasPermission('delete-customer') && (
-                          <Tooltip text="Delete Permanently">
-                            <Button
-                              size="xs"
-                              onClick={() => handleDelete(customer)}
-                              className="bg-red-600 hover:bg-red-700 text-white"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          </Tooltip>
-                        )}
-                      </>
-                    )}
-                  </div>
+                <TableCell className="px-4 py-3 text-end">
+                  <TableActions
+                    isTrashed={viewMode === 'trashed'}
+                    onEdit={
+                      hasPermission('update-customer') ? () => handleEdit(customer) : undefined
+                    }
+                    onDelete={
+                      hasPermission('delete-customer') ? () => handleDelete(customer) : undefined
+                    }
+                    onRestore={
+                      hasPermission('update-customer')
+                        ? () => handleRestore(customer.id)
+                        : undefined
+                    }
+                  />
                 </TableCell>
               </TableRow>
             ))}
@@ -222,13 +173,13 @@ export default function CustomerTable({
           <EditCustomerModal
             isOpen={isEditModalOpen}
             onClose={handleCloseModals}
-            onCustomerUpdated={onAction}
+            onSuccess={onAction}
             customer={selectedCustomer}
           />
           <DeleteCustomerModal
             isOpen={isDeleteModalOpen}
             onClose={handleCloseModals}
-            onCustomerDeleted={onAction}
+            onSuccess={onAction}
             customer={selectedCustomer}
             force={viewMode === 'trashed'}
           />

@@ -10,12 +10,10 @@ import { useModal } from '../../hooks/useModal';
 import Pagination from '../../components/common/Pagination';
 import Button from '../../components/ui/button/Button';
 import Tooltip from '../../components/ui/tooltip/Tooltip';
-import Select from '../../components/form/Select';
 import { getPlans } from '../../services/PlanService';
 import { usePermissions } from '../../hooks/usePermissions';
 import { Plan } from '../../types';
 import TableToolbar from '../../components/common/TableToolbar';
-import { Plus } from 'lucide-react';
 
 export default function Plans() {
   const { hasPermission } = usePermissions();
@@ -33,7 +31,12 @@ export default function Plans() {
 
   const fetchPlans = async (page = 1, limit = 10, sortCol = 'created_at', sortDir = 'desc') => {
     try {
-      const response = await getPlans(page, limit, sortCol, sortDir);
+      const response = await getPlans({
+        page,
+        perPage: limit,
+        sort_by: sortCol,
+        sort_direction: sortDir,
+      });
       setPlans(Array.isArray(response.data) ? response.data : []);
       if (response.meta) {
         setTotalPages(response.meta.last_page || 1);

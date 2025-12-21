@@ -2,22 +2,14 @@
 
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '../../ui/table';
 import { useState } from 'react';
-import Badge from '../../ui/badge/Badge';
 import EditCategoryModal from './EditCategoryModal';
 import DeleteCategoryModal from './DeleteCategoryModal';
-import {
-  ChevronsUpDown,
-  ArrowUpWideNarrow,
-  ArrowDownNarrowWide,
-  Edit,
-  Trash2,
-  RefreshCw,
-} from 'lucide-react';
+import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide } from 'lucide-react';
 import { restoreCategory } from '../../../services/CategoryService';
 import { toast } from 'sonner';
-import Button from '../../ui/button/Button';
-import Tooltip from '../../ui/tooltip/Tooltip';
+import { TableActions } from '../../common/TableActions';
 import { Category } from '../../../types';
+import { usePermissions } from '../../../hooks/usePermissions';
 
 interface Props {
   data: Category[];
@@ -42,6 +34,7 @@ export default function CategoryTable({
   startIndex,
   viewMode = 'active',
 }: Props) {
+  const { hasPermission } = usePermissions();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
@@ -112,7 +105,7 @@ export default function CategoryTable({
               </TableCell>
               <TableCell
                 isHeader
-                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                className="px-5 py-3 font-medium text-gray-500 text-end text-theme-xs dark:text-gray-400"
               >
                 Actions
               </TableCell>
@@ -137,52 +130,21 @@ export default function CategoryTable({
                 <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
                   {category.description}
                 </TableCell>
-                <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                  <div className="flex items-center gap-2">
-                    {viewMode === 'active' ? (
-                      <>
-                        <Tooltip text="Edit">
-                          <Button
-                            size="xs"
-                            onClick={() => handleEdit(category)}
-                            className="bg-blue-600 hover:bg-blue-700 text-white"
-                          >
-                            <Edit className="w-4 h-4" />
-                          </Button>
-                        </Tooltip>
-                        <Tooltip text="Delete">
-                          <Button
-                            size="xs"
-                            onClick={() => handleDelete(category)}
-                            className="bg-red-600 hover:bg-red-700 text-white"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </Tooltip>
-                      </>
-                    ) : (
-                      <>
-                        <Tooltip text="Restore">
-                          <Button
-                            size="xs"
-                            onClick={() => handleRestore(category.id)}
-                            className="bg-green-600 hover:bg-green-700 text-white"
-                          >
-                            <RefreshCw className="w-4 h-4" />
-                          </Button>
-                        </Tooltip>
-                        <Tooltip text="Delete Permanently">
-                          <Button
-                            size="xs"
-                            onClick={() => handleDelete(category)}
-                            className="bg-red-600 hover:bg-red-700 text-white"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </Tooltip>
-                      </>
-                    )}
-                  </div>
+                <TableCell className="px-4 py-3 text-gray-500 text-end text-theme-sm dark:text-gray-400">
+                  <TableActions
+                    isTrashed={viewMode === 'trashed'}
+                    onEdit={
+                      hasPermission('update-category') ? () => handleEdit(category) : undefined
+                    }
+                    onDelete={
+                      hasPermission('delete-category') ? () => handleDelete(category) : undefined
+                    }
+                    onRestore={
+                      hasPermission('update-category')
+                        ? () => handleRestore(category.id)
+                        : undefined
+                    }
+                  />
                 </TableCell>
               </TableRow>
             ))}
@@ -194,7 +156,7 @@ export default function CategoryTable({
           <EditCategoryModal
             isOpen={isEditModalOpen}
             onClose={handleCloseModals}
-            onCategoryUpdated={onAction}
+            onSuccess={onAction}
             category={selectedCategory}
           />
           <DeleteCategoryModal

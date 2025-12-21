@@ -48,7 +48,7 @@ const componentMap = {
   TopItems,
 };
 
-// Component mapping - maps backend component names to React components
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const componentNameToComponent: Record<string, React.ComponentType<any>> = {
   TotalSalesCard: MetricCard,
   TotalPurchaseCard: MetricCard,
@@ -79,7 +79,7 @@ const componentNameToComponent: Record<string, React.ComponentType<any>> = {
 };
 
 // Card-specific props mapping (hardcoded for now, could be moved to backend later)
-const cardPropsMap: Record<string, any> = {
+const cardPropsMap: Record<string, Record<string, unknown>> = {
   'total-sales': {
     icon: 'DollarLineIcon',
     title: 'Total Sales',
@@ -211,9 +211,9 @@ function Home() {
 
   const getComponentProps = useCallback(
     (props?: { [key: string]: string | number | object }) => {
-      const getNestedValue = (obj: DashboardData, path: string) => {
-        // @ts-expect-error: Inferred type as any
-        return path.split('.').reduce((acc, part) => acc?.[part], obj);
+      const getNestedValue = (obj: DashboardData, path: string): unknown => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        return path.split('.').reduce((acc: any, part) => acc?.[part], obj);
       };
 
       const newProps: { [key: string]: unknown } = { ...props };
@@ -267,21 +267,28 @@ function Home() {
         const layoutRes = await getLayout();
         if (layoutRes.data.data && layoutRes.data.data.length > 0) {
           // Backend returned permission-filtered layouts
-          const adaptedLayout = layoutRes.data.data.map((item: any) => {
+          const adaptedLayout = (
+            layoutRes.data.data as Record<string, string | number | boolean | null>[]
+          ).map((item) => {
             return {
               ...item,
-              i: item.slug || item.dashboard_card_id.toString(),
+              i:
+                item.slug ||
+                (item.dashboard_card_id
+                  ? item.dashboard_card_id.toString()
+                  : Math.random().toString()),
               dashboard_card_id: item.dashboard_card_id,
               slug: item.slug,
               w: item.width || item.default_width || 12,
               h: item.height || item.default_height || 4,
               x: item.x || 0,
               y: item.y || 0,
+              visible: item.visible === false ? false : true,
               component: item.component, // Backend provides component name
-              props: cardPropsMap[item.slug || ''], // Local props mapping
+              props: cardPropsMap[(item.slug as string) || ''], // Local props mapping
               minW: 4,
               minH: 3,
-            };
+            } as Layout;
           });
           setCards(adaptedLayout);
         } else {
@@ -289,7 +296,7 @@ function Home() {
           // Frontend displays empty dashboard until backend initializes layouts
           setCards([]);
         }
-      } catch (err) {
+      } catch (err: unknown) {
         console.error('Dashboard fetch failed', err);
       } finally {
         setLoading(false);
@@ -412,9 +419,8 @@ function Home() {
                     key={card.i}
                     className={`dashboard-card-wrapper ${!card.visible && editMode ? 'opacity-50' : ''}`}
                   >
-                    {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                     {Component ? (
-                      <Component {...(resolvedProps as any)} />
+                      <Component {...(resolvedProps as Record<string, unknown>)} />
                     ) : (
                       <div className="p-4 text-red-500">Component not found: {card.component}</div>
                     )}

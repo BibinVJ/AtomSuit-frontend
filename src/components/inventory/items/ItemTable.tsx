@@ -2,24 +2,15 @@
 
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '../../ui/table';
 import { useState } from 'react';
-import Badge from '../../ui/badge/Badge';
 import EditItemModal from './EditItemModal';
 import DeleteItemModal from './DeleteItemModal';
-import Button from '../../ui/button/Button';
-import {
-  ChevronsUpDown,
-  ArrowUpWideNarrow,
-  ArrowDownNarrowWide,
-  Edit,
-  Trash2,
-  RotateCcw,
-  Trash,
-} from 'lucide-react';
-import Tooltip from '../../ui/tooltip/Tooltip';
+import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide } from 'lucide-react';
 import { restoreItem } from '../../../services/ItemService';
 import { toast } from 'sonner';
-
 import { Item } from '../../../types';
+import { usePermissions } from '../../../hooks/usePermissions';
+import { useSettings } from '../../../hooks/useSettings';
+import { TableActions } from '../../common/TableActions';
 
 interface Props {
   data: Item[];
@@ -33,9 +24,6 @@ interface Props {
   viewMode?: 'active' | 'trashed';
 }
 
-import { usePermissions } from '../../../hooks/usePermissions';
-import { useSettings } from '../../../hooks/useSettings';
-
 export default function ItemTable({
   data,
   onAction,
@@ -45,7 +33,7 @@ export default function ItemTable({
   currentPage,
   perPage,
   startIndex,
-  viewMode,
+  viewMode = 'active',
 }: Props) {
   const { hasPermission } = usePermissions();
   const { formatCurrency } = useSettings();
@@ -67,6 +55,16 @@ export default function ItemTable({
     setIsEditModalOpen(false);
     setIsDeleteModalOpen(false);
     setSelectedItem(null);
+  };
+
+  const handleRestore = async (id: number) => {
+    try {
+      await restoreItem(id);
+      toast.success('Item restored successfully');
+      onAction();
+    } catch {
+      toast.error('Failed to restore item');
+    }
   };
 
   const renderSortIcon = (column: string) => {
@@ -136,7 +134,7 @@ export default function ItemTable({
               </TableCell>
               <TableCell
                 isHeader
-                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                className="px-5 py-3 font-medium text-gray-500 text-end text-theme-xs dark:text-gray-400"
               >
                 Actions
               </TableCell>
@@ -160,10 +158,10 @@ export default function ItemTable({
                   {item.name}
                 </TableCell>
                 <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
-                  {item.category.name}
+                  {item.category?.name}
                 </TableCell>
                 <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
-                  {item.unit.name} ({item.unit.code})
+                  {item.unit?.name} ({item.unit?.code})
                 </TableCell>
                 <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
                   {item.type}
@@ -172,68 +170,15 @@ export default function ItemTable({
                   {formatCurrency(item.selling_price)}
                 </TableCell>
 
-                <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                  <div className="flex items-center gap-2">
-                    {viewMode === 'active' ? (
-                      <>
-                        {hasPermission('update-item') && (
-                          <Tooltip text="Edit">
-                            <Button
-                              size="xs"
-                              onClick={() => handleEdit(item)}
-                              className="bg-blue-600 hover:bg-blue-700 text-white"
-                            >
-                              <Edit className="w-4 h-4" />
-                            </Button>
-                          </Tooltip>
-                        )}
-                        {hasPermission('delete-item') && (
-                          <Tooltip text="Delete">
-                            <Button
-                              size="xs"
-                              onClick={() => handleDelete(item)}
-                              className="bg-red-600 hover:bg-red-700 text-white"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          </Tooltip>
-                        )}
-                      </>
-                    ) : (
-                      <>
-                        {hasPermission('update-item') && (
-                          <Tooltip text="Restore">
-                            <Button
-                              size="xs"
-                              onClick={async () => {
-                                try {
-                                  await restoreItem(item.id);
-                                  toast.success('Item restored successfully');
-                                  onAction();
-                                } catch (error) {
-                                  toast.error('Failed to restore item');
-                                }
-                              }}
-                              className="bg-green-600 hover:bg-green-700 text-white"
-                            >
-                              <RotateCcw className="w-4 h-4" />
-                            </Button>
-                          </Tooltip>
-                        )}
-                        {hasPermission('delete-item') && (
-                          <Tooltip text="Permanent Delete">
-                            <Button
-                              size="xs"
-                              onClick={() => handleDelete(item)}
-                              className="bg-red-600 hover:bg-red-700 text-white"
-                            >
-                              <Trash className="w-4 h-4" />
-                            </Button>
-                          </Tooltip>
-                        )}
-                      </>
-                    )}
-                  </div>
+                <TableCell className="px-4 py-3 text-end">
+                  <TableActions
+                    isTrashed={viewMode === 'trashed'}
+                    onEdit={hasPermission('update-item') ? () => handleEdit(item) : undefined}
+                    onDelete={hasPermission('delete-item') ? () => handleDelete(item) : undefined}
+                    onRestore={
+                      hasPermission('update-item') ? () => handleRestore(item.id) : undefined
+                    }
+                  />
                 </TableCell>
               </TableRow>
             ))}
@@ -245,13 +190,13 @@ export default function ItemTable({
           <EditItemModal
             isOpen={isEditModalOpen}
             onClose={handleCloseModals}
-            onItemUpdated={onAction}
+            onSuccess={onAction}
             item={selectedItem}
           />
           <DeleteItemModal
             isOpen={isDeleteModalOpen}
             onClose={handleCloseModals}
-            onItemDeleted={onAction}
+            onSuccess={onAction}
             item={selectedItem}
             isForceDelete={viewMode === 'trashed'}
           />

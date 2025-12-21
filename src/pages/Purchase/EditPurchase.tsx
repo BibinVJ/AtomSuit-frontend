@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import PageBreadcrumb from '../../components/common/PageBreadCrumb';
 import ComponentCard from '../../components/common/ComponentCard';
 import PageMeta from '../../components/common/PageMeta';
@@ -45,54 +45,61 @@ export default function EditPurchase() {
   const [purchaseItems, setPurchaseItems] = useState<PurchaseItem[]>([]);
   const [errors, setErrors] = useState<ApiError>({});
 
-  useEffect(() => {
-    const fetchInitialData = async () => {
-      try {
-        const [vendorResponse, itemResponse, purchaseResponse] = await Promise.all([
-          getVendors(1, 10, 'created_at', 'desc', true),
-          getItems({
-            page: 1,
-            limit: 10,
-            sortCol: 'created_at',
-            sortDir: 'desc',
-            unpaginated: true,
-          }),
-          getPurchase(id!),
-        ]);
-        setVendors(vendorResponse.data || vendorResponse);
-        setItems(itemResponse.data || itemResponse);
+  const fetchInitialData = useCallback(async () => {
+    try {
+      const [vendorResponse, itemResponse, purchase] = await Promise.all([
+        getVendors({
+          page: 1,
+          limit: 10,
+          sortCol: 'created_at',
+          sortDir: 'desc',
+          unpaginated: true,
+        }),
+        getItems({
+          page: 1,
+          limit: 10,
+          sortCol: 'created_at',
+          sortDir: 'desc',
+          unpaginated: true,
+        }),
+        getPurchase(id!),
+      ]);
+      setVendors(vendorResponse.data);
+      setItems(itemResponse.data);
 
-        const { vendor, invoice_number, purchase_date, items } = purchaseResponse.data;
-        setVendorId(String(vendor.id));
-        setInvoiceNumber(invoice_number);
-        setPurchaseDate(purchase_date);
-        setPurchaseItems(
-          items.map(
-            (item: {
-              id: number;
-              item: { id: number };
-              description: string;
-              batch: { batch_number: string; expiry_date: string; manufacture_date: string };
-              quantity: number;
-              unit_cost: number;
-            }) => ({
-              id: item.id,
-              item_id: String(item.item.id),
-              description: item.description || '',
-              batch_number: item.batch.batch_number,
-              expiry_date: item.batch.expiry_date,
-              manufacture_date: item.batch.manufacture_date,
-              quantity: item.quantity,
-              unit_cost: item.unit_cost,
-            })
-          )
-        );
-      } catch (error) {
-        console.error('Error fetching initial data:', error);
-      }
-    };
-    fetchInitialData();
+      const { vendor, invoice_number, purchase_date, items } = purchase;
+      setVendorId(String(vendor.id));
+      setInvoiceNumber(invoice_number);
+      setPurchaseDate(purchase_date);
+      setPurchaseItems(
+        items.map(
+          (item: {
+            id: number;
+            item: { id: number };
+            description: string;
+            batch: { batch_number: string; expiry_date: string; manufacture_date: string };
+            quantity: number;
+            unit_cost: number;
+          }) => ({
+            id: item.id,
+            item_id: String(item.item.id),
+            description: item.description || '',
+            batch_number: item.batch.batch_number,
+            expiry_date: item.batch.expiry_date,
+            manufacture_date: item.batch.manufacture_date,
+            quantity: item.quantity,
+            unit_cost: item.unit_cost,
+          })
+        )
+      );
+    } catch (error) {
+      console.error('Error fetching initial data:', error);
+    }
   }, [id]);
+
+  useEffect(() => {
+    fetchInitialData();
+  }, [fetchInitialData]);
 
   const handleAddItem = () => {
     setPurchaseItems([

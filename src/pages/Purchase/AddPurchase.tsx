@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import PageBreadcrumb from '../../components/common/PageBreadCrumb';
 import ComponentCard from '../../components/common/ComponentCard';
 import PageMeta from '../../components/common/PageMeta';
@@ -34,7 +34,7 @@ interface ApiError {
 }
 
 export default function AddPurchase() {
-  const { formatDate, getSetting } = useSettings();
+  const { getSetting } = useSettings();
   const router = useRouter();
   const [vendors, setVendors] = useState<Vendor[]>([]);
   const [items, setItems] = useState<Item[]>([]);
@@ -54,14 +54,16 @@ export default function AddPurchase() {
   ]);
   const [errors, setErrors] = useState<ApiError>({});
 
-  useEffect(() => {
-    fetchInitialData();
-  }, []);
-
-  const fetchInitialData = async () => {
+  const fetchInitialData = useCallback(async () => {
     try {
       const [vendorResponse, itemResponse, invoiceResponse] = await Promise.all([
-        getVendors(1, 10, 'created_at', 'desc', true),
+        getVendors({
+          page: 1,
+          limit: 10,
+          sortCol: 'created_at',
+          sortDir: 'desc',
+          unpaginated: true,
+        }),
         getItems({ page: 1, limit: 10, sortCol: 'created_at', sortDir: 'desc', unpaginated: true }),
         getNextPurchaseInvoiceNumber(),
       ]);
@@ -73,7 +75,11 @@ export default function AddPurchase() {
     } catch (error) {
       console.error('Error fetching initial data:', error);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchInitialData();
+  }, [fetchInitialData]);
 
   const handleAddItem = () => {
     setPurchaseItems([
@@ -324,13 +330,13 @@ export default function AddPurchase() {
                     error={!!getErrorMessage(`items.${index}.unit_cost`)}
                     hint={getErrorMessage(`items.${index}.unit_cost`)}
                     prefix={
-                      getSetting('currency_position') === 'before'
-                        ? getSetting('currency_symbol')
+                      getSetting<string>('currency_position') === 'before'
+                        ? getSetting<string>('currency_symbol')
                         : undefined
                     }
                     suffix={
-                      getSetting('currency_position') === 'after'
-                        ? getSetting('currency_symbol')
+                      getSetting<string>('currency_position') === 'after'
+                        ? getSetting<string>('currency_symbol')
                         : undefined
                     }
                   />

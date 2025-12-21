@@ -1,5 +1,5 @@
 import { Check } from 'lucide-react';
-import { Plan } from '../../types';
+import { Plan, PlanFeature } from '../../types';
 import { useSettings } from '../../hooks/useSettings';
 
 interface Props {
@@ -26,7 +26,7 @@ export default function PlanCard({
     }
   };
 
-  const getFeatureValue = (feature: any) => {
+  const getFeatureValue = (feature: PlanFeature) => {
     if (feature.type === 'boolean') {
       return feature.value ? 'Yes' : 'No';
     }

@@ -30,6 +30,7 @@ interface Props {
   perPage: number;
   startIndex?: number;
   viewMode?: 'active' | 'trashed';
+  loading?: boolean;
 }
 
 export default function RoleTable({
@@ -42,6 +43,7 @@ export default function RoleTable({
   perPage,
   startIndex,
   viewMode = 'active',
+  loading,
 }: Props) {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
@@ -112,69 +114,86 @@ export default function RoleTable({
           </TableHeader>
 
           <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-            {data.map((role, index) => (
-              <TableRow key={role.id}>
-                <TableCell className="px-5 py-4 sm:px-6 text-start">
-                  <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                    {startIndex !== undefined
-                      ? startIndex + index
-                      : (currentPage - 1) * perPage + index + 1}
-                  </p>
-                </TableCell>
-                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
-                  {formatKebabCase(role.name)}
-                </TableCell>
-                <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                  {role.name !== 'admin' && (
-                    <div className="flex items-center gap-2">
-                      {viewMode === 'active' ? (
-                        <>
-                          <Tooltip text="Edit">
-                            <Button
-                              size="xs"
-                              onClick={() => handleEdit(role)}
-                              className="bg-blue-600 hover:bg-blue-700 text-white"
-                            >
-                              <Edit className="w-4 h-4" />
-                            </Button>
-                          </Tooltip>
-                          <Tooltip text="Delete">
-                            <Button
-                              size="xs"
-                              onClick={() => handleDelete(role)}
-                              className="bg-red-600 hover:bg-red-700 text-white"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          </Tooltip>
-                        </>
-                      ) : (
-                        <>
-                          <Tooltip text="Restore">
-                            <Button
-                              size="xs"
-                              onClick={() => handleRestore(role.id)}
-                              className="bg-green-600 hover:bg-green-700 text-white"
-                            >
-                              <RefreshCw className="w-4 h-4" />
-                            </Button>
-                          </Tooltip>
-                          <Tooltip text="Delete Permanently">
-                            <Button
-                              size="xs"
-                              onClick={() => handleDelete(role)}
-                              className="bg-red-600 hover:bg-red-700 text-white"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          </Tooltip>
-                        </>
-                      )}
-                    </div>
-                  )}
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={3} className="px-5 py-10 text-center">
+                  <div className="flex flex-col items-center justify-center space-y-2">
+                    <div className="w-10 h-10 border-4 border-brand-500 border-t-transparent rounded-full animate-spin"></div>
+                    <p className="text-gray-500">Loading roles...</p>
+                  </div>
                 </TableCell>
               </TableRow>
-            ))}
+            ) : data.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={3} className="px-5 py-10 text-center text-gray-500">
+                  No roles found.
+                </TableCell>
+              </TableRow>
+            ) : (
+              data.map((role, index) => (
+                <TableRow key={role.id}>
+                  <TableCell className="px-5 py-4 sm:px-6 text-start">
+                    <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
+                      {startIndex !== undefined
+                        ? startIndex + index
+                        : (currentPage - 1) * perPage + index + 1}
+                    </p>
+                  </TableCell>
+                  <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
+                    {formatKebabCase(role.name)}
+                  </TableCell>
+                  <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
+                    {role.name !== 'admin' && (
+                      <div className="flex items-center gap-2">
+                        {viewMode === 'active' ? (
+                          <>
+                            <Tooltip text="Edit">
+                              <Button
+                                size="xs"
+                                onClick={() => handleEdit(role)}
+                                className="bg-blue-600 hover:bg-blue-700 text-white"
+                              >
+                                <Edit className="w-4 h-4" />
+                              </Button>
+                            </Tooltip>
+                            <Tooltip text="Delete">
+                              <Button
+                                size="xs"
+                                onClick={() => handleDelete(role)}
+                                className="bg-red-600 hover:bg-red-700 text-white"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </Tooltip>
+                          </>
+                        ) : (
+                          <>
+                            <Tooltip text="Restore">
+                              <Button
+                                size="xs"
+                                onClick={() => handleRestore(role.id)}
+                                className="bg-green-600 hover:bg-green-700 text-white"
+                              >
+                                <RefreshCw className="w-4 h-4" />
+                              </Button>
+                            </Tooltip>
+                            <Tooltip text="Delete Permanently">
+                              <Button
+                                size="xs"
+                                onClick={() => handleDelete(role)}
+                                className="bg-red-600 hover:bg-red-700 text-white"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </Tooltip>
+                          </>
+                        )}
+                      </div>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>

@@ -2,21 +2,14 @@
 
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '../../ui/table';
 import { useState } from 'react';
-import {
-  ChevronsUpDown,
-  ArrowUpWideNarrow,
-  ArrowDownNarrowWide,
-  Edit,
-  Trash2,
-  RefreshCw,
-} from 'lucide-react';
+import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide } from 'lucide-react';
 import { restoreCurrency } from '../../../services/CurrencyService';
 import { toast } from 'sonner';
-import Button from '../../ui/button/Button';
-import Tooltip from '../../ui/tooltip/Tooltip';
-import { Currency } from '../../../types/Currency';
+import { Currency } from '../../../types';
 import EditCurrencyModal from './EditCurrencyModal';
 import DeleteCurrencyModal from './DeleteCurrencyModal';
+import { TableActions } from '../../common/TableActions';
+import { usePermissions } from '../../../hooks/usePermissions';
 
 interface Props {
   data: Currency[];
@@ -41,6 +34,7 @@ export default function CurrencyTable({
   startIndex,
   viewMode = 'active',
 }: Props) {
+  const { hasPermission } = usePermissions();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedCurrency, setSelectedCurrency] = useState<Currency | null>(null);
@@ -124,7 +118,7 @@ export default function CurrencyTable({
               </TableCell>
               <TableCell
                 isHeader
-                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                className="px-5 py-3 font-medium text-gray-500 text-end text-theme-xs dark:text-gray-400"
               >
                 Actions
               </TableCell>
@@ -174,52 +168,21 @@ export default function CurrencyTable({
                     {currency.thousand_separator ? ` '${currency.thousand_separator}'` : ' Global'}{' '}
                     |{currency.decimal_separator ? ` '${currency.decimal_separator}'` : ' Global'}
                   </TableCell>
-                  <TableCell className="px-5 py-4 sm:px-6 text-start text-gray-500 dark:text-gray-400 text-theme-sm">
-                    <div className="flex items-center gap-2">
-                      {viewMode === 'active' ? (
-                        <>
-                          <Tooltip text="Edit">
-                            <Button
-                              size="xs"
-                              onClick={() => handleEdit(currency)}
-                              className="bg-blue-600 hover:bg-blue-700 text-white"
-                            >
-                              <Edit className="w-4 h-4" />
-                            </Button>
-                          </Tooltip>
-                          <Tooltip text="Delete">
-                            <Button
-                              size="xs"
-                              onClick={() => handleDelete(currency)}
-                              className="bg-red-600 hover:bg-red-700 text-white"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          </Tooltip>
-                        </>
-                      ) : (
-                        <>
-                          <Tooltip text="Restore">
-                            <Button
-                              size="xs"
-                              onClick={() => handleRestore(currency.id)}
-                              className="bg-green-600 hover:bg-green-700 text-white"
-                            >
-                              <RefreshCw className="w-4 h-4" />
-                            </Button>
-                          </Tooltip>
-                          <Tooltip text="Delete Permanently">
-                            <Button
-                              size="xs"
-                              onClick={() => handleDelete(currency)}
-                              className="bg-red-600 hover:bg-red-700 text-white"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          </Tooltip>
-                        </>
-                      )}
-                    </div>
+                  <TableCell className="px-5 py-4 sm:px-6 text-end text-gray-500 dark:text-gray-400 text-theme-sm">
+                    <TableActions
+                      isTrashed={viewMode === 'trashed'}
+                      onEdit={
+                        hasPermission('update-currency') ? () => handleEdit(currency) : undefined
+                      }
+                      onDelete={
+                        hasPermission('delete-currency') ? () => handleDelete(currency) : undefined
+                      }
+                      onRestore={
+                        hasPermission('update-currency')
+                          ? () => handleRestore(currency.id)
+                          : undefined
+                      }
+                    />
                   </TableCell>
                 </TableRow>
               ))

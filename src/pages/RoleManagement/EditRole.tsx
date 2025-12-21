@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { getRole, updateRole } from '../../services/RoleService';
@@ -29,21 +29,22 @@ export default function EditRole() {
   const [availablePermissions, setAvailablePermissions] = useState<Permission[]>([]);
   const [errors, setErrors] = useState({ name: '', permissions: '' });
 
-  useEffect(() => {
-    const fetchRoleAndPermissions = async () => {
-      try {
-        const [roleData, perms] = await Promise.all([getRole(id!), getPermissions()]);
-        setRole(roleData);
-        setName(roleData.name);
-        setSelectedPermissions(roleData.permissions.map((p: Permission) => p.id));
-        setAvailablePermissions(perms.data);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        toast.error('Failed to fetch role or permissions');
-      }
-    };
-    fetchRoleAndPermissions();
+  const fetchRoleAndPermissions = useCallback(async () => {
+    try {
+      const [roleData, perms] = await Promise.all([getRole(id!), getPermissions()]);
+      setRole(roleData);
+      setName(roleData.name);
+      setSelectedPermissions(roleData.permissions.map((p: Permission) => p.id));
+      setAvailablePermissions(perms.data);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      toast.error('Failed to fetch role or permissions');
+    }
   }, [id]);
+
+  useEffect(() => {
+    fetchRoleAndPermissions();
+  }, [fetchRoleAndPermissions]);
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
