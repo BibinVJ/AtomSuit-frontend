@@ -5,18 +5,10 @@ import { useState } from 'react';
 import Badge from '../ui/badge/Badge';
 import EditUserModal from './EditUserModal';
 import DeleteUserModal from './DeleteUserModal';
-import {
-  ChevronsUpDown,
-  ArrowUpWideNarrow,
-  ArrowDownNarrowWide,
-  Pencil,
-  Trash2,
-  RefreshCw,
-} from 'lucide-react';
+import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide } from 'lucide-react';
 import { restoreUser } from '../../services/UserService';
 import { toast } from 'sonner';
-import Button from '../ui/button/Button';
-import Tooltip from '../ui/tooltip/Tooltip';
+import { TableActions } from '../common/TableActions';
 import { formatKebabCase } from '../../utils/string';
 import { User } from '../../types';
 
@@ -30,6 +22,7 @@ interface Props {
   perPage: number;
   startIndex?: number;
   viewMode?: 'active' | 'trashed';
+  loading?: boolean;
 }
 
 export default function UserTable({
@@ -42,6 +35,7 @@ export default function UserTable({
   perPage,
   startIndex,
   viewMode = 'active',
+  loading,
 }: Props) {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -133,7 +127,7 @@ export default function UserTable({
               </TableCell>
               <TableCell
                 isHeader
-                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                className="px-5 py-3 font-medium text-gray-500 text-end text-theme-xs dark:text-gray-400"
               >
                 Actions
               </TableCell>
@@ -141,81 +135,59 @@ export default function UserTable({
           </TableHeader>
 
           <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-            {data.map((user, index) => (
-              <TableRow key={user.id}>
-                <TableCell className="px-5 py-4 sm:px-6 text-start">
-                  <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                    {startIndex !== undefined
-                      ? startIndex + index
-                      : (currentPage - 1) * perPage + index + 1}
-                  </p>
-                </TableCell>
-                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
-                  {user.name}
-                </TableCell>
-                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
-                  {user.email}
-                </TableCell>
-                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
-                  {user.phone}
-                </TableCell>
-                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
-                  {formatKebabCase(user.role.name)}
-                </TableCell>
-                <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                  <Badge size="sm" color={user.status === 'active' ? 'success' : 'error'}>
-                    {user.status}
-                  </Badge>
-                </TableCell>
-                <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                  <div className="flex items-center gap-2">
-                    {viewMode === 'active' ? (
-                      <>
-                        <Tooltip text="Edit">
-                          <Button
-                            size="xs"
-                            onClick={() => handleEdit(user)}
-                            className="bg-blue-600 hover:bg-blue-700 text-white"
-                          >
-                            <Pencil className="w-4 h-4" />
-                          </Button>
-                        </Tooltip>
-                        <Tooltip text="Delete">
-                          <Button
-                            size="xs"
-                            onClick={() => handleDelete(user)}
-                            className="bg-red-600 hover:bg-red-700 text-white"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </Tooltip>
-                      </>
-                    ) : (
-                      <>
-                        <Tooltip text="Restore">
-                          <Button
-                            size="xs"
-                            onClick={() => handleRestore(user.id)}
-                            className="bg-green-600 hover:bg-green-700 text-white"
-                          >
-                            <RefreshCw className="w-4 h-4" />
-                          </Button>
-                        </Tooltip>
-                        <Tooltip text="Delete Permanently">
-                          <Button
-                            size="xs"
-                            onClick={() => handleDelete(user)}
-                            className="bg-red-600 hover:bg-red-700 text-white"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </Tooltip>
-                      </>
-                    )}
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={7} className="px-5 py-10 text-center">
+                  <div className="flex flex-col items-center justify-center space-y-2">
+                    <div className="w-10 h-10 border-4 border-brand-500 border-t-transparent rounded-full animate-spin"></div>
+                    <p className="text-gray-500">Loading users...</p>
                   </div>
                 </TableCell>
               </TableRow>
-            ))}
+            ) : data.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={7} className="px-5 py-10 text-center text-gray-500 font-medium">
+                  No users found
+                </TableCell>
+              </TableRow>
+            ) : (
+              data.map((user, index) => (
+                <TableRow key={user.id}>
+                  <TableCell className="px-5 py-4 sm:px-6 text-start">
+                    <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
+                      {startIndex !== undefined
+                        ? startIndex + index
+                        : (currentPage - 1) * perPage + index + 1}
+                    </p>
+                  </TableCell>
+                  <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
+                    {user.name}
+                  </TableCell>
+                  <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
+                    {user.email}
+                  </TableCell>
+                  <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
+                    {user.phone}
+                  </TableCell>
+                  <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
+                    {formatKebabCase(user.role.name)}
+                  </TableCell>
+                  <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
+                    <Badge size="sm" color={user.status === 'active' ? 'success' : 'error'}>
+                      {user.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="px-4 py-3 text-gray-500 text-end text-theme-sm dark:text-gray-400">
+                    <TableActions
+                      isTrashed={viewMode === 'trashed'}
+                      onEdit={() => handleEdit(user)}
+                      onDelete={() => handleDelete(user)}
+                      onRestore={() => handleRestore(user.id)}
+                    />
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>

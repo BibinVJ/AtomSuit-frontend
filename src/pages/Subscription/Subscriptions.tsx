@@ -29,7 +29,7 @@ export default function Subscriptions() {
     handleSort,
     refresh,
   } = useDataTable<Subscription>({
-    fetchData: (params) => getSubscriptions(params),
+    fetchData: getSubscriptions,
   });
 
   return (

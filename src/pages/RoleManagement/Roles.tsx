@@ -42,7 +42,7 @@ export default function Roles() {
     handleSort,
     refresh,
   } = useDataTable<Role>({
-    fetchData: (params) => getRoles(params),
+    fetchData: getRoles,
   });
 
   return (

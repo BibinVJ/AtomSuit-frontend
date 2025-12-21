@@ -41,7 +41,7 @@ export default function Purchases() {
     handleSort,
     refresh,
   } = useDataTable<Purchase>({
-    fetchData: (params) => getPurchases(params),
+    fetchData: getPurchases,
   });
 
   return (

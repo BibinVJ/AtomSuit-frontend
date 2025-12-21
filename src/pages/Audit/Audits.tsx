@@ -42,7 +42,7 @@ export default function Audits() {
     handlePerPageChange,
     resetFilters,
   } = useDataTable<AuditEntry>({
-    fetchData: (params) => AuditService.getActivities(params),
+    fetchData: AuditService.getActivities,
     initialPerPage: 20,
     extraParams,
   });

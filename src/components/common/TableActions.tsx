@@ -1,12 +1,15 @@
 import React from 'react';
 import Tooltip from '../ui/tooltip/Tooltip';
-import { Edit, Trash, RotateCcw } from 'lucide-react';
+import { Edit, Trash, RotateCcw, Eye } from 'lucide-react';
+import Button from '../ui/button/Button';
 
 interface TableActionsProps {
   isTrashed?: boolean;
+  onView?: () => void;
   onEdit?: () => void;
   onDelete?: () => void;
   onRestore?: () => void;
+  viewTooltip?: string;
   editTooltip?: string;
   deleteTooltip?: string;
   restoreTooltip?: string;
@@ -14,35 +17,53 @@ interface TableActionsProps {
 
 export const TableActions: React.FC<TableActionsProps> = ({
   isTrashed = false,
+  onView,
   onEdit,
   onDelete,
   onRestore,
+  viewTooltip = 'View',
   editTooltip = 'Edit',
   deleteTooltip = 'Delete',
   restoreTooltip = 'Restore',
 }) => {
   return (
-    <div className="flex items-center justify-end gap-2">
+    <div className="flex items-center justify-end gap-1">
       {!isTrashed ? (
         <>
+          {onView && (
+            <Tooltip text={viewTooltip}>
+              <Button
+                variant="ghost"
+                size="xs"
+                onClick={onView}
+                className="text-gray-500 hover:text-brand-500"
+              >
+                <Eye size={18} />
+              </Button>
+            </Tooltip>
+          )}
           {onEdit && (
             <Tooltip text={editTooltip}>
-              <button
+              <Button
+                variant="ghost"
+                size="xs"
                 onClick={onEdit}
-                className="p-2 text-gray-500 hover:text-blue-600 transition-colors"
+                className="text-gray-500 hover:text-blue-600"
               >
                 <Edit size={18} />
-              </button>
+              </Button>
             </Tooltip>
           )}
           {onDelete && (
             <Tooltip text={deleteTooltip}>
-              <button
+              <Button
+                variant="ghost"
+                size="xs"
                 onClick={onDelete}
-                className="p-2 text-gray-500 hover:text-red-600 transition-colors"
+                className="text-gray-500 hover:text-red-600"
               >
                 <Trash size={18} />
-              </button>
+              </Button>
             </Tooltip>
           )}
         </>
@@ -50,22 +71,26 @@ export const TableActions: React.FC<TableActionsProps> = ({
         <>
           {onRestore && (
             <Tooltip text={restoreTooltip}>
-              <button
+              <Button
+                variant="ghost"
+                size="xs"
                 onClick={onRestore}
-                className="p-2 text-gray-500 hover:text-green-600 transition-colors"
+                className="text-gray-500 hover:text-green-600"
               >
                 <RotateCcw size={18} />
-              </button>
+              </Button>
             </Tooltip>
           )}
           {onDelete && (
             <Tooltip text="Permanently Delete">
-              <button
+              <Button
+                variant="ghost"
+                size="xs"
                 onClick={onDelete}
-                className="p-2 text-gray-500 hover:text-red-700 transition-colors"
+                className="text-gray-500 hover:text-red-700"
               >
                 <Trash size={18} />
-              </button>
+              </Button>
             </Tooltip>
           )}
         </>

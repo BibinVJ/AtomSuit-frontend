@@ -2,9 +2,7 @@
 
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '../ui/table';
 import Badge from '../ui/badge/Badge';
-import { Eye } from 'lucide-react';
-import Button from '../ui/button/Button';
-import Tooltip from '../ui/tooltip/Tooltip';
+import { TableActions } from '../common/TableActions';
 import { useContext } from 'react';
 import { SettingsContext } from '../../context/SettingsContext';
 
@@ -116,7 +114,7 @@ export default function AuditTable({
               </TableCell>
               <TableCell
                 isHeader
-                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                className="px-5 py-3 font-medium text-gray-500 text-end text-theme-xs dark:text-gray-400"
               >
                 Actions
               </TableCell>
@@ -153,18 +151,8 @@ export default function AuditTable({
                 <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
                   {formatDateTime(entry.created_at)}
                 </TableCell>
-                <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                  <div className="flex items-center gap-2">
-                    <Tooltip text="View Details">
-                      <Button
-                        size="xs"
-                        onClick={() => onViewDetails(entry)}
-                        className="bg-brand-500 hover:bg-brand-600 text-white"
-                      >
-                        <Eye className="w-4 h-4" />
-                      </Button>
-                    </Tooltip>
-                  </div>
+                <TableCell className="px-4 py-3 text-gray-500 text-end text-theme-sm dark:text-gray-400">
+                  <TableActions onView={() => onViewDetails(entry)} viewTooltip="View Details" />
                 </TableCell>
               </TableRow>
             ))}

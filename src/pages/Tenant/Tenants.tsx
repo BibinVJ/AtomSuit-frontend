@@ -29,7 +29,7 @@ export default function Tenants() {
     handleSort,
     refresh,
   } = useDataTable<Tenant>({
-    fetchData: (params) => getTenants(params),
+    fetchData: getTenants,
   });
 
   return (

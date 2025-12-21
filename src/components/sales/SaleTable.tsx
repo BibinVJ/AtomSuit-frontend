@@ -3,16 +3,8 @@
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '../ui/table';
 import { useState } from 'react';
 import Badge from '../ui/badge/Badge';
-import {
-  ChevronsUpDown,
-  ArrowUpWideNarrow,
-  ArrowDownNarrowWide,
-  View,
-  Edit,
-  Trash2,
-} from 'lucide-react';
-import Button from '../ui/button/Button';
-import Tooltip from '../ui/tooltip/Tooltip';
+import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide } from 'lucide-react';
+import { TableActions } from '../common/TableActions';
 import { useRouter } from 'next/navigation';
 import VoidSaleModal from './VoidSaleModal';
 
@@ -128,7 +120,7 @@ export default function SaleTable({
               </TableCell>
               <TableCell
                 isHeader
-                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                className="px-5 py-3 font-medium text-gray-500 text-end text-theme-xs dark:text-gray-400"
               >
                 Actions
               </TableCell>
@@ -187,42 +179,13 @@ export default function SaleTable({
                       {sale.status}
                     </Badge>
                   </TableCell>
-                  <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                    <div className="flex items-center gap-2">
-                      {hasPermission('view-sale') && (
-                        <Tooltip text="View">
-                          <Button
-                            size="xs"
-                            onClick={() => handleView(sale.id)}
-                            className="bg-gray-600 hover:bg-gray-700 text-white"
-                          >
-                            <View className="w-4 h-4" />
-                          </Button>
-                        </Tooltip>
-                      )}
-                      {hasPermission('update-sale') && (
-                        <Tooltip text="Edit">
-                          <Button
-                            size="xs"
-                            onClick={() => handleEdit(sale.id)}
-                            className="bg-blue-600 hover:bg-blue-700 text-white"
-                          >
-                            <Edit className="w-4 h-4" />
-                          </Button>
-                        </Tooltip>
-                      )}
-                      {hasPermission('delete-sale') && (
-                        <Tooltip text="Void">
-                          <Button
-                            size="xs"
-                            onClick={() => handleDelete(sale)}
-                            className="bg-red-600 hover:bg-red-700 text-white"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </Tooltip>
-                      )}
-                    </div>
+                  <TableCell className="px-4 py-3 text-gray-500 text-end text-theme-sm dark:text-gray-400">
+                    <TableActions
+                      onView={hasPermission('view-sale') ? () => handleView(sale.id) : undefined}
+                      onEdit={hasPermission('update-sale') ? () => handleEdit(sale.id) : undefined}
+                      onDelete={hasPermission('delete-sale') ? () => handleDelete(sale) : undefined}
+                      deleteTooltip="Void"
+                    />
                   </TableCell>
                 </TableRow>
               ))

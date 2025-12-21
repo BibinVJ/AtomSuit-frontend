@@ -30,6 +30,7 @@ import { getLayout, saveLayout } from '../../services/LayoutService';
 import MetricCard from '../../components/ecommerce/MetricCard';
 import SkeletonCard from '../../components/common/SkeletonCard';
 import { useAuth } from '../../hooks/useAuth';
+import { useTenant } from '../../hooks/useTenant';
 import { Layout } from '../../types/Layout';
 import { DashboardData } from '../../types/Dashboard';
 
@@ -199,6 +200,7 @@ const DashboardSkeleton = () => (
 
 function Home() {
   const { hasPermission, loading: authLoading } = useAuth();
+  const { isLoading: tenantLoading } = useTenant();
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [chartData, setChartData] = useState<{
@@ -246,8 +248,14 @@ function Home() {
   );
 
   useEffect(() => {
-    // Wait for auth to initialize and check permission
-    if (authLoading || !hasPermission('view-dashboard')) return;
+    // Wait for auth and tenant to initialize
+    if (authLoading || tenantLoading) return;
+
+    // Check permission
+    if (!hasPermission('view-dashboard')) {
+      setLoading(false);
+      return;
+    }
 
     const fetchInitialData = async () => {
       try {
@@ -304,7 +312,7 @@ function Home() {
     };
 
     fetchInitialData();
-  }, [authLoading, hasPermission]);
+  }, [authLoading, tenantLoading, hasPermission]);
 
   const onLayoutChange = (newLayout: ReactGridLayout.Layout[]) => {
     setCards((prevCards) =>
@@ -357,7 +365,7 @@ function Home() {
     return <div>This is dashboard</div>;
   }
 
-  if (loading || authLoading) {
+  if (authLoading || tenantLoading || (loading && hasPermission('view-dashboard'))) {
     return <DashboardSkeleton />;
   }
 

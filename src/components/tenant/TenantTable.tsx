@@ -4,9 +4,8 @@ import { Table, TableBody, TableCell, TableHeader, TableRow } from '../ui/table'
 import { useState } from 'react';
 import Badge from '../ui/badge/Badge';
 import DeleteTenantModal from './DeleteTenantModal';
-import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide, Trash2 } from 'lucide-react';
-import Button from '../ui/button/Button';
-import Tooltip from '../ui/tooltip/Tooltip';
+import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide } from 'lucide-react';
+import { TableActions } from '../common/TableActions';
 
 import { Tenant } from '../../types';
 import { usePermissions } from '../../hooks/usePermissions';
@@ -196,20 +195,12 @@ export default function TenantTable({
                   <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
                     {formatDate(tenant.created_at)}
                   </TableCell>
-                  <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                    <div className="flex items-center gap-2">
-                      {hasPermission('delete-tenant') && (
-                        <Tooltip text="Delete">
-                          <Button
-                            size="xs"
-                            onClick={() => handleDelete(tenant)}
-                            className="bg-red-600 hover:bg-red-700 text-white"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </Tooltip>
-                      )}
-                    </div>
+                  <TableCell className="px-4 py-3 text-gray-500 text-end text-theme-sm dark:text-gray-400">
+                    <TableActions
+                      onDelete={
+                        hasPermission('delete-tenant') ? () => handleDelete(tenant) : undefined
+                      }
+                    />
                   </TableCell>
                 </TableRow>
               ))

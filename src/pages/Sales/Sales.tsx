@@ -41,7 +41,7 @@ export default function Sales() {
     handleSort,
     refresh,
   } = useDataTable<Sale>({
-    fetchData: (params) => getSales(params),
+    fetchData: getSales,
   });
 
   return (

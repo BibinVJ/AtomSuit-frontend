@@ -3,16 +3,8 @@
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '../ui/table';
 import { useState } from 'react';
 import Badge from '../ui/badge/Badge';
-import {
-  ChevronsUpDown,
-  ArrowUpWideNarrow,
-  ArrowDownNarrowWide,
-  View,
-  Edit,
-  Trash2,
-} from 'lucide-react';
-import Button from '../ui/button/Button';
-import Tooltip from '../ui/tooltip/Tooltip';
+import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide } from 'lucide-react';
+import { TableActions } from '../common/TableActions';
 import { useRouter } from 'next/navigation';
 import VoidPurchaseModal from './VoidPurchaseModal';
 
@@ -128,7 +120,7 @@ export default function PurchaseTable({
               </TableCell>
               <TableCell
                 isHeader
-                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                className="px-5 py-3 font-medium text-gray-500 text-end text-theme-xs dark:text-gray-400"
               >
                 Actions
               </TableCell>
@@ -181,42 +173,19 @@ export default function PurchaseTable({
                       {purchase.payment_status}
                     </Badge>
                   </TableCell>
-                  <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                    <div className="flex items-center gap-2">
-                      {hasPermission('view-purchase') && (
-                        <Tooltip text="View">
-                          <Button
-                            size="xs"
-                            onClick={() => handleView(purchase.id)}
-                            className="bg-gray-600 hover:bg-gray-700 text-white"
-                          >
-                            <View className="w-4 h-4" />
-                          </Button>
-                        </Tooltip>
-                      )}
-                      {hasPermission('update-purchase') && (
-                        <Tooltip text="Edit">
-                          <Button
-                            size="xs"
-                            onClick={() => handleEdit(purchase.id)}
-                            className="bg-blue-600 hover:bg-blue-700 text-white"
-                          >
-                            <Edit className="w-4 h-4" />
-                          </Button>
-                        </Tooltip>
-                      )}
-                      {hasPermission('delete-purchase') && (
-                        <Tooltip text="Void">
-                          <Button
-                            size="xs"
-                            onClick={() => handleDelete(purchase)}
-                            className="bg-red-600 hover:bg-red-700 text-white"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </Tooltip>
-                      )}
-                    </div>
+                  <TableCell className="px-4 py-3 text-gray-500 text-end text-theme-sm dark:text-gray-400">
+                    <TableActions
+                      onView={
+                        hasPermission('view-purchase') ? () => handleView(purchase.id) : undefined
+                      }
+                      onEdit={
+                        hasPermission('update-purchase') ? () => handleEdit(purchase.id) : undefined
+                      }
+                      onDelete={
+                        hasPermission('delete-purchase') ? () => handleDelete(purchase) : undefined
+                      }
+                      deleteTooltip="Void"
+                    />
                   </TableCell>
                 </TableRow>
               ))

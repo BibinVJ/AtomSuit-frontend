@@ -3,18 +3,10 @@
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '../ui/table';
 import { useState } from 'react';
 import DeleteRoleModal from './DeleteRoleModal';
-import {
-  ChevronsUpDown,
-  ArrowUpWideNarrow,
-  ArrowDownNarrowWide,
-  Edit,
-  Trash2,
-  RefreshCw,
-} from 'lucide-react';
+import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide } from 'lucide-react';
 import { restoreRole } from '../../services/RoleService';
 import { toast } from 'sonner';
-import Button from '../ui/button/Button';
-import Tooltip from '../ui/tooltip/Tooltip';
+import { TableActions } from '../common/TableActions';
 import { Role } from '../../types';
 import { useRouter } from 'next/navigation';
 
@@ -106,7 +98,7 @@ export default function RoleTable({
               </TableCell>
               <TableCell
                 isHeader
-                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                className="px-5 py-3 font-medium text-gray-500 text-end text-theme-xs dark:text-gray-400"
               >
                 Actions
               </TableCell>
@@ -142,53 +134,14 @@ export default function RoleTable({
                   <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
                     {formatKebabCase(role.name)}
                   </TableCell>
-                  <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
+                  <TableCell className="px-4 py-3 text-gray-500 text-end text-theme-sm dark:text-gray-400">
                     {role.name !== 'admin' && (
-                      <div className="flex items-center gap-2">
-                        {viewMode === 'active' ? (
-                          <>
-                            <Tooltip text="Edit">
-                              <Button
-                                size="xs"
-                                onClick={() => handleEdit(role)}
-                                className="bg-blue-600 hover:bg-blue-700 text-white"
-                              >
-                                <Edit className="w-4 h-4" />
-                              </Button>
-                            </Tooltip>
-                            <Tooltip text="Delete">
-                              <Button
-                                size="xs"
-                                onClick={() => handleDelete(role)}
-                                className="bg-red-600 hover:bg-red-700 text-white"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </Button>
-                            </Tooltip>
-                          </>
-                        ) : (
-                          <>
-                            <Tooltip text="Restore">
-                              <Button
-                                size="xs"
-                                onClick={() => handleRestore(role.id)}
-                                className="bg-green-600 hover:bg-green-700 text-white"
-                              >
-                                <RefreshCw className="w-4 h-4" />
-                              </Button>
-                            </Tooltip>
-                            <Tooltip text="Delete Permanently">
-                              <Button
-                                size="xs"
-                                onClick={() => handleDelete(role)}
-                                className="bg-red-600 hover:bg-red-700 text-white"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </Button>
-                            </Tooltip>
-                          </>
-                        )}
-                      </div>
+                      <TableActions
+                        isTrashed={viewMode === 'trashed'}
+                        onEdit={() => handleEdit(role)}
+                        onDelete={() => handleDelete(role)}
+                        onRestore={() => handleRestore(role.id)}
+                      />
                     )}
                   </TableCell>
                 </TableRow>

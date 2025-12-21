@@ -5,7 +5,8 @@ import { useState } from 'react';
 import Badge from '../ui/badge/Badge';
 import ViewSubscriptionModal from './ViewSubscriptionModal';
 import CancelSubscriptionModal from './CancelSubscriptionModal';
-import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide, Eye, XCircle } from 'lucide-react';
+import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide, XCircle } from 'lucide-react';
+import { TableActions } from '../common/TableActions';
 import Button from '../ui/button/Button';
 import Tooltip from '../ui/tooltip/Tooltip';
 
@@ -160,7 +161,7 @@ export default function SubscriptionTable({
               </TableCell>
               <TableCell
                 isHeader
-                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                className="px-5 py-3 font-medium text-gray-500 text-end text-theme-xs dark:text-gray-400"
               >
                 Actions
               </TableCell>
@@ -215,24 +216,17 @@ export default function SubscriptionTable({
                     {getStatusBadge(subscription)}
                   </TableCell>
                   <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                    <div className="flex items-center gap-2">
-                      <Tooltip text="View">
-                        <Button
-                          size="xs"
-                          onClick={() => handleView(subscription)}
-                          className="bg-blue-600 hover:bg-blue-700 text-white"
-                        >
-                          <Eye className="w-4 h-4" />
-                        </Button>
-                      </Tooltip>
+                    <div className="flex items-center justify-end gap-1">
+                      <TableActions onView={() => handleView(subscription)} />
                       {hasPermission('delete-subscription') && !subscription.is_canceled && (
                         <Tooltip text="Cancel">
                           <Button
+                            variant="ghost"
                             size="xs"
                             onClick={() => handleCancel(subscription)}
-                            className="bg-red-600 hover:bg-red-700 text-white"
+                            className="text-gray-500 hover:text-red-600"
                           >
-                            <XCircle className="w-4 h-4" />
+                            <XCircle size={18} />
                           </Button>
                         </Tooltip>
                       )}

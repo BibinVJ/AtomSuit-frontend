@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import PageBreadcrumb from '../../components/common/PageBreadCrumb';
 import ComponentCard from '../../components/common/ComponentCard';
 import PageMeta from '../../components/common/PageMeta';
@@ -15,90 +15,54 @@ import { getUsers } from '../../services/UserService';
 import { getRoles } from '../../services/RoleService';
 import { User } from '../../types/User';
 import { Role } from '../../types/Role';
-import { useDebounce } from '../../hooks/useDebounce';
+import { useDataTable } from '../../hooks/useDataTable';
 
 import { Plus } from 'lucide-react';
 import TableToolbar from '../../components/common/TableToolbar';
 import ViewModeTabs from '../../components/common/ViewModeTabs';
 
 export default function Users() {
-  const [users, setUsers] = useState<User[]>([]);
   const { isOpen, openModal, closeModal } = useModal();
-  const [currentPage, setCurrentPage] = useState(1);
-  const [perPage, setPerPage] = useState(10);
-  const [totalPages, setTotalPages] = useState(1);
-  const [from, setFrom] = useState(0);
-  const [to, setTo] = useState(0);
-  const [total, setTotal] = useState(0);
-  const [sortBy, setSortBy] = useState('created_at');
-  const [sortDirection, setSortDirection] = useState('desc');
-  const [viewMode, setViewMode] = useState<'active' | 'trashed'>('active');
-
-  /* State for Range Fetching */
-  const [rangeFrom, setRangeFrom] = useState<number | ''>('');
-  const [rangeTo, setRangeTo] = useState<number | ''>('');
-  const [searchTerm, setSearchTerm] = useState('');
-
-  const debouncedSearchTerm = useDebounce(searchTerm, 1000); // 1 second delay
-  const debouncedRangeFrom = useDebounce(rangeFrom, 1000);
-  const debouncedRangeTo = useDebounce(rangeTo, 1000);
-
-  /* State for Advanced Filters */
   const [roles, setRoles] = useState<Role[]>([]);
   const [selectedRole, setSelectedRole] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
 
-  const fetchUsers = useCallback(
-    async (page = 1, limit = 10, sortCol = 'created_at', sortDir = 'desc') => {
-      try {
-        const response = await getUsers({
-          page,
-          limit,
-          sortCol,
-          sortDir,
-          from: debouncedRangeFrom !== '' ? Number(debouncedRangeFrom) : undefined,
-          to: debouncedRangeTo !== '' ? Number(debouncedRangeTo) : undefined,
-          search: debouncedSearchTerm,
-          role: selectedRole,
-          status: selectedStatus,
-          trashed: viewMode === 'trashed' ? 'only' : undefined,
-        });
-
-        setUsers(response.data);
-
-        // Cast meta to any or specific PaginatedMeta to handle potential missing fields in range-fetch mode
-        const meta = response.meta;
-
-        if (meta) {
-          setTotalPages(meta.last_page || 1);
-          setCurrentPage(meta.current_page || 1);
-
-          // Use meta values if available, otherwise fallback to range values
-          setFrom(
-            meta.from !== undefined
-              ? meta.from
-              : debouncedRangeFrom !== ''
-                ? Number(debouncedRangeFrom)
-                : 0
-          );
-          setTo(
-            meta.to !== undefined ? meta.to : debouncedRangeTo !== '' ? Number(debouncedRangeTo) : 0
-          );
-          setTotal(meta.total || 0);
-        }
-      } catch (error) {
-        console.error('Error fetching users:', error);
-      }
-    },
-    [
-      debouncedRangeFrom,
-      debouncedRangeTo,
-      debouncedSearchTerm,
-      selectedRole,
-      selectedStatus,
-      viewMode,
-    ]
+  const extraParams = useMemo(
+    () => ({
+      role: selectedRole,
+      status: selectedStatus,
+    }),
+    [selectedRole, selectedStatus]
   );
+
+  const {
+    data: users,
+    loading,
+    currentPage,
+    perPage,
+    totalPages,
+    total,
+    from,
+    to,
+    sortBy,
+    sortDirection,
+    searchTerm,
+    setSearchTerm,
+    rangeFrom,
+    setRangeFrom,
+    rangeTo,
+    setRangeTo,
+    viewMode,
+    setViewMode,
+    handlePageChange,
+    handlePerPageChange,
+    handleSort,
+    resetFilters,
+    refresh,
+  } = useDataTable<User>({
+    fetchData: getUsers,
+    extraParams,
+  });
 
   const fetchRoles = useCallback(async () => {
     try {
@@ -113,38 +77,10 @@ export default function Users() {
     fetchRoles();
   }, [fetchRoles]);
 
-  useEffect(() => {
-    fetchUsers(currentPage, perPage, sortBy, sortDirection);
-  }, [
-    currentPage,
-    perPage,
-    sortBy,
-    sortDirection,
-    selectedRole,
-    selectedStatus,
-    debouncedSearchTerm,
-    debouncedRangeFrom,
-    debouncedRangeTo,
-    viewMode,
-    fetchUsers,
-  ]);
-
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
-
-  const handlePerPageChange = (value: string) => {
-    setPerPage(parseInt(value, 10));
-    setCurrentPage(1);
-  };
-
-  const handleSort = (column: string) => {
-    if (sortBy === column) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortBy(column);
-      setSortDirection('asc');
-    }
+  const handleReset = () => {
+    resetFilters();
+    setSelectedRole('');
+    setSelectedStatus('');
   };
 
   return (
@@ -164,13 +100,7 @@ export default function Users() {
             onRangeToChange={(val) => setRangeTo(val as number | '')}
             perPage={perPage}
             onPerPageChange={handlePerPageChange}
-            onReset={() => {
-              setSearchTerm('');
-              setSelectedRole('');
-              setSelectedStatus('');
-              setRangeFrom('');
-              setRangeTo('');
-            }}
+            onReset={handleReset}
             extraFilters={
               <>
                 <div className="w-full md:w-44">
@@ -224,13 +154,14 @@ export default function Users() {
         >
           <UserTable
             data={users}
-            onAction={() => fetchUsers(currentPage, perPage, sortBy, sortDirection)}
+            loading={loading}
+            onAction={refresh}
             onSort={handleSort}
             sortBy={sortBy}
             sortDirection={sortDirection}
             currentPage={currentPage}
             perPage={perPage}
-            startIndex={debouncedRangeFrom !== '' ? Number(debouncedRangeFrom) : undefined}
+            startIndex={rangeFrom !== '' ? Number(rangeFrom) : undefined}
             viewMode={viewMode}
           />
           <Pagination
@@ -243,7 +174,7 @@ export default function Users() {
           />
         </ComponentCard>
       </div>
-      <AddUserModal isOpen={isOpen} onClose={closeModal} onSuccess={() => fetchUsers(1, perPage)} />
+      <AddUserModal isOpen={isOpen} onClose={closeModal} onSuccess={refresh} />
     </>
   );
 }

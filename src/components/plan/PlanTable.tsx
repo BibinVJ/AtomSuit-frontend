@@ -4,9 +4,8 @@ import { Table, TableBody, TableCell, TableHeader, TableRow } from '../ui/table'
 import { useState } from 'react';
 import EditPlanModal from './EditPlanModal';
 import DeletePlanModal from './DeletePlanModal';
-import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide, Edit, Trash2 } from 'lucide-react';
-import Button from '../ui/button/Button';
-import Tooltip from '../ui/tooltip/Tooltip';
+import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide } from 'lucide-react';
+import { TableActions } from '../common/TableActions';
 
 import { Plan } from '../../types';
 import { usePermissions } from '../../hooks/usePermissions';
@@ -119,7 +118,7 @@ export default function PlanTable({
               </TableCell>
               <TableCell
                 isHeader
-                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                className="px-5 py-3 font-medium text-gray-500 text-end text-theme-xs dark:text-gray-400"
               >
                 Actions
               </TableCell>
@@ -154,31 +153,11 @@ export default function PlanTable({
                 <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
                   {plan.subscribed_tenants?.length || 0}
                 </TableCell>
-                <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                  <div className="flex items-center gap-2">
-                    {hasPermission('update-plan') && (
-                      <Tooltip text="Edit">
-                        <Button
-                          size="xs"
-                          onClick={() => handleEdit(plan)}
-                          className="bg-blue-600 hover:bg-blue-700 text-white"
-                        >
-                          <Edit className="w-4 h-4" />
-                        </Button>
-                      </Tooltip>
-                    )}
-                    {hasPermission('delete-plan') && (
-                      <Tooltip text="Delete">
-                        <Button
-                          size="xs"
-                          onClick={() => handleDelete(plan)}
-                          className="bg-red-600 hover:bg-red-700 text-white"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </Tooltip>
-                    )}
-                  </div>
+                <TableCell className="px-4 py-3 text-gray-500 text-end text-theme-sm dark:text-gray-400">
+                  <TableActions
+                    onEdit={hasPermission('update-plan') ? () => handleEdit(plan) : undefined}
+                    onDelete={hasPermission('delete-plan') ? () => handleDelete(plan) : undefined}
+                  />
                 </TableCell>
               </TableRow>
             ))}
