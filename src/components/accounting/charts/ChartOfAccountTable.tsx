@@ -1,19 +1,19 @@
 'use client';
 
-import { Table, TableBody, TableCell, TableHeader, TableRow } from '../ui/table';
-import { useRouter } from 'next/navigation';
+import { Table, TableBody, TableCell, TableHeader, TableRow } from '../../ui/table';
 import { useState } from 'react';
-import EditCustomerModal from './EditCustomerModal';
-import DeleteCustomerModal from './DeleteCustomerModal';
+import EditChartOfAccountModal from './EditChartOfAccountModal';
+import DeleteChartOfAccountModal from './DeleteChartOfAccountModal';
 import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide } from 'lucide-react';
-import { restoreCustomer } from '../../services/CustomerService';
+import { restoreChartOfAccount } from '../../../services/ChartOfAccountService';
 import { toast } from 'sonner';
-import { Customer } from '../../types';
-import { usePermissions } from '../../hooks/usePermissions';
-import { TableActions } from '../common/TableActions';
+import { TableActions } from '../../common/TableActions';
+import { ChartOfAccount } from '../../../types';
+import { usePermissions } from '../../../hooks/usePermissions';
+import Badge from '../../ui/badge/Badge';
 
 interface Props {
-  data: Customer[];
+  data: ChartOfAccount[];
   onAction: () => void;
   onSort: (column: string) => void;
   sortBy: string;
@@ -24,7 +24,7 @@ interface Props {
   viewMode?: 'active' | 'trashed';
 }
 
-export default function CustomerTable({
+export default function ChartOfAccountTable({
   data,
   onAction,
   onSort,
@@ -36,35 +36,34 @@ export default function CustomerTable({
   viewMode = 'active',
 }: Props) {
   const { hasPermission } = usePermissions();
-  const router = useRouter();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+  const [selectedAccount, setSelectedAccount] = useState<ChartOfAccount | null>(null);
 
-  const handleEdit = (customer: Customer) => {
-    setSelectedCustomer(customer);
+  const handleEdit = (account: ChartOfAccount) => {
+    setSelectedAccount(account);
     setIsEditModalOpen(true);
   };
 
-  const handleDelete = (customer: Customer) => {
-    setSelectedCustomer(customer);
+  const handleDelete = (account: ChartOfAccount) => {
+    setSelectedAccount(account);
     setIsDeleteModalOpen(true);
   };
 
   const handleCloseModals = () => {
     setIsEditModalOpen(false);
     setIsDeleteModalOpen(false);
-    setSelectedCustomer(null);
+    setSelectedAccount(null);
   };
 
   const handleRestore = async (id: number) => {
     try {
-      await restoreCustomer(id);
-      toast.success('Customer restored successfully');
+      await restoreChartOfAccount(id);
+      toast.success('Account restored successfully');
       onAction();
     } catch (error) {
-      console.error('Error restoring customer:', error);
-      toast.error('Failed to restore customer');
+      console.error('Error restoring account:', error);
+      toast.error('Failed to restore account');
     }
   };
 
@@ -94,6 +93,13 @@ export default function CustomerTable({
               <TableCell
                 isHeader
                 className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400"
+                onClick={() => onSort('code')}
+              >
+                Code {renderSortIcon('code')}
+              </TableCell>
+              <TableCell
+                isHeader
+                className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400"
                 onClick={() => onSort('name')}
               >
                 Name {renderSortIcon('name')}
@@ -102,13 +108,13 @@ export default function CustomerTable({
                 isHeader
                 className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
               >
-                Contact Info
+                Group
               </TableCell>
               <TableCell
                 isHeader
                 className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
               >
-                Currency
+                Balance
               </TableCell>
               <TableCell
                 isHeader
@@ -120,8 +126,8 @@ export default function CustomerTable({
           </TableHeader>
 
           <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-            {data.map((customer, index) => (
-              <TableRow key={customer.id}>
+            {data.map((account, index) => (
+              <TableRow key={account.id}>
                 <TableCell className="px-5 py-4 sm:px-6 text-start">
                   <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
                     {startIndex !== undefined
@@ -129,44 +135,51 @@ export default function CustomerTable({
                       : (currentPage - 1) * perPage + index + 1}
                   </p>
                 </TableCell>
-                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
-                  {customer.name}
+                <TableCell className="px-5 py-4 sm:px-6 text-start">
+                  <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
+                    {account.code}
+                  </p>
                 </TableCell>
-                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
-                  <div className="flex flex-col">
-                    <span>{customer.email}</span>
-                    <span className="text-gray-500 text-xs">{customer.phone}</span>
-                  </div>
+                <TableCell className="px-5 py-4 sm:px-6 text-start">
+                  <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
+                    {account.name}
+                  </p>
                 </TableCell>
-                <TableCell className="px-4 py-3 text-start">
-                  {customer.currency ? (
-                    <span
-                      className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-                        customer.currency.deleted_at
-                          ? 'bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-500'
-                          : 'bg-gray-100 text-gray-800 dark:bg-white/10 dark:text-white'
-                      }`}
-                    >
-                      {customer.currency.code}
-                      {customer.currency.deleted_at ? ' (Deleted)' : ''}
-                    </span>
-                  ) : (
-                    '-'
-                  )}
+                <TableCell className="px-5 py-4 sm:px-6 text-start">
+                  <span
+                    className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+                      account.account_group?.deleted_at
+                        ? 'bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-500'
+                        : 'bg-gray-100 text-gray-800 dark:bg-white/10 dark:text-white'
+                    }`}
+                  >
+                    {account.account_group?.name}
+                    {account.account_group?.deleted_at ? ' (Deleted)' : ''}
+                  </span>
                 </TableCell>
-                <TableCell className="px-4 py-3 text-end">
+                <TableCell className="px-5 py-4 sm:px-6 text-start">
+                  <p className="text-gray-500 text-theme-sm dark:text-gray-400">
+                    {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(
+                      account.opening_balance
+                    )}
+                  </p>
+                </TableCell>
+                <TableCell className="px-4 py-3 text-gray-500 text-end text-theme-sm dark:text-gray-400">
                   <TableActions
                     isTrashed={viewMode === 'trashed'}
-                    onView={() => router.push(`/customers/${customer.id}`)}
                     onEdit={
-                      hasPermission('update-customer') ? () => handleEdit(customer) : undefined
+                      hasPermission('update-chart-of-account')
+                        ? () => handleEdit(account)
+                        : undefined
                     }
                     onDelete={
-                      hasPermission('delete-customer') ? () => handleDelete(customer) : undefined
+                      hasPermission('delete-chart-of-account')
+                        ? () => handleDelete(account)
+                        : undefined
                     }
                     onRestore={
-                      hasPermission('update-customer')
-                        ? () => handleRestore(customer.id)
+                      hasPermission('update-chart-of-account')
+                        ? () => handleRestore(account.id)
                         : undefined
                     }
                   />
@@ -176,19 +189,19 @@ export default function CustomerTable({
           </TableBody>
         </Table>
       </div>
-      {selectedCustomer && (
+      {selectedAccount && (
         <>
-          <EditCustomerModal
+          <EditChartOfAccountModal
             isOpen={isEditModalOpen}
             onClose={handleCloseModals}
             onSuccess={onAction}
-            customer={selectedCustomer}
+            chartOfAccount={selectedAccount}
           />
-          <DeleteCustomerModal
+          <DeleteChartOfAccountModal
             isOpen={isDeleteModalOpen}
             onClose={handleCloseModals}
             onSuccess={onAction}
-            customer={selectedCustomer}
+            chartOfAccount={selectedAccount}
             force={viewMode === 'trashed'}
           />
         </>

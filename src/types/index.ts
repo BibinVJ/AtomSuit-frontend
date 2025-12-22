@@ -19,3 +19,6 @@ export * from './Settings';
 export * from './Audit';
 export * from './Currency';
 export * from './ExchangeRate';
+export * from './AccountType';
+export * from './AccountGroup';
+export * from './ChartOfAccount';

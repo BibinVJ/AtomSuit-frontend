@@ -59,7 +59,7 @@ export default function EditItemModal({ isOpen, onClose, onSuccess, item }: Prop
 
   const fetchCategories = async () => {
     try {
-      const response = await getCategories({ unpaginated: true });
+      const response = await getCategories({ unpaginated: true, trashed: 'with' });
       setCategories(response.data);
     } catch (error) {
       console.error('Error fetching categories:', error);
@@ -68,7 +68,7 @@ export default function EditItemModal({ isOpen, onClose, onSuccess, item }: Prop
 
   const fetchUnits = async () => {
     try {
-      const response = await getUnits({ unpaginated: true });
+      const response = await getUnits({ unpaginated: true, trashed: 'with' });
       setUnits(response.data);
     } catch (error) {
       console.error('Error fetching units:', error);
@@ -147,7 +147,13 @@ export default function EditItemModal({ isOpen, onClose, onSuccess, item }: Prop
             Category <span className="text-red-500">*</span>
           </Label>
           <Select
-            options={categories.map((cat) => ({ value: String(cat.id), label: cat.name }))}
+            options={categories
+              .filter((cat) => !cat.deleted_at || String(cat.id) === String(formData.category_id))
+              .map((cat) => ({
+                value: String(cat.id),
+                label: cat.deleted_at ? `${cat.name} (Deleted)` : cat.name,
+                className: cat.deleted_at ? 'text-red-500' : '',
+              }))}
             value={String(formData.category_id)}
             onChange={(val) => setFormData({ ...formData, category_id: val })}
             placeholder="Select a category"
@@ -160,10 +166,15 @@ export default function EditItemModal({ isOpen, onClose, onSuccess, item }: Prop
             Unit <span className="text-red-500">*</span>
           </Label>
           <Select
-            options={units.map((unit) => ({
-              value: String(unit.id),
-              label: `${unit.name} (${unit.code})`,
-            }))}
+            options={units
+              .filter((unit) => !unit.deleted_at || String(unit.id) === String(formData.unit_id))
+              .map((unit) => ({
+                value: String(unit.id),
+                label: unit.deleted_at
+                  ? `${unit.name} (${unit.code}) (Deleted)`
+                  : `${unit.name} (${unit.code})`,
+                className: unit.deleted_at ? 'text-red-500' : '',
+              }))}
             value={String(formData.unit_id)}
             onChange={(val) => setFormData({ ...formData, unit_id: val })}
             placeholder="Select a unit"

@@ -6,6 +6,7 @@ import { ChevronsUpDown, Check } from 'lucide-react';
 interface Option {
   value: string;
   label: string;
+  className?: string; // Added optional className
 }
 
 interface SelectProps {
@@ -118,8 +119,9 @@ const Select: React.FC<SelectProps> = ({
     }
   };
 
-  const selectedLabel =
-    options.find((option) => option.value === selectedValue)?.label || placeholder;
+  const selectedOption = options.find((option) => option.value === selectedValue);
+  const selectedLabel = selectedOption?.label || placeholder;
+  const selectedClass = selectedOption?.className || '';
 
   return (
     <div className={`relative ${className}`} ref={selectRef} onKeyDown={handleKeyDown} tabIndex={0}>
@@ -129,7 +131,9 @@ const Select: React.FC<SelectProps> = ({
         }`}
         onClick={() => setIsOpen(!isOpen)}
       >
-        <span className={selectedValue ? 'text-gray-800 dark:text-white/90' : 'text-gray-400'}>
+        <span
+          className={`${selectedValue ? 'text-gray-800 dark:text-white/90' : 'text-gray-400'} ${selectedClass}`}
+        >
           {selectedLabel}
         </span>
         <ChevronsUpDown className="h-4 w-4 text-gray-400" />
@@ -157,12 +161,23 @@ const Select: React.FC<SelectProps> = ({
                 key={option.value}
                 className={`flex items-center justify-between px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer ${
                   index === focusedOptionIndex ? 'bg-gray-100 dark:bg-gray-700' : ''
-                }`}
+                } ${option.className || ''}`}
                 onClick={() => handleSelect(option.value)}
                 onMouseMove={() => setFocusedOptionIndex(index)}
               >
                 <span>{option.label}</span>
                 {selectedValue === option.value && <Check className="h-4 w-4" />}
+                {/* 
+                   Wait, I should verify the replacement content logic. 
+                   I am replacing the whole file content basically from line 6 to 164 based on the line count 
+                   but Step 4815 showed 1-184. 
+                   The prompt asks to replace lines. The replace_file_content replaces a chunk.
+                   The instruction is "Update Option interface and apply className in render."
+                   I will be careful to replace just the needed parts if I can, or the whole file if safer.
+                   Ah, `replace_file_content` takes StartLine and EndLine. 
+                   Let's target the interface at top and the list item at bottom logic.
+                   Actually, MultiReplace is safer here.
+                */}
               </li>
             ))}
             {filteredOptions.length === 0 && (

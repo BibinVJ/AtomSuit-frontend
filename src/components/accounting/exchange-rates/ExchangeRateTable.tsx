@@ -147,10 +147,36 @@ export default function ExchangeRateTable({
                     </p>
                   </TableCell>
                   <TableCell className="px-5 py-4 sm:px-6 text-start text-gray-800 dark:text-white/90 text-theme-sm font-medium">
-                    {rate.base_currency?.code || 'N/A'}
+                    {rate.base_currency ? (
+                      <span
+                        className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+                          rate.base_currency.deleted_at
+                            ? 'bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-500'
+                            : 'bg-gray-100 text-gray-800 dark:bg-white/10 dark:text-white'
+                        }`}
+                      >
+                        {rate.base_currency.code}
+                        {rate.base_currency.deleted_at ? ' (Deleted)' : ''}
+                      </span>
+                    ) : (
+                      <span className="text-red-500 italic">Deleted</span>
+                    )}
                   </TableCell>
                   <TableCell className="px-5 py-4 sm:px-6 text-start text-gray-800 dark:text-white/90 text-theme-sm font-medium">
-                    {rate.target_currency?.code || 'N/A'}
+                    {rate.target_currency ? (
+                      <span
+                        className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+                          rate.target_currency.deleted_at
+                            ? 'bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-500'
+                            : 'bg-gray-100 text-gray-800 dark:bg-white/10 dark:text-white'
+                        }`}
+                      >
+                        {rate.target_currency.code}
+                        {rate.target_currency.deleted_at ? ' (Deleted)' : ''}
+                      </span>
+                    ) : (
+                      <span className="text-red-500 italic">Deleted</span>
+                    )}
                   </TableCell>
                   <TableCell className="px-5 py-4 sm:px-6 text-start text-gray-500 dark:text-gray-400 text-theme-sm">
                     {rate.rate}

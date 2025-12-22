@@ -4,6 +4,7 @@ export interface Role {
   id: number;
   name: string;
   permissions: Permission[];
+  deleted_at?: string;
 }
 export interface RoleApiResponse {
   data: Role[];

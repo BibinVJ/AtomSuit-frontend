@@ -9,8 +9,12 @@ import TextArea from '../form/input/TextArea';
 import { toast } from 'sonner';
 import { updateVendor } from '../../services/VendorService';
 import { getCurrencies } from '../../services/CurrencyService';
+import { getChartOfAccounts } from '../../services/ChartOfAccountService';
 import { isApiError } from '../../utils/errors';
-import { Vendor, VendorInput, Currency } from '../../types';
+import { Vendor, VendorInput, Currency, ChartOfAccount } from '../../types';
+
+import CollapsibleSection from '../common/CollapsibleSection';
+import Button from '../ui/button/Button';
 
 interface Props {
   isOpen: boolean;
@@ -24,11 +28,27 @@ export default function EditVendorModal({ isOpen, onClose, onSuccess, vendor }: 
     name: '',
     email: '',
     phone: '',
-    address: '',
     currency_id: undefined,
+    payables_account_id: undefined,
+    purchase_account_id: undefined,
+    purchase_discount_account_id: undefined,
+    purchase_return_account_id: undefined,
+    billing_address_line_1: '',
+    billing_address_line_2: '',
+    billing_city: '',
+    billing_state: '',
+    billing_country: '',
+    billing_zip_code: '',
+    shipping_address_line_1: '',
+    shipping_address_line_2: '',
+    shipping_city: '',
+    shipping_state: '',
+    shipping_country: '',
+    shipping_zip_code: '',
   });
 
   const [currencies, setCurrencies] = useState<Currency[]>([]);
+  const [chartOfAccounts, setChartOfAccounts] = useState<ChartOfAccount[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -38,26 +58,58 @@ export default function EditVendorModal({ isOpen, onClose, onSuccess, vendor }: 
         name: vendor.name || '',
         email: vendor.email || '',
         phone: vendor.phone || '',
-        address: vendor.address || '',
-        currency_id: vendor.currency_id,
+        currency_id: vendor.currency?.id,
+        payables_account_id: vendor.payables_account?.id,
+        purchase_account_id: vendor.purchase_account?.id,
+        purchase_discount_account_id: vendor.purchase_discount_account?.id,
+        purchase_return_account_id: vendor.purchase_return_account?.id,
+        billing_address_line_1: vendor.billing_address_line_1 || '',
+        billing_address_line_2: vendor.billing_address_line_2 || '',
+        billing_city: vendor.billing_city || '',
+        billing_state: vendor.billing_state || '',
+        billing_country: vendor.billing_country || '',
+        billing_zip_code: vendor.billing_zip_code || '',
+        shipping_address_line_1: vendor.shipping_address_line_1 || '',
+        shipping_address_line_2: vendor.shipping_address_line_2 || '',
+        shipping_city: vendor.shipping_city || '',
+        shipping_state: vendor.shipping_state || '',
+        shipping_country: vendor.shipping_country || '',
+        shipping_zip_code: vendor.shipping_zip_code || '',
       });
     }
   }, [vendor]);
 
   useEffect(() => {
     if (isOpen) {
-      fetchCurrencies();
+      fetchData();
     }
   }, [isOpen]);
 
-  const fetchCurrencies = async () => {
+  const fetchData = async () => {
     try {
-      const response = await getCurrencies({ unpaginated: true });
-      setCurrencies(response.data);
+      const [currencyRes, coaRes] = await Promise.all([
+        getCurrencies({ unpaginated: true, trashed: 'with' }),
+        getChartOfAccounts({ unpaginated: true, trashed: 'with' }),
+      ]);
+      setCurrencies(currencyRes.data);
+      setChartOfAccounts(coaRes.data);
     } catch (error) {
-      console.error('Failed to fetch currencies:', error);
-      toast.error('Failed to load currencies');
+      console.error('Failed to fetch data:', error);
+      toast.error('Failed to load form data');
     }
+  };
+
+  const copyBillingToShipping = () => {
+    setFormData((prev) => ({
+      ...prev,
+      shipping_address_line_1: prev.billing_address_line_1,
+      shipping_address_line_2: prev.billing_address_line_2,
+      shipping_city: prev.billing_city,
+      shipping_state: prev.billing_state,
+      shipping_country: prev.billing_country,
+      shipping_zip_code: prev.billing_zip_code,
+    }));
+    toast.info('Copied Billing Address to Shipping Address');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -92,6 +144,16 @@ export default function EditVendorModal({ isOpen, onClose, onSuccess, vendor }: 
     }
   };
 
+  const getFilteredAccounts = (selectedId?: number | undefined) => {
+    return chartOfAccounts
+      .filter((c) => !c.deleted_at || c.id === selectedId)
+      .map((c) => ({
+        value: String(c.id),
+        label: c.deleted_at ? `${c.code} - ${c.name} (Deleted)` : `${c.code} - ${c.name}`,
+        className: c.deleted_at ? 'text-red-500' : '',
+      }));
+  };
+
   return (
     <FormModal
       isOpen={isOpen}
@@ -100,65 +162,263 @@ export default function EditVendorModal({ isOpen, onClose, onSuccess, vendor }: 
       title="Edit Vendor"
       description="Update the details of the vendor."
       isSubmitting={isSubmitting}
-      size="lg"
+      size="2xl"
     >
-      <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
+          <div>
+            <Label>
+              Name <span className="text-red-500">*</span>
+            </Label>
+            <Input
+              type="text"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              error={!!errors.name}
+              hint={errors.name}
+            />
+          </div>
+          <div>
+            <Label>Email</Label>
+            <Input
+              type="email"
+              value={formData.email || ''}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              error={!!errors.email}
+              hint={errors.email}
+            />
+          </div>
+          <div>
+            <Label>Phone</Label>
+            <Input
+              type="text"
+              value={formData.phone || ''}
+              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+              error={!!errors.phone}
+              hint={errors.phone}
+            />
+          </div>
+          <div>
+            <Label>Currency</Label>
+            <Select
+              options={currencies
+                .filter((c) => !c.deleted_at || c.id === formData.currency_id)
+                .map((c) => ({
+                  value: String(c.id),
+                  label: c.deleted_at ? `${c.code} - ${c.name} (Deleted)` : `${c.code} - ${c.name}`,
+                  className: c.deleted_at ? 'text-red-500' : '',
+                }))}
+              value={formData.currency_id ? String(formData.currency_id) : ''}
+              onChange={(val) => setFormData({ ...formData, currency_id: Number(val) })}
+              placeholder="Select Currency"
+              error={!!errors.currency_id}
+            />
+            {errors.currency_id && (
+              <p className="mt-1 text-xs text-red-500">{errors.currency_id}</p>
+            )}
+          </div>
+        </div>
+
         <div>
-          <Label>
-            Name <span className="text-red-500">*</span>
-          </Label>
-          <Input
-            type="text"
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            error={!!errors.name}
-            hint={errors.name}
-          />
+          <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-4 border-b pb-2 border-gray-200 dark:border-gray-700">
+            Accounting Details
+          </h4>
+          <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
+            <div>
+              <Label>
+                Payables Account <span className="text-red-500">*</span>
+              </Label>
+              <Select
+                options={getFilteredAccounts(formData.payables_account_id)}
+                value={formData.payables_account_id ? String(formData.payables_account_id) : ''}
+                onChange={(val) => setFormData({ ...formData, payables_account_id: Number(val) })}
+                placeholder="Select Payables Account"
+                error={!!errors.payables_account_id}
+              />
+              {errors.payables_account_id && (
+                <p className="mt-1 text-xs text-red-500">{errors.payables_account_id}</p>
+              )}
+            </div>
+            <div>
+              <Label>
+                Purchase Account <span className="text-red-500">*</span>
+              </Label>
+              <Select
+                options={getFilteredAccounts(formData.purchase_account_id)}
+                value={formData.purchase_account_id ? String(formData.purchase_account_id) : ''}
+                onChange={(val) => setFormData({ ...formData, purchase_account_id: Number(val) })}
+                placeholder="Select Purchase Account"
+                error={!!errors.purchase_account_id}
+              />
+              {errors.purchase_account_id && (
+                <p className="mt-1 text-xs text-red-500">{errors.purchase_account_id}</p>
+              )}
+            </div>
+            <div>
+              <Label>
+                Purchase Discount Account <span className="text-red-500">*</span>
+              </Label>
+              <Select
+                options={getFilteredAccounts(formData.purchase_discount_account_id)}
+                value={
+                  formData.purchase_discount_account_id
+                    ? String(formData.purchase_discount_account_id)
+                    : ''
+                }
+                onChange={(val) =>
+                  setFormData({ ...formData, purchase_discount_account_id: Number(val) })
+                }
+                placeholder="Select Discount Account"
+                error={!!errors.purchase_discount_account_id}
+              />
+              {errors.purchase_discount_account_id && (
+                <p className="mt-1 text-xs text-red-500">{errors.purchase_discount_account_id}</p>
+              )}
+            </div>
+            <div>
+              <Label>
+                Purchase Return Account <span className="text-red-500">*</span>
+              </Label>
+              <Select
+                options={getFilteredAccounts(formData.purchase_return_account_id)}
+                value={
+                  formData.purchase_return_account_id
+                    ? String(formData.purchase_return_account_id)
+                    : ''
+                }
+                onChange={(val) =>
+                  setFormData({ ...formData, purchase_return_account_id: Number(val) })
+                }
+                placeholder="Select Return Account"
+                error={!!errors.purchase_return_account_id}
+              />
+              {errors.purchase_return_account_id && (
+                <p className="mt-1 text-xs text-red-500">{errors.purchase_return_account_id}</p>
+              )}
+            </div>
+          </div>
         </div>
-        <div>
-          <Label>Email</Label>
-          <Input
-            type="email"
-            value={formData.email || ''}
-            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-            error={!!errors.email}
-            hint={errors.email}
-          />
-        </div>
-        <div>
-          <Label>Phone</Label>
-          <Input
-            type="text"
-            value={formData.phone || ''}
-            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-            error={!!errors.phone}
-            hint={errors.phone}
-          />
-        </div>
-        <div>
-          <Label>Currency</Label>
-          <Select
-            options={currencies.map((c) => ({
-              value: String(c.id),
-              label: `${c.code} - ${c.name}`,
-            }))}
-            value={formData.currency_id ? String(formData.currency_id) : ''}
-            onChange={(val) => setFormData({ ...formData, currency_id: Number(val) })}
-            placeholder="Select Currency"
-            error={!!errors.currency_id}
-          />
-          {errors.currency_id && <p className="mt-1 text-xs text-red-500">{errors.currency_id}</p>}
-        </div>
-        <div className="lg:col-span-2">
-          <Label>Address</Label>
-          <TextArea
-            placeholder="Enter address"
-            value={formData.address || ''}
-            onChange={(val) => setFormData({ ...formData, address: val })}
-            error={!!errors.address}
-            hint={errors.address}
-          />
-        </div>
+
+        <CollapsibleSection title="Billing Address">
+          <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
+            <div>
+              <Label>Address Line 1</Label>
+              <Input
+                type="text"
+                value={formData.billing_address_line_1 || ''}
+                onChange={(e) =>
+                  setFormData({ ...formData, billing_address_line_1: e.target.value })
+                }
+              />
+            </div>
+            <div>
+              <Label>Address Line 2</Label>
+              <Input
+                type="text"
+                value={formData.billing_address_line_2 || ''}
+                onChange={(e) =>
+                  setFormData({ ...formData, billing_address_line_2: e.target.value })
+                }
+              />
+            </div>
+            <div>
+              <Label>City</Label>
+              <Input
+                type="text"
+                value={formData.billing_city || ''}
+                onChange={(e) => setFormData({ ...formData, billing_city: e.target.value })}
+              />
+            </div>
+            <div>
+              <Label>State</Label>
+              <Input
+                type="text"
+                value={formData.billing_state || ''}
+                onChange={(e) => setFormData({ ...formData, billing_state: e.target.value })}
+              />
+            </div>
+            <div>
+              <Label>Country</Label>
+              <Input
+                type="text"
+                value={formData.billing_country || ''}
+                onChange={(e) => setFormData({ ...formData, billing_country: e.target.value })}
+              />
+            </div>
+            <div>
+              <Label>Zip Code</Label>
+              <Input
+                type="text"
+                value={formData.billing_zip_code || ''}
+                onChange={(e) => setFormData({ ...formData, billing_zip_code: e.target.value })}
+              />
+            </div>
+          </div>
+        </CollapsibleSection>
+
+        <CollapsibleSection
+          title="Shipping Address"
+          rightElement={
+            <Button size="sm" variant="outline" type="button" onClick={copyBillingToShipping}>
+              Copy from Billing
+            </Button>
+          }
+        >
+          <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
+            <div>
+              <Label>Address Line 1</Label>
+              <Input
+                type="text"
+                value={formData.shipping_address_line_1 || ''}
+                onChange={(e) =>
+                  setFormData({ ...formData, shipping_address_line_1: e.target.value })
+                }
+              />
+            </div>
+            <div>
+              <Label>Address Line 2</Label>
+              <Input
+                type="text"
+                value={formData.shipping_address_line_2 || ''}
+                onChange={(e) =>
+                  setFormData({ ...formData, shipping_address_line_2: e.target.value })
+                }
+              />
+            </div>
+            <div>
+              <Label>City</Label>
+              <Input
+                type="text"
+                value={formData.shipping_city || ''}
+                onChange={(e) => setFormData({ ...formData, shipping_city: e.target.value })}
+              />
+            </div>
+            <div>
+              <Label>State</Label>
+              <Input
+                type="text"
+                value={formData.shipping_state || ''}
+                onChange={(e) => setFormData({ ...formData, shipping_state: e.target.value })}
+              />
+            </div>
+            <div>
+              <Label>Country</Label>
+              <Input
+                type="text"
+                value={formData.shipping_country || ''}
+                onChange={(e) => setFormData({ ...formData, shipping_country: e.target.value })}
+              />
+            </div>
+            <div>
+              <Label>Zip Code</Label>
+              <Input
+                type="text"
+                value={formData.shipping_zip_code || ''}
+                onChange={(e) => setFormData({ ...formData, shipping_zip_code: e.target.value })}
+              />
+            </div>
+          </div>
+        </CollapsibleSection>
       </div>
     </FormModal>
   );

@@ -10,6 +10,7 @@ export interface Currency {
   symbol_position: 'before' | 'after' | null;
   created_at?: string;
   updated_at?: string;
+  deleted_at?: string;
 }
 
 export interface CurrencyInput {

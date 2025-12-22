@@ -45,6 +45,17 @@ const navItems: NavItem[] = [
     subItems: [
       { name: 'Currencies', path: '/accounting/currencies', permission: 'view-currency' },
       {
+        name: 'Chart of Accounts',
+        path: '/accounting/chart-of-accounts',
+        permission: 'view-chart-of-account',
+      },
+      {
+        name: 'Account Groups',
+        path: '/accounting/account-groups',
+        permission: 'view-account-group',
+      },
+      { name: 'Account Types', path: '/accounting/account-types', permission: 'view-account-type' },
+      {
         name: 'Exchange Rates',
         path: '/accounting/exchange-rates',
         permission: 'view-exchange-rate',

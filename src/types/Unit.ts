@@ -5,6 +5,7 @@ export interface Unit {
   description: string;
   is_active?: boolean;
   short_name?: string; // Add as alias for compatibility if needed, but we'll try to use code
+  deleted_at?: string;
 }
 
 export interface UnitApiResponse {

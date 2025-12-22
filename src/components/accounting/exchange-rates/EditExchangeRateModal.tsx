@@ -49,7 +49,7 @@ export default function EditExchangeRateModal({ isOpen, onClose, onSuccess, exch
 
   const fetchCurrencies = async () => {
     try {
-      const resp = await getCurrencies({ unpaginated: true });
+      const resp = await getCurrencies({ unpaginated: true, trashed: 'with' });
       setCurrencies(resp.data);
     } catch (error) {
       console.error('Error fetching currencies:', error);
@@ -103,10 +103,13 @@ export default function EditExchangeRateModal({ isOpen, onClose, onSuccess, exch
             Base Currency <span className="text-red-500">*</span>
           </Label>
           <Select
-            options={currencies.map((c) => ({
-              value: String(c.id),
-              label: `${c.code} - ${c.name}`,
-            }))}
+            options={currencies
+              .filter((c) => !c.deleted_at || c.id === exchangeRate?.base_currency_id)
+              .map((c) => ({
+                value: String(c.id),
+                label: `${c.code} - ${c.name}${c.deleted_at ? ' (Deleted)' : ''}`,
+                className: c.deleted_at ? 'text-red-500' : '',
+              }))}
             value={String(formData.base_currency_id)}
             onChange={(val) => setFormData({ ...formData, base_currency_id: Number(val) })}
             error={!!errors.base_currency_id}
@@ -121,10 +124,13 @@ export default function EditExchangeRateModal({ isOpen, onClose, onSuccess, exch
             Target Currency <span className="text-red-500">*</span>
           </Label>
           <Select
-            options={currencies.map((c) => ({
-              value: String(c.id),
-              label: `${c.code} - ${c.name}`,
-            }))}
+            options={currencies
+              .filter((c) => !c.deleted_at || c.id === exchangeRate?.target_currency_id)
+              .map((c) => ({
+                value: String(c.id),
+                label: `${c.code} - ${c.name}${c.deleted_at ? ' (Deleted)' : ''}`,
+                className: c.deleted_at ? 'text-red-500' : '',
+              }))}
             value={String(formData.target_currency_id)}
             onChange={(val) => setFormData({ ...formData, target_currency_id: Number(val) })}
             error={!!errors.target_currency_id}

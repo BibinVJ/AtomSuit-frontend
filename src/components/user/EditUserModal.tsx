@@ -41,6 +41,7 @@ export default function EditUserModal({ isOpen, onClose, onUserUpdated, user }: 
             sortCol: 'created_at',
             sortDir: 'desc',
             unpaginated: true,
+            trashed: 'with',
           });
           setRoles(rolesData.data);
         } catch (error) {
@@ -106,7 +107,13 @@ export default function EditUserModal({ isOpen, onClose, onUserUpdated, user }: 
     }
   };
 
-  const roleOptions = roles.map((r) => ({ value: String(r.id), label: formatKebabCase(r.name) }));
+  const roleOptions = roles
+    .filter((r) => !r.deleted_at || r.id === user?.role?.id)
+    .map((r) => ({
+      value: String(r.id),
+      label: `${formatKebabCase(r.name)}${r.deleted_at ? ' (Deleted)' : ''}`,
+      className: r.deleted_at ? 'text-red-500' : '',
+    }));
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} className="max-w-[700px] p-6 md:p-10">

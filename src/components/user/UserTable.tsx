@@ -170,7 +170,20 @@ export default function UserTable({
                     {user.phone}
                   </TableCell>
                   <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
-                    {formatKebabCase(user.role.name)}
+                    {user.role ? (
+                      <span
+                        className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+                          user.role.deleted_at
+                            ? 'bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-500'
+                            : 'bg-gray-100 text-gray-800 dark:bg-white/10 dark:text-white'
+                        }`}
+                      >
+                        {formatKebabCase(user.role.name)}
+                        {user.role.deleted_at ? ' (Deleted)' : ''}
+                      </span>
+                    ) : (
+                      <span className="text-gray-400 italic">No Role</span>
+                    )}
                   </TableCell>
                   <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
                     <Badge size="sm" color={user.status === 'active' ? 'success' : 'error'}>

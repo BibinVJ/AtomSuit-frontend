@@ -1,6 +1,7 @@
 'use client';
 
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '../ui/table';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import EditVendorModal from './EditVendorModal';
 import DeleteVendorModal from './DeleteVendorModal';
@@ -35,6 +36,7 @@ export default function VendorTable({
   viewMode = 'active',
 }: Props) {
   const { hasPermission } = usePermissions();
+  const router = useRouter();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedVendor, setSelectedVendor] = useState<Vendor | null>(null);
@@ -98,23 +100,15 @@ export default function VendorTable({
               </TableCell>
               <TableCell
                 isHeader
-                className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400"
-                onClick={() => onSort('email')}
+                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
               >
-                Email {renderSortIcon('email')}
-              </TableCell>
-              <TableCell
-                isHeader
-                className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400"
-                onClick={() => onSort('phone')}
-              >
-                Phone {renderSortIcon('phone')}
+                Contact Info
               </TableCell>
               <TableCell
                 isHeader
                 className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
               >
-                Address
+                Currency
               </TableCell>
               <TableCell
                 isHeader
@@ -139,17 +133,31 @@ export default function VendorTable({
                   {vendor.name}
                 </TableCell>
                 <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
-                  {vendor.email}
+                  <div className="flex flex-col">
+                    <span>{vendor.email}</span>
+                    <span className="text-gray-500 text-xs">{vendor.phone}</span>
+                  </div>
                 </TableCell>
-                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
-                  {vendor.phone}
-                </TableCell>
-                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
-                  {vendor.address}
+                <TableCell className="px-4 py-3 text-start">
+                  {vendor.currency ? (
+                    <span
+                      className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+                        vendor.currency.deleted_at
+                          ? 'bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-500'
+                          : 'bg-gray-100 text-gray-800 dark:bg-white/10 dark:text-white'
+                      }`}
+                    >
+                      {vendor.currency.code}
+                      {vendor.currency.deleted_at ? ' (Deleted)' : ''}
+                    </span>
+                  ) : (
+                    '-'
+                  )}
                 </TableCell>
                 <TableCell className="px-4 py-3 text-end">
                   <TableActions
                     isTrashed={viewMode === 'trashed'}
+                    onView={() => router.push(`/vendors/${vendor.id}`)}
                     onEdit={hasPermission('update-vendor') ? () => handleEdit(vendor) : undefined}
                     onDelete={
                       hasPermission('delete-vendor') ? () => handleDelete(vendor) : undefined

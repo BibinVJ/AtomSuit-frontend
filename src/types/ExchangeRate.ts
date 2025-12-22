@@ -8,6 +8,7 @@ export interface ExchangeRate {
   effective_date: string;
   base_currency?: Currency;
   target_currency?: Currency;
+  deleted_at?: string;
   created_at?: string;
   updated_at?: string;
 }
