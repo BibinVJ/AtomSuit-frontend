@@ -4,6 +4,7 @@ import { Table, TableBody, TableCell, TableHeader, TableRow } from '../../ui/tab
 import { useState } from 'react';
 import EditCategoryModal from './EditCategoryModal';
 import DeleteCategoryModal from './DeleteCategoryModal';
+import ViewCategoryModal from './ViewCategoryModal';
 import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide } from 'lucide-react';
 import { restoreCategory } from '../../../services/CategoryService';
 import { toast } from 'sonner';
@@ -37,6 +38,7 @@ export default function CategoryTable({
   const { hasPermission } = usePermissions();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
 
   const handleEdit = (category: Category) => {
@@ -49,9 +51,15 @@ export default function CategoryTable({
     setIsDeleteModalOpen(true);
   };
 
+  const handleView = (category: Category) => {
+    setSelectedCategory(category);
+    setIsViewModalOpen(true);
+  };
+
   const handleCloseModals = () => {
     setIsEditModalOpen(false);
     setIsDeleteModalOpen(false);
+    setIsViewModalOpen(false);
     setSelectedCategory(null);
   };
 
@@ -133,6 +141,7 @@ export default function CategoryTable({
                 <TableCell className="px-4 py-3 text-gray-500 text-end text-theme-sm dark:text-gray-400">
                   <TableActions
                     isTrashed={viewMode === 'trashed'}
+                    onView={() => handleView(category)}
                     onEdit={
                       hasPermission('update-category') ? () => handleEdit(category) : undefined
                     }
@@ -153,6 +162,11 @@ export default function CategoryTable({
       </div>
       {selectedCategory && (
         <>
+          <ViewCategoryModal
+            isOpen={isViewModalOpen}
+            onClose={handleCloseModals}
+            category={selectedCategory}
+          />
           <EditCategoryModal
             isOpen={isEditModalOpen}
             onClose={handleCloseModals}

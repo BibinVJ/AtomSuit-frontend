@@ -1,8 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
-import PageHeader from '@/components/common/PageHeader';
-import { PlusIcon } from '@heroicons/react/24/outline';
+import { Plus } from 'lucide-react';
 import Button from '@/components/ui/button/Button';
 import { useSearchParams } from 'next/navigation';
 import {
@@ -19,12 +18,18 @@ import DeleteWarehouseModal from '@/components/inventory/warehouses/DeleteWareho
 import { Warehouse } from '@/types/Warehouse';
 import { toast } from 'sonner';
 import Pagination from '@/components/common/Pagination';
-import TableActions from '@/components/common/TableActions';
+import TableToolbar from '@/components/common/TableToolbar';
+import PageMeta from '@/components/common/PageMeta';
+import PageBreadcrumb from '@/components/common/PageBreadCrumb';
+import ComponentCard from '@/components/common/ComponentCard';
+import ImportModal from '@/components/common/ImportModal';
+import { Download, Upload } from 'lucide-react';
 
 export default function WarehousesPage() {
   const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [editingWarehouse, setEditingWarehouse] = useState<Warehouse | null>(null);
   const [deletingWarehouse, setDeletingWarehouse] = useState<Warehouse | null>(null);
 
@@ -32,6 +37,8 @@ export default function WarehousesPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
+  const [from, setFrom] = useState(0);
+  const [to, setTo] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(15);
   const [searchQuery, setSearchQuery] = useState('');
   const [showDeleted, setShowDeleted] = useState(false);
@@ -57,6 +64,8 @@ export default function WarehousesPage() {
       setWarehouses(response.data);
       setTotalPages(response.meta.last_page);
       setTotalItems(response.meta.total);
+      setFrom(response.meta.from || 0);
+      setTo(response.meta.to || 0);
     } catch (error) {
       console.error('Error fetching warehouses:', error);
       toast.error('Failed to fetch warehouses');
@@ -106,79 +115,101 @@ export default function WarehousesPage() {
     }
   };
 
-  const handleImport = async (file: File) => {
-    try {
-      await importWarehouses(file);
-      toast.success('Warehouses imported successfully');
-      fetchWarehouses();
-    } catch (error) {
-      console.error('Import failed:', error);
-      toast.error('Failed to import warehouses');
-    }
+  const onImport = async (file: File) => {
+    // Wrapper for importWarehouses to be passed to ImportModal
+    return importWarehouses(file);
   };
 
-  const handleDownloadSample = async () => {
-    try {
-      const blob = await downloadSampleWarehouseExcel();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'sample_warehouses.xlsx';
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-    } catch (error) {
-      console.error('Download sample failed:', error);
-      toast.error('Failed to download sample file');
-    }
+  const onDownloadSample = async () => {
+    return downloadSampleWarehouseExcel();
   };
 
   return (
-    <div className="space-y-6">
-      <PageHeader
-        title="Warehouses"
-        description="Manage your warehouse locations and details."
-        actions={
-          <Button
-            onClick={() => setIsCreateModalOpen(true)}
-            startIcon={<PlusIcon className="w-5 h-5" />}
-          >
-            Add Warehouse
-          </Button>
-        }
-      />
+    <>
+      <PageMeta title="Warehouses" description="Manage your warehouse locations and details." />
+      <PageBreadcrumb pageTitle="Warehouses" />
 
-      <TableActions
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-        showDeleted={showDeleted}
-        onShowDeletedChange={setShowDeleted}
-        onExport={handleExport}
-        onImport={handleImport}
-        onDownloadSample={handleDownloadSample}
-      />
+      <div className="space-y-6">
+        <ComponentCard
+          title="Warehouses"
+          action={
+            <div className="flex flex-wrap items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleExport}
+                className="flex items-center gap-2"
+              >
+                <Download className="w-4 h-4" /> Export
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsImportModalOpen(true)}
+                className="flex items-center gap-2"
+              >
+                <Upload className="w-4 h-4" /> Import
+              </Button>
+              <Button
+                onClick={() => setIsCreateModalOpen(true)}
+                size="sm"
+                className="flex items-center gap-2"
+              >
+                <Plus className="w-4 h-4" /> Add Warehouse
+              </Button>
+            </div>
+          }
+        >
+          <TableToolbar
+            searchTerm={searchQuery}
+            onSearchChange={setSearchQuery}
+            searchPlaceholder="Search warehouses..."
+            perPage={itemsPerPage}
+            onPerPageChange={(val) => setItemsPerPage(Number(val))}
+            extraFilters={
+              <label className="flex items-center space-x-2 text-sm text-gray-700 dark:text-gray-300">
+                <input
+                  type="checkbox"
+                  checked={showDeleted}
+                  onChange={(e) => setShowDeleted(e.target.checked)}
+                  className="rounded border-gray-300 text-brand-600 focus:ring-brand-500"
+                />
+                <span>Show Deleted</span>
+              </label>
+            }
+          />
 
-      <WarehouseTable
-        warehouses={warehouses}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-        onRestore={handleRestore}
-      />
+          <WarehouseTable
+            warehouses={warehouses}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            onRestore={handleRestore}
+          />
 
-      <Pagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        totalItems={totalItems}
-        itemsPerPage={itemsPerPage}
-        onPageChange={setCurrentPage}
-        onItemsPerPageChange={setItemsPerPage}
-      />
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            total={totalItems}
+            from={from}
+            to={to}
+            onPageChange={setCurrentPage}
+          />
+        </ComponentCard>
+      </div>
 
       <CreateWarehouseModal
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
         onWarehouseCreated={fetchWarehouses}
+      />
+
+      <ImportModal
+        isOpen={isImportModalOpen}
+        onClose={() => setIsImportModalOpen(false)}
+        onImport={onImport}
+        onDownloadSample={onDownloadSample}
+        onSuccess={fetchWarehouses}
+        entityName="Warehouses"
       />
 
       {editingWarehouse && (
@@ -198,6 +229,6 @@ export default function WarehousesPage() {
           warehouse={deletingWarehouse}
         />
       )}
-    </div>
+    </>
   );
 }

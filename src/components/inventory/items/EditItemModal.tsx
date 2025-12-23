@@ -10,7 +10,9 @@ import { toast } from 'sonner';
 import { updateItem } from '../../../services/ItemService';
 import { getCategories } from '../../../services/CategoryService';
 import { getUnits } from '../../../services/UnitService';
-import { Category, Item, Unit, ItemInput } from '../../../types';
+import { getChartOfAccounts } from '../../../services/ChartOfAccountService';
+import { Category, Item, Unit, ItemInput, ChartOfAccount } from '../../../types';
+import CollapsibleSection from '../../common/CollapsibleSection';
 import { isApiError } from '../../../utils/errors';
 
 interface Props {
@@ -36,6 +38,11 @@ export default function EditItemModal({ isOpen, onClose, onSuccess, item }: Prop
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const [salesAccounts, setSalesAccounts] = useState<ChartOfAccount[]>([]);
+  const [cogsAccounts, setCogsAccounts] = useState<ChartOfAccount[]>([]);
+  const [inventoryAccounts, setInventoryAccounts] = useState<ChartOfAccount[]>([]);
+  const [expenseAccounts, setExpenseAccounts] = useState<ChartOfAccount[]>([]);
+
   useEffect(() => {
     if (item) {
       setFormData({
@@ -46,6 +53,11 @@ export default function EditItemModal({ isOpen, onClose, onSuccess, item }: Prop
         description: item.description || '',
         type: item.type,
         selling_price: item.selling_price,
+        sales_account_id: String(item.sales_account_id || ''),
+        cogs_account_id: String(item.cogs_account_id || ''),
+        inventory_account_id: String(item.inventory_account_id || ''),
+        inventory_adjustment_account_id: String(item.inventory_adjustment_account_id || ''),
+        purchase_account_id: String(item.purchase_account_id || ''),
       });
     }
   }, [item]);
@@ -54,6 +66,7 @@ export default function EditItemModal({ isOpen, onClose, onSuccess, item }: Prop
     if (isOpen) {
       fetchCategories();
       fetchUnits();
+      fetchAccounts();
     }
   }, [isOpen]);
 
@@ -72,6 +85,19 @@ export default function EditItemModal({ isOpen, onClose, onSuccess, item }: Prop
       setUnits(response.data);
     } catch (error) {
       console.error('Error fetching units:', error);
+    }
+  };
+
+  const fetchAccounts = async () => {
+    try {
+      const response = await getChartOfAccounts({ unpaginated: true, trashed: 'with' });
+      const accounts = response.data;
+      setSalesAccounts(accounts);
+      setCogsAccounts(accounts);
+      setInventoryAccounts(accounts);
+      setExpenseAccounts(accounts);
+    } catch (error) {
+      console.error('Error fetching accounts:', error);
     }
   };
 
@@ -115,108 +141,248 @@ export default function EditItemModal({ isOpen, onClose, onSuccess, item }: Prop
       title="Edit Item"
       description="Update the details of the item."
       isSubmitting={isSubmitting}
-      size="lg"
+      size="2xl"
     >
-      <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
-        <div>
-          <Label>
-            SKU <span className="text-red-500">*</span>
-          </Label>
-          <Input
-            type="text"
-            value={formData.sku}
-            onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
-            error={!!errors.sku}
-            hint={errors.sku}
-          />
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
+          <div>
+            <Label>
+              SKU <span className="text-red-500">*</span>
+            </Label>
+            <Input
+              type="text"
+              value={formData.sku}
+              onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
+              error={!!errors.sku}
+              hint={errors.sku}
+            />
+          </div>
+          <div>
+            <Label>
+              Name <span className="text-red-500">*</span>
+            </Label>
+            <Input
+              type="text"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              error={!!errors.name}
+              hint={errors.name}
+            />
+          </div>
+          <div>
+            <Label>
+              Category <span className="text-red-500">*</span>
+            </Label>
+            <Select
+              options={categories
+                .filter((cat) => !cat.deleted_at || String(cat.id) === String(formData.category_id))
+                .map((cat) => ({
+                  value: String(cat.id),
+                  label: cat.deleted_at ? `${cat.name} (Deleted)` : cat.name,
+                  className: cat.deleted_at ? 'text-red-500' : '',
+                }))}
+              value={String(formData.category_id)}
+              onChange={(val) => setFormData({ ...formData, category_id: val })}
+              placeholder="Select a category"
+              error={!!errors.category_id}
+            />
+            {errors.category_id && (
+              <p className="mt-1 text-xs text-red-500">{errors.category_id}</p>
+            )}
+          </div>
+          <div>
+            <Label>
+              Unit <span className="text-red-500">*</span>
+            </Label>
+            <Select
+              options={units
+                .filter((unit) => !unit.deleted_at || String(unit.id) === String(formData.unit_id))
+                .map((unit) => ({
+                  value: String(unit.id),
+                  label: unit.deleted_at
+                    ? `${unit.name} (${unit.code}) (Deleted)`
+                    : `${unit.name} (${unit.code})`,
+                  className: unit.deleted_at ? 'text-red-500' : '',
+                }))}
+              value={String(formData.unit_id)}
+              onChange={(val) => setFormData({ ...formData, unit_id: val })}
+              placeholder="Select a unit"
+              error={!!errors.unit_id}
+            />
+            {errors.unit_id && <p className="mt-1 text-xs text-red-500">{errors.unit_id}</p>}
+          </div>
+          <div>
+            <Label>
+              Selling Price <span className="text-red-500">*</span>
+            </Label>
+            <Input
+              type="number"
+              value={formData.selling_price}
+              onChange={(e) => setFormData({ ...formData, selling_price: Number(e.target.value) })}
+              error={!!errors.selling_price}
+              hint={errors.selling_price}
+            />
+          </div>
+          <div>
+            <Label>
+              Type <span className="text-red-500">*</span>
+            </Label>
+            <Select
+              options={[
+                { value: 'product', label: 'Product' },
+                { value: 'service', label: 'Service' },
+              ]}
+              value={formData.type}
+              onChange={(val) => setFormData({ ...formData, type: val })}
+              error={!!errors.type}
+            />
+            {errors.type && <p className="mt-1 text-xs text-red-500">{errors.type}</p>}
+          </div>
+          <div className="lg:col-span-2">
+            <Label>Description</Label>
+            <TextArea
+              placeholder="Enter description"
+              value={formData.description}
+              onChange={(val) => setFormData({ ...formData, description: val })}
+            />
+          </div>
         </div>
-        <div>
-          <Label>
-            Name <span className="text-red-500">*</span>
-          </Label>
-          <Input
-            type="text"
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            error={!!errors.name}
-            hint={errors.name}
-          />
-        </div>
-        <div>
-          <Label>
-            Category <span className="text-red-500">*</span>
-          </Label>
-          <Select
-            options={categories
-              .filter((cat) => !cat.deleted_at || String(cat.id) === String(formData.category_id))
-              .map((cat) => ({
-                value: String(cat.id),
-                label: cat.deleted_at ? `${cat.name} (Deleted)` : cat.name,
-                className: cat.deleted_at ? 'text-red-500' : '',
-              }))}
-            value={String(formData.category_id)}
-            onChange={(val) => setFormData({ ...formData, category_id: val })}
-            placeholder="Select a category"
-            error={!!errors.category_id}
-          />
-          {errors.category_id && <p className="mt-1 text-xs text-red-500">{errors.category_id}</p>}
-        </div>
-        <div>
-          <Label>
-            Unit <span className="text-red-500">*</span>
-          </Label>
-          <Select
-            options={units
-              .filter((unit) => !unit.deleted_at || String(unit.id) === String(formData.unit_id))
-              .map((unit) => ({
-                value: String(unit.id),
-                label: unit.deleted_at
-                  ? `${unit.name} (${unit.code}) (Deleted)`
-                  : `${unit.name} (${unit.code})`,
-                className: unit.deleted_at ? 'text-red-500' : '',
-              }))}
-            value={String(formData.unit_id)}
-            onChange={(val) => setFormData({ ...formData, unit_id: val })}
-            placeholder="Select a unit"
-            error={!!errors.unit_id}
-          />
-          {errors.unit_id && <p className="mt-1 text-xs text-red-500">{errors.unit_id}</p>}
-        </div>
-        <div>
-          <Label>
-            Selling Price <span className="text-red-500">*</span>
-          </Label>
-          <Input
-            type="number"
-            value={formData.selling_price}
-            onChange={(e) => setFormData({ ...formData, selling_price: Number(e.target.value) })}
-            error={!!errors.selling_price}
-            hint={errors.selling_price}
-          />
-        </div>
-        <div>
-          <Label>
-            Type <span className="text-red-500">*</span>
-          </Label>
-          <Select
-            options={[
-              { value: 'product', label: 'Product' },
-              { value: 'service', label: 'Service' },
-            ]}
-            value={formData.type}
-            onChange={(val) => setFormData({ ...formData, type: val })}
-            error={!!errors.type}
-          />
-          {errors.type && <p className="mt-1 text-xs text-red-500">{errors.type}</p>}
-        </div>
-        <div className="lg:col-span-2">
-          <Label>Description</Label>
-          <TextArea
-            placeholder="Enter description"
-            value={formData.description}
-            onChange={(val) => setFormData({ ...formData, description: val })}
-          />
-        </div>
+
+        <CollapsibleSection title="Accounting Details">
+          <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
+            <div>
+              <Label>
+                Sales Account <span className="text-red-500">*</span>
+              </Label>
+              <Select
+                options={salesAccounts
+                  .filter(
+                    (acc) => !acc.deleted_at || String(acc.id) === String(formData.sales_account_id)
+                  )
+                  .map((acc) => ({
+                    value: String(acc.id),
+                    label: acc.deleted_at
+                      ? `${acc.code} - ${acc.name} (Deleted)`
+                      : `${acc.code} - ${acc.name}`,
+                    className: acc.deleted_at ? 'text-red-500' : '',
+                  }))}
+                value={String(formData.sales_account_id)}
+                onChange={(val) => setFormData({ ...formData, sales_account_id: val })}
+                placeholder="Select Sales Account"
+                error={!!errors.sales_account_id}
+              />
+              {errors.sales_account_id && (
+                <p className="mt-1 text-xs text-red-500">{errors.sales_account_id}</p>
+              )}
+            </div>
+            <div>
+              <Label>
+                Cost of Goods Sold Account <span className="text-red-500">*</span>
+              </Label>
+              <Select
+                options={cogsAccounts
+                  .filter(
+                    (acc) => !acc.deleted_at || String(acc.id) === String(formData.cogs_account_id)
+                  )
+                  .map((acc) => ({
+                    value: String(acc.id),
+                    label: acc.deleted_at
+                      ? `${acc.code} - ${acc.name} (Deleted)`
+                      : `${acc.code} - ${acc.name}`,
+                    className: acc.deleted_at ? 'text-red-500' : '',
+                  }))}
+                value={String(formData.cogs_account_id)}
+                onChange={(val) => setFormData({ ...formData, cogs_account_id: val })}
+                placeholder="Select COGS Account"
+                error={!!errors.cogs_account_id}
+              />
+              {errors.cogs_account_id && (
+                <p className="mt-1 text-xs text-red-500">{errors.cogs_account_id}</p>
+              )}
+            </div>
+            <div>
+              <Label>
+                Inventory Account <span className="text-red-500">*</span>
+              </Label>
+              <Select
+                options={inventoryAccounts
+                  .filter(
+                    (acc) =>
+                      !acc.deleted_at || String(acc.id) === String(formData.inventory_account_id)
+                  )
+                  .map((acc) => ({
+                    value: String(acc.id),
+                    label: acc.deleted_at
+                      ? `${acc.code} - ${acc.name} (Deleted)`
+                      : `${acc.code} - ${acc.name}`,
+                    className: acc.deleted_at ? 'text-red-500' : '',
+                  }))}
+                value={String(formData.inventory_account_id)}
+                onChange={(val) => setFormData({ ...formData, inventory_account_id: val })}
+                placeholder="Select Inventory Account"
+                error={!!errors.inventory_account_id}
+              />
+              {errors.inventory_account_id && (
+                <p className="mt-1 text-xs text-red-500">{errors.inventory_account_id}</p>
+              )}
+            </div>
+            <div>
+              <Label>
+                Inventory Adjustments Account <span className="text-red-500">*</span>
+              </Label>
+              <Select
+                options={expenseAccounts
+                  .filter(
+                    (acc) =>
+                      !acc.deleted_at ||
+                      String(acc.id) === String(formData.inventory_adjustment_account_id)
+                  )
+                  .map((acc) => ({
+                    value: String(acc.id),
+                    label: acc.deleted_at
+                      ? `${acc.code} - ${acc.name} (Deleted)`
+                      : `${acc.code} - ${acc.name}`,
+                    className: acc.deleted_at ? 'text-red-500' : '',
+                  }))}
+                value={String(formData.inventory_adjustment_account_id)}
+                onChange={(val) =>
+                  setFormData({ ...formData, inventory_adjustment_account_id: val })
+                }
+                placeholder="Select Adjustment Account"
+                error={!!errors.inventory_adjustment_account_id}
+              />
+              {errors.inventory_adjustment_account_id && (
+                <p className="mt-1 text-xs text-red-500">
+                  {errors.inventory_adjustment_account_id}
+                </p>
+              )}
+            </div>
+            <div className="lg:col-span-2">
+              <Label>Purchase Account (Optional)</Label>
+              <Select
+                options={cogsAccounts
+                  .filter(
+                    (acc) =>
+                      !acc.deleted_at || String(acc.id) === String(formData.purchase_account_id)
+                  )
+                  .map((acc) => ({
+                    value: String(acc.id),
+                    label: acc.deleted_at
+                      ? `${acc.code} - ${acc.name} (Deleted)`
+                      : `${acc.code} - ${acc.name}`,
+                    className: acc.deleted_at ? 'text-red-500' : '',
+                  }))}
+                value={String(formData.purchase_account_id)}
+                onChange={(val) => setFormData({ ...formData, purchase_account_id: val })}
+                placeholder="Select Purchase Account"
+                error={!!errors.purchase_account_id}
+              />
+              <p className="mt-1 text-xs text-gray-500">
+                Usually COGS or Expense account for non-inventory items.
+              </p>
+            </div>
+          </div>
+        </CollapsibleSection>
       </div>
     </FormModal>
   );

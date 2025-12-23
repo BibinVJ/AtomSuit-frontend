@@ -15,6 +15,11 @@ export interface Item {
   non_expired_stock?: number;
   expired_stock?: number;
   is_expired_sale_enabled?: boolean;
+  sales_account_id?: number | null;
+  cogs_account_id?: number | null;
+  inventory_account_id?: number | null;
+  inventory_adjustment_account_id?: number | null;
+  purchase_account_id?: number | null;
 }
 
 export interface ItemInput {
@@ -25,6 +30,11 @@ export interface ItemInput {
   description: string;
   type: string;
   selling_price: number;
+  sales_account_id?: string | number | null;
+  cogs_account_id?: string | number | null;
+  inventory_account_id?: string | number | null;
+  inventory_adjustment_account_id?: string | number | null;
+  purchase_account_id?: string | number | null;
 }
 
 export interface ItemApiResponse {

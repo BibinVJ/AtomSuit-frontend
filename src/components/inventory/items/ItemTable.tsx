@@ -4,6 +4,7 @@ import { Table, TableBody, TableCell, TableHeader, TableRow } from '../../ui/tab
 import { useState } from 'react';
 import EditItemModal from './EditItemModal';
 import DeleteItemModal from './DeleteItemModal';
+import ViewItemModal from './ViewItemModal';
 import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide } from 'lucide-react';
 import { restoreItem } from '../../../services/ItemService';
 import { toast } from 'sonner';
@@ -39,6 +40,7 @@ export default function ItemTable({
   const { formatCurrency } = useSettings();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
 
   const handleEdit = (item: Item) => {
@@ -51,9 +53,15 @@ export default function ItemTable({
     setIsDeleteModalOpen(true);
   };
 
+  const handleView = (item: Item) => {
+    setSelectedItem(item);
+    setIsViewModalOpen(true);
+  };
+
   const handleCloseModals = () => {
     setIsEditModalOpen(false);
     setIsDeleteModalOpen(false);
+    setIsViewModalOpen(false);
     setSelectedItem(null);
   };
 
@@ -198,6 +206,7 @@ export default function ItemTable({
                 <TableCell className="px-4 py-3 text-end">
                   <TableActions
                     isTrashed={viewMode === 'trashed'}
+                    onView={() => handleView(item)}
                     onEdit={hasPermission('update-item') ? () => handleEdit(item) : undefined}
                     onDelete={hasPermission('delete-item') ? () => handleDelete(item) : undefined}
                     onRestore={
@@ -212,6 +221,7 @@ export default function ItemTable({
       </div>
       {selectedItem && (
         <>
+          <ViewItemModal isOpen={isViewModalOpen} onClose={handleCloseModals} item={selectedItem} />
           <EditItemModal
             isOpen={isEditModalOpen}
             onClose={handleCloseModals}
