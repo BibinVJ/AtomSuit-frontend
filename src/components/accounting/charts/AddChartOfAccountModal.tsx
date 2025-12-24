@@ -6,7 +6,6 @@ import Input from '../../form/input/InputField';
 import Label from '../../form/Label';
 import Select from '../../form/Select';
 import TextArea from '../../form/input/TextArea';
-import Checkbox from '../../form/input/Checkbox';
 import { toast } from 'sonner';
 import { addChartOfAccount } from '../../../services/ChartOfAccountService';
 import { getAccountGroups } from '../../../services/AccountGroupService';

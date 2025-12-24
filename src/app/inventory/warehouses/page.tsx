@@ -3,7 +3,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { Plus } from 'lucide-react';
 import Button from '@/components/ui/button/Button';
-import { useSearchParams } from 'next/navigation';
 import {
   getWarehouses,
   restoreWarehouse,
@@ -27,7 +26,6 @@ import { Download, Upload } from 'lucide-react';
 
 export default function WarehousesPage() {
   const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [editingWarehouse, setEditingWarehouse] = useState<Warehouse | null>(null);
@@ -43,14 +41,11 @@ export default function WarehousesPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showDeleted, setShowDeleted] = useState(false);
 
-  // Sorting
-  const [sortCol, setSortCol] = useState('created_at');
-  const [sortDir, setSortDir] = useState('desc');
-
-  const searchParams = useSearchParams();
+  // Sorting - hardcoded for now as UI doesn't support it yet
+  const sortCol = 'created_at';
+  const sortDir = 'desc';
 
   const fetchWarehouses = useCallback(async () => {
-    setIsLoading(true);
     try {
       const response = await getWarehouses({
         page: currentPage,
@@ -70,7 +65,7 @@ export default function WarehousesPage() {
       console.error('Error fetching warehouses:', error);
       toast.error('Failed to fetch warehouses');
     } finally {
-      setIsLoading(false);
+      // setIsLoading(false);
     }
   }, [currentPage, itemsPerPage, searchQuery, sortCol, sortDir, showDeleted]);
 

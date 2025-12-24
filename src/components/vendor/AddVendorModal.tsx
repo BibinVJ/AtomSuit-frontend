@@ -5,7 +5,6 @@ import FormModal from '../common/FormModal';
 import Input from '../form/input/InputField';
 import Label from '../form/Label';
 import Select from '../form/Select';
-import TextArea from '../form/input/TextArea';
 import { toast } from 'sonner';
 import { addVendor } from '../../services/VendorService';
 import { getCurrencies } from '../../services/CurrencyService';

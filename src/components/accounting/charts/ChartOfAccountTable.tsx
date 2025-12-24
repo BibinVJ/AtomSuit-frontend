@@ -10,7 +10,6 @@ import { toast } from 'sonner';
 import { TableActions } from '../../common/TableActions';
 import { ChartOfAccount } from '../../../types';
 import { usePermissions } from '../../../hooks/usePermissions';
-import Badge from '../../ui/badge/Badge';
 
 interface Props {
   data: ChartOfAccount[];
