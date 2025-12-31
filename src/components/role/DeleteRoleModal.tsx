@@ -1,4 +1,3 @@
-
 import { Modal } from '../ui/modal';
 import Button from '../ui/button/Button';
 import { toast } from 'sonner';
@@ -10,15 +9,21 @@ interface Props {
   onClose: () => void;
   onRoleDeleted: () => void;
   role: Role;
+  force?: boolean;
 }
 
-export default function DeleteRoleModal({ isOpen, onClose, onRoleDeleted, role }: Props) {
-
+export default function DeleteRoleModal({
+  isOpen,
+  onClose,
+  onRoleDeleted,
+  role,
+  force = false,
+}: Props) {
   const handleDelete = async () => {
     try {
-      await deleteRole(role.id);
+      await deleteRole(role.id, force);
       onRoleDeleted();
-      toast.success('Role deleted successfully');
+      toast.success(force ? 'Role permanently deleted' : 'Role deleted successfully');
       onClose();
     } catch (error) {
       console.error('Error deleting role:', error);
@@ -27,8 +32,8 @@ export default function DeleteRoleModal({ isOpen, onClose, onRoleDeleted, role }
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} className="max-w-lg">
-      <div className="relative w-full p-4 overflow-y-auto bg-white no-scrollbar rounded-3xl dark:bg-gray-900">
+    <Modal isOpen={isOpen} onClose={onClose} className="max-w-lg p-6 md:p-10">
+      <div className="relative w-full">
         <div className="p-4 text-center">
           <div className="mx-auto mb-5 text-red-500 bg-red-100 rounded-full w-14 h-14">
             <svg
@@ -50,10 +55,12 @@ export default function DeleteRoleModal({ isOpen, onClose, onRoleDeleted, role }
             </svg>
           </div>
           <h4 className="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90">
-            Delete Role
+            {force ? 'Permanently Delete Role' : 'Delete Role'}
           </h4>
           <p className="mb-6 text-gray-500 dark:text-gray-400">
-            Are you sure you want to delete the role &quot;{role?.name}&quot;? This action cannot be undone.
+            Are you sure you want to {force ? 'permanently ' : ''}delete the role &quot;{role?.name}
+            &quot;?{' '}
+            {force ? 'This action cannot be undone.' : 'You can restore it later from the trash.'}
           </p>
           <div className="flex items-center justify-center gap-4">
             <Button type="button" variant="outline" onClick={onClose}>
@@ -64,7 +71,7 @@ export default function DeleteRoleModal({ isOpen, onClose, onRoleDeleted, role }
               className="text-white bg-red-600 hover:bg-red-800"
               onClick={handleDelete}
             >
-              Delete
+              {force ? 'Permanently Delete' : 'Delete'}
             </Button>
           </div>
         </div>

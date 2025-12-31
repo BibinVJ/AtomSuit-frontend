@@ -1,4 +1,5 @@
 import { Plan } from './Plan';
+import { Domain } from './Domain';
 
 export interface Tenant {
   id: string;
@@ -8,22 +9,14 @@ export interface Tenant {
   status: 'active' | 'suspended' | 'trial';
   trial_ends_at?: string;
   grace_period_ends_at?: string;
-  domain_name?: Domain;
+  domain_name?: Domain | string;
   current_plan?: Plan;
   // For creating/updating
+  password?: string;
   plan_id?: number;
   load_sample_data?: boolean;
   created_at?: string;
   updated_at?: string;
-}
-
-export interface Domain {
-  id: number;
-  tenant_id: number;
-  domain: string;
-  is_primary: boolean;
-  created_at: string;
-  updated_at: string;
 }
 
 export interface TenantApiResponse {
@@ -36,6 +29,8 @@ export interface TenantApiResponse {
     last_page: number;
     per_page: number;
     total: number;
+    from?: number;
+    to?: number;
   };
   links?: {
     first: string;
@@ -44,3 +39,5 @@ export interface TenantApiResponse {
     next: string | null;
   };
 }
+
+export type TenantInput = Partial<Tenant>;

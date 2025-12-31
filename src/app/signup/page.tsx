@@ -10,7 +10,7 @@ export default function SignUpPage() {
 
   useEffect(() => {
     const tenant = getTenantFromBrowser();
-    
+
     // If accessing from tenant subdomain, redirect to signin
     if (!tenant.isCentral) {
       router.replace('/signin');
@@ -18,7 +18,7 @@ export default function SignUpPage() {
   }, [router]);
 
   const tenant = getTenantFromBrowser();
-  
+
   // Don't render signup form for tenant subdomains
   if (!tenant.isCentral) {
     return null;

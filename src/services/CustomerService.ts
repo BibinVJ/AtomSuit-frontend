@@ -1,25 +1,32 @@
+import { Customer, CustomerInput } from '../types';
+import { createBaseService, QueryParams, PaginatedResponse } from './BaseService';
 
-import api from './api';
+const customerService = createBaseService<Customer, CustomerInput>('/customer');
 
-import { CustomerApiResponse } from '../types';
+export const getCustomers = (params: QueryParams = {}): Promise<PaginatedResponse<Customer>> =>
+  customerService.list(params);
 
-export const getCustomers = async (page = 1, limit = 10, sortCol = 'created_at', sortDir = 'desc', unpaginated = false): Promise<CustomerApiResponse> => {
-  const url = unpaginated ? '/customer?unpaginated=1' : `/customer?perPage=${limit}&page=${page}&sort_by=${sortCol}&sort_direction=${sortDir}`;
-  const response = await api.get(url);
-  return response.data;
+export const getCustomer = (id: number): Promise<Customer> => customerService.get(id);
+
+export const addCustomer = (data: CustomerInput) => customerService.create(data);
+
+export const updateCustomer = (id: number, data: CustomerInput) => customerService.update(id, data);
+
+export const deleteCustomer = (id: number, force: boolean = false) =>
+  customerService.delete(id, force);
+
+export const restoreCustomer = (id: number) => customerService.restore(id);
+
+export const exportCustomers = () => customerService.export('/customer/export');
+
+export const importCustomers = (file: File) => customerService.import(file);
+
+export const downloadSampleCustomerExcel = () => customerService.downloadSample();
+
+const CustomerService = {
+  ...customerService,
+  importCustomers,
+  downloadSampleCustomerExcel,
 };
 
-export const addCustomer = async (customer: { name: string; email: string; phone: string; address: string; is_active: boolean; }) => {
-    const response = await api.post('/customer', customer);
-    return response.data;
-};
-
-export const updateCustomer = async (id: number, customer: { name: string; email: string; phone: string; address: string; is_active: boolean; }) => {
-    const response = await api.put(`/customer/${id}`, customer);
-    return response.data;
-};
-
-export const deleteCustomer = async (id: number) => {
-    const response = await api.delete(`/customer/${id}`);
-    return response.data;
-};
+export default CustomerService;

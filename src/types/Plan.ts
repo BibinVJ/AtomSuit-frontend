@@ -1,15 +1,16 @@
 export interface Plan {
   id: number;
   name: string;
+  description?: string;
   price: number;
   interval: 'day' | 'week' | 'month' | 'year' | 'lifetime';
   interval_count: number;
   is_trial_plan: boolean;
   trial_duration_in_days?: number;
   is_expired_user_plan: boolean;
-  is_active: boolean;
+  currency?: string;
   features?: PlanFeature[];
-  subscribed_tenants?: any[];
+  subscribed_tenants?: unknown[];
 }
 
 export interface PlanFeature {
@@ -32,6 +33,8 @@ export interface PlanApiResponse {
     last_page: number;
     per_page: number;
     total: number;
+    from?: number;
+    to?: number;
   };
   links?: {
     first: string;
@@ -40,3 +43,5 @@ export interface PlanApiResponse {
     next: string | null;
   };
 }
+
+export type PlanInput = Partial<Plan>;

@@ -1,10 +1,10 @@
-import api from "./api";
-import { LoginResponse } from "../types";
+import api from './api';
+import { LoginResponse } from '../types';
 
 export const login = async (identifier: string, password: string): Promise<LoginResponse> => {
   const formData = new FormData();
-  formData.append("identifier", identifier);
-  formData.append("password", password);
+  formData.append('identifier', identifier);
+  formData.append('password', password);
 
   const response = await api.post('/login', formData);
   return response.data;
@@ -21,30 +21,30 @@ export const logout = async () => {
     // Silently handle logout errors
   } finally {
     // Always clear local data
-    localStorage.removeItem("user");
-    sessionStorage.removeItem("user");
-    localStorage.removeItem("token");
-    sessionStorage.removeItem("token");
+    localStorage.removeItem('user');
+    sessionStorage.removeItem('user');
+    localStorage.removeItem('token');
+    sessionStorage.removeItem('token');
     // Remove the authorization header
-    delete api.defaults.headers.common["Authorization"];
+    delete api.defaults.headers.common['Authorization'];
   }
 };
 
 export const storeUser = (user: LoginResponse, persistent = false) => {
   const userString = JSON.stringify(user);
   const token = user.data.token.access_token;
-  
+
   if (persistent) {
-    localStorage.setItem("user", userString);
-    localStorage.setItem("token", token);
+    localStorage.setItem('user', userString);
+    localStorage.setItem('token', token);
   } else {
-    sessionStorage.setItem("user", userString);
-    sessionStorage.setItem("token", token);
+    sessionStorage.setItem('user', userString);
+    sessionStorage.setItem('token', token);
   }
 };
 
 export const getUser = () => {
-  const userString = sessionStorage.getItem("user") || localStorage.getItem("user");
+  const userString = sessionStorage.getItem('user') || localStorage.getItem('user');
   if (userString) {
     return JSON.parse(userString);
   }

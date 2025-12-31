@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useState } from 'react';
 import { Modal } from '../ui/modal';
@@ -27,7 +27,6 @@ export default function AddPlanModal({ isOpen, onClose, onPlanAdded }: Props) {
   const [isTrial, setIsTrial] = useState(false);
   const [trialDays, setTrialDays] = useState('14');
   const [isExpiredUserPlan, setIsExpiredUserPlan] = useState(false);
-  const [isActive, setIsActive] = useState(true);
   const [features, setFeatures] = useState<Omit<PlanFeature, 'id'>[]>([]);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
@@ -39,7 +38,6 @@ export default function AddPlanModal({ isOpen, onClose, onPlanAdded }: Props) {
     setIsTrial(false);
     setTrialDays('14');
     setIsExpiredUserPlan(false);
-    setIsActive(true);
     setFeatures([]);
     setErrors({});
   };
@@ -93,7 +91,7 @@ export default function AddPlanModal({ isOpen, onClose, onPlanAdded }: Props) {
     }
 
     try {
-      const payload: any = {
+      const payload: Record<string, unknown> = {
         name,
         price: Number(price),
         interval,
@@ -101,7 +99,6 @@ export default function AddPlanModal({ isOpen, onClose, onPlanAdded }: Props) {
         is_trial_plan: isTrial,
         trial_duration_in_days: isTrial ? Number(trialDays) : undefined,
         is_expired_user_plan: isExpiredUserPlan,
-        is_active: isActive,
         features: features.map((f, index) => ({
           key: f.key,
           value: f.value,
@@ -113,7 +110,7 @@ export default function AddPlanModal({ isOpen, onClose, onPlanAdded }: Props) {
       };
 
       const response = await createPlan(payload);
-      onPlanAdded(response.data);
+      onPlanAdded(response);
       toast.success('Plan added successfully');
       handleClose();
     } catch (error: unknown) {
@@ -143,21 +140,24 @@ export default function AddPlanModal({ isOpen, onClose, onPlanAdded }: Props) {
   };
 
   const addFeature = () => {
-    setFeatures([...features, {
-      key: '',
-      value: '',
-      type: 'string',
-      display_name: '',
-      description: '',
-      display_order: features.length,
-    }]);
+    setFeatures([
+      ...features,
+      {
+        key: '',
+        value: '',
+        type: 'string',
+        display_name: '',
+        description: '',
+        display_order: features.length,
+      },
+    ]);
   };
 
   const removeFeature = (index: number) => {
     setFeatures(features.filter((_, i) => i !== index));
   };
 
-  const updateFeature = (index: number, field: keyof Omit<PlanFeature, 'id'>, value: any) => {
+  const updateFeature = (index: number, field: keyof Omit<PlanFeature, 'id'>, value: unknown) => {
     const updated = [...features];
     updated[index] = { ...updated[index], [field]: value };
     setFeatures(updated);
@@ -166,162 +166,239 @@ export default function AddPlanModal({ isOpen, onClose, onPlanAdded }: Props) {
   return (
     <Modal isOpen={isOpen} onClose={handleClose} className="max-w-[700px] lg:p-11">
       <div className="relative w-full max-h-[85vh] p-4 overflow-y-auto bg-white custom-scrollbar rounded-3xl dark:bg-gray-900">
-          <div className="px-2 pr-14">
-            <h4 className="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90">
-              Add New Plan
-            </h4>
-            <p className="mb-6 text-sm text-gray-500 dark:text-gray-400 lg:mb-7">
-              Fill in the details to add a new plan.
-            </p>
-          </div>
-          <form className="flex flex-col" onSubmit={handleSubmit}>
-            <div className="px-2">
-              <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
+        <div className="px-2 pr-14">
+          <h4 className="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90">
+            Add New Plan
+          </h4>
+          <p className="mb-6 text-sm text-gray-500 dark:text-gray-400 lg:mb-7">
+            Fill in the details to add a new plan.
+          </p>
+        </div>
+        <form className="flex flex-col" onSubmit={handleSubmit}>
+          <div className="px-2">
+            <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
+              <div>
+                <Label>
+                  Name <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  type="text"
+                  value={name}
+                  onChange={(e) => {
+                    setName(e.target.value);
+                    setErrors({ ...errors, name: '' });
+                  }}
+                  error={!!errors.name}
+                  hint={errors.name}
+                />
+              </div>
+              <div>
+                <Label>
+                  Price <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  type="number"
+                  value={price}
+                  onChange={(e) => {
+                    setPrice(e.target.value);
+                    setErrors({ ...errors, price: '' });
+                  }}
+                  error={!!errors.price}
+                  hint={errors.price}
+                />
+              </div>
+              <div>
+                <Label>
+                  Interval <span className="text-red-500">*</span>
+                </Label>
+                <Select
+                  options={[
+                    { value: 'day', label: 'Day' },
+                    { value: 'week', label: 'Week' },
+                    { value: 'month', label: 'Month' },
+                    { value: 'year', label: 'Year' },
+                    { value: 'lifetime', label: 'Lifetime' },
+                  ]}
+                  onChange={(value) =>
+                    setInterval(value as 'day' | 'week' | 'month' | 'year' | 'lifetime')
+                  }
+                  defaultValue={interval}
+                  showPlaceholder={false}
+                />
+              </div>
+              <div>
+                <Label>
+                  Interval Count <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  type="number"
+                  value={intervalCount}
+                  onChange={(e) => {
+                    setIntervalCount(e.target.value);
+                    setErrors({ ...errors, intervalCount: '' });
+                  }}
+                  error={!!errors.intervalCount}
+                  hint={errors.intervalCount}
+                  min="1"
+                />
+              </div>
+              <div>
+                <Label>Trial Plan?</Label>
+                <Switch label={isTrial ? 'Yes' : 'No'} checked={isTrial} onChange={setIsTrial} />
+              </div>
+              {isTrial && (
                 <div>
-                  <Label>Name <span className="text-red-500">*</span></Label>
-                  <Input type="text" value={name} onChange={(e) => {setName(e.target.value); setErrors({...errors, name: ''})}} error={!!errors.name} hint={errors.name} />
-                </div>
-                <div>
-                  <Label>Price <span className="text-red-500">*</span></Label>
-                  <Input type="number" value={price} onChange={(e) => {setPrice(e.target.value); setErrors({...errors, price: ''})}} error={!!errors.price} hint={errors.price} />
-                </div>
-                <div>
-                  <Label>Interval <span className="text-red-500">*</span></Label>
-                  <Select 
-                    options={[
-                      { value: 'day', label: 'Day' },
-                      { value: 'week', label: 'Week' },
-                      { value: 'month', label: 'Month' },
-                      { value: 'year', label: 'Year' },
-                      { value: 'lifetime', label: 'Lifetime' },
-                    ]}
-                    onChange={(value) => setInterval(value as any)}
-                    defaultValue={interval}
-                    showPlaceholder={false}
+                  <Label>Trial Days</Label>
+                  <Input
+                    type="number"
+                    value={trialDays}
+                    onChange={(e) => {
+                      setTrialDays(e.target.value);
+                      setErrors({ ...errors, trialDays: '' });
+                    }}
+                    error={!!errors.trialDays}
+                    hint={errors.trialDays}
                   />
                 </div>
-                <div>
-                  <Label>Interval Count <span className="text-red-500">*</span></Label>
-                  <Input type="number" value={intervalCount} onChange={(e) => {setIntervalCount(e.target.value); setErrors({...errors, intervalCount: ''})}} error={!!errors.intervalCount} hint={errors.intervalCount} min="1" />
-                </div>
-                <div>
-                  <Label>Trial Plan?</Label>
-                  <Switch label={isTrial ? 'Yes' : 'No'} checked={isTrial} onChange={setIsTrial} />
-                </div>
-                {isTrial && (
-                  <div>
-                    <Label>Trial Days</Label>
-                    <Input type="number" value={trialDays} onChange={(e) => {setTrialDays(e.target.value); setErrors({...errors, trialDays: ''})}} error={!!errors.trialDays} hint={errors.trialDays} />
-                  </div>
-                )}
-                <div>
-                  <Label>Expired User Plan?</Label>
-                  <Switch label={isExpiredUserPlan ? 'Yes' : 'No'} checked={isExpiredUserPlan} onChange={setIsExpiredUserPlan} />
-                </div>
-                <div>
-                  <Label>Status</Label>
-                  <Switch label={isActive ? 'Active' : 'Inactive'} checked={isActive} onChange={setIsActive} />
-                </div>
+              )}
+              <div>
+                <Label>Expired User Plan?</Label>
+                <Switch
+                  label={isExpiredUserPlan ? 'Yes' : 'No'}
+                  checked={isExpiredUserPlan}
+                  onChange={setIsExpiredUserPlan}
+                />
               </div>
+            </div>
 
-              {/* Features Section */}
-              <div className="mt-6">
-                <div className="flex items-center justify-between mb-4">
-                  <Label>Features</Label>
-                  <Button type="button" size="xs" onClick={addFeature}>
-                    <Plus className="w-4 h-4 mr-1" /> Add Feature
-                  </Button>
-                </div>
-                {features.map((feature, index) => (
-                  <div key={index} className="p-4 mb-4 border rounded dark:border-gray-700">
-                    <div className="flex items-start justify-between mb-3">
-                      <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300">Feature {index + 1}</h5>
-                      <Button type="button" size="xs" variant="outline" onClick={() => removeFeature(index)}>
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
+            {/* Features Section */}
+            <div className="mt-6">
+              <div className="flex items-center justify-between mb-4">
+                <Label>Features</Label>
+                <Button type="button" size="xs" onClick={addFeature}>
+                  <Plus className="w-4 h-4 mr-1" /> Add Feature
+                </Button>
+              </div>
+              {features.map((feature, index) => (
+                <div key={index} className="p-4 mb-4 border rounded dark:border-gray-700">
+                  <div className="flex items-start justify-between mb-3">
+                    <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Feature {index + 1}
+                    </h5>
+                    <Button
+                      type="button"
+                      size="xs"
+                      variant="outline"
+                      onClick={() => removeFeature(index)}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                  <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                    <div>
+                      <Label>
+                        Key <span className="text-red-500">*</span>
+                      </Label>
+                      <Input
+                        type="text"
+                        value={feature.key}
+                        onChange={(e) => {
+                          updateFeature(index, 'key', e.target.value);
+                          setErrors({ ...errors, [`feature_${index}_key`]: '' });
+                        }}
+                        placeholder="e.g., storage_gb"
+                        error={!!errors[`feature_${index}_key`]}
+                        hint={errors[`feature_${index}_key`]}
+                      />
                     </div>
-                    <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-                      <div>
-                        <Label>Key <span className="text-red-500">*</span></Label>
-                        <Input 
-                          type="text" 
-                          value={feature.key} 
-                          onChange={(e) => {
-                            updateFeature(index, 'key', e.target.value);
-                            setErrors({...errors, [`feature_${index}_key`]: ''});
-                          }} 
-                          placeholder="e.g., storage_gb"
-                          error={!!errors[`feature_${index}_key`]}
-                          hint={errors[`feature_${index}_key`]}
-                        />
-                      </div>
-                      <div>
-                        <Label>Display Name <span className="text-red-500">*</span></Label>
-                        <Input 
-                          type="text" 
-                          value={feature.display_name} 
-                          onChange={(e) => {
-                            updateFeature(index, 'display_name', e.target.value);
-                            setErrors({...errors, [`feature_${index}_display_name`]: ''});
-                          }} 
-                          placeholder="e.g., Storage"
-                          error={!!errors[`feature_${index}_display_name`]}
-                          hint={errors[`feature_${index}_display_name`]}
-                        />
-                      </div>
-                      <div>
-                        <Label>Type <span className="text-red-500">*</span></Label>
-                        <Select 
+                    <div>
+                      <Label>
+                        Display Name <span className="text-red-500">*</span>
+                      </Label>
+                      <Input
+                        type="text"
+                        value={feature.display_name}
+                        onChange={(e) => {
+                          updateFeature(index, 'display_name', e.target.value);
+                          setErrors({ ...errors, [`feature_${index}_display_name`]: '' });
+                        }}
+                        placeholder="e.g., Storage"
+                        error={!!errors[`feature_${index}_display_name`]}
+                        hint={errors[`feature_${index}_display_name`]}
+                      />
+                    </div>
+                    <div>
+                      <Label>
+                        Type <span className="text-red-500">*</span>
+                      </Label>
+                      <Select
+                        options={[
+                          { value: 'string', label: 'String' },
+                          { value: 'integer', label: 'Integer' },
+                          { value: 'boolean', label: 'Boolean' },
+                        ]}
+                        onChange={(value) =>
+                          updateFeature(index, 'type', value as 'string' | 'integer' | 'boolean')
+                        }
+                        defaultValue={feature.type}
+                        showPlaceholder={false}
+                      />
+                    </div>
+                    <div>
+                      <Label>
+                        Value <span className="text-red-500">*</span>
+                      </Label>
+                      {feature.type === 'boolean' ? (
+                        <Select
                           options={[
-                            { value: 'string', label: 'String' },
-                            { value: 'integer', label: 'Integer' },
-                            { value: 'boolean', label: 'Boolean' },
+                            { value: 'true', label: 'True' },
+                            { value: 'false', label: 'False' },
                           ]}
-                          onChange={(value) => updateFeature(index, 'type', value as any)}
-                          defaultValue={feature.type}
+                          onChange={(value) => updateFeature(index, 'value', value === 'true')}
+                          defaultValue={String(feature.value)}
                           showPlaceholder={false}
+                          error={!!errors[`feature_${index}_value`]}
+                          hint={errors[`feature_${index}_value`]}
                         />
-                      </div>
-                      <div>
-                        <Label>Value <span className="text-red-500">*</span></Label>
-                        {feature.type === 'boolean' ? (
-                          <Select 
-                            options={[
-                              { value: 'true', label: 'True' },
-                              { value: 'false', label: 'False' },
-                            ]}
-                            onChange={(value) => updateFeature(index, 'value', value === 'true')}
-                            defaultValue={String(feature.value)}
-                            showPlaceholder={false}
-                            error={!!errors[`feature_${index}_value`]}
-                            hint={errors[`feature_${index}_value`]}
-                          />
-                        ) : (
-                          <Input 
-                            type={feature.type === 'integer' ? 'number' : 'text'} 
-                            value={String(feature.value)} 
-                            onChange={(e) => updateFeature(index, 'value', feature.type === 'integer' ? Number(e.target.value) : e.target.value)} 
-                            placeholder="Feature value"
-                            error={!!errors[`feature_${index}_value`]}
-                            hint={errors[`feature_${index}_value`]}
-                          />
-                        )}
-                      </div>
-                      <div className="lg:col-span-2">
-                        <Label>Description</Label>
-                        <Input type="text" value={feature.description || ''} onChange={(e) => updateFeature(index, 'description', e.target.value)} placeholder="Optional description" />
-                      </div>
+                      ) : (
+                        <Input
+                          type={feature.type === 'integer' ? 'number' : 'text'}
+                          value={String(feature.value)}
+                          onChange={(e) =>
+                            updateFeature(
+                              index,
+                              'value',
+                              feature.type === 'integer' ? Number(e.target.value) : e.target.value
+                            )
+                          }
+                          placeholder="Feature value"
+                          error={!!errors[`feature_${index}_value`]}
+                          hint={errors[`feature_${index}_value`]}
+                        />
+                      )}
+                    </div>
+                    <div className="lg:col-span-2">
+                      <Label>Description</Label>
+                      <Input
+                        type="text"
+                        value={feature.description || ''}
+                        onChange={(e) => updateFeature(index, 'description', e.target.value)}
+                        placeholder="Optional description"
+                      />
                     </div>
                   </div>
-                ))}
-              </div>
+                </div>
+              ))}
             </div>
-            <div className="flex items-center gap-3 px-2 mt-6 lg:justify-end">
-                <Button type="button" variant='outline' onClick={handleClose}>Close</Button>
-                <Button type="submit">Save Changes</Button>
-            </div>
-          </form>
-        </div>
+          </div>
+          <div className="flex items-center gap-3 px-2 mt-6 lg:justify-end">
+            <Button type="button" variant="outline" onClick={handleClose}>
+              Close
+            </Button>
+            <Button type="submit">Save Changes</Button>
+          </div>
+        </form>
+      </div>
     </Modal>
   );
 }

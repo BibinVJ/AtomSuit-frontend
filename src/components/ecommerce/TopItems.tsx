@@ -1,11 +1,5 @@
-import TableSection from "../ui/table/TableSection";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHeader,
-  TableRow,
-} from "../ui/table";
+import TableSection from '../ui/table/TableSection';
+import { Table, TableBody, TableCell, TableHeader, TableRow } from '../ui/table';
 
 interface TopItem {
   id: number;
@@ -19,8 +13,8 @@ interface Props {
   title?: string;
 }
 
-export default function TopItemsTable({ items, title = "Top Items" }: Props) {
-      if (!items || items.length === 0) {
+export default function TopItemsTable({ items, title = 'Top Items' }: Props) {
+  if (!items || items.length === 0) {
     return (
       <TableSection title={title}>
         <div className="p-4 text-center text-sm text-gray-500 dark:text-gray-400">
@@ -29,7 +23,7 @@ export default function TopItemsTable({ items, title = "Top Items" }: Props) {
       </TableSection>
     );
   }
-  
+
   return (
     <TableSection title={title}>
       <Table>

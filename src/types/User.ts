@@ -1,4 +1,4 @@
-import { Role } from "./Role";
+import { Role } from './Role';
 
 export interface Address {
   type: string;
@@ -50,12 +50,13 @@ export interface UserApiResponse {
   };
 }
 
-export type UserUpdatePayload = Partial<
-  Pick<User, "name" | "email" | "phone" | "status">
-> & {
+export type UserUpdatePayload = Partial<Pick<User, 'name' | 'email' | 'phone' | 'status'>> & {
   role_id?: number;
+  password?: string;
 };
 export interface UserFormData {
   phone: string;
   role_id: number | string;
 }
+
+export type UserInput = UserUpdatePayload;

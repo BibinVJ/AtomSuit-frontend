@@ -14,7 +14,6 @@ export interface Subscription {
   ends_at?: string;
   plan_id: number;
   plan?: Plan;
-  is_active: boolean;
   is_canceled: boolean;
   is_on_trial: boolean;
   is_on_grace_period: boolean;
@@ -34,7 +33,7 @@ export interface SubscriptionInvoice {
   invoice_date: string;
   due_date?: string;
   paid_at?: string;
-  metadata?: any;
+  metadata?: unknown;
 }
 
 export interface SubscriptionItem {
@@ -58,6 +57,8 @@ export interface SubscriptionApiResponse {
     last_page: number;
     per_page: number;
     total: number;
+    from?: number;
+    to?: number;
   };
   links?: {
     first: string;

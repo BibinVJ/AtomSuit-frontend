@@ -1,12 +1,8 @@
-"use client";
+'use client';
 
 import { useState, useEffect, useCallback, ReactNode } from 'react';
 import { TenantContext, TenantContextType } from './TenantContext';
-import {
-  getTenantFromBrowser,
-  TenantInfo,
-  getMainDomainUrl,
-} from '../utils/tenant';
+import { getTenantFromBrowser, TenantInfo, getMainDomainUrl } from '../utils/tenant';
 
 interface TenantProviderProps {
   children: ReactNode;
@@ -19,7 +15,7 @@ export const TenantProvider = ({ children }: TenantProviderProps) => {
 
   const validateTenant = useCallback(async (tenantToValidate?: TenantInfo): Promise<boolean> => {
     const targetTenant = tenantToValidate || tenant;
-        
+
     try {
       setError(null);
 
@@ -27,20 +23,20 @@ export const TenantProvider = ({ children }: TenantProviderProps) => {
       if (targetTenant.isCentral) {
         return true;
       }
-      
+
       // Use proxy API to avoid CORS issues
       const response = await fetch('/api/proxy', {
         method: 'GET',
         headers: {
           'X-Tenant': targetTenant.subdomain,
           'Content-Type': 'application/json',
-        }
+        },
       });
-      
+
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}`);
       }
-      
+
       const data = await response.json();
 
       // Check if the response indicates tenant validation success
@@ -57,7 +53,8 @@ export const TenantProvider = ({ children }: TenantProviderProps) => {
         errorMessage = err.message;
       } else if (typeof err === 'object' && err !== null && 'response' in err) {
         const axiosError = err as { response?: { data?: { message?: string } }; message?: string };
-        errorMessage = axiosError.response?.data?.message || axiosError.message || 'Tenant not found';
+        errorMessage =
+          axiosError.response?.data?.message || axiosError.message || 'Tenant not found';
       }
       setError(errorMessage);
 
@@ -83,10 +80,10 @@ export const TenantProvider = ({ children }: TenantProviderProps) => {
       if (!currentTenant.isCentral) {
         await validateTenant(currentTenant);
       }
-      
+
       setIsLoading(false);
     };
-    
+
     initializeTenant();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Intentionally omitting 'validateTenant' dependency to prevent infinite loop
@@ -99,9 +96,5 @@ export const TenantProvider = ({ children }: TenantProviderProps) => {
     refreshTenant,
   };
 
-  return (
-    <TenantContext.Provider value={contextValue}>
-      {children}
-    </TenantContext.Provider>
-  );
+  return <TenantContext.Provider value={contextValue}>{children}</TenantContext.Provider>;
 };

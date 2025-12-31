@@ -1,8 +1,9 @@
-"use client";
+'use client';
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import TenantSubscriptionService, { Subscription } from '../../services/TenantSubscriptionService';
+import * as TenantSubscriptionService from '../../services/TenantSubscriptionService';
+import { Subscription } from '../../types';
 import Button from '../ui/button/Button';
 import { CreditCard, AlertTriangle, CheckCircle, Calendar } from 'lucide-react';
 
@@ -19,18 +20,11 @@ export default function SubscriptionWidget() {
     try {
       const data = await TenantSubscriptionService.getCurrentSubscription();
       setSubscription(data);
-    } catch (error) {
+    } catch {
       // Subscription not found or error - handle gracefully
     } finally {
       setLoading(false);
     }
-  };
-
-  const formatAmount = (amount: number, currency: string) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: currency.toUpperCase(),
-    }).format(amount / 100);
   };
 
   const formatDate = (dateString: string | null) => {
@@ -40,28 +34,31 @@ export default function SubscriptionWidget() {
 
   const getStatusInfo = () => {
     if (!subscription) return { color: 'text-gray-500', icon: CreditCard, text: 'No Subscription' };
-    
-    if (subscription.is_past_due) return { 
-      color: 'text-red-600', 
-      icon: AlertTriangle, 
-      text: 'Payment Overdue' 
+
+    if (subscription.stripe_status === 'past_due')
+      return {
+        color: 'text-red-600',
+        icon: AlertTriangle,
+        text: 'Payment Overdue',
+      };
+    if (subscription.is_canceled)
+      return {
+        color: 'text-orange-600',
+        icon: AlertTriangle,
+        text: 'Cancelled',
+      };
+    if (subscription.is_on_trial)
+      return {
+        color: 'text-blue-600',
+        icon: CheckCircle,
+        text: 'Free Trial',
+      };
+    return {
+      color: 'text-green-600',
+      icon: CheckCircle,
+      text: 'Active',
     };
-    if (subscription.is_cancelled) return { 
-      color: 'text-orange-600', 
-      icon: AlertTriangle, 
-      text: 'Cancelled' 
-    };
-    if (subscription.is_on_trial) return { 
-      color: 'text-blue-600', 
-      icon: CheckCircle, 
-      text: 'Free Trial' 
-    };
-    if (subscription.is_active) return { 
-      color: 'text-green-600', 
-      icon: CheckCircle, 
-      text: 'Active' 
-    };
-    
+
     return { color: 'text-gray-500', icon: CreditCard, text: 'Inactive' };
   };
 
@@ -93,21 +90,21 @@ export default function SubscriptionWidget() {
 
       {subscription ? (
         <div className="space-y-2">
-          {subscription.items.length > 0 && (
+          {subscription.plan && (
             <div className="flex items-baseline gap-1">
               <span className="text-lg font-semibold text-gray-900 dark:text-white">
-                {formatAmount(subscription.items[0].price.unit_amount, subscription.items[0].price.currency)}
+                ${subscription.plan.price}
               </span>
               <span className="text-xs text-gray-500 dark:text-gray-400">
-                /{subscription.items[0].price.recurring.interval}
+                /{subscription.plan.interval}
               </span>
             </div>
           )}
 
-          {subscription.current_period_end && (
+          {subscription.ends_at && (
             <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
               <Calendar className="w-3 h-3" />
-              <span>Renews {formatDate(subscription.current_period_end)}</span>
+              <span>Ends {formatDate(subscription.ends_at)}</span>
             </div>
           )}
 
@@ -118,7 +115,7 @@ export default function SubscriptionWidget() {
             </div>
           )}
 
-          {subscription.ends_at && subscription.is_cancelled && (
+          {subscription.ends_at && subscription.is_canceled && (
             <div className="flex items-center gap-1 text-xs text-orange-600 dark:text-orange-400">
               <AlertTriangle className="w-3 h-3" />
               <span>Ends {formatDate(subscription.ends_at)}</span>

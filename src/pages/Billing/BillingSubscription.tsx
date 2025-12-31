@@ -1,13 +1,19 @@
-"use client";
+'use client';
 
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
-import { getCurrentSubscription, changePlan, cancelSubscription } from '../../services/TenantSubscriptionService';
+import {
+  getCurrentSubscription,
+  changePlan,
+  cancelSubscription,
+} from '../../services/TenantSubscriptionService';
 import { getPlans } from '../../services/PlanService';
-import { RefreshCw, Star, Calendar, CreditCard, AlertTriangle, CheckCircle } from 'lucide-react';
+import { RefreshCw, Calendar, CreditCard, AlertTriangle, CheckCircle } from 'lucide-react';
 import { Plan, Subscription } from '@/types';
+import { useSettings } from '../../hooks/useSettings';
 
 export default function BillingSubscription() {
+  const { formatCurrency, formatDate: globalFormatDate } = useSettings();
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [plans, setPlans] = useState<Plan[]>([]);
   const [loading, setLoading] = useState(true);
@@ -24,11 +30,11 @@ export default function BillingSubscription() {
       setLoading(true);
       const [subscriptionData, plansResponse] = await Promise.all([
         getCurrentSubscription().catch(() => null),
-        getPlans(undefined, undefined, undefined, undefined, true)
+        getPlans({ unpaginated: true }),
       ]);
       setSubscription(subscriptionData);
       setPlans(plansResponse.data as Plan[]);
-    } catch (error) {
+    } catch {
       toast.error('Failed to load subscription data');
     } finally {
       setLoading(false);
@@ -42,8 +48,9 @@ export default function BillingSubscription() {
       toast.success('Plan changed successfully!');
       await loadData();
       setShowPlansModal(false);
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Failed to change plan');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Failed to change plan';
+      toast.error(message);
     } finally {
       setActionLoading(false);
     }
@@ -56,8 +63,9 @@ export default function BillingSubscription() {
       await loadData();
       setShowCancelModal(false);
       toast.success('Subscription cancelled. Access will continue until end of billing period.');
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Failed to cancel subscription');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Failed to cancel subscription';
+      toast.error(message);
     } finally {
       setActionLoading(false);
     }
@@ -65,26 +73,27 @@ export default function BillingSubscription() {
 
   const formatDate = (dateString: string | null) => {
     if (!dateString) return 'N/A';
-    return new Date(dateString).toLocaleDateString();
+    return globalFormatDate(dateString);
   };
 
   const getStatusColor = () => {
     if (subscription?.is_canceled) return 'text-orange-600 bg-orange-50';
     if (subscription?.is_on_trial) return 'text-blue-600 bg-blue-50';
-    if (subscription?.is_active) return 'text-green-600 bg-green-50';
+    return 'text-green-600 bg-green-50';
     return 'text-gray-600 bg-gray-50';
   };
 
   const getStatusText = () => {
     if (subscription?.is_canceled) return 'Cancelled';
     if (subscription?.is_on_trial) return 'Trial';
-    if (subscription?.is_active) return 'Active';
+    return 'Active';
     return 'Inactive';
   };
 
   const getStatusIcon = () => {
     if (subscription?.is_canceled) return <AlertTriangle className="w-4 h-4" />;
-    if (subscription?.is_active || subscription?.is_on_trial) return <CheckCircle className="w-4 h-4" />;
+    if (subscription?.is_on_trial) return <CheckCircle className="w-4 h-4" />;
+    return <CheckCircle className="w-4 h-4" />;
     return <CreditCard className="w-4 h-4" />;
   };
 
@@ -101,8 +110,12 @@ export default function BillingSubscription() {
     return (
       <div className="text-center p-8">
         <AlertTriangle className="w-12 h-12 text-orange-500 mx-auto mb-4" />
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">No Active Subscription</h3>
-        <p className="text-gray-600 dark:text-gray-400 mb-4">You don't have an active subscription.</p>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+          No Active Subscription
+        </h3>
+        <p className="text-gray-600 dark:text-gray-400 mb-4">
+          You don&apos;t have an active subscription.
+        </p>
         <button
           onClick={() => setShowPlansModal(true)}
           className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
@@ -118,7 +131,9 @@ export default function BillingSubscription() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">My Subscription</h1>
-          <p className="text-gray-600 dark:text-gray-400">Manage your current subscription and billing</p>
+          <p className="text-gray-600 dark:text-gray-400">
+            Manage your current subscription and billing
+          </p>
         </div>
         <button
           onClick={loadData}
@@ -142,7 +157,9 @@ export default function BillingSubscription() {
                   Subscription ID: {subscription.stripe_id}
                 </p>
               </div>
-              <div className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${getStatusColor()}`}>
+              <div
+                className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${getStatusColor()}`}
+              >
                 {getStatusIcon()}
                 {getStatusText()}
               </div>
@@ -152,7 +169,7 @@ export default function BillingSubscription() {
               <div className="mb-4">
                 <div className="flex items-center justify-between">
                   <span className="text-2xl font-bold text-gray-900 dark:text-white">
-                    ${subscription.plan.price}
+                    {formatCurrency(subscription.plan.price)}
                   </span>
                   <span className="text-sm text-gray-500 dark:text-gray-400">
                     per {subscription.plan.interval}
@@ -184,27 +201,13 @@ export default function BillingSubscription() {
                 <span>Created: {formatDate(subscription.created_at)}</span>
               </div>
             </div>
-
-            <button
-              onClick={() => setShowPlansModal(true)}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg"
-            >
-              Manage Subscription
-            </button>
           </div>
         </div>
-        
+
         <div className="space-y-4">
           <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
             <h3 className="font-semibold text-gray-900 dark:text-white mb-3">Quick Actions</h3>
             <div className="space-y-2">
-              <button
-                onClick={() => setShowPlansModal(true)}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg text-sm"
-              >
-                Change Plan
-              </button>
-              
               {!subscription.is_canceled && (
                 <button
                   onClick={() => setShowCancelModal(true)}
@@ -232,24 +235,28 @@ export default function BillingSubscription() {
               </button>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {plans.filter(plan => plan.is_active).map((plan) => {
+              {plans.map((plan) => {
                 const isCurrentPlan = subscription?.plan?.id === plan.id;
 
                 return (
                   <div key={plan.id} className="border rounded-lg p-4 bg-white dark:bg-gray-800">
                     <h3 className="text-lg font-semibold mb-2">{plan.name}</h3>
-                    <p className="text-2xl font-bold mb-4">${plan.price}</p>
+                    <p className="text-2xl font-bold mb-4">{formatCurrency(plan.price)}</p>
                     <p className="text-sm text-gray-600 mb-4">per {plan.interval}</p>
                     <button
                       onClick={() => handlePlanChange(plan.id.toString())}
                       disabled={isCurrentPlan || actionLoading}
                       className={`w-full py-2 px-4 rounded ${
-                        isCurrentPlan 
-                          ? 'bg-gray-100 text-gray-500 cursor-not-allowed' 
+                        isCurrentPlan
+                          ? 'bg-gray-100 text-gray-500 cursor-not-allowed'
                           : 'bg-blue-600 hover:bg-blue-700 text-white'
                       }`}
                     >
-                      {isCurrentPlan ? 'Current Plan' : actionLoading ? 'Changing...' : 'Select Plan'}
+                      {isCurrentPlan
+                        ? 'Current Plan'
+                        : actionLoading
+                          ? 'Changing...'
+                          : 'Select Plan'}
                     </button>
                   </div>
                 );
@@ -263,7 +270,9 @@ export default function BillingSubscription() {
       {showCancelModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full p-6">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Cancel Subscription</h2>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+              Cancel Subscription
+            </h2>
             <div className="space-y-4">
               <div className="flex items-start gap-3">
                 <AlertTriangle className="w-6 h-6 text-orange-500 mt-1" />
@@ -272,12 +281,12 @@ export default function BillingSubscription() {
                     Are you sure you want to cancel?
                   </h3>
                   <p className="text-gray-600 dark:text-gray-300 text-sm">
-                    Your subscription will remain active until the end of your current billing period. 
-                    You can resume your subscription at any time before it expires.
+                    Your subscription will remain active until the end of your current billing
+                    period. You can resume your subscription at any time before it expires.
                   </p>
                 </div>
               </div>
-              
+
               <div className="flex gap-3 pt-4">
                 <button
                   onClick={() => setShowCancelModal(false)}

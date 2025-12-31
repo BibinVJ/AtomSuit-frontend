@@ -1,17 +1,17 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { Modal } from "../ui/modal";
-import Button from "../ui/button/Button";
-import Input from "../form/input/InputField";
-import Label from "../form/Label";
-import { User } from "../../types";
-import { updateProfile } from "../../services/ProfileService";
-import { useAuth } from "../../hooks/useAuth";
-import Select from "../form/Select";
-import { toast } from "sonner";
-import { isApiError } from "../../utils/errors";
-import DatePicker from "../form/date-picker";
+import { useState, useEffect } from 'react';
+import { Modal } from '../ui/modal';
+import Button from '../ui/button/Button';
+import Input from '../form/input/InputField';
+import Label from '../form/Label';
+import { User } from '../../types';
+import { updateProfile } from '../../services/ProfileService';
+import { useAuth } from '../../hooks/useAuth';
+import Select from '../form/Select';
+import { toast } from 'sonner';
+import { isApiError } from '../../utils/errors';
+import DatePicker from '../form/date-picker';
 
 interface EditProfileModalProps {
   isOpen: boolean;
@@ -20,16 +20,12 @@ interface EditProfileModalProps {
 }
 
 const genderOptions = [
-  { value: "male", label: "Male" },
-  { value: "female", label: "Female" },
-  { value: "other", label: "Other" },
+  { value: 'male', label: 'Male' },
+  { value: 'female', label: 'Female' },
+  { value: 'other', label: 'Other' },
 ];
 
-export default function EditProfileModal({
-  isOpen,
-  onClose,
-  user,
-}: EditProfileModalProps) {
+export default function EditProfileModal({ isOpen, onClose, user }: EditProfileModalProps) {
   const { fetchProfile } = useAuth();
   const [formData, setFormData] = useState<Partial<User>>({});
 
@@ -65,7 +61,7 @@ export default function EditProfileModal({
       if (isApiError(error)) {
         toast.error(error.response?.data?.message);
       } else {
-        toast.error("An unexpected error occurred.");
+        toast.error('An unexpected error occurred.');
       }
     }
   };
@@ -86,17 +82,13 @@ export default function EditProfileModal({
             <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
               <div>
                 <Label>Full Name</Label>
-                <Input
-                  name="name"
-                  value={formData.name || ""}
-                  onChange={handleChange}
-                />
+                <Input name="name" value={formData.name || ''} onChange={handleChange} />
               </div>
               <div>
                 <Label>Alternate Email</Label>
                 <Input
                   name="alternate_email"
-                  value={formData.alternate_email || ""}
+                  value={formData.alternate_email || ''}
                   onChange={handleChange}
                 />
               </div>
@@ -104,7 +96,7 @@ export default function EditProfileModal({
                 <Label>Alternate Phone</Label>
                 <Input
                   name="alternate_phone"
-                  value={formData.alternate_phone || ""}
+                  value={formData.alternate_phone || ''}
                   onChange={handleChange}
                 />
               </div>
@@ -112,7 +104,7 @@ export default function EditProfileModal({
                 <Label>ID Proof Type</Label>
                 <Input
                   name="id_proof_type"
-                  value={formData.id_proof_type || ""}
+                  value={formData.id_proof_type || ''}
                   onChange={handleChange}
                 />
               </div>
@@ -120,7 +112,7 @@ export default function EditProfileModal({
                 <Label>ID Proof Number</Label>
                 <Input
                   name="id_proof_number"
-                  value={formData.id_proof_number || ""}
+                  value={formData.id_proof_number || ''}
                   onChange={handleChange}
                 />
               </div>

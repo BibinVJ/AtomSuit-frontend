@@ -1,8 +1,8 @@
-import PageBreadcrumb from "../../components/common/PageBreadCrumb";
-import Badge from "../../components/ui/badge/Badge";
-import { Plus } from "lucide-react";
-import PageMeta from "../../components/common/PageMeta";
-import ComponentCard from "../../components/common/ComponentCard";
+import PageBreadcrumb from '../../components/common/PageBreadCrumb';
+import Badge from '../../components/ui/badge/Badge';
+import { Plus } from 'lucide-react';
+import PageMeta from '../../components/common/PageMeta';
+import ComponentCard from '../../components/common/ComponentCard';
 
 export default function Badges() {
   return (
@@ -21,13 +21,13 @@ export default function Badges() {
             </Badge>
             <Badge variant="light" color="success">
               Success
-            </Badge>{" "}
+            </Badge>{' '}
             <Badge variant="light" color="error">
               Error
-            </Badge>{" "}
+            </Badge>{' '}
             <Badge variant="light" color="warning">
               Warning
-            </Badge>{" "}
+            </Badge>{' '}
             <Badge variant="light" color="info">
               Info
             </Badge>
@@ -47,13 +47,13 @@ export default function Badges() {
             </Badge>
             <Badge variant="solid" color="success">
               Success
-            </Badge>{" "}
+            </Badge>{' '}
             <Badge variant="solid" color="error">
               Error
-            </Badge>{" "}
+            </Badge>{' '}
             <Badge variant="solid" color="warning">
               Warning
-            </Badge>{" "}
+            </Badge>{' '}
             <Badge variant="solid" color="info">
               Info
             </Badge>
@@ -72,13 +72,13 @@ export default function Badges() {
             </Badge>
             <Badge variant="light" color="success" startIcon={<Plus className="w-3 h-3" />}>
               Success
-            </Badge>{" "}
+            </Badge>{' '}
             <Badge variant="light" color="error" startIcon={<Plus className="w-3 h-3" />}>
               Error
-            </Badge>{" "}
+            </Badge>{' '}
             <Badge variant="light" color="warning" startIcon={<Plus className="w-3 h-3" />}>
               Warning
-            </Badge>{" "}
+            </Badge>{' '}
             <Badge variant="light" color="info" startIcon={<Plus className="w-3 h-3" />}>
               Info
             </Badge>
@@ -97,13 +97,13 @@ export default function Badges() {
             </Badge>
             <Badge variant="solid" color="success" startIcon={<Plus className="w-3 h-3" />}>
               Success
-            </Badge>{" "}
+            </Badge>{' '}
             <Badge variant="solid" color="error" startIcon={<Plus className="w-3 h-3" />}>
               Error
-            </Badge>{" "}
+            </Badge>{' '}
             <Badge variant="solid" color="warning" startIcon={<Plus className="w-3 h-3" />}>
               Warning
-            </Badge>{" "}
+            </Badge>{' '}
             <Badge variant="solid" color="info" startIcon={<Plus className="w-3 h-3" />}>
               Info
             </Badge>
@@ -122,13 +122,13 @@ export default function Badges() {
             </Badge>
             <Badge variant="light" color="success" endIcon={<Plus className="w-3 h-3" />}>
               Success
-            </Badge>{" "}
+            </Badge>{' '}
             <Badge variant="light" color="error" endIcon={<Plus className="w-3 h-3" />}>
               Error
-            </Badge>{" "}
+            </Badge>{' '}
             <Badge variant="light" color="warning" endIcon={<Plus className="w-3 h-3" />}>
               Warning
-            </Badge>{" "}
+            </Badge>{' '}
             <Badge variant="light" color="info" endIcon={<Plus className="w-3 h-3" />}>
               Info
             </Badge>
@@ -147,13 +147,13 @@ export default function Badges() {
             </Badge>
             <Badge variant="solid" color="success" endIcon={<Plus className="w-3 h-3" />}>
               Success
-            </Badge>{" "}
+            </Badge>{' '}
             <Badge variant="solid" color="error" endIcon={<Plus className="w-3 h-3" />}>
               Error
-            </Badge>{" "}
+            </Badge>{' '}
             <Badge variant="solid" color="warning" endIcon={<Plus className="w-3 h-3" />}>
               Warning
-            </Badge>{" "}
+            </Badge>{' '}
             <Badge variant="solid" color="info" endIcon={<Plus className="w-3 h-3" />}>
               Info
             </Badge>

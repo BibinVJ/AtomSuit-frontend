@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useState, useEffect } from 'react';
 import { Modal } from '../ui/modal';
@@ -11,7 +11,7 @@ import { toast } from 'sonner';
 import { createTenant } from '../../services/TenantService';
 import { getPlans } from '../../services/PlanService';
 import { isApiError } from '../../utils/errors';
-import { Plan, Tenant } from '../../types';
+import { Plan, Tenant, TenantInput } from '../../types';
 
 interface Props {
   isOpen: boolean;
@@ -38,7 +38,7 @@ export default function AddTenantModal({ isOpen, onClose, onTenantAdded }: Props
 
   const fetchPlans = async () => {
     try {
-      const response = await getPlans(1, 100, 'name', 'asc', true);
+      const response = await getPlans({ unpaginated: true });
       setPlans(Array.isArray(response.data) ? response.data : [response.data]);
     } catch (error) {
       console.error('Error fetching plans:', error);
@@ -108,18 +108,18 @@ export default function AddTenantModal({ isOpen, onClose, onTenantAdded }: Props
     }
 
     try {
-      const payload = {
+      const payload: TenantInput = {
         name,
         email,
         phone,
         password,
         domain_name: domainName,
-        plan_id: planId,
+        plan_id: Number(planId),
         load_sample_data: loadSampleData,
       };
 
       const response = await createTenant(payload);
-      onTenantAdded(response.data);
+      onTenantAdded(response);
       toast.success('Tenant created successfully');
       handleClose();
     } catch (error: unknown) {
@@ -147,7 +147,7 @@ export default function AddTenantModal({ isOpen, onClose, onTenantAdded }: Props
     }
   };
 
-  const planOptions = plans.map(p => ({ value: String(p.id), label: p.name }));
+  const planOptions = plans.map((p) => ({ value: String(p.id), label: p.name }));
 
   return (
     <Modal isOpen={isOpen} onClose={handleClose} className="max-w-[700px] lg:p-11">
@@ -164,95 +164,109 @@ export default function AddTenantModal({ isOpen, onClose, onTenantAdded }: Props
           <div className="px-2">
             <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
               <div>
-                <Label>Name <span className="text-red-500">*</span></Label>
-                <Input 
-                  type="text" 
-                  value={name} 
+                <Label>
+                  Name <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  type="text"
+                  value={name}
                   onChange={(e) => {
                     setName(e.target.value);
-                    setErrors({...errors, name: ''});
-                  }} 
-                  error={!!errors.name} 
-                  hint={errors.name} 
+                    setErrors({ ...errors, name: '' });
+                  }}
+                  error={!!errors.name}
+                  hint={errors.name}
                 />
               </div>
               <div>
-                <Label>Email <span className="text-red-500">*</span></Label>
-                <Input 
-                  type="email" 
-                  value={email} 
+                <Label>
+                  Email <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  type="email"
+                  value={email}
                   onChange={(e) => {
                     setEmail(e.target.value);
-                    setErrors({...errors, email: ''});
-                  }} 
-                  error={!!errors.email} 
-                  hint={errors.email} 
+                    setErrors({ ...errors, email: '' });
+                  }}
+                  error={!!errors.email}
+                  hint={errors.email}
                 />
               </div>
               <div>
-                <Label>Phone <span className="text-red-500">*</span></Label>
-                <Input 
-                  type="tel" 
-                  value={phone} 
+                <Label>
+                  Phone <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  type="tel"
+                  value={phone}
                   onChange={(e) => {
                     setPhone(e.target.value);
-                    setErrors({...errors, phone: ''});
-                  }} 
-                  error={!!errors.phone} 
-                  hint={errors.phone} 
+                    setErrors({ ...errors, phone: '' });
+                  }}
+                  error={!!errors.phone}
+                  hint={errors.phone}
                 />
               </div>
               <div>
-                <Label>Password <span className="text-red-500">*</span></Label>
-                <Input 
-                  type="password" 
-                  value={password} 
+                <Label>
+                  Password <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  type="password"
+                  value={password}
                   onChange={(e) => {
                     setPassword(e.target.value);
-                    setErrors({...errors, password: ''});
-                  }} 
-                  error={!!errors.password} 
-                  hint={errors.password} 
+                    setErrors({ ...errors, password: '' });
+                  }}
+                  error={!!errors.password}
+                  hint={errors.password}
                 />
               </div>
               <div>
-                <Label>Domain <span className="text-red-500">*</span></Label>
-                <Input 
-                  type="text" 
-                  value={domainName} 
+                <Label>
+                  Domain <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  type="text"
+                  value={domainName}
                   onChange={(e) => {
                     setDomainName(e.target.value);
-                    setErrors({...errors, domain_name: ''});
-                  }} 
-                  error={!!errors.domain_name} 
+                    setErrors({ ...errors, domain_name: '' });
+                  }}
+                  error={!!errors.domain_name}
                   hint={errors.domain_name}
-                  placeholder="subdomain" 
+                  placeholder="subdomain"
                 />
               </div>
               <div>
-                <Label>Plan <span className="text-red-500">*</span></Label>
-                <Select 
-                  options={planOptions} 
+                <Label>
+                  Plan <span className="text-red-500">*</span>
+                </Label>
+                <Select
+                  options={planOptions}
                   onChange={(value) => {
                     setPlanId(Number(value));
-                    setErrors({...errors, plan_id: ''});
-                  }} 
-                  error={!!errors.plan_id} 
+                    setErrors({ ...errors, plan_id: '' });
+                  }}
+                  error={!!errors.plan_id}
                   hint={errors.plan_id}
                 />
               </div>
               <div>
                 <Label>Load Sample Data?</Label>
-                <Switch 
-                  label={loadSampleData ? 'Yes' : 'No'} 
-                  checked={loadSampleData} 
-                  onChange={setLoadSampleData} 
+                <Switch
+                  label={loadSampleData ? 'Yes' : 'No'}
+                  checked={loadSampleData}
+                  onChange={setLoadSampleData}
                 />
               </div>
             </div>
           </div>
           <div className="flex items-center gap-3 px-2 mt-6 lg:justify-end">
-            <Button type="button" variant='outline' onClick={handleClose}>Close</Button>
+            <Button type="button" variant="outline" onClick={handleClose}>
+              Close
+            </Button>
             <Button type="submit">Save Changes</Button>
           </div>
         </form>

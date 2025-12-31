@@ -1,24 +1,25 @@
-"use client";
+'use client';
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useSidebar } from "../../hooks/useSidebar";
-import { useAuth } from "../../hooks/useAuth";
-import { usePathname } from "next/navigation";
-import { useTenant } from "../../hooks/useTenant";
-import AppHeader from "../../layout/AppHeader";
-import Backdrop from "../../layout/Backdrop";
-import AppSidebar from "../../layout/AppSidebar";
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useSidebar } from '../../hooks/useSidebar';
+import { useAuth } from '../../hooks/useAuth';
+import { usePathname } from 'next/navigation';
+import { useTenant } from '../../hooks/useTenant';
+import AppHeader from '../../layout/AppHeader';
+import Backdrop from '../../layout/Backdrop';
+import AppSidebar from '../../layout/AppSidebar';
 interface ProtectedLayoutProps {
   children: React.ReactNode;
 }
 const ProtectedLayout: React.FC<ProtectedLayoutProps> = ({ children }) => {
-  const { isExpanded, isHovered, isMobileOpen, isFullScreen, enterFullScreen, exitFullScreen } = useSidebar();
+  const { isExpanded, isHovered, isMobileOpen, isFullScreen, enterFullScreen, exitFullScreen } =
+    useSidebar();
   const { user, loading } = useAuth();
   const { tenant } = useTenant();
   const router = useRouter();
   const pathname = usePathname();
-  
+
   // All hooks must be called before any conditional returns
   useEffect(() => {
     // Check if we need fullscreen mode based on pathname or other logic
@@ -31,7 +32,7 @@ const ProtectedLayout: React.FC<ProtectedLayoutProps> = ({ children }) => {
       }
     }
   }, [pathname, isFullScreen, enterFullScreen, exitFullScreen]);
-  
+
   // Check authentication status
   useEffect(() => {
     if (!loading && !user) {
@@ -40,7 +41,7 @@ const ProtectedLayout: React.FC<ProtectedLayoutProps> = ({ children }) => {
       router.push('/signin');
     }
   }, [user, loading, router, tenant]);
-  
+
   // Show loading spinner while checking authentication
   if (loading) {
     return (
@@ -49,7 +50,7 @@ const ProtectedLayout: React.FC<ProtectedLayoutProps> = ({ children }) => {
       </div>
     );
   }
-  
+
   // If not loading and no user, show loading spinner (redirect will happen in useEffect)
   if (!user) {
     return (
@@ -61,9 +62,7 @@ const ProtectedLayout: React.FC<ProtectedLayoutProps> = ({ children }) => {
   if (isFullScreen) {
     return (
       <div className="min-h-screen">
-        <div className="p-4 mx-auto max-w-(--breakpoint-2xl) md:p-6">
-          {children}
-        </div>
+        <div className="p-4 mx-auto max-w-(--breakpoint-2xl) md:p-6">{children}</div>
       </div>
     );
   }
@@ -75,13 +74,11 @@ const ProtectedLayout: React.FC<ProtectedLayoutProps> = ({ children }) => {
       </div>
       <div
         className={`flex-1 transition-all duration-300 ease-in-out ${
-          isExpanded || isHovered ? "lg:ml-[290px]" : "lg:ml-[90px]"
-        } ${isMobileOpen ? "ml-0" : ""}`}
+          isExpanded || isHovered ? 'lg:ml-[290px]' : 'lg:ml-[90px]'
+        } ${isMobileOpen ? 'ml-0' : ''}`}
       >
         <AppHeader />
-        <div className="p-4 mx-auto max-w-(--breakpoint-2xl) md:p-6">
-          {children}
-        </div>
+        <div className="p-4 mx-auto max-w-(--breakpoint-2xl) md:p-6">{children}</div>
       </div>
     </div>
   );

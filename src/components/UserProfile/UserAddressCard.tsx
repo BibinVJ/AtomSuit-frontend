@@ -1,5 +1,5 @@
-import { User } from "../../types";
-import { Pencil, Plus } from "lucide-react";
+import { User } from '../../types';
+import { Pencil, Plus } from 'lucide-react';
 
 interface UserAddressCardProps {
   user: User | null;
@@ -41,8 +41,7 @@ export default function UserAddressCard({ user, onEdit }: UserAddressCardProps) 
                     </p>
                   )}
                   <p className="text-sm text-gray-500 dark:text-gray-400">
-                    {address.city}, {address.state}, {address.country} -{" "}
-                    {address.postal_code}
+                    {address.city}, {address.state}, {address.country} - {address.postal_code}
                   </p>
                 </div>
               </div>
@@ -50,7 +49,7 @@ export default function UserAddressCard({ user, onEdit }: UserAddressCardProps) 
           </div>
         </div>
         <button
-          onClick={() => onEdit("new")}
+          onClick={() => onEdit('new')}
           className="flex w-full items-center justify-center gap-2 rounded-full bg-brand-500 border border-brand-300 text-white px-4 py-3 text-sm font-medium hover:bg-brand-600 hover:border-brand-400 transition-colors duration-200 lg:inline-flex lg:w-auto dark:bg-brand-500 dark:border-brand-600 dark:hover:bg-brand-400 dark:hover:border-brand-500"
         >
           <Plus className="w-4 h-4" />

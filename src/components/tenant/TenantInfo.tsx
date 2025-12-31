@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useTenant } from '../../hooks/useTenant';
 import { Building, Crown } from 'lucide-react';

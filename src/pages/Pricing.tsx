@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useState, useEffect } from 'react';
 import PlanCard from '../components/plan/PlanCard';
@@ -16,8 +16,19 @@ export default function Pricing() {
   useEffect(() => {
     const fetchPlans = async () => {
       try {
-        const response = await getPlans(1, 10, 'created_at', 'desc', true);
-        setPlans(response.data.filter((plan: Plan) => plan.is_active));
+        const response = await getPlans({
+          page: 1,
+          limit: 10,
+          sortCol: 'created_at',
+          sortDir: 'desc',
+          unpaginated: true,
+        });
+        if (Array.isArray(response.data)) {
+          setPlans(response.data);
+        } else if (response.data && typeof response.data === 'object' && 'id' in response.data) {
+          // If it's a single plan (unlikely here but for safety)
+          setPlans([response.data as Plan]);
+        }
       } catch (error) {
         console.error('Failed to fetch plans:', error);
         setPlans([]);
@@ -30,12 +41,18 @@ export default function Pricing() {
   }, []);
 
   // Categorize plans (exclude expired user plans)
-  const activePlans = plans.filter(plan => !plan.is_expired_user_plan);
-  const freePlans = activePlans.filter(plan => plan.is_trial_plan);
-  const monthlyPlans = activePlans.filter(plan => !plan.is_trial_plan && plan.interval === 'month' && plan.interval_count === 1);
-  const yearlyPlans = activePlans.filter(plan => !plan.is_trial_plan && plan.interval === 'year' && plan.interval_count === 1);
-  const lifetimePlans = activePlans.filter(plan => !plan.is_trial_plan && plan.interval === 'lifetime');
-  
+  const activePlans = plans.filter((plan) => !plan.is_expired_user_plan);
+  const freePlans = activePlans.filter((plan) => plan.is_trial_plan);
+  const monthlyPlans = activePlans.filter(
+    (plan) => !plan.is_trial_plan && plan.interval === 'month' && plan.interval_count === 1
+  );
+  const yearlyPlans = activePlans.filter(
+    (plan) => !plan.is_trial_plan && plan.interval === 'year' && plan.interval_count === 1
+  );
+  const lifetimePlans = activePlans.filter(
+    (plan) => !plan.is_trial_plan && plan.interval === 'lifetime'
+  );
+
   const currentPlans = billingCycle === 'month' ? monthlyPlans : yearlyPlans;
   const allPlansToShow = [...freePlans, ...currentPlans];
 
@@ -96,10 +113,9 @@ export default function Pricing() {
             <div className="mb-16">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {allPlansToShow.map((plan, index) => {
-                  const isPopular = !plan.is_trial_plan && index === Math.floor(allPlansToShow.length / 2);
-                  return (
-                    <PlanCard key={plan.id} plan={plan} isPopular={isPopular} />
-                  );
+                  const isPopular =
+                    !plan.is_trial_plan && index === Math.floor(allPlansToShow.length / 2);
+                  return <PlanCard key={plan.id} plan={plan} isPopular={isPopular} />;
                 })}
               </div>
             </div>
@@ -112,9 +128,7 @@ export default function Pricing() {
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
                   Lifetime Access
                 </h2>
-                <p className="text-gray-600 dark:text-gray-400 mt-2">
-                  Pay once, use forever
-                </p>
+                <p className="text-gray-600 dark:text-gray-400 mt-2">Pay once, use forever</p>
               </div>
               <div className="space-y-8">
                 {lifetimePlans.map((plan) => (

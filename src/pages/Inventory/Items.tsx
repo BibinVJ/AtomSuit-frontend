@@ -1,108 +1,233 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import PageBreadcrumb from '../../components/common/PageBreadCrumb';
 import ComponentCard from '../../components/common/ComponentCard';
 import PageMeta from '../../components/common/PageMeta';
 import ItemTable from '../../components/inventory/items/ItemTable';
 import AddItemModal from '../../components/inventory/items/AddItemModal';
+import ImportItemModal from '../../components/inventory/items/ImportItemModal';
 import { useModal } from '../../hooks/useModal';
 import Pagination from '../../components/common/Pagination';
 import Button from '../../components/ui/button/Button';
+import Tooltip from '../../components/ui/tooltip/Tooltip';
 import Select from '../../components/form/Select';
-import { getItems } from '../../services/ItemService';
-import { Item } from '../../types';
-
+import { getItems, exportItems } from '../../services/ItemService';
+import { getCategories } from '../../services/CategoryService';
+import { getUnits } from '../../services/UnitService';
+import { Item, Category, Unit } from '../../types';
+import { Download, Upload, Plus } from 'lucide-react';
 import { usePermissions } from '../../hooks/usePermissions';
+import TableToolbar from '../../components/common/TableToolbar';
+import ViewModeTabs from '../../components/common/ViewModeTabs';
+import { useDataTable } from '../../hooks/useDataTable';
+import { useExport } from '../../hooks/useExport';
 
 export default function Items() {
   const { hasPermission } = usePermissions();
-  const [items, setItems] = useState<Item[]>([]);
-  const { isOpen, openModal, closeModal } = useModal();
-  const [currentPage, setCurrentPage] = useState(1);
-  const [perPage, setPerPage] = useState(10);
-  const [totalPages, setTotalPages] = useState(1);
-  const [from, setFrom] = useState(0);
-  const [to, setTo] = useState(0);
-  const [total, setTotal] = useState(0);
-  const [sortBy, setSortBy] = useState('created_at');
-  const [sortDirection, setSortDirection] = useState('desc');
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [units, setUnits] = useState<Unit[]>([]);
+  const { isOpen: isAddOpen, openModal: openAddModal, closeModal: closeAddModal } = useModal();
+  const {
+    isOpen: isImportOpen,
+    openModal: openImportModal,
+    closeModal: closeImportModal,
+  } = useModal();
 
-  const fetchItems = async (page = 1, limit = 10, sortCol = 'created_at', sortDir = 'desc') => {
+  const [selectedCategory, setSelectedCategory] = useState<string | number>('');
+  const [selectedUnit, setSelectedUnit] = useState<string | number>('');
+  const [selectedType, setSelectedType] = useState<string>('');
+
+  const extraParams = useMemo(
+    () => ({
+      category_id: selectedCategory || undefined,
+      unit_id: selectedUnit || undefined,
+      type: selectedType || undefined,
+    }),
+    [selectedCategory, selectedUnit, selectedType]
+  );
+
+  const {
+    data: items,
+    currentPage,
+    perPage,
+    totalPages,
+    total,
+    from,
+    to,
+    sortBy,
+    sortDirection,
+    searchTerm,
+    setSearchTerm,
+    rangeFrom,
+    setRangeFrom,
+    rangeTo,
+    setRangeTo,
+    viewMode,
+    setViewMode,
+    handlePageChange,
+    handlePerPageChange,
+    handleSort,
+    resetFilters,
+    refresh,
+  } = useDataTable<Item>({
+    fetchData: getItems,
+    extraParams,
+  });
+
+  const { exportData } = useExport();
+
+  const fetchOptions = async () => {
     try {
-      const response = await getItems(page, limit, sortCol, sortDir);
-      setItems(response.data);
-      setTotalPages(response.meta.last_page);
-      setCurrentPage(response.meta.current_page);
-      setFrom(response.meta.from);
-      setTo(response.meta.to);
-      setTotal(response.meta.total);
+      const [categoriesRes, unitsRes] = await Promise.all([
+        getCategories({ unpaginated: true }),
+        getUnits({ unpaginated: true }),
+      ]);
+      setCategories(categoriesRes.data || []);
+      setUnits(unitsRes.data || []);
     } catch (error) {
-      console.error('Error fetching items:', error);
+      console.error('Error fetching options:', error);
     }
   };
 
   useEffect(() => {
-    fetchItems(currentPage, perPage, sortBy, sortDirection);
-  }, [currentPage, perPage, sortBy, sortDirection]);
+    fetchOptions();
+  }, []);
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
+  const handleExport = () => {
+    exportData({
+      exportFunction: exportItems,
+      entityName: 'Items',
+    });
   };
 
-  const handlePerPageChange = (value: string) => {
-    setPerPage(parseInt(value, 10));
-    setCurrentPage(1);
-  };
-
-  const handleSort = (column: string) => {
-    if (sortBy === column) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortBy(column);
-      setSortDirection('asc');
-    }
+  const handleReset = () => {
+    resetFilters();
+    setSelectedCategory('');
+    setSelectedUnit('');
+    setSelectedType('');
   };
 
   return (
     <>
-      <PageMeta
-        title="Items"
-        description="List of items"
-      />
+      <PageMeta title="Items" description="List of items" />
       <PageBreadcrumb pageTitle="Items" />
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <label htmlFor="perPage" className="text-sm font-medium text-gray-700">Per Page:</label>
-          <Select
-            options={[
-              { value: '10', label: '10' },
-              { value: '20', label: '20' },
-              { value: '50', label: '50' },
-            ]}
-            onChange={handlePerPageChange}
-            defaultValue={String(perPage)}
-            showPlaceholder={false}
-            className="w-20"
-            searchable={false}
+
+      <div className="space-y-6">
+        <div className="p-5 border border-gray-200 rounded-2xl bg-gray-50 dark:bg-white/[0.03] dark:border-gray-800 shadow-sm">
+          <TableToolbar
+            className="mb-0"
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            searchPlaceholder="Search items..."
+            rangeFrom={rangeFrom}
+            onRangeFromChange={(val) => setRangeFrom(val as number | '')}
+            rangeTo={rangeTo}
+            onRangeToChange={(val) => setRangeTo(val as number | '')}
+            perPage={perPage}
+            onPerPageChange={handlePerPageChange}
+            onReset={handleReset}
+            extraFilters={
+              <>
+                <div className="w-full md:w-44">
+                  <Select
+                    options={[
+                      { value: '', label: 'All Categories' },
+                      ...categories.map((cat) => ({ value: String(cat.id), label: cat.name })),
+                    ]}
+                    onChange={(value) => setSelectedCategory(value)}
+                    value={String(selectedCategory)}
+                    placeholder="Category"
+                    className="w-full"
+                    searchable={true}
+                  />
+                </div>
+                <div className="w-full md:w-36">
+                  <Select
+                    options={[
+                      { value: '', label: 'All Units' },
+                      ...units.map((unit) => ({ value: String(unit.id), label: unit.name })),
+                    ]}
+                    onChange={(value) => setSelectedUnit(value)}
+                    value={String(selectedUnit)}
+                    placeholder="Unit"
+                    className="w-full"
+                    searchable={true}
+                  />
+                </div>
+                <div className="w-full md:w-36">
+                  <Select
+                    options={[
+                      { value: '', label: 'All Types' },
+                      { value: 'product', label: 'Product' },
+                      { value: 'service', label: 'Service' },
+                    ]}
+                    onChange={(value) => setSelectedType(String(value))}
+                    value={selectedType}
+                    placeholder="Type"
+                    className="w-full"
+                  />
+                </div>
+              </>
+            }
           />
         </div>
-        {hasPermission("create-item") && (
-          <Button onClick={openModal}>
-            Add Item
-          </Button>
-        )}
-      </div>
-      <div className="space-y-6">
-        <ComponentCard title="Items">
+
+        <ComponentCard
+          title={`Items (${viewMode})`}
+          action={
+            <div className="flex flex-wrap items-center gap-4">
+              <ViewModeTabs viewMode={viewMode} setViewMode={setViewMode} />
+
+              <div className="flex flex-wrap items-center gap-2">
+                {hasPermission('view-item') && (
+                  <Tooltip text="Export Items">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleExport}
+                      className="flex items-center gap-2"
+                    >
+                      <Download className="w-4 h-4" />
+                      Export
+                    </Button>
+                  </Tooltip>
+                )}
+                {hasPermission('create-item') && (
+                  <>
+                    <Tooltip text="Import Items">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={openImportModal}
+                        className="flex items-center gap-2"
+                      >
+                        <Upload className="w-4 h-4" />
+                        Import
+                      </Button>
+                    </Tooltip>
+                    <Tooltip text="Add New Item">
+                      <Button onClick={openAddModal} size="sm" className="flex items-center gap-2">
+                        <Plus className="w-4 h-4" />
+                        Add Item
+                      </Button>
+                    </Tooltip>
+                  </>
+                )}
+              </div>
+            </div>
+          }
+        >
           <ItemTable
             data={items}
-            onAction={() => fetchItems(currentPage, perPage, sortBy, sortDirection)}
+            onAction={refresh}
             onSort={handleSort}
             sortBy={sortBy}
             sortDirection={sortDirection}
             currentPage={currentPage}
             perPage={perPage}
+            startIndex={rangeFrom !== '' ? Number(rangeFrom) : undefined}
+            viewMode={viewMode}
           />
           <Pagination
             currentPage={currentPage}
@@ -114,7 +239,8 @@ export default function Items() {
           />
         </ComponentCard>
       </div>
-      <AddItemModal isOpen={isOpen} onClose={closeModal} onItemAdded={() => fetchItems(1, perPage)} />
+      <AddItemModal isOpen={isAddOpen} onClose={closeAddModal} onSuccess={refresh} />
+      <ImportItemModal isOpen={isImportOpen} onClose={closeImportModal} onSuccess={refresh} />
     </>
   );
 }

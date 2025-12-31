@@ -1,5 +1,4 @@
-
-import Button from "../ui/button/Button";
+import Button from '../ui/button/Button';
 
 interface Props {
   currentPage: number;
@@ -10,7 +9,14 @@ interface Props {
   total: number;
 }
 
-export default function Pagination({ currentPage, totalPages, onPageChange, from, to, total }: Props) {
+export default function Pagination({
+  currentPage,
+  totalPages,
+  onPageChange,
+  from,
+  to,
+  total,
+}: Props) {
   const handlePrevious = () => {
     if (currentPage > 1) {
       onPageChange(currentPage - 1);
@@ -48,7 +54,11 @@ export default function Pagination({ currentPage, totalPages, onPageChange, from
       } else {
         pageNumbers.push(1);
         pageNumbers.push('...');
-        for (let i = currentPage - halfPagesToShow + 1; i <= currentPage + halfPagesToShow -1; i++) {
+        for (
+          let i = currentPage - halfPagesToShow + 1;
+          i <= currentPage + halfPagesToShow - 1;
+          i++
+        ) {
           pageNumbers.push(i);
         }
         pageNumbers.push('...');
@@ -64,16 +74,11 @@ export default function Pagination({ currentPage, totalPages, onPageChange, from
         Showing {from} to {to} of {total} results
       </div>
       <div className="flex items-center gap-2">
-        <Button
-          size="sm"
-          onClick={handlePrevious}
-          disabled={currentPage === 1}
-          variant="outline"
-        >
+        <Button size="sm" onClick={handlePrevious} disabled={currentPage === 1} variant="outline">
           Previous
         </Button>
         <div className="flex items-center gap-2">
-          {getPageNumbers().map((page, index) => (
+          {getPageNumbers().map((page, index) =>
             typeof page === 'number' ? (
               <Button
                 size="xs"
@@ -88,7 +93,7 @@ export default function Pagination({ currentPage, totalPages, onPageChange, from
                 {page}
               </span>
             )
-          ))}
+          )}
         </div>
         <Button
           size="sm"

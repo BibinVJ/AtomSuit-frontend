@@ -28,7 +28,7 @@ export async function middleware(request: NextRequest) {
     // Restrict access to marketing pages and signup page
     const restrictedTenantRoutes = ['/', '/signup'];
     const isRestrictedRoute = restrictedTenantRoutes.includes(pathname);
-    
+
     // If trying to access restricted routes on tenant domain, redirect to signin
     if (isRestrictedRoute) {
       const signinUrl = new URL('/signin', request.url);
@@ -37,12 +37,12 @@ export async function middleware(request: NextRequest) {
 
     // For tenant subdomains, validate with API
     const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://api.atomsuit.test/api';
-    
+
     try {
       const response = await fetch(`${apiUrl}`, {
         headers: {
           'X-Tenant': tenant.subdomain,
-          'Accept': 'application/json',
+          Accept: 'application/json',
           'Content-Type': 'application/json',
         },
       });
@@ -61,7 +61,6 @@ export async function middleware(request: NextRequest) {
       // If API call fails, redirect to main domain for safety
       return NextResponse.redirect(getMainDomainUrl());
     }
-
   } catch {
     // In case of any error, allow the request to continue in development
     // but redirect in production
@@ -82,7 +81,5 @@ export const config = {
    * - favicon.ico (favicon file)
    * - public folder files
    */
-  matcher: [
-    '/((?!api|_next/static|_next/image|favicon.ico|manifest.json|.*\\..*).*)',
-  ],
+  matcher: ['/((?!api|_next/static|_next/image|favicon.ico|manifest.json|.*\\..*).*)'],
 };

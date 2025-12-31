@@ -14,7 +14,6 @@ interface Props {
 }
 
 export default function VoidSaleModal({ isOpen, onClose, onSaleVoided, sale }: Props) {
-
   const handleVoid = async () => {
     try {
       await voidSale(sale.id);
@@ -58,7 +57,8 @@ export default function VoidSaleModal({ isOpen, onClose, onSaleVoided, sale }: P
             Void Sale
           </h4>
           <p className="mb-6 text-gray-500 dark:text-gray-400">
-            Are you sure you want to void the sale &quot;{sale?.invoice_number}&quot;? This action cannot be undone.
+            Are you sure you want to void the sale &quot;{sale?.invoice_number}&quot;? This action
+            cannot be undone.
           </p>
           <div className="flex items-center justify-center gap-4">
             <Button type="button" variant="outline" onClick={onClose}>

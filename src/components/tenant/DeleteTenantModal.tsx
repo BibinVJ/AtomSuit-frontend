@@ -12,7 +12,6 @@ interface Props {
 }
 
 export default function DeleteTenantModal({ isOpen, onClose, onTenantDeleted, tenant }: Props) {
-
   const handleDelete = async () => {
     try {
       await deleteTenant(tenant.id);
@@ -52,7 +51,8 @@ export default function DeleteTenantModal({ isOpen, onClose, onTenantDeleted, te
             Delete Tenant
           </h4>
           <p className="mb-6 text-gray-500 dark:text-gray-400">
-            Are you sure you want to delete the tenant &quot;{tenant?.name}&quot;? This action cannot be undone and will delete all tenant data.
+            Are you sure you want to delete the tenant &quot;{tenant?.name}&quot;? This action
+            cannot be undone and will delete all tenant data.
           </p>
           <div className="flex items-center justify-center gap-4">
             <Button type="button" variant="outline" onClick={onClose}>

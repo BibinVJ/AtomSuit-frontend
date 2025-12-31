@@ -28,14 +28,15 @@ const mockUser: User = {
   created_at: '2023-01-01T00:00:00Z',
 };
 
-export const login = async () => Promise.resolve({
-  data: {
-    user: mockUser,
-    token: {
-      access_token: 'test_token',
+export const login = async () =>
+  Promise.resolve({
+    data: {
+      user: mockUser,
+      token: {
+        access_token: 'test_token',
+      },
     },
-  },
-});
+  });
 
 export const logout = async () => Promise.resolve(undefined);
 

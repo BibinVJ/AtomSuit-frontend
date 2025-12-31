@@ -2,7 +2,12 @@ export interface Category {
   id: number;
   name: string;
   description: string;
-  is_active: boolean;
+  sales_account_id?: number | null;
+  cogs_account_id?: number | null;
+  inventory_account_id?: number | null;
+  inventory_adjustment_account_id?: number | null;
+  purchase_account_id?: number | null;
+  deleted_at?: string;
 }
 
 export interface CategoryApiResponse {
@@ -15,3 +20,5 @@ export interface CategoryApiResponse {
     to: number;
   };
 }
+
+export type CategoryInput = Partial<Category>;

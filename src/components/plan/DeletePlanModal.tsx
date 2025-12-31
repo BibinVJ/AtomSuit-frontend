@@ -1,4 +1,3 @@
-
 import { Modal } from '../ui/modal';
 import Button from '../ui/button/Button';
 import { toast } from 'sonner';
@@ -14,7 +13,6 @@ interface Props {
 }
 
 export default function DeletePlanModal({ isOpen, onClose, onPlanDeleted, plan }: Props) {
-
   const handleDelete = async () => {
     try {
       await deletePlan(plan.id);
@@ -54,7 +52,8 @@ export default function DeletePlanModal({ isOpen, onClose, onPlanDeleted, plan }
             Delete Plan
           </h4>
           <p className="mb-6 text-gray-500 dark:text-gray-400">
-            Are you sure you want to delete the plan &quot;{plan?.name}&quot;? This action cannot be undone.
+            Are you sure you want to delete the plan &quot;{plan?.name}&quot;? This action cannot be
+            undone.
           </p>
           <div className="flex items-center justify-center gap-4">
             <Button type="button" variant="outline" onClick={onClose}>

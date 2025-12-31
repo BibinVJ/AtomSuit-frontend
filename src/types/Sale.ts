@@ -1,6 +1,6 @@
-import { Customer } from "./Customer";
-import { Item } from "./Item";
-import { User } from "./User";
+import { Customer } from './Customer';
+import { Item } from './Item';
+import { User } from './User';
 
 export interface SaleItem {
   id: number;
@@ -19,7 +19,6 @@ export interface Sale {
   payment_status: string;
   payment_method: string;
   note?: string;
-  is_active: boolean;
   items: SaleItem[];
 }
 
@@ -44,3 +43,5 @@ export interface SalePayload {
     unit_price: number;
   }[];
 }
+
+export type SaleInput = SalePayload;

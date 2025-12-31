@@ -1,24 +1,26 @@
+import { Category, CategoryInput } from '../types';
+import { createBaseService, QueryParams, PaginatedResponse } from './BaseService';
 
-import { CategoryApiResponse } from '../types';
-import api from './api';
+const categoryService = createBaseService<Category, CategoryInput>('/category');
 
-export const getCategories = async (page = 1, limit = 10, sortCol = 'created_at', sortDir = 'desc', unpaginated = false): Promise<CategoryApiResponse> => {
-  const url = unpaginated ? '/category?unpaginated=1' : `/category?perPage=${limit}&page=${page}&sort_by=${sortCol}&sort_direction=${sortDir}`;
-  const response = await api.get(url);
-  return response.data;
+export const getCategories = (params: QueryParams = {}): Promise<PaginatedResponse<Category>> =>
+  categoryService.list(params);
+
+export const getCategory = (id: number): Promise<Category> => categoryService.get(id);
+
+export const addCategory = (data: CategoryInput) => categoryService.create(data);
+
+export const updateCategory = (id: number, data: CategoryInput) => categoryService.update(id, data);
+
+export const deleteCategory = (id: number, force: boolean = false) =>
+  categoryService.delete(id, force);
+
+export const restoreCategory = (id: number) => categoryService.restore(id);
+
+export const exportCategories = () => categoryService.export('/category/export');
+
+const CategoryService = {
+  ...categoryService,
 };
 
-export const addCategory = async (category: { name: string; description: string; is_active: boolean }) => {
-  const response = await api.post('/category', category);
-  return response.data;
-};
-
-export const updateCategory = async (id: number, category: { name: string; description: string; is_active: boolean }) => {
-  const response = await api.put(`/category/${id}`, category);
-  return response.data;
-};
-
-export const deleteCategory = async (id: number) => {
-  const response = await api.delete(`/category/${id}`);
-  return response.data;
-};
+export default CategoryService;

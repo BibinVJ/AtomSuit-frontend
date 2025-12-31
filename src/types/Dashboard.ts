@@ -1,4 +1,4 @@
-import { Customer, Item, StockAlert } from ".";
+import { Customer, Item, StockAlert } from '.';
 
 export interface DashboardData {
   // Tenant context data

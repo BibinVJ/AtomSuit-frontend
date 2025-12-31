@@ -1,4 +1,3 @@
-
 import { Modal } from '../ui/modal';
 import Button from '../ui/button/Button';
 import { toast } from 'sonner';
@@ -14,7 +13,6 @@ interface Props {
 }
 
 export default function VoidPurchaseModal({ isOpen, onClose, onPurchaseVoided, purchase }: Props) {
-
   const handleVoid = async () => {
     try {
       await voidPurchase(purchase.id);
@@ -54,7 +52,8 @@ export default function VoidPurchaseModal({ isOpen, onClose, onPurchaseVoided, p
             Void Purchase
           </h4>
           <p className="mb-6 text-gray-500 dark:text-gray-400">
-            Are you sure you want to void the purchase &quot;{purchase?.invoice_number}&quot;? This action cannot be undone.
+            Are you sure you want to void the purchase &quot;{purchase?.invoice_number}&quot;? This
+            action cannot be undone.
           </p>
           <div className="flex items-center justify-center gap-4">
             <Button type="button" variant="outline" onClick={onClose}>

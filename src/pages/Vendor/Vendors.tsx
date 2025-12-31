@@ -1,7 +1,5 @@
-"use client";
+'use client';
 
-
-import { useEffect, useState } from 'react';
 import PageBreadcrumb from '../../components/common/PageBreadCrumb';
 import ComponentCard from '../../components/common/ComponentCard';
 import PageMeta from '../../components/common/PageMeta';
@@ -10,100 +8,137 @@ import AddVendorModal from '../../components/vendor/AddVendorModal';
 import { useModal } from '../../hooks/useModal';
 import Pagination from '../../components/common/Pagination';
 import Button from '../../components/ui/button/Button';
-import Select from '../../components/form/Select';
-import { getVendors } from '../../services/VendorService';
+import Tooltip from '../../components/ui/tooltip/Tooltip';
+import {
+  getVendors,
+  exportVendors,
+  importVendors,
+  downloadSampleVendorExcel,
+} from '../../services/VendorService';
 import { Vendor } from '../../types';
-
+import ImportModal from '../../components/common/ImportModal';
+import { Download, Upload, Plus } from 'lucide-react';
+import ViewModeTabs from '../../components/common/ViewModeTabs';
 import { usePermissions } from '../../hooks/usePermissions';
+import TableToolbar from '../../components/common/TableToolbar';
+import { useDataTable } from '../../hooks/useDataTable';
+import { useExport } from '../../hooks/useExport';
 
 export default function Vendors() {
   const { hasPermission } = usePermissions();
-  const [vendors, setVendors] = useState<Vendor[]>([]);
   const { isOpen, openModal, closeModal } = useModal();
-  const [currentPage, setCurrentPage] = useState(1);
-  const [perPage, setPerPage] = useState(10);
-  const [totalPages, setTotalPages] = useState(1);
-  const [from, setFrom] = useState(0);
-  const [to, setTo] = useState(0);
-  const [total, setTotal] = useState(0);
-  const [sortBy, setSortBy] = useState('created_at');
-  const [sortDirection, setSortDirection] = useState('desc');
+  const {
+    isOpen: isImportModalOpen,
+    openModal: openImportModal,
+    closeModal: closeImportModal,
+  } = useModal();
 
-  const fetchVendors = async (page = 1, limit = 10, sortCol = 'created_at', sortDir = 'desc') => {
-    try {
-      const response = await getVendors(page, limit, sortCol, sortDir);
-      setVendors(response.data);
-      setTotalPages(response.meta.last_page);
-      setCurrentPage(response.meta.current_page);
-      setFrom(response.meta.from);
-      setTo(response.meta.to);
-      setTotal(response.meta.total);
-    } catch (error) {
-      console.error('Error fetching vendors:', error);
-    }
-  };
+  const {
+    data: vendors,
+    currentPage,
+    perPage,
+    totalPages,
+    total,
+    from,
+    to,
+    sortBy,
+    sortDirection,
+    searchTerm,
+    setSearchTerm,
+    rangeFrom,
+    setRangeFrom,
+    rangeTo,
+    setRangeTo,
+    viewMode,
+    setViewMode,
+    handlePageChange,
+    handlePerPageChange,
+    handleSort,
+    resetFilters,
+    refresh,
+  } = useDataTable<Vendor>({
+    fetchData: getVendors,
+  });
 
-  useEffect(() => {
-    fetchVendors(currentPage, perPage, sortBy, sortDirection);
-  }, [currentPage, perPage, sortBy, sortDirection]);
+  const { exportData } = useExport();
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
-
-  const handlePerPageChange = (value: string) => {
-    setPerPage(parseInt(value, 10));
-    setCurrentPage(1);
-  };
-
-  const handleSort = (column: string) => {
-    if (sortBy === column) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortBy(column);
-      setSortDirection('asc');
-    }
+  const handleExport = () => {
+    exportData({
+      exportFunction: exportVendors,
+      entityName: 'Vendors',
+    });
   };
 
   return (
     <>
-      <PageMeta
-        title="Vendors"
-        description="List of vendors"
-      />
+      <PageMeta title="Vendors" description="List of vendors" />
       <PageBreadcrumb pageTitle="Vendors" />
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <label htmlFor="perPage" className="text-sm font-medium text-gray-700">Per Page:</label>
-          <Select
-            options={[
-              { value: '10', label: '10' },
-              { value: '20', label: '20' },
-              { value: '50', label: '50' },
-            ]}
-            onChange={handlePerPageChange}
-            defaultValue={String(perPage)}
-            showPlaceholder={false}
-            className="w-20"
-            searchable={false}
+
+      <div className="space-y-6">
+        <div className="p-5 border border-gray-200 rounded-2xl bg-gray-50 dark:bg-white/[0.03] dark:border-gray-800 shadow-sm">
+          <TableToolbar
+            className="mb-0"
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            searchPlaceholder="Search vendors..."
+            rangeFrom={rangeFrom}
+            onRangeFromChange={(val) => setRangeFrom(val as number | '')}
+            rangeTo={rangeTo}
+            onRangeToChange={(val) => setRangeTo(val as number | '')}
+            perPage={perPage}
+            onPerPageChange={handlePerPageChange}
+            onReset={resetFilters}
           />
         </div>
-        {hasPermission("create-vendor") && (
-          <Button onClick={openModal}>
-            Add Vendor
-          </Button>
-        )}
-      </div>
-      <div className="space-y-6">
-        <ComponentCard title="Vendors">
+
+        <ComponentCard
+          title={`Vendors (${viewMode})`}
+          action={
+            <div className="flex flex-wrap items-center gap-2">
+              <ViewModeTabs viewMode={viewMode} setViewMode={setViewMode} />
+              <Tooltip text="Import Vendors">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={openImportModal}
+                  className="flex items-center gap-2"
+                >
+                  <Upload className="w-4 h-4" />
+                  Import
+                </Button>
+              </Tooltip>
+              <Tooltip text="Export Vendors">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleExport}
+                  className="flex items-center gap-2"
+                >
+                  <Download className="w-4 h-4" />
+                  Export
+                </Button>
+              </Tooltip>
+              {hasPermission('create-vendor') && (
+                <Tooltip text="Add New Vendor">
+                  <Button onClick={openModal} size="sm" className="flex items-center gap-2">
+                    <Plus className="w-4 h-4" />
+                    Add Vendor
+                  </Button>
+                </Tooltip>
+              )}
+            </div>
+          }
+        >
           <VendorTable
             data={vendors}
-            onAction={() => fetchVendors(currentPage, perPage, sortBy, sortDirection)}
+            onAction={refresh}
             onSort={handleSort}
             sortBy={sortBy}
             sortDirection={sortDirection}
             currentPage={currentPage}
             perPage={perPage}
+            startIndex={rangeFrom !== '' ? Number(rangeFrom) : undefined}
+            viewMode={viewMode}
           />
           <Pagination
             currentPage={currentPage}
@@ -115,7 +150,15 @@ export default function Vendors() {
           />
         </ComponentCard>
       </div>
-      <AddVendorModal isOpen={isOpen} onClose={closeModal} onVendorAdded={() => fetchVendors(1, perPage)} />
+      <AddVendorModal isOpen={isOpen} onClose={closeModal} onSuccess={refresh} />
+      <ImportModal
+        isOpen={isImportModalOpen}
+        onClose={closeImportModal}
+        onImport={importVendors}
+        onDownloadSample={downloadSampleVendorExcel}
+        onSuccess={refresh}
+        entityName="Vendors"
+      />
     </>
   );
 }

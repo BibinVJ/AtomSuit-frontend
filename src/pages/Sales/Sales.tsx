@@ -1,107 +1,103 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import PageBreadcrumb from '../../components/common/PageBreadCrumb';
 import ComponentCard from '../../components/common/ComponentCard';
 import PageMeta from '../../components/common/PageMeta';
 import SaleTable from '../../components/sales/SaleTable';
 import Pagination from '../../components/common/Pagination';
 import Button from '../../components/ui/button/Button';
-import Select from '../../components/form/Select';
-import { useRouter } from 'next/navigation';
+import Tooltip from '../../components/ui/tooltip/Tooltip';
 import { getSales } from '../../services/SaleService';
 import { Sale } from '../../types';
-
 import { usePermissions } from '../../hooks/usePermissions';
+import { useDataTable } from '../../hooks/useDataTable';
+import TableToolbar from '../../components/common/TableToolbar';
+import { Plus } from 'lucide-react';
 
 export default function Sales() {
   const { hasPermission } = usePermissions();
   const router = useRouter();
-  const [sales, setSales] = useState<Sale[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [perPage, setPerPage] = useState(10);
-  const [totalPages, setTotalPages] = useState(1);
-  const [from, setFrom] = useState(0);
-  const [to, setTo] = useState(0);
-  const [total, setTotal] = useState(0);
-  const [sortBy, setSortBy] = useState('created_at');
-  const [sortDirection, setSortDirection] = useState('desc');
 
-  const fetchSales = async (page = 1, limit = 10, sortCol = 'created_at', sortDir = 'desc') => {
-    try {
-      const response = await getSales(page, limit, sortCol, sortDir);
-      setSales(response.data);
-      setTotalPages(response.meta.last_page);
-      setCurrentPage(response.meta.current_page);
-      setFrom(response.meta.from);
-      setTo(response.meta.to);
-      setTotal(response.meta.total);
-    } catch (error) {
-      console.error('Error fetching sales:', error);
-    }
-  };
-
-  useEffect(() => {
-    fetchSales(currentPage, perPage, sortBy, sortDirection);
-  }, [currentPage, perPage, sortBy, sortDirection]);
-
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
-
-  const handlePerPageChange = (value: string) => {
-    setPerPage(parseInt(value, 10));
-    setCurrentPage(1);
-  };
-
-  const handleSort = (column: string) => {
-    if (sortBy === column) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortBy(column);
-      setSortDirection('asc');
-    }
-  };
+  const {
+    data: sales,
+    loading,
+    currentPage,
+    perPage,
+    totalPages,
+    total,
+    from,
+    to,
+    sortBy,
+    sortDirection,
+    searchTerm,
+    setSearchTerm,
+    rangeFrom,
+    setRangeFrom,
+    rangeTo,
+    setRangeTo,
+    handlePageChange,
+    handlePerPageChange,
+    handleSort,
+    refresh,
+  } = useDataTable<Sale>({
+    fetchData: getSales,
+  });
 
   return (
     <>
-      <PageMeta
-        title="Sales"
-        description="List of sales"
-      />
+      <PageMeta title="Sales" description="List of sales" />
       <PageBreadcrumb pageTitle="Sales" />
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <label htmlFor="perPage" className="text-sm font-medium text-gray-700">Per Page:</label>
-          <Select
-            options={[
-              { value: '10', label: '10' },
-              { value: '20', label: '20' },
-              { value: '50', label: '50' },
-            ]}
-            onChange={handlePerPageChange}
-            defaultValue={String(perPage)}
-            showPlaceholder={false}
-            className="w-20"
-            searchable={false}
+
+      <div className="space-y-6">
+        <div className="p-5 border border-gray-200 rounded-2xl bg-gray-50 dark:bg-white/[0.03] dark:border-gray-800 shadow-sm">
+          <TableToolbar
+            className="mb-0"
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            searchPlaceholder="Search sales..."
+            rangeFrom={rangeFrom}
+            onRangeFromChange={(val) => setRangeFrom(val as number | '')}
+            rangeTo={rangeTo}
+            onRangeToChange={(val) => setRangeTo(val as number | '')}
+            perPage={perPage}
+            onPerPageChange={handlePerPageChange}
+            onReset={() => {
+              setSearchTerm('');
+              setRangeFrom('');
+              setRangeTo('');
+            }}
           />
         </div>
-        {hasPermission("create-sale") && (
-          <Button onClick={() => router.push('/sales/add')}>
-            Add Sale
-          </Button>
-        )}
-      </div>
-      <div className="space-y-6">
-        <ComponentCard>
+
+        <ComponentCard
+          title="Sales"
+          action={
+            <div className="flex flex-wrap items-center gap-2">
+              {hasPermission('create-sale') && (
+                <Tooltip text="Add New Sale">
+                  <Button
+                    onClick={() => router.push('/sales/add')}
+                    size="sm"
+                    startIcon={<Plus className="w-4 h-4" />}
+                  >
+                    Add Sale
+                  </Button>
+                </Tooltip>
+              )}
+            </div>
+          }
+        >
           <SaleTable
             data={sales}
-            onAction={() => fetchSales(currentPage, perPage, sortBy, sortDirection)}
+            loading={loading}
+            onAction={refresh}
             onSort={handleSort}
             sortBy={sortBy}
             sortDirection={sortDirection}
             currentPage={currentPage}
             perPage={perPage}
+            startIndex={rangeFrom !== '' ? Number(rangeFrom) : undefined}
           />
           <Pagination
             currentPage={currentPage}

@@ -19,8 +19,8 @@ const Footer = () => {
               />
             </div>
             <p className="text-gray-300 text-sm">
-              Streamline your business operations with our comprehensive ERP solution. 
-              Built for modern enterprises seeking efficiency and growth.
+              Streamline your business operations with our comprehensive ERP solution. Built for
+              modern enterprises seeking efficiency and growth.
             </p>
             <div className="space-y-2">
               <div className="flex items-center space-x-3">
@@ -43,27 +43,42 @@ const Footer = () => {
             <h3 className="text-lg font-semibold mb-4">Products</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="#" className="text-gray-300 hover:text-brand-400 text-sm transition-colors">
+                <Link
+                  href="#"
+                  className="text-gray-300 hover:text-brand-400 text-sm transition-colors"
+                >
                   Inventory Management
                 </Link>
               </li>
               <li>
-                <Link href="#" className="text-gray-300 hover:text-brand-400 text-sm transition-colors">
+                <Link
+                  href="#"
+                  className="text-gray-300 hover:text-brand-400 text-sm transition-colors"
+                >
                   Financial Management
                 </Link>
               </li>
               <li>
-                <Link href="#" className="text-gray-300 hover:text-brand-400 text-sm transition-colors">
+                <Link
+                  href="#"
+                  className="text-gray-300 hover:text-brand-400 text-sm transition-colors"
+                >
                   HR Management
                 </Link>
               </li>
               <li>
-                <Link href="#" className="text-gray-300 hover:text-brand-400 text-sm transition-colors">
+                <Link
+                  href="#"
+                  className="text-gray-300 hover:text-brand-400 text-sm transition-colors"
+                >
                   Customer Relations
                 </Link>
               </li>
               <li>
-                <Link href="#" className="text-gray-300 hover:text-brand-400 text-sm transition-colors">
+                <Link
+                  href="#"
+                  className="text-gray-300 hover:text-brand-400 text-sm transition-colors"
+                >
                   Supply Chain
                 </Link>
               </li>
@@ -75,27 +90,42 @@ const Footer = () => {
             <h3 className="text-lg font-semibold mb-4">Company</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="#" className="text-gray-300 hover:text-brand-400 text-sm transition-colors">
+                <Link
+                  href="#"
+                  className="text-gray-300 hover:text-brand-400 text-sm transition-colors"
+                >
                   About Us
                 </Link>
               </li>
               <li>
-                <Link href="#" className="text-gray-300 hover:text-brand-400 text-sm transition-colors">
+                <Link
+                  href="#"
+                  className="text-gray-300 hover:text-brand-400 text-sm transition-colors"
+                >
                   Careers
                 </Link>
               </li>
               <li>
-                <Link href="#" className="text-gray-300 hover:text-brand-400 text-sm transition-colors">
+                <Link
+                  href="#"
+                  className="text-gray-300 hover:text-brand-400 text-sm transition-colors"
+                >
                   Press
                 </Link>
               </li>
               <li>
-                <Link href="#" className="text-gray-300 hover:text-brand-400 text-sm transition-colors">
+                <Link
+                  href="#"
+                  className="text-gray-300 hover:text-brand-400 text-sm transition-colors"
+                >
                   Blog
                 </Link>
               </li>
               <li>
-                <Link href="#" className="text-gray-300 hover:text-brand-400 text-sm transition-colors">
+                <Link
+                  href="#"
+                  className="text-gray-300 hover:text-brand-400 text-sm transition-colors"
+                >
                   Partners
                 </Link>
               </li>
@@ -107,27 +137,42 @@ const Footer = () => {
             <h3 className="text-lg font-semibold mb-4">Resources</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="#" className="text-gray-300 hover:text-brand-400 text-sm transition-colors">
+                <Link
+                  href="#"
+                  className="text-gray-300 hover:text-brand-400 text-sm transition-colors"
+                >
                   Documentation
                 </Link>
               </li>
               <li>
-                <Link href="#" className="text-gray-300 hover:text-brand-400 text-sm transition-colors">
+                <Link
+                  href="#"
+                  className="text-gray-300 hover:text-brand-400 text-sm transition-colors"
+                >
                   Help Center
                 </Link>
               </li>
               <li>
-                <Link href="#" className="text-gray-300 hover:text-brand-400 text-sm transition-colors">
+                <Link
+                  href="#"
+                  className="text-gray-300 hover:text-brand-400 text-sm transition-colors"
+                >
                   API Reference
                 </Link>
               </li>
               <li>
-                <Link href="#" className="text-gray-300 hover:text-brand-400 text-sm transition-colors">
+                <Link
+                  href="#"
+                  className="text-gray-300 hover:text-brand-400 text-sm transition-colors"
+                >
                   System Status
                 </Link>
               </li>
               <li>
-                <Link href="#" className="text-gray-300 hover:text-brand-400 text-sm transition-colors">
+                <Link
+                  href="#"
+                  className="text-gray-300 hover:text-brand-400 text-sm transition-colors"
+                >
                   Contact Support
                 </Link>
               </li>
@@ -152,7 +197,7 @@ const Footer = () => {
                 <Instagram className="h-5 w-5" />
               </Link>
             </div>
-            
+
             <div className="flex items-center space-x-6 text-sm text-gray-400">
               <Link href="#" className="hover:text-brand-400 transition-colors">
                 Privacy Policy
@@ -165,7 +210,7 @@ const Footer = () => {
               </Link>
             </div>
           </div>
-          
+
           <div className="mt-6 text-center text-sm text-gray-400">
             <p>&copy; {new Date().getFullYear()} Atom Suit. All rights reserved.</p>
           </div>

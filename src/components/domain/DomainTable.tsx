@@ -1,12 +1,6 @@
-"use client";
+'use client';
 
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHeader,
-  TableRow,
-} from "../ui/table";
+import { Table, TableBody, TableCell, TableHeader, TableRow } from '../ui/table';
 import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide } from 'lucide-react';
 
 import { Domain } from '../../types';
@@ -20,7 +14,14 @@ interface Props {
   perPage: number;
 }
 
-export default function DomainTable({ data, onSort, sortBy, sortDirection, currentPage, perPage }: Props) {
+export default function DomainTable({
+  data,
+  onSort,
+  sortBy,
+  sortDirection,
+  currentPage,
+  perPage,
+}: Props) {
   const renderSortIcon = (column: string) => {
     if (sortBy !== column) {
       return <ChevronsUpDown className="inline-block w-4 h-4 ml-1 text-gray-400" />;
@@ -38,9 +39,25 @@ export default function DomainTable({ data, onSort, sortBy, sortDirection, curre
         <Table>
           <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
             <TableRow>
-              <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">#</TableCell>
-              <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400" onClick={() => onSort('domain')}>Domain {renderSortIcon('domain')}</TableCell>
-              <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">Tenant</TableCell>
+              <TableCell
+                isHeader
+                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+              >
+                #
+              </TableCell>
+              <TableCell
+                isHeader
+                className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400"
+                onClick={() => onSort('domain')}
+              >
+                Domain {renderSortIcon('domain')}
+              </TableCell>
+              <TableCell
+                isHeader
+                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+              >
+                Tenant
+              </TableCell>
             </TableRow>
           </TableHeader>
 
@@ -53,7 +70,9 @@ export default function DomainTable({ data, onSort, sortBy, sortDirection, curre
                   </p>
                 </TableCell>
                 <TableCell className="px-4 py-3 text-start">
-                  <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">{domain.domain}</p>
+                  <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
+                    {domain.domain}
+                  </p>
                 </TableCell>
                 <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
                   {domain.tenant?.name || 'N/A'}

@@ -1,30 +1,31 @@
+import { Item, ItemInput } from '../types';
+import { createBaseService, QueryParams, PaginatedResponse } from './BaseService';
 
-import api from './api';
+export interface ItemQueryParams extends QueryParams {
+  category_id?: string | number;
+  unit_id?: string | number;
+  type?: string;
+}
 
-import { Item, ItemApiResponse } from '../types';
+const itemService = createBaseService<Item, ItemInput>('/item');
 
-export const getItems = async (page = 1, limit = 10, sortCol = 'created_at', sortDir = 'desc', unpaginated = false): Promise<ItemApiResponse> => {
-  const url = unpaginated ? '/item?unpaginated=1' : `/item?perPage=${limit}&page=${page}&sort_by=${sortCol}&sort_direction=${sortDir}`;
-  const response = await api.get(url);
-  return response.data;
-};
+export const getItems = (params: ItemQueryParams = {}): Promise<PaginatedResponse<Item>> =>
+  itemService.list(params);
 
-export const getItem = async (id: string): Promise<Item> => {
-    const response = await api.get(`/item/${id}`);
-    return response.data.data;
-};
+export const getItem = (id: string | number): Promise<Item> => itemService.get(id);
 
-export const addItem = async (item: { sku: string; name: string; category_id: string; unit_id: string; description: string; is_active: boolean; type: string; selling_price: number }) => {
-    const response = await api.post('/item', item);
-    return response.data;
-};
+export const addItem = (item: ItemInput) => itemService.create(item);
 
-export const updateItem = async (id: number, item: { sku: string; name: string; category_id: string; unit_id: string; description: string; is_active: boolean; type: string; selling_price: number }) => {
-    const response = await api.put(`/item/${id}`, item);
-    return response.data;
-};
+export const updateItem = (id: number, item: ItemInput) => itemService.update(id, item);
 
-export const deleteItem = async (id: number) => {
-    const response = await api.delete(`/item/${id}`);
-    return response.data;
-};
+export const deleteItem = (id: number, force: boolean = false) => itemService.delete(id, force);
+
+export const restoreItem = (id: number) => itemService.restore(id);
+
+export const exportItems = () => itemService.export('/item/export');
+
+export const importItems = (file: File) => itemService.import(file, '/item/import');
+
+export const downloadSampleItemExcel = () => itemService.downloadSample('/item/sample-excel');
+
+export default itemService;

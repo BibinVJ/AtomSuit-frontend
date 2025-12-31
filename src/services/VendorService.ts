@@ -1,25 +1,31 @@
+import { Vendor, VendorInput } from '../types';
+import { createBaseService, QueryParams, PaginatedResponse } from './BaseService';
 
-import api from './api';
+const vendorService = createBaseService<Vendor, VendorInput>('/vendor');
 
-import { VendorApiResponse } from '../types';
+export const getVendors = (params: QueryParams = {}): Promise<PaginatedResponse<Vendor>> =>
+  vendorService.list(params);
 
-export const getVendors = async (page = 1, limit = 10, sortCol = 'created_at', sortDir = 'desc', unpaginated = false): Promise<VendorApiResponse> => {
-  const url = unpaginated ? '/vendor?unpaginated=1' : `/vendor?perPage=${limit}&page=${page}&sort_by=${sortCol}&sort_direction=${sortDir}`;
-  const response = await api.get(url);
-  return response.data;
+export const getVendor = (id: number): Promise<Vendor> => vendorService.get(id);
+
+export const addVendor = (data: VendorInput) => vendorService.create(data);
+
+export const updateVendor = (id: number, data: VendorInput) => vendorService.update(id, data);
+
+export const deleteVendor = (id: number, force: boolean = false) => vendorService.delete(id, force);
+
+export const restoreVendor = (id: number) => vendorService.restore(id);
+
+export const exportVendors = () => vendorService.export('/vendor/export');
+
+export const importVendors = (file: File) => vendorService.import(file);
+
+export const downloadSampleVendorExcel = () => vendorService.downloadSample();
+
+const VendorService = {
+  ...vendorService,
+  importVendors,
+  downloadSampleVendorExcel,
 };
 
-export const addVendor = async (vendor: { name: string; email: string; phone: string; address: string; is_active: boolean; }) => {
-    const response = await api.post('/vendor', vendor);
-    return response.data;
-};
-
-export const updateVendor = async (id: number, vendor: { name: string; email: string; phone: string; address: string; is_active: boolean; }) => {
-    const response = await api.put(`/vendor/${id}`, vendor);
-    return response.data;
-};
-
-export const deleteVendor = async (id: number) => {
-    const response = await api.delete(`/vendor/${id}`);
-    return response.data;
-};
+export default VendorService;

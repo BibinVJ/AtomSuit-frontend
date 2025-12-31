@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useTenant } from '../../hooks/useTenant';
 import { AlertCircle } from 'lucide-react';
@@ -18,9 +18,7 @@ export default function TenantLoading({ children }: TenantLoadingProps) {
           <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-2">
             Loading Tenant
           </h2>
-          <p className="text-gray-500 dark:text-gray-400">
-            Validating tenant configuration...
-          </p>
+          <p className="text-gray-500 dark:text-gray-400">Validating tenant configuration...</p>
         </div>
       </div>
     );
@@ -34,9 +32,7 @@ export default function TenantLoading({ children }: TenantLoadingProps) {
           <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-2">
             Tenant Validation Failed
           </h2>
-          <p className="text-gray-500 dark:text-gray-400 mb-4">
-            {error}
-          </p>
+          <p className="text-gray-500 dark:text-gray-400 mb-4">{error}</p>
           <p className="text-sm text-gray-400 dark:text-gray-500">
             You will be redirected to the main site shortly...
           </p>

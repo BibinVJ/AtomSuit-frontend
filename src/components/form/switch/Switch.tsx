@@ -1,13 +1,15 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
+import { useState, useEffect } from 'react';
+import Tooltip from '../../ui/tooltip/Tooltip';
 
 interface SwitchProps {
   label: string;
   checked?: boolean;
   disabled?: boolean;
   onChange?: (checked: boolean) => void;
-  color?: "blue" | "gray"; // Added prop to toggle color theme
+  color?: 'blue' | 'gray'; // Added prop to toggle color theme
+  tooltip?: string;
 }
 
 const Switch: React.FC<SwitchProps> = ({
@@ -15,7 +17,8 @@ const Switch: React.FC<SwitchProps> = ({
   checked = false,
   disabled = false,
   onChange,
-  color = "blue", // Default to blue color
+  color = 'blue', // Default to blue color
+  tooltip,
 }) => {
   const [isChecked, setIsChecked] = useState(checked);
 
@@ -33,36 +36,26 @@ const Switch: React.FC<SwitchProps> = ({
   };
 
   const switchColors =
-    color === "blue"
+    color === 'blue'
       ? {
-          background: isChecked
-            ? "bg-brand-500 "
-            : "bg-gray-200 dark:bg-white/10", // Blue version
-          knob: isChecked
-            ? "translate-x-full bg-white"
-            : "translate-x-0 bg-white",
+          background: isChecked ? 'bg-brand-500 ' : 'bg-gray-200 dark:bg-white/10', // Blue version
+          knob: isChecked ? 'translate-x-full bg-white' : 'translate-x-0 bg-white',
         }
       : {
-          background: isChecked
-            ? "bg-gray-800 dark:bg-white/10"
-            : "bg-gray-200 dark:bg-white/10", // Gray version
-          knob: isChecked
-            ? "translate-x-full bg-white"
-            : "translate-x-0 bg-white",
+          background: isChecked ? 'bg-gray-800 dark:bg-white/10' : 'bg-gray-200 dark:bg-white/10', // Gray version
+          knob: isChecked ? 'translate-x-full bg-white' : 'translate-x-0 bg-white',
         };
 
-  return (
+  const content = (
     <label
       className={`flex cursor-pointer select-none items-center gap-3 text-sm font-medium ${
-        disabled ? "text-gray-400" : "text-gray-700 dark:text-gray-400"
+        disabled ? 'text-gray-400' : 'text-gray-700 dark:text-gray-400'
       }`}
     >
       <div className="relative" onClick={handleToggle}>
         <div
           className={`block transition duration-150 ease-linear h-6 w-11 rounded-full ${
-            disabled
-              ? "bg-gray-100 pointer-events-none dark:bg-gray-800"
-              : switchColors.background
+            disabled ? 'bg-gray-100 pointer-events-none dark:bg-gray-800' : switchColors.background
           }`}
         ></div>
         <div
@@ -72,6 +65,8 @@ const Switch: React.FC<SwitchProps> = ({
       {label}
     </label>
   );
+
+  return tooltip ? <Tooltip text={tooltip}>{content}</Tooltip> : content;
 };
 
 export default Switch;

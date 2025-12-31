@@ -1,7 +1,5 @@
-"use client";
+'use client';
 
-
-import { useEffect, useState } from 'react';
 import PageBreadcrumb from '../../components/common/PageBreadCrumb';
 import ComponentCard from '../../components/common/ComponentCard';
 import PageMeta from '../../components/common/PageMeta';
@@ -10,95 +8,113 @@ import AddCategoryModal from '../../components/inventory/categories/AddCategoryM
 import { useModal } from '../../hooks/useModal';
 import Pagination from '../../components/common/Pagination';
 import Button from '../../components/ui/button/Button';
-import Select from '../../components/form/Select';
-import { getCategories } from '../../services/CategoryService';
+import Tooltip from '../../components/ui/tooltip/Tooltip';
+import { getCategories, exportCategories } from '../../services/CategoryService';
 import { Category } from '../../types';
+import { Download, Plus } from 'lucide-react';
+import ViewModeTabs from '../../components/common/ViewModeTabs';
+import TableToolbar from '../../components/common/TableToolbar';
+import { useDataTable } from '../../hooks/useDataTable';
+import { useExport } from '../../hooks/useExport';
 
 export default function Categories() {
-  const [categories, setCategories] = useState<Category[]>([]);
   const { isOpen, openModal, closeModal } = useModal();
-  const [currentPage, setCurrentPage] = useState(1);
-  const [perPage, setPerPage] = useState(10);
-  const [totalPages, setTotalPages] = useState(1);
-  const [from, setFrom] = useState(0);
-  const [to, setTo] = useState(0);
-  const [total, setTotal] = useState(0);
-  const [sortBy, setSortBy] = useState('created_at');
-  const [sortDirection, setSortDirection] = useState('desc');
 
-  const fetchCategories = async (page = 1, limit = 10, sortCol = 'created_at', sortDir = 'desc') => {
-    try {
-      const response = await getCategories(page, limit, sortCol, sortDir);
-      setCategories(response.data);
-      setTotalPages(response.meta.last_page);
-      setCurrentPage(response.meta.current_page);
-      setFrom(response.meta.from);
-      setTo(response.meta.to);
-      setTotal(response.meta.total);
-    } catch (error) {
-      console.error('Error fetching categories:', error);
-    }
-  };
+  const {
+    data: categories,
+    currentPage,
+    perPage,
+    totalPages,
+    total,
+    from,
+    to,
+    sortBy,
+    sortDirection,
+    searchTerm,
+    setSearchTerm,
+    rangeFrom,
+    setRangeFrom,
+    rangeTo,
+    setRangeTo,
+    viewMode,
+    setViewMode,
+    handlePageChange,
+    handlePerPageChange,
+    handleSort,
+    resetFilters,
+    refresh,
+  } = useDataTable<Category>({
+    fetchData: getCategories,
+    initialSortBy: 'name',
+    initialSortDirection: 'asc',
+  });
 
-  useEffect(() => {
-    fetchCategories(currentPage, perPage, sortBy, sortDirection);
-  }, [currentPage, perPage, sortBy, sortDirection]);
+  const { exportData } = useExport();
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
-
-  const handlePerPageChange = (value: string) => {
-    setPerPage(parseInt(value, 10));
-    setCurrentPage(1);
-  };
-
-  const handleSort = (column: string) => {
-    if (sortBy === column) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortBy(column);
-      setSortDirection('asc');
-    }
+  const handleExport = () => {
+    exportData({
+      exportFunction: exportCategories,
+      entityName: 'Categories',
+    });
   };
 
   return (
     <>
-      <PageMeta
-        title="Categories"
-        description="List of categories"
-      />
+      <PageMeta title="Categories" description="List of categories" />
       <PageBreadcrumb pageTitle="Categories" />
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <label htmlFor="perPage" className="text-sm font-medium text-gray-700">Per Page:</label>
-          <Select
-            options={[
-              { value: '10', label: '10' },
-              { value: '20', label: '20' },
-              { value: '50', label: '50' },
-            ]}
-            onChange={handlePerPageChange}
-            defaultValue={String(perPage)}
-            showPlaceholder={false}
-            className="w-20"
-            searchable={false}
+
+      <div className="space-y-6">
+        <div className="p-5 border border-gray-200 rounded-2xl bg-gray-50 dark:bg-white/[0.03] dark:border-gray-800 shadow-sm">
+          <TableToolbar
+            className="mb-0"
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            searchPlaceholder="Search categories..."
+            rangeFrom={rangeFrom}
+            onRangeFromChange={(val) => setRangeFrom(val as number | '')}
+            rangeTo={rangeTo}
+            onRangeToChange={(val) => setRangeTo(val as number | '')}
+            perPage={perPage}
+            onPerPageChange={handlePerPageChange}
+            onReset={resetFilters}
           />
         </div>
-        <Button onClick={openModal}>
-          Add Category
-        </Button>
-      </div>
-      <div className="space-y-6">
-        <ComponentCard title="Categories">
+
+        <ComponentCard
+          title={`Categories (${viewMode})`}
+          action={
+            <div className="flex flex-wrap items-center gap-3">
+              <ViewModeTabs viewMode={viewMode} setViewMode={setViewMode} />
+              <Tooltip text="Export Categories">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleExport}
+                  className="flex items-center gap-2"
+                >
+                  <Download size={16} />
+                  Export
+                </Button>
+              </Tooltip>
+              <Tooltip text="Add New Category">
+                <Button onClick={openModal} size="sm" className="flex items-center gap-2">
+                  <Plus size={16} />
+                  Add Category
+                </Button>
+              </Tooltip>
+            </div>
+          }
+        >
           <CategoryTable
             data={categories}
-            onAction={() => fetchCategories(currentPage, perPage, sortBy, sortDirection)}
+            onAction={refresh}
             onSort={handleSort}
             sortBy={sortBy}
             sortDirection={sortDirection}
             currentPage={currentPage}
             perPage={perPage}
+            startIndex={rangeFrom !== '' ? Number(rangeFrom) : undefined}
+            viewMode={viewMode}
           />
           <Pagination
             currentPage={currentPage}
@@ -110,7 +126,7 @@ export default function Categories() {
           />
         </ComponentCard>
       </div>
-      <AddCategoryModal isOpen={isOpen} onClose={closeModal} onCategoryAdded={() => fetchCategories(1, perPage)} />
+      <AddCategoryModal isOpen={isOpen} onClose={closeModal} onSuccess={refresh} />
     </>
   );
 }

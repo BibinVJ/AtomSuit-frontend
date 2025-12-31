@@ -1,5 +1,5 @@
-import { Category } from "./Category";
-import { Unit } from "./Unit";
+import { Category } from './Category';
+import { Unit } from './Unit';
 
 export interface Item {
   id: number;
@@ -10,12 +10,33 @@ export interface Item {
   unit: Unit;
   type: string;
   selling_price: number;
-  is_active: boolean;
+  deleted_at?: string;
   stock_on_hand?: number;
   non_expired_stock?: number;
   expired_stock?: number;
   is_expired_sale_enabled?: boolean;
+  sales_account_id?: number | null;
+  cogs_account_id?: number | null;
+  inventory_account_id?: number | null;
+  inventory_adjustment_account_id?: number | null;
+  purchase_account_id?: number | null;
 }
+
+export interface ItemInput {
+  sku: string;
+  name: string;
+  category_id: string | number;
+  unit_id: string | number;
+  description: string;
+  type: string;
+  selling_price: number;
+  sales_account_id?: string | number | null;
+  cogs_account_id?: string | number | null;
+  inventory_account_id?: string | number | null;
+  inventory_adjustment_account_id?: string | number | null;
+  purchase_account_id?: string | number | null;
+}
+
 export interface ItemApiResponse {
   data: Item[];
   meta: {

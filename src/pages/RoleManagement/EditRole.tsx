@@ -1,7 +1,6 @@
-"use client";
+'use client';
 
-
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { getRole, updateRole } from '../../services/RoleService';
@@ -30,24 +29,22 @@ export default function EditRole() {
   const [availablePermissions, setAvailablePermissions] = useState<Permission[]>([]);
   const [errors, setErrors] = useState({ name: '', permissions: '' });
 
-  useEffect(() => {
-    const fetchRoleAndPermissions = async () => {
-      try {
-        const [roleData, perms] = await Promise.all([
-          getRole(id!),
-          getPermissions()
-        ]);
-        setRole(roleData);
-        setName(roleData.name);
-        setSelectedPermissions(roleData.permissions.map((p: Permission) => p.id));
-        setAvailablePermissions(perms.data);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        toast.error('Failed to fetch role or permissions');
-      }
-    };
-    fetchRoleAndPermissions();
+  const fetchRoleAndPermissions = useCallback(async () => {
+    try {
+      const [roleData, perms] = await Promise.all([getRole(id!), getPermissions()]);
+      setRole(roleData);
+      setName(roleData.name);
+      setSelectedPermissions(roleData.permissions.map((p: Permission) => p.id));
+      setAvailablePermissions(perms.data);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      toast.error('Failed to fetch role or permissions');
+    }
   }, [id]);
+
+  useEffect(() => {
+    fetchRoleAndPermissions();
+  }, [fetchRoleAndPermissions]);
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -58,25 +55,27 @@ export default function EditRole() {
     }
   };
 
-
   const { groupedPermissions, allActions } = useMemo(() => {
     const actionsOrder = ['view', 'create', 'update', 'delete', 'manage'];
     const newAllActions: string[] = [];
 
-    const newGroupedPermissions = availablePermissions.reduce((acc, permission) => {
-      const parts = permission.name.split('-');
-      const action = parts[0];
-      const resource = parts.slice(1).join('-');
+    const newGroupedPermissions = availablePermissions.reduce(
+      (acc, permission) => {
+        const parts = permission.name.split('-');
+        const action = parts[0];
+        const resource = parts.slice(1).join('-');
 
-      if (!acc[resource]) {
-        acc[resource] = {};
-      }
-      acc[resource][action] = permission;
-      if (!newAllActions.includes(action)) {
-        newAllActions.push(action);
-      }
-      return acc;
-    }, {} as Record<string, Record<string, Permission>>);
+        if (!acc[resource]) {
+          acc[resource] = {};
+        }
+        acc[resource][action] = permission;
+        if (!newAllActions.includes(action)) {
+          newAllActions.push(action);
+        }
+        return acc;
+      },
+      {} as Record<string, Record<string, Permission>>
+    );
 
     newAllActions.sort((a, b) => {
       const indexA = actionsOrder.indexOf(a);
@@ -91,34 +90,36 @@ export default function EditRole() {
   }, [availablePermissions]);
 
   const handlePermissionChange = (permissionId: number, checked: boolean) => {
-    setSelectedPermissions(prev =>
-      checked ? [...prev, permissionId] : prev.filter(id => id !== permissionId)
+    setSelectedPermissions((prev) =>
+      checked ? [...prev, permissionId] : prev.filter((id) => id !== permissionId)
     );
   };
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      setSelectedPermissions(availablePermissions.map(p => p.id));
+      setSelectedPermissions(availablePermissions.map((p) => p.id));
     } else {
       setSelectedPermissions([]);
     }
   };
 
   const handleSelectRow = (resource: string, checked: boolean) => {
-    const resourcePermissions = Object.values(groupedPermissions[resource]).map(p => p.id);
+    const resourcePermissions = Object.values(groupedPermissions[resource]).map((p) => p.id);
     if (checked) {
-      setSelectedPermissions(prev => [...new Set([...prev, ...resourcePermissions])]);
+      setSelectedPermissions((prev) => [...new Set([...prev, ...resourcePermissions])]);
     } else {
-      setSelectedPermissions(prev => prev.filter(id => !resourcePermissions.includes(id)));
+      setSelectedPermissions((prev) => prev.filter((id) => !resourcePermissions.includes(id)));
     }
   };
 
   const handleSelectColumn = (action: string, checked: boolean) => {
-    const actionPermissions = Object.values(groupedPermissions).map(res => res[action]?.id).filter(Boolean);
+    const actionPermissions = Object.values(groupedPermissions)
+      .map((res) => res[action]?.id)
+      .filter(Boolean);
     if (checked) {
-      setSelectedPermissions(prev => [...new Set([...prev, ...actionPermissions])]);
+      setSelectedPermissions((prev) => [...new Set([...prev, ...actionPermissions])]);
     } else {
-      setSelectedPermissions(prev => prev.filter(id => !actionPermissions.includes(id)));
+      setSelectedPermissions((prev) => prev.filter((id) => !actionPermissions.includes(id)));
     }
   };
 
@@ -126,7 +127,7 @@ export default function EditRole() {
     e.preventDefault();
     // Validation logic...
     try {
-      await updateRole(role!.id, { name, permissions: selectedPermissions});
+      await updateRole(role!.id, { name, permissions: selectedPermissions });
       toast.success('Role updated successfully');
       router.push('/roles');
     } catch (error: unknown) {
@@ -149,37 +150,70 @@ export default function EditRole() {
     return <div>Loading...</div>;
   }
 
-  const allSelected = availablePermissions.length > 0 && selectedPermissions.length === availablePermissions.length;
+  const allSelected =
+    availablePermissions.length > 0 && selectedPermissions.length === availablePermissions.length;
 
   return (
     <>
       <PageMeta title="Edit Role" description="Edit an existing role" />
-      <PageBreadcrumb pageTitle="Edit Role" breadcrumbs={[{ label: 'Roles', path: '/roles' }]} backButton />
+      <PageBreadcrumb
+        pageTitle="Edit Role"
+        breadcrumbs={[{ label: 'Roles', path: '/roles' }]}
+        backButton
+      />
       <ComponentCard>
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 gap-6">
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               <div>
-                <Label>Name <span className="text-red-500">*</span></Label>
-                <Input type="text" value={name} onChange={handleNameChange} error={!!errors.name} hint={errors.name} />
+                <Label>
+                  Name <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  type="text"
+                  value={name}
+                  onChange={handleNameChange}
+                  error={!!errors.name}
+                  hint={errors.name}
+                />
               </div>
             </div>
             <div>
-              <Label>Permissions <span className="text-red-500">*</span></Label>
+              <Label>
+                Permissions <span className="text-red-500">*</span>
+              </Label>
               <div className="overflow-hidden rounded-xl border border-gray-200 custom-card-bg dark:border-white/[0.05]">
                 <div className="max-w-full overflow-x-auto">
                   <Table>
                     <TableHeader>
                       <TableRow>
                         <TableCell isHeader className="p-4 text-base font-semibold capitalize">
-                          <Checkbox id="select-all" label="Resource" checked={allSelected} onChange={handleSelectAll} />
+                          <Checkbox
+                            id="select-all"
+                            label="Resource"
+                            checked={allSelected}
+                            onChange={handleSelectAll}
+                          />
                         </TableCell>
-                        {allActions.map(action => {
-                          const actionPermissions = Object.values(groupedPermissions).map(res => res[action]?.id).filter(Boolean);
-                          const isAllChecked = actionPermissions.length > 0 && actionPermissions.every(id => selectedPermissions.includes(id));
+                        {allActions.map((action) => {
+                          const actionPermissions = Object.values(groupedPermissions)
+                            .map((res) => res[action]?.id)
+                            .filter(Boolean);
+                          const isAllChecked =
+                            actionPermissions.length > 0 &&
+                            actionPermissions.every((id) => selectedPermissions.includes(id));
                           return (
-                            <TableCell isHeader key={action} className="p-4 text-base font-semibold capitalize">
-                              <Checkbox id={`select-col-${action}`} label={formatKebabCase(action)} checked={isAllChecked} onChange={(c) => handleSelectColumn(action, c)} />
+                            <TableCell
+                              isHeader
+                              key={action}
+                              className="p-4 text-base font-semibold capitalize"
+                            >
+                              <Checkbox
+                                id={`select-col-${action}`}
+                                label={formatKebabCase(action)}
+                                checked={isAllChecked}
+                                onChange={(c) => handleSelectColumn(action, c)}
+                              />
                             </TableCell>
                           );
                         })}
@@ -187,14 +221,25 @@ export default function EditRole() {
                     </TableHeader>
                     <TableBody>
                       {Object.entries(groupedPermissions).map(([resource, actions], index) => {
-                        const resourcePermissions = Object.values(actions).map(p => p.id);
-                        const isAllChecked = resourcePermissions.length > 0 && resourcePermissions.every(id => selectedPermissions.includes(id));
+                        const resourcePermissions = Object.values(actions).map((p) => p.id);
+                        const isAllChecked =
+                          resourcePermissions.length > 0 &&
+                          resourcePermissions.every((id) => selectedPermissions.includes(id));
                         return (
-                          <TableRow key={resource} className={index % 2 === 0 ? 'custom-table-row-alt' : ''}>
+                          <TableRow
+                            key={resource}
+                            className={index % 2 === 0 ? 'custom-table-row-alt' : ''}
+                          >
                             <TableCell className="p-4">
-                              <Checkbox id={`select-row-${resource}`} label={formatKebabCase(resource)} checked={isAllChecked} onChange={(c) => handleSelectRow(resource, c)} className="font-medium capitalize" />
+                              <Checkbox
+                                id={`select-row-${resource}`}
+                                label={formatKebabCase(resource)}
+                                checked={isAllChecked}
+                                onChange={(c) => handleSelectRow(resource, c)}
+                                className="font-medium capitalize"
+                              />
                             </TableCell>
-                            {allActions.map(action => (
+                            {allActions.map((action) => (
                               <TableCell key={action} className="p-4">
                                 {actions[action] ? (
                                   <Checkbox
@@ -213,7 +258,9 @@ export default function EditRole() {
                   </Table>
                 </div>
               </div>
-              {errors.permissions && <p className="mt-2 text-sm text-red-600">{errors.permissions}</p>}
+              {errors.permissions && (
+                <p className="mt-2 text-sm text-red-600">{errors.permissions}</p>
+              )}
             </div>
           </div>
           <div className="flex justify-end mt-6">

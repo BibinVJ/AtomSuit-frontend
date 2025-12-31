@@ -1,22 +1,17 @@
-"use client";
+'use client';
 
-
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHeader,
-  TableRow,
-} from "../../ui/table";
-import { useState } from "react";
-import Badge from "../../ui/badge/Badge";
-import EditItemModal from "./EditItemModal";
-import DeleteItemModal from "./DeleteItemModal";
-import Button from "../../ui/button/Button";
-import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide, Edit, Trash2 } from 'lucide-react';
-import Tooltip from "../../ui/tooltip/Tooltip";
-
+import { Table, TableBody, TableCell, TableHeader, TableRow } from '../../ui/table';
+import { useState } from 'react';
+import EditItemModal from './EditItemModal';
+import DeleteItemModal from './DeleteItemModal';
+import ViewItemModal from './ViewItemModal';
+import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide } from 'lucide-react';
+import { restoreItem } from '../../../services/ItemService';
+import { toast } from 'sonner';
 import { Item } from '../../../types';
+import { usePermissions } from '../../../hooks/usePermissions';
+import { useSettings } from '../../../hooks/useSettings';
+import { TableActions } from '../../common/TableActions';
 
 interface Props {
   data: Item[];
@@ -26,14 +21,26 @@ interface Props {
   sortDirection: string;
   currentPage: number;
   perPage: number;
+  startIndex?: number;
+  viewMode?: 'active' | 'trashed';
 }
 
-import { usePermissions } from "../../../hooks/usePermissions";
-
-export default function ItemTable({ data, onAction, onSort, sortBy, sortDirection, currentPage, perPage }: Props) {
+export default function ItemTable({
+  data,
+  onAction,
+  onSort,
+  sortBy,
+  sortDirection,
+  currentPage,
+  perPage,
+  startIndex,
+  viewMode = 'active',
+}: Props) {
   const { hasPermission } = usePermissions();
+  const { formatCurrency } = useSettings();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
 
   const handleEdit = (item: Item) => {
@@ -46,10 +53,26 @@ export default function ItemTable({ data, onAction, onSort, sortBy, sortDirectio
     setIsDeleteModalOpen(true);
   };
 
+  const handleView = (item: Item) => {
+    setSelectedItem(item);
+    setIsViewModalOpen(true);
+  };
+
   const handleCloseModals = () => {
     setIsEditModalOpen(false);
     setIsDeleteModalOpen(false);
+    setIsViewModalOpen(false);
     setSelectedItem(null);
+  };
+
+  const handleRestore = async (id: number) => {
+    try {
+      await restoreItem(id);
+      toast.success('Item restored successfully');
+      onAction();
+    } catch {
+      toast.error('Failed to restore item');
+    }
   };
 
   const renderSortIcon = (column: string) => {
@@ -69,15 +92,60 @@ export default function ItemTable({ data, onAction, onSort, sortBy, sortDirectio
         <Table>
           <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
             <TableRow>
-              <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">#</TableCell>
-              <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400" onClick={() => onSort('sku')}>SKU {renderSortIcon('sku')}</TableCell>
-              <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400" onClick={() => onSort('name')}>Name {renderSortIcon('name')}</TableCell>
-              <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400" onClick={() => onSort('category_id')}>Category {renderSortIcon('category_id')}</TableCell>
-              <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400" onClick={() => onSort('unit_id')}>Unit {renderSortIcon('unit_id')}</TableCell>
-              <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400" onClick={() => onSort('type')}>Type {renderSortIcon('type')}</TableCell>
-              <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400" onClick={() => onSort('selling_price')}>Selling Price {renderSortIcon('selling_price')}</TableCell>
-              <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400" onClick={() => onSort('is_active')}>Status {renderSortIcon('is_active')}</TableCell>
-              <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">Actions</TableCell>
+              <TableCell
+                isHeader
+                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+              >
+                #
+              </TableCell>
+              <TableCell
+                isHeader
+                className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400"
+                onClick={() => onSort('sku')}
+              >
+                SKU {renderSortIcon('sku')}
+              </TableCell>
+              <TableCell
+                isHeader
+                className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400"
+                onClick={() => onSort('name')}
+              >
+                Name {renderSortIcon('name')}
+              </TableCell>
+              <TableCell
+                isHeader
+                className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400"
+                onClick={() => onSort('category_id')}
+              >
+                Category {renderSortIcon('category_id')}
+              </TableCell>
+              <TableCell
+                isHeader
+                className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400"
+                onClick={() => onSort('unit_id')}
+              >
+                Unit {renderSortIcon('unit_id')}
+              </TableCell>
+              <TableCell
+                isHeader
+                className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400"
+                onClick={() => onSort('type')}
+              >
+                Type {renderSortIcon('type')}
+              </TableCell>
+              <TableCell
+                isHeader
+                className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400"
+                onClick={() => onSort('selling_price')}
+              >
+                Selling Price {renderSortIcon('selling_price')}
+              </TableCell>
+              <TableCell
+                isHeader
+                className="px-5 py-3 font-medium text-gray-500 text-end text-theme-xs dark:text-gray-400"
+              >
+                Actions
+              </TableCell>
             </TableRow>
           </TableHeader>
 
@@ -86,46 +154,65 @@ export default function ItemTable({ data, onAction, onSort, sortBy, sortDirectio
               <TableRow key={item.id}>
                 <TableCell className="px-5 py-4 sm:px-6 text-start">
                   <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                    {(currentPage - 1) * perPage + index + 1}
+                    {startIndex !== undefined
+                      ? startIndex + index
+                      : (currentPage - 1) * perPage + index + 1}
                   </p>
                 </TableCell>
-                <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">{item.sku}</TableCell>
-                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">{item.name}</TableCell>
-                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">{item.category.name}</TableCell>
-                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">{item.unit.name} ({item.unit.code})</TableCell>
-                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">{item.type}</TableCell>
-                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">{item.selling_price}</TableCell>
                 <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                  <Badge size="sm" color={item.is_active ? "success" : "error"}>
-                    {item.is_active ? "Active" : "Inactive"}
-                  </Badge>
+                  {item.sku}
+                </TableCell>
+                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
+                  {item.name}
+                </TableCell>
+                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
+                  {item.category ? (
+                    <span
+                      className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+                        item.category.deleted_at
+                          ? 'bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-500'
+                          : 'bg-gray-100 text-gray-800 dark:bg-white/10 dark:text-white'
+                      }`}
+                    >
+                      {item.category.name}
+                      {item.category.deleted_at ? ' (Deleted)' : ''}
+                    </span>
+                  ) : (
+                    '-'
+                  )}
+                </TableCell>
+                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
+                  {item.unit ? (
+                    <span
+                      className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+                        item.unit.deleted_at
+                          ? 'bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-500'
+                          : 'bg-gray-100 text-gray-800 dark:bg-white/10 dark:text-white'
+                      }`}
+                    >
+                      {item.unit.name} ({item.unit.code}){item.unit.deleted_at ? ' (Deleted)' : ''}
+                    </span>
+                  ) : (
+                    '-'
+                  )}
+                </TableCell>
+                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
+                  {item.type}
+                </TableCell>
+                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
+                  {formatCurrency(item.selling_price)}
                 </TableCell>
 
-                <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                  <div className="flex items-center gap-2">
-                    {hasPermission("update-item") && (
-                      <Tooltip text="Edit">
-                        <Button
-                          size="xs"
-                          onClick={() => handleEdit(item)}
-                          className="bg-blue-600 hover:bg-blue-700 text-white"
-                        >
-                          <Edit className="w-4 h-4" />
-                        </Button>
-                      </Tooltip>
-                    )}
-                    {hasPermission("delete-item") && (
-                      <Tooltip text="Delete">
-                        <Button
-                          size="xs"
-                          onClick={() => handleDelete(item)}
-                          className="bg-red-600 hover:bg-red-700 text-white"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </Tooltip>
-                    )}
-                  </div>
+                <TableCell className="px-4 py-3 text-end">
+                  <TableActions
+                    isTrashed={viewMode === 'trashed'}
+                    onView={() => handleView(item)}
+                    onEdit={hasPermission('update-item') ? () => handleEdit(item) : undefined}
+                    onDelete={hasPermission('delete-item') ? () => handleDelete(item) : undefined}
+                    onRestore={
+                      hasPermission('update-item') ? () => handleRestore(item.id) : undefined
+                    }
+                  />
                 </TableCell>
               </TableRow>
             ))}
@@ -134,17 +221,19 @@ export default function ItemTable({ data, onAction, onSort, sortBy, sortDirectio
       </div>
       {selectedItem && (
         <>
+          <ViewItemModal isOpen={isViewModalOpen} onClose={handleCloseModals} item={selectedItem} />
           <EditItemModal
             isOpen={isEditModalOpen}
             onClose={handleCloseModals}
-            onItemUpdated={onAction}
+            onSuccess={onAction}
             item={selectedItem}
           />
           <DeleteItemModal
             isOpen={isDeleteModalOpen}
             onClose={handleCloseModals}
-            onItemDeleted={onAction}
+            onSuccess={onAction}
             item={selectedItem}
+            isForceDelete={viewMode === 'trashed'}
           />
         </>
       )}

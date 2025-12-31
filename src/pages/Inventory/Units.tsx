@@ -1,7 +1,5 @@
-"use client";
+'use client';
 
-
-import { useEffect, useState } from 'react';
 import PageBreadcrumb from '../../components/common/PageBreadCrumb';
 import ComponentCard from '../../components/common/ComponentCard';
 import PageMeta from '../../components/common/PageMeta';
@@ -10,100 +8,113 @@ import AddUnitModal from '../../components/inventory/units/AddUnitModal';
 import { useModal } from '../../hooks/useModal';
 import Pagination from '../../components/common/Pagination';
 import Button from '../../components/ui/button/Button';
-import Select from '../../components/form/Select';
-import { getUnits } from '../../services/UnitService';
+import Tooltip from '../../components/ui/tooltip/Tooltip';
+import { getUnits, exportUnits } from '../../services/UnitService';
 import { Unit } from '../../types';
-
-import { usePermissions } from '../../hooks/usePermissions';
+import { Download, Plus } from 'lucide-react';
+import ViewModeTabs from '../../components/common/ViewModeTabs';
+import TableToolbar from '../../components/common/TableToolbar';
+import { useDataTable } from '../../hooks/useDataTable';
+import { useExport } from '../../hooks/useExport';
 
 export default function Units() {
-  const { hasPermission } = usePermissions();
-  const [units, setUnits] = useState<Unit[]>([]);
   const { isOpen, openModal, closeModal } = useModal();
-  const [currentPage, setCurrentPage] = useState(1);
-  const [perPage, setPerPage] = useState(10);
-  const [totalPages, setTotalPages] = useState(1);
-  const [from, setFrom] = useState(0);
-  const [to, setTo] = useState(0);
-  const [total, setTotal] = useState(0);
-  const [sortBy, setSortBy] = useState('created_at');
-  const [sortDirection, setSortDirection] = useState('desc');
 
-  const fetchUnits = async (page = 1, limit = 10, sortCol = 'created_at', sortDir = 'desc') => {
-    try {
-      const response = await getUnits(page, limit, sortCol, sortDir);
-      setUnits(response.data);
-      setTotalPages(response.meta.last_page);
-      setCurrentPage(response.meta.current_page);
-      setFrom(response.meta.from);
-      setTo(response.meta.to);
-      setTotal(response.meta.total);
-    } catch (error) {
-      console.error('Error fetching units:', error);
-    }
-  };
+  const {
+    data: units,
+    currentPage,
+    perPage,
+    totalPages,
+    total,
+    from,
+    to,
+    sortBy,
+    sortDirection,
+    searchTerm,
+    setSearchTerm,
+    rangeFrom,
+    setRangeFrom,
+    rangeTo,
+    setRangeTo,
+    viewMode,
+    setViewMode,
+    handlePageChange,
+    handlePerPageChange,
+    handleSort,
+    resetFilters,
+    refresh,
+  } = useDataTable<Unit>({
+    fetchData: getUnits,
+    initialSortBy: 'name',
+    initialSortDirection: 'asc',
+  });
 
-  useEffect(() => {
-    fetchUnits(currentPage, perPage, sortBy, sortDirection);
-  }, [currentPage, perPage, sortBy, sortDirection]);
+  const { exportData } = useExport();
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
-
-  const handlePerPageChange = (value: string) => {
-    setPerPage(parseInt(value, 10));
-    setCurrentPage(1);
-  };
-
-  const handleSort = (column: string) => {
-    if (sortBy === column) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortBy(column);
-      setSortDirection('asc');
-    }
+  const handleExport = () => {
+    exportData({
+      exportFunction: exportUnits,
+      entityName: 'Units',
+    });
   };
 
   return (
     <>
-      <PageMeta
-        title="Units"
-        description="List of units"
-      />
+      <PageMeta title="Units of Measurement" description="Manage system units" />
       <PageBreadcrumb pageTitle="Units" />
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <label htmlFor="perPage" className="text-sm font-medium text-gray-700">Per Page:</label>
-          <Select
-            options={[
-              { value: '10', label: '10' },
-              { value: '20', label: '20' },
-              { value: '50', label: '50' },
-            ]}
-            onChange={handlePerPageChange}
-            defaultValue={String(perPage)}
-            showPlaceholder={false}
-            className="w-20"
-            searchable={false}
+
+      <div className="space-y-6">
+        <div className="p-5 border border-gray-200 rounded-2xl bg-gray-50 dark:bg-white/[0.03] dark:border-gray-800 shadow-sm">
+          <TableToolbar
+            className="mb-0"
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            searchPlaceholder="Search units..."
+            rangeFrom={rangeFrom}
+            onRangeFromChange={(val) => setRangeFrom(val as number | '')}
+            rangeTo={rangeTo}
+            onRangeToChange={(val) => setRangeTo(val as number | '')}
+            perPage={perPage}
+            onPerPageChange={handlePerPageChange}
+            onReset={resetFilters}
           />
         </div>
-        {hasPermission("create-unit") && (
-          <Button onClick={openModal}>
-            Add Unit
-          </Button>
-        )}
-      </div>
-      <div className="space-y-6">
-        <ComponentCard title="Units">
+
+        <ComponentCard
+          title={`Units (${viewMode})`}
+          action={
+            <div className="flex flex-wrap items-center gap-3">
+              <ViewModeTabs viewMode={viewMode} setViewMode={setViewMode} />
+              <Tooltip text="Export Units">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleExport}
+                  className="flex items-center gap-2"
+                >
+                  <Download size={16} />
+                  Export
+                </Button>
+              </Tooltip>
+              <Tooltip text="Add New Unit">
+                <Button onClick={openModal} size="sm" className="flex items-center gap-2">
+                  <Plus size={16} />
+                  Add Unit
+                </Button>
+              </Tooltip>
+            </div>
+          }
+        >
           <UnitTable
             data={units}
-            onAction={() => fetchUnits(currentPage, perPage, sortBy, sortDirection)}
+            onAction={refresh}
             onSort={handleSort}
             sortBy={sortBy}
             sortDirection={sortDirection}
             currentPage={currentPage}
             perPage={perPage}
+            startIndex={rangeFrom !== '' ? Number(rangeFrom) : undefined}
+            viewMode={viewMode}
           />
           <Pagination
             currentPage={currentPage}
@@ -115,7 +126,7 @@ export default function Units() {
           />
         </ComponentCard>
       </div>
-      <AddUnitModal isOpen={isOpen} onClose={closeModal} onUnitAdded={() => fetchUnits(1, perPage)} />
+      <AddUnitModal isOpen={isOpen} onClose={closeModal} onSuccess={refresh} />
     </>
   );
 }

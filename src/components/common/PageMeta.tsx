@@ -1,14 +1,8 @@
-"use client";
+'use client';
 
-import Head from "next/head";
+import Head from 'next/head';
 
-const PageMeta = ({
-  title,
-  description,
-}: {
-  title: string;
-  description: string;
-}) => (
+const PageMeta = ({ title, description }: { title: string; description: string }) => (
   <Head>
     <title>{title}</title>
     <meta name="description" content={description} />
@@ -16,8 +10,6 @@ const PageMeta = ({
 );
 
 // No need for AppWrapper with Next.js Head
-export const AppWrapper = ({ children }: { children: React.ReactNode }) => (
-  <>{children}</>
-);
+export const AppWrapper = ({ children }: { children: React.ReactNode }) => <>{children}</>;
 
 export default PageMeta;

@@ -1,134 +1,253 @@
-"use client";
-
-
 import { useState, useEffect } from 'react';
-import { Modal } from '../../ui/modal';
+import FormModal from '../../common/FormModal';
 import Input from '../../form/input/InputField';
 import Label from '../../form/Label';
-import Switch from '../../form/switch/Switch';
+import Select from '../../form/Select';
 import TextArea from '../../form/input/TextArea';
-import Button from '../../ui/button/Button';
+import CollapsibleSection from '../../common/CollapsibleSection';
 import { toast } from 'sonner';
 import { updateCategory } from '../../../services/CategoryService';
-import { Category } from '../../../types';
+import { getChartOfAccounts } from '../../../services/ChartOfAccountService';
+import { ChartOfAccount, Category } from '../../../types';
 import { isApiError } from '../../../utils/errors';
-
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
-  onCategoryUpdated: () => void;
+  onSuccess: () => void;
   category: Category;
 }
 
-export default function EditCategoryModal({ isOpen, onClose, onCategoryUpdated, category }: Props) {
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [isActive, setIsActive] = useState(true);
-  const [errors, setErrors] = useState({ name: '' });
+export default function EditCategoryModal({ isOpen, onClose, onSuccess, category }: Props) {
+  const [formData, setFormData] = useState({
+    name: '',
+    description: '',
+    sales_account_id: '',
+    cogs_account_id: '',
+    inventory_account_id: '',
+    inventory_adjustment_account_id: '',
+    purchase_account_id: '',
+  });
+
+  const [salesAccounts, setSalesAccounts] = useState<ChartOfAccount[]>([]);
+  const [cogsAccounts, setCogsAccounts] = useState<ChartOfAccount[]>([]);
+  const [inventoryAccounts, setInventoryAccounts] = useState<ChartOfAccount[]>([]);
+  const [expenseAccounts, setExpenseAccounts] = useState<ChartOfAccount[]>([]);
+
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      fetchAccounts();
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     if (category) {
-      setName(category.name);
-      setDescription(category.description || '');
-      setIsActive(category.is_active);
+      setFormData({
+        name: category.name,
+        description: category.description || '',
+        sales_account_id: category.sales_account_id ? String(category.sales_account_id) : '',
+        cogs_account_id: category.cogs_account_id ? String(category.cogs_account_id) : '',
+        inventory_account_id: category.inventory_account_id
+          ? String(category.inventory_account_id)
+          : '',
+        inventory_adjustment_account_id: category.inventory_adjustment_account_id
+          ? String(category.inventory_adjustment_account_id)
+          : '',
+        purchase_account_id: category.purchase_account_id
+          ? String(category.purchase_account_id)
+          : '',
+      });
     }
   }, [category]);
 
+  const fetchAccounts = async () => {
+    try {
+      const response = await getChartOfAccounts({ unpaginated: true, trashed: 'with' });
+      const accounts = response.data;
+      setSalesAccounts(accounts);
+      setCogsAccounts(accounts);
+      setInventoryAccounts(accounts);
+      setExpenseAccounts(accounts);
+    } catch (error) {
+      console.error('Error fetching accounts:', error);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name) {
-      setErrors({ name: 'Name is required' });
-      return;
-    }
-    
+    setIsSubmitting(true);
+
+    const dataToSubmit = {
+      ...formData,
+      sales_account_id: formData.sales_account_id ? Number(formData.sales_account_id) : null,
+      cogs_account_id: formData.cogs_account_id ? Number(formData.cogs_account_id) : null,
+      inventory_account_id: formData.inventory_account_id
+        ? Number(formData.inventory_account_id)
+        : null,
+      inventory_adjustment_account_id: formData.inventory_adjustment_account_id
+        ? Number(formData.inventory_adjustment_account_id)
+        : null,
+      purchase_account_id: formData.purchase_account_id
+        ? Number(formData.purchase_account_id)
+        : null,
+    };
+
     try {
-      await updateCategory(category.id, { name, description, is_active: isActive });
-      onCategoryUpdated();
+      await updateCategory(category.id, dataToSubmit);
+      onSuccess();
       toast.success('Category updated successfully');
       onClose();
     } catch (error: unknown) {
       if (isApiError(error) && error.response?.status === 422) {
         const apiErrors = error.response.data.errors;
-        const newErrors = {
+        setErrors({
           name: apiErrors?.name?.[0] || '',
-        };
-        setErrors(newErrors);
+          sales_account_id: apiErrors?.sales_account_id?.[0] || '',
+          cogs_account_id: apiErrors?.cogs_account_id?.[0] || '',
+          inventory_account_id: apiErrors?.inventory_account_id?.[0] || '',
+          inventory_adjustment_account_id: apiErrors?.inventory_adjustment_account_id?.[0] || '',
+        });
         toast.error('Please correct the errors in the form');
       } else {
-        console.error('Error adding category:', error);
         toast.error('Failed to update category');
       }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-
-
   return (
-    <Modal isOpen={isOpen} onClose={onClose} className="max-w-[700px] lg:p-11">
-      <div className="relative w-full p-4 overflow-y-auto bg-white no-scrollbar rounded-3xl dark:bg-gray-900">
-          <div className="px-2 pr-14">
-            <h4 className="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90">
-              Edit Category
-            </h4>
-            <p className="mb-6 text-sm text-gray-500 dark:text-gray-400 lg:mb-7">
-              Update the details of the category.
-            </p>
-          </div>
-          <form className="flex flex-col" onSubmit={handleSubmit}>
-            <div className="px-2 overflow-y-auto custom-scrollbar">
-              <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-1">
-                <div>
-                  <Label>Name <span className="text-red-500">*</span></Label>
-                  <Input
-                    type="text"
-                    id="name"
-                    value={name}
-                    onChange={(e) => {
-                      setName(e.target.value);
-                      setErrors({ name: '' });
-                    }}
-                    error={!!errors.name}
-                    hint={errors.name}
-                  />
-                </div>
-
-                <div>
-                  <Label>Description</Label>
-                  <TextArea
-                    placeholder="Enter description"
-                    value={description}
-                    onChange={setDescription}
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  />
-                </div>
-                <div>
-                  <Label>Status</Label>
-                  <Switch
-                    label={isActive ? 'Active' : 'Inactive'}
-                    checked={isActive}
-                    onChange={setIsActive}
-                  />
-                </div>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 px-2 mt-6 lg:justify-end">
-                <Button
-                    type="button"
-                    variant='outline'
-                    onClick={onClose}
-                >
-                    Close
-                </Button>
-                <Button
-                    type="submit"
-                >
-                    Save Changes
-                </Button>
-            </div>
-          </form>
+    <FormModal
+      isOpen={isOpen}
+      onClose={onClose}
+      onSubmit={handleSubmit}
+      title="Edit Category"
+      description="Update the details of the category."
+      isSubmitting={isSubmitting}
+    >
+      <div className="grid grid-cols-1 gap-x-6 gap-y-5">
+        <div>
+          <Label>
+            Name <span className="text-red-500">*</span>
+          </Label>
+          <Input
+            type="text"
+            value={formData.name}
+            onChange={(e) => {
+              setFormData({ ...formData, name: e.target.value });
+              setErrors({ name: '' });
+            }}
+            error={!!errors.name}
+            hint={errors.name}
+          />
         </div>
-    </Modal>
+        <div>
+          <Label>Description</Label>
+          <TextArea
+            placeholder="Enter description (optional)"
+            value={formData.description}
+            onChange={(val) => setFormData({ ...formData, description: val })}
+          />
+        </div>
+      </div>
+
+      <div className="mt-5">
+        <CollapsibleSection title="Accounting Defaults">
+          <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
+            <div>
+              <Label>
+                Sales Account <span className="text-red-500">*</span>
+              </Label>
+              <Select
+                options={salesAccounts.map((acc) => ({
+                  value: String(acc.id),
+                  label: `${acc.code} - ${acc.name}`,
+                }))}
+                value={String(formData.sales_account_id)}
+                onChange={(val) => setFormData({ ...formData, sales_account_id: val })}
+                placeholder="Select Sales Account"
+                error={!!errors.sales_account_id}
+              />
+              {errors.sales_account_id && (
+                <p className="mt-1 text-xs text-red-500">{errors.sales_account_id}</p>
+              )}
+            </div>
+            <div>
+              <Label>
+                Cost of Goods Sold Account <span className="text-red-500">*</span>
+              </Label>
+              <Select
+                options={cogsAccounts.map((acc) => ({
+                  value: String(acc.id),
+                  label: `${acc.code} - ${acc.name}`,
+                }))}
+                value={String(formData.cogs_account_id)}
+                onChange={(val) => setFormData({ ...formData, cogs_account_id: val })}
+                placeholder="Select COGS Account"
+                error={!!errors.cogs_account_id}
+              />
+              {errors.cogs_account_id && (
+                <p className="mt-1 text-xs text-red-500">{errors.cogs_account_id}</p>
+              )}
+            </div>
+            <div>
+              <Label>
+                Inventory Account <span className="text-red-500">*</span>
+              </Label>
+              <Select
+                options={inventoryAccounts.map((acc) => ({
+                  value: String(acc.id),
+                  label: `${acc.code} - ${acc.name}`,
+                }))}
+                value={String(formData.inventory_account_id)}
+                onChange={(val) => setFormData({ ...formData, inventory_account_id: val })}
+                placeholder="Select Inventory Account"
+                error={!!errors.inventory_account_id}
+              />
+              {errors.inventory_account_id && (
+                <p className="mt-1 text-xs text-red-500">{errors.inventory_account_id}</p>
+              )}
+            </div>
+            <div>
+              <Label>
+                Inventory Adjustments Account <span className="text-red-500">*</span>
+              </Label>
+              <Select
+                options={expenseAccounts.map((acc) => ({
+                  value: String(acc.id),
+                  label: `${acc.code} - ${acc.name}`,
+                }))}
+                value={String(formData.inventory_adjustment_account_id)}
+                onChange={(val) =>
+                  setFormData({ ...formData, inventory_adjustment_account_id: val })
+                }
+                placeholder="Select Adjustment Account"
+                error={!!errors.inventory_adjustment_account_id}
+              />
+              {errors.inventory_adjustment_account_id && (
+                <p className="mt-1 text-xs text-red-500">
+                  {errors.inventory_adjustment_account_id}
+                </p>
+              )}
+            </div>
+            <div className="lg:col-span-2">
+              <Label>Purchase Account (Optional)</Label>
+              <Select
+                options={cogsAccounts.map((acc) => ({
+                  value: String(acc.id),
+                  label: `${acc.code} - ${acc.name}`,
+                }))}
+                value={String(formData.purchase_account_id)}
+                onChange={(val) => setFormData({ ...formData, purchase_account_id: val })}
+                placeholder="Select Purchase Account"
+              />
+            </div>
+          </div>
+        </CollapsibleSection>
+      </div>
+    </FormModal>
   );
 }
-

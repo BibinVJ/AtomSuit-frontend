@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useState } from 'react';
 import { Setting } from '../../types';
@@ -12,6 +12,9 @@ import MultiSelect from '../form/MultiSelect';
 import { Save, Trash2, Clock } from 'lucide-react';
 import { updateSetting, deleteSettingFile } from '../../services/SettingsService';
 import { toast } from 'sonner';
+import { formatLabel } from '../../utils/string';
+import { useSettings } from '../../hooks/useSettings';
+import Image from 'next/image';
 
 interface Props {
   setting: Setting;
@@ -19,19 +22,19 @@ interface Props {
 }
 
 const DATE_FORMATS = [
-  { value: 'Y-m-d', label: '2024-01-15 (Y-m-d)' },
-  { value: 'd/m/Y', label: '15/01/2024 (d/m/Y)' },
-  { value: 'm/d/Y', label: '01/15/2024 (m/d/Y)' },
-  { value: 'd-m-Y', label: '15-01-2024 (d-m-Y)' },
-  { value: 'F j, Y', label: 'January 15, 2024 (F j, Y)' },
-  { value: 'j F Y', label: '15 January 2024 (j F Y)' },
+  { value: 'Y-m-d', label: 'YYYY-MM-DD' },
+  { value: 'd/m/Y', label: 'DD/MM/YYYY' },
+  { value: 'm/d/Y', label: 'MM/DD/YYYY' },
+  { value: 'd-m-Y', label: 'DD-MM-YYYY' },
+  { value: 'F j, Y', label: 'Month Day, Year' },
+  { value: 'j F Y', label: 'Day Month Year' },
 ];
 
 const TIME_FORMATS = [
-  { value: 'H:i:s', label: '14:30:00 (H:i:s)' },
-  { value: 'H:i', label: '14:30 (H:i)' },
-  { value: 'g:i A', label: '2:30 PM (g:i A)' },
-  { value: 'g:i a', label: '2:30 pm (g:i a)' },
+  { value: 'H:i:s', label: '24 Hour (with seconds)' },
+  { value: 'H:i', label: '24 Hour' },
+  { value: 'g:i A', label: '12 Hour (AM/PM)' },
+  { value: 'g:i a', label: '12 Hour (am/pm)' },
 ];
 
 const THEME_OPTIONS = [
@@ -41,8 +44,8 @@ const THEME_OPTIONS = [
 ];
 
 const CURRENCY_POSITION_OPTIONS = [
-  { value: 'before', label: 'Before ($100)' },
-  { value: 'after', label: 'After (100$)' },
+  { value: 'before', label: 'Before' },
+  { value: 'after', label: 'After' },
 ];
 
 const DAY_OPTIONS = [
@@ -56,7 +59,9 @@ const DAY_OPTIONS = [
 ];
 
 export default function SettingField({ setting, onUpdate }: Props) {
-  const [value, setValue] = useState(setting.value);
+  const { refreshSettings } = useSettings();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [value, setValue] = useState<any>(setting.value);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSave = async () => {
@@ -64,8 +69,9 @@ export default function SettingField({ setting, onUpdate }: Props) {
     try {
       await updateSetting(setting.key, value, setting.type, setting.group);
       toast.success('Setting updated successfully');
+      await refreshSettings();
       onUpdate();
-    } catch (error) {
+    } catch {
       toast.error('Failed to update setting');
     } finally {
       setIsLoading(false);
@@ -81,7 +87,7 @@ export default function SettingField({ setting, onUpdate }: Props) {
       await updateSetting(setting.key, file, 'file', setting.group);
       toast.success('File uploaded successfully');
       onUpdate();
-    } catch (error) {
+    } catch {
       toast.error('Failed to upload file');
     } finally {
       setIsLoading(false);
@@ -94,7 +100,7 @@ export default function SettingField({ setting, onUpdate }: Props) {
       await deleteSettingFile(setting.key);
       toast.success('File deleted successfully');
       onUpdate();
-    } catch (error) {
+    } catch {
       toast.error('Failed to delete file');
     } finally {
       setIsLoading(false);
@@ -117,7 +123,7 @@ export default function SettingField({ setting, onUpdate }: Props) {
       return (
         <MultiSelect
           label=""
-          options={DAY_OPTIONS.map(day => ({ value: day.value, text: day.label }))}
+          options={DAY_OPTIONS.map((day) => ({ value: day.value, text: day.label }))}
           defaultSelected={currentValues}
           onChange={(selected) => setValue(selected.map(Number))}
         />
@@ -138,11 +144,7 @@ export default function SettingField({ setting, onUpdate }: Props) {
     switch (setting.type) {
       case 'boolean':
         return (
-          <Switch
-            label=""
-            checked={Boolean(value)}
-            onChange={(checked) => setValue(checked)}
-          />
+          <Switch label="" checked={Boolean(value)} onChange={(checked) => setValue(checked)} />
         );
       case 'integer':
         return (
@@ -153,18 +155,20 @@ export default function SettingField({ setting, onUpdate }: Props) {
           />
         );
       case 'file':
-        const isImage = setting.file_url && /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(setting.file_url);
+        const isImage =
+          setting.file_url && /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(setting.file_url);
         return (
           <div className="space-y-2">
             <FileInput onChange={handleFileChange} />
             {setting.file_url && (
               <div className="space-y-2">
                 {isImage ? (
-                  <div className="relative">
-                    <img
+                  <div className="relative w-full max-w-xs h-32">
+                    <Image
                       src={setting.file_url}
                       alt={setting.key}
-                      className="max-w-xs max-h-32 object-contain border border-gray-200 rounded-lg dark:border-gray-700"
+                      fill
+                      className="object-contain border border-gray-200 rounded-lg dark:border-gray-700"
                     />
                   </div>
                 ) : null}
@@ -248,11 +252,7 @@ export default function SettingField({ setting, onUpdate }: Props) {
         if (isTimeField) {
           return (
             <div className="relative">
-              <Input
-                type="time"
-                value={value || ''}
-                onChange={(e) => setValue(e.target.value)}
-              />
+              <Input type="time" value={value || ''} onChange={(e) => setValue(e.target.value)} />
               <span className="absolute text-gray-500 -translate-y-1/2 pointer-events-none right-3 top-1/2 dark:text-gray-400">
                 <Clock className="size-6" />
               </span>
@@ -276,10 +276,10 @@ export default function SettingField({ setting, onUpdate }: Props) {
                   placeholder="#000000"
                   className="flex-1"
                 />
-                {setting.value && (
+                {setting.value !== null && setting.value !== undefined && (
                   <div
                     className="w-10 h-10 rounded border border-gray-300 flex-shrink-0"
-                    style={{ backgroundColor: setting.value }}
+                    style={{ backgroundColor: String(setting.value) }}
                     title={`Original: ${setting.value}`}
                   />
                 )}
@@ -302,14 +302,13 @@ export default function SettingField({ setting, onUpdate }: Props) {
     <div className="p-4 border border-gray-200 rounded-lg dark:border-gray-700">
       <div className="flex justify-between items-start mb-2">
         <div>
-          <h3 className="font-medium text-gray-900 dark:text-white">{setting.key}</h3>
+          <h3 className="font-medium text-gray-900 dark:text-white">{formatLabel(setting.key)}</h3>
           {setting.description && (
             <p className="text-sm text-gray-500 dark:text-gray-400">{setting.description}</p>
           )}
         </div>
-        <span className="text-xs bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">{setting.type}</span>
       </div>
-      
+
       <div className="space-y-2">
         {renderInput()}
         {setting.type !== 'file' && (

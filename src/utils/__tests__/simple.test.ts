@@ -1,108 +1,104 @@
-import {
-  extractTenant,
-  isDevelopment,
-  getMainDomainUrl,
-} from '../tenant'
+import { extractTenant, isDevelopment, getMainDomainUrl } from '../tenant';
 
 describe('tenant utilities (simple tests)', () => {
-  const originalEnv = process.env
+  const originalEnv = process.env;
 
   beforeEach(() => {
-    jest.resetModules()
-    process.env = { ...originalEnv }
-    process.env.NEXT_PUBLIC_BASE_DOMAIN = 'atomsuit.test'
-  })
+    jest.resetModules();
+    process.env = { ...originalEnv };
+    process.env.NEXT_PUBLIC_BASE_DOMAIN = 'atomsuit.test';
+  });
 
   afterAll(() => {
-    process.env = originalEnv
-  })
+    process.env = originalEnv;
+  });
 
   describe('extractTenant', () => {
     it('should identify central domain correctly', () => {
       expect(extractTenant('atomsuit.test')).toEqual({
         subdomain: '',
         isCentral: true,
-      })
+      });
 
       expect(extractTenant('www.atomsuit.test')).toEqual({
         subdomain: '',
         isCentral: true,
-      })
-    })
+      });
+    });
 
     it('should extract valid subdomain', () => {
       expect(extractTenant('company1.atomsuit.test')).toEqual({
         subdomain: 'company1',
         isCentral: false,
-      })
+      });
 
       expect(extractTenant('test-company.atomsuit.test')).toEqual({
         subdomain: 'test-company',
         isCentral: false,
-      })
-    })
+      });
+    });
 
     it('should handle reserved subdomains', () => {
-      const reservedSubdomains = ['www', 'api', 'admin', 'mail', 'ftp']
-      
-      reservedSubdomains.forEach(subdomain => {
+      const reservedSubdomains = ['www', 'api', 'admin', 'mail', 'ftp'];
+
+      reservedSubdomains.forEach((subdomain) => {
         expect(extractTenant(`${subdomain}.atomsuit.test`)).toEqual({
           subdomain: '',
           isCentral: true,
-        })
-      })
-    })
+        });
+      });
+    });
 
     it('should handle hostnames with ports', () => {
       expect(extractTenant('company1.atomsuit.test:3000')).toEqual({
         subdomain: 'company1',
         isCentral: false,
-      })
+      });
 
       expect(extractTenant('atomsuit.test:3000')).toEqual({
         subdomain: '',
         isCentral: true,
-      })
-    })
+      });
+    });
 
     it('should handle invalid hostnames', () => {
       expect(extractTenant('invalid-domain.com')).toEqual({
         subdomain: '',
         isCentral: true,
-      })
+      });
 
       expect(extractTenant('localhost')).toEqual({
         subdomain: '',
         isCentral: true,
-      })
-    })
-  })
+      });
+    });
+  });
 
   describe('isDevelopment', () => {
     it('should return true in development', () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ;(process.env as any).NODE_ENV = 'development'
-      expect(isDevelopment()).toBe(true)
-    })
+      (process.env as any).NODE_ENV = 'development';
+      expect(isDevelopment()).toBe(true);
+    });
 
     it('should return false in production', () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ;(process.env as any).NODE_ENV = 'production'
-      expect(isDevelopment()).toBe(false)
-    })
-  })
+      (process.env as any).NODE_ENV = 'production';
+      expect(isDevelopment()).toBe(false);
+    });
+  });
 
   describe('getMainDomainUrl', () => {
     it('should return http URL in development', () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ;(process.env as any).NODE_ENV = 'development'
-      expect(getMainDomainUrl()).toBe('http://atomsuit.test')
-    })
+      (process.env as any).NODE_ENV = 'development';
+      expect(getMainDomainUrl()).toBe('http://atomsuit.test');
+    });
 
     it('should return https URL in production', () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ;(process.env as any).NODE_ENV = 'production'
-      expect(getMainDomainUrl()).toBe('https://atomsuit.test')
-    })
-  })
-})
+      (process.env as any).NODE_ENV = 'production';
+      expect(getMainDomainUrl()).toBe('https://atomsuit.test');
+    });
+  });
+});
