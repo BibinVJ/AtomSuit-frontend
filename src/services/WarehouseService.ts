@@ -24,7 +24,7 @@ interface WarehouseResponse {
 }
 
 export const getWarehouses = async (params: GetWarehousesParams): Promise<WarehouseResponse> => {
-  const { data } = await axios.get('/warehouse', {
+  const { data } = await axios.get('/warehouses', {
     params: {
       ...params,
       perPage: params.limit,
@@ -36,12 +36,12 @@ export const getWarehouses = async (params: GetWarehousesParams): Promise<Wareho
 };
 
 export const getWarehouse = async (id: number): Promise<Warehouse> => {
-  const { data } = await axios.get(`/warehouse/${id}`);
+  const { data } = await axios.get(`/warehouses/${id}`);
   return data.data;
 };
 
 export const createWarehouse = async (warehouse: WarehouseInput): Promise<Warehouse> => {
-  const { data } = await axios.post('/warehouse', warehouse);
+  const { data } = await axios.post('/warehouses', warehouse);
   return data.data;
 };
 
@@ -49,32 +49,32 @@ export const updateWarehouse = async (
   id: number,
   warehouse: WarehouseInput
 ): Promise<Warehouse> => {
-  const { data } = await axios.put(`/warehouse/${id}`, warehouse);
+  const { data } = await axios.put(`/warehouses/${id}`, warehouse);
   return data.data;
 };
 
 export const deleteWarehouse = async (id: number): Promise<void> => {
-  await axios.delete(`/warehouse/${id}`);
+  await axios.delete(`/warehouses/${id}`);
 };
 
 export const restoreWarehouse = async (id: number): Promise<void> => {
-  await axios.post(`/warehouse/${id}/restore`);
+  await axios.post(`/warehouses/${id}/restore`);
 };
 
 export const exportWarehouses = async (): Promise<Blob> => {
-  const { data } = await axios.get('/warehouse/export', { responseType: 'blob' });
+  const { data } = await axios.get('/warehouses/export', { responseType: 'blob' });
   return data;
 };
 
 export const importWarehouses = async (file: File): Promise<void> => {
   const formData = new FormData();
   formData.append('file', file);
-  await axios.post('/warehouse/import', formData, {
+  await axios.post('/warehouses/import', formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
   });
 };
 
 export const downloadSampleWarehouseExcel = async (): Promise<Blob> => {
-  const { data } = await axios.get('/warehouse/sample-excel', { responseType: 'blob' });
+  const { data } = await axios.get('/warehouses/sample-excel', { responseType: 'blob' });
   return data;
 };

@@ -1,7 +1,7 @@
 import { Customer, CustomerInput } from '../types';
 import { createBaseService, QueryParams, PaginatedResponse } from './BaseService';
 
-const customerService = createBaseService<Customer, CustomerInput>('/customer');
+const customerService = createBaseService<Customer, CustomerInput>('/customers');
 
 export const getCustomers = (params: QueryParams = {}): Promise<PaginatedResponse<Customer>> =>
   customerService.list(params);
@@ -17,7 +17,7 @@ export const deleteCustomer = (id: number, force: boolean = false) =>
 
 export const restoreCustomer = (id: number) => customerService.restore(id);
 
-export const exportCustomers = () => customerService.export('/customer/export');
+export const exportCustomers = () => customerService.export('/customers/export');
 
 export const importCustomers = (file: File) => customerService.import(file);
 

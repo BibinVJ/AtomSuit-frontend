@@ -1,7 +1,7 @@
 import { Unit, UnitInput } from '../types';
 import { createBaseService, QueryParams, PaginatedResponse } from './BaseService';
 
-const unitService = createBaseService<Unit, UnitInput>('/unit');
+const unitService = createBaseService<Unit, UnitInput>('/units');
 
 export const getUnits = (params: QueryParams = {}): Promise<PaginatedResponse<Unit>> =>
   unitService.list(params);
@@ -16,7 +16,7 @@ export const deleteUnit = (id: number, force: boolean = false) => unitService.de
 
 export const restoreUnit = (id: number) => unitService.restore(id);
 
-export const exportUnits = () => unitService.export('/unit/export');
+export const exportUnits = () => unitService.export('/units/export');
 
 const UnitService = {
   ...unitService,

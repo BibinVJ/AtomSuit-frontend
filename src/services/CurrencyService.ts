@@ -2,7 +2,7 @@ import api from './api';
 import { Currency, CurrencyInput } from '../types';
 import { createBaseService, QueryParams, PaginatedResponse } from './BaseService';
 
-const currencyService = createBaseService<Currency, CurrencyInput>('/currency');
+const currencyService = createBaseService<Currency, CurrencyInput>('/currencies');
 
 export const getCurrencies = (params: QueryParams = {}): Promise<PaginatedResponse<Currency>> =>
   currencyService.list(params);
@@ -18,15 +18,15 @@ export const deleteCurrency = (id: number, force: boolean = false) =>
 
 export const restoreCurrency = (id: number) => currencyService.restore(id);
 
-export const exportCurrencies = () => currencyService.export('/currency/export');
+export const exportCurrencies = () => currencyService.export('/currencies/export');
 
 export const getDefaultCurrency = async () => {
-  const response = await api.get('/currency/default');
+  const response = await api.get('/currencies/default');
   return response.data.data;
 };
 
 export const setAsDefaultCurrency = async (id: number) => {
-  const response = await api.post(`/currency/${id}/set-default`);
+  const response = await api.post(`/currencies/${id}/set-default`);
   return response.data;
 };
 

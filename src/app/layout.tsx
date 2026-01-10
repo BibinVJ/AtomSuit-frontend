@@ -10,6 +10,8 @@ import { AuthProvider } from '@/context/AuthProvider';
 import { TenantProvider } from '@/context/TenantProvider';
 import { SettingsProvider } from '@/context/SettingsProvider';
 import { Toaster } from 'sonner';
+import { Suspense } from 'react';
+import NavigationEvents from '@/components/common/NavigationEvents';
 
 const outfit = Outfit({
   subsets: ['latin'],
@@ -34,6 +36,9 @@ export default function RootLayout({
               <SettingsProvider>
                 <SidebarProvider>
                   <Toaster richColors position="top-center" closeButton={true} />
+                  <Suspense fallback={null}>
+                    <NavigationEvents />
+                  </Suspense>
                   {children}
                 </SidebarProvider>
               </SettingsProvider>

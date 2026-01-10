@@ -1,7 +1,7 @@
 import { Subscription } from '../types';
 import { createBaseService } from './BaseService';
 
-const baseService = createBaseService<Subscription, unknown>('/subscription');
+const baseService = createBaseService<Subscription, unknown>('/subscriptions');
 
 export const getSubscriptions = baseService.list;
 export const getSubscription = baseService.get;

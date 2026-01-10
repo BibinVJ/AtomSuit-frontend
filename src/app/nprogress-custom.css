@@ -4,11 +4,11 @@
   top: 0 !important;
   left: 0 !important;
   width: 100% !important;
-  height: 5px !important;
+  height: 7px !important;
   z-index: 9999999 !important;
   box-shadow:
-    0 0 10px var(--color-brand-500),
-    0 0 5px var(--color-brand-500) !important;
+    0 0 14px var(--color-brand-500),
+    0 0 7px var(--color-brand-500) !important;
 }
 
 #nprogress .peg {

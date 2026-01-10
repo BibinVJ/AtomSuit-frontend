@@ -64,7 +64,7 @@ export default function CurrencyList() {
             className="mb-0"
             searchTerm={searchTerm}
             onSearchChange={setSearchTerm}
-            searchPlaceholder="Search currency..."
+            searchPlaceholder="Search currencies..."
             rangeFrom={rangeFrom}
             onRangeFromChange={(val) => setRangeFrom(val as number | '')}
             rangeTo={rangeTo}
@@ -76,11 +76,11 @@ export default function CurrencyList() {
         </div>
 
         <ComponentCard
-          title={`Currency (${viewMode})`}
+          title={`Currencies (${viewMode})`}
           action={
             <div className="flex flex-wrap items-center gap-3">
               <ViewModeTabs viewMode={viewMode} setViewMode={setViewMode} />
-              <Tooltip text="Export Currency">
+              <Tooltip text="Export Currencies">
                 <Button
                   variant="outline"
                   size="sm"

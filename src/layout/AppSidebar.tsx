@@ -43,7 +43,7 @@ const navItems: NavItem[] = [
     name: 'Accounting',
     icon: <Receipt size={20} />,
     subItems: [
-      { name: 'Currency', path: '/accounting/currency', permission: 'view-currency' },
+      { name: 'Currencies', path: '/accounting/currencies', permission: 'view-currency' },
       {
         name: 'Chart of Accounts',
         path: '/accounting/chart-of-accounts',
@@ -332,6 +332,9 @@ const AppSidebar: React.FC = () => {
             ) : nav.path ? (
               <Link
                 href={nav.path}
+                onClick={() => {
+                  if (isMobileOpen) toggleMobileSidebar();
+                }}
                 className={`menu-item group ${
                   isActive(nav.path) ? 'menu-item-active' : 'menu-item-inactive'
                 }`}
@@ -375,6 +378,7 @@ const AppSidebar: React.FC = () => {
                       <Link
                         href={subItem.path}
                         onClick={() => {
+                          if (isMobileOpen) toggleMobileSidebar();
                           if (subItem.name === 'Add Sale' && isExpanded) {
                             toggleSidebar();
                           }
