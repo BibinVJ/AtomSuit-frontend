@@ -43,7 +43,7 @@ const navItems: NavItem[] = [
     name: 'Accounting',
     icon: <Receipt size={20} />,
     subItems: [
-      { name: 'Currencies', path: '/accounting/currencies', permission: 'view-currency' },
+      { name: 'Currency', path: '/accounting/currency', permission: 'view-currency' },
       {
         name: 'Chart of Accounts',
         path: '/accounting/chart-of-accounts',
@@ -55,11 +55,6 @@ const navItems: NavItem[] = [
         permission: 'view-account-group',
       },
       { name: 'Account Types', path: '/accounting/account-types', permission: 'view-account-type' },
-      {
-        name: 'Exchange Rates',
-        path: '/accounting/exchange-rates',
-        permission: 'view-exchange-rate',
-      },
     ],
   },
   {

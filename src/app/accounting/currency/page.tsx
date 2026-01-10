@@ -1,10 +1,10 @@
-import Currencies from '@/pages/Accounting/Currencies/Currencies';
+import Currency from '@/pages/Accounting/Currency/Currency';
 import ProtectedLayout from '@/components/layout/ProtectedLayout';
 
-export default function CurrenciesPage() {
+export default function CurrencyPage() {
   return (
     <ProtectedLayout>
-      <Currencies />
+      <Currency />
     </ProtectedLayout>
   );
 }

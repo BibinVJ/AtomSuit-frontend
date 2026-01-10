@@ -1,27 +1,25 @@
 'use client';
 
-import PageBreadcrumb from '../../../components/common/PageBreadCrumb';
 import ComponentCard from '../../../components/common/ComponentCard';
-import PageMeta from '../../../components/common/PageMeta';
-import CurrencyTable from '../../../components/accounting/currencies/CurrencyTable';
-import AddCurrencyModal from '../../../components/accounting/currencies/AddCurrencyModal';
+import ExchangeRateTable from './ExchangeRateTable';
+import AddExchangeRateModal from './AddExchangeRateModal';
 import { useModal } from '../../../hooks/useModal';
 import Pagination from '../../../components/common/Pagination';
 import Button from '../../../components/ui/button/Button';
 import Tooltip from '../../../components/ui/tooltip/Tooltip';
-import { getCurrencies, exportCurrencies } from '../../../services/CurrencyService';
-import { Currency } from '../../../types';
+import { getExchangeRates, exportExchangeRates } from '../../../services/ExchangeRateService';
+import { ExchangeRate } from '../../../types';
 import { Download, Plus } from 'lucide-react';
 import ViewModeTabs from '../../../components/common/ViewModeTabs';
 import TableToolbar from '../../../components/common/TableToolbar';
 import { useDataTable } from '../../../hooks/useDataTable';
 import { useExport } from '../../../hooks/useExport';
 
-export default function Currencies() {
+export default function ExchangeRatesList() {
   const { isOpen, openModal, closeModal } = useModal();
 
   const {
-    data: currencies,
+    data: rates,
     currentPage,
     perPage,
     totalPages,
@@ -43,33 +41,30 @@ export default function Currencies() {
     handleSort,
     resetFilters,
     refresh,
-  } = useDataTable<Currency>({
-    fetchData: getCurrencies,
-    initialSortBy: 'code',
-    initialSortDirection: 'asc',
+  } = useDataTable<ExchangeRate>({
+    fetchData: getExchangeRates,
+    initialSortBy: 'effective_date',
+    initialSortDirection: 'desc',
   });
 
   const { exportData } = useExport();
 
   const handleExport = () => {
     exportData({
-      exportFunction: exportCurrencies,
-      entityName: 'Currencies',
+      exportFunction: exportExchangeRates,
+      entityName: 'ExchangeRates',
     });
   };
 
   return (
     <>
-      <PageMeta title="Currencies" description="System currencies and formatting" />
-      <PageBreadcrumb pageTitle="Currencies" />
-
       <div className="space-y-6">
         <div className="p-5 border border-gray-200 rounded-2xl bg-gray-50 dark:bg-white/[0.03] dark:border-gray-800 shadow-sm">
           <TableToolbar
             className="mb-0"
             searchTerm={searchTerm}
             onSearchChange={setSearchTerm}
-            searchPlaceholder="Search currencies..."
+            searchPlaceholder="Search exchange rates..."
             rangeFrom={rangeFrom}
             onRangeFromChange={(val) => setRangeFrom(val as number | '')}
             rangeTo={rangeTo}
@@ -81,11 +76,11 @@ export default function Currencies() {
         </div>
 
         <ComponentCard
-          title={`Currencies (${viewMode})`}
+          title={`Exchange Rates (${viewMode})`}
           action={
             <div className="flex flex-wrap items-center gap-3">
               <ViewModeTabs viewMode={viewMode} setViewMode={setViewMode} />
-              <Tooltip text="Export Currencies">
+              <Tooltip text="Export Exchange Rates">
                 <Button
                   variant="outline"
                   size="sm"
@@ -96,17 +91,17 @@ export default function Currencies() {
                   Export
                 </Button>
               </Tooltip>
-              <Tooltip text="Add New Currency">
+              <Tooltip text="Add New Exchange Rate">
                 <Button onClick={openModal} size="sm" className="flex items-center gap-2">
                   <Plus size={16} />
-                  Add Currency
+                  Add Rate
                 </Button>
               </Tooltip>
             </div>
           }
         >
-          <CurrencyTable
-            data={currencies}
+          <ExchangeRateTable
+            data={rates}
             onAction={refresh}
             onSort={handleSort}
             sortBy={sortBy}
@@ -126,7 +121,7 @@ export default function Currencies() {
           />
         </ComponentCard>
       </div>
-      <AddCurrencyModal isOpen={isOpen} onClose={closeModal} onSuccess={refresh} />
+      <AddExchangeRateModal isOpen={isOpen} onClose={closeModal} onSuccess={refresh} />
     </>
   );
 }

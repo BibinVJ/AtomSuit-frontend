@@ -54,7 +54,7 @@ export default function Settings() {
 
       <div className="flex flex-col lg:flex-row gap-8">
         {/* Sidebar Navigation */}
-        <aside className="lg:w-64 flex-shrink-0">
+        <aside className="lg:w-64 flex-shrink-0 lg:sticky lg:top-24 lg:self-start">
           <nav className="flex lg:flex-col gap-1 overflow-x-auto lg:overflow-visible pb-4 lg:pb-0 scrollbar-hide">
             {groupNames.map((groupName) => (
               <button

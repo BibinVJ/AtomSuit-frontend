@@ -22,6 +22,7 @@ import PageMeta from '@/components/common/PageMeta';
 import PageBreadcrumb from '@/components/common/PageBreadCrumb';
 import ComponentCard from '@/components/common/ComponentCard';
 import ImportModal from '@/components/common/ImportModal';
+import ViewModeTabs from '@/components/common/ViewModeTabs';
 import { Download, Upload } from 'lucide-react';
 
 export default function WarehousesPage() {
@@ -39,7 +40,7 @@ export default function WarehousesPage() {
   const [to, setTo] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(15);
   const [searchQuery, setSearchQuery] = useState('');
-  const [showDeleted, setShowDeleted] = useState(false);
+  const [viewMode, setViewMode] = useState<'active' | 'trashed'>('active');
 
   // Sorting - hardcoded for now as UI doesn't support it yet
   const sortCol = 'created_at';
@@ -53,7 +54,7 @@ export default function WarehousesPage() {
         search: searchQuery,
         sortCol,
         sortDir,
-        trashed: showDeleted ? 'with' : undefined,
+        trashed: viewMode === 'trashed' ? 'only' : undefined,
       });
 
       setWarehouses(response.data);
@@ -67,7 +68,7 @@ export default function WarehousesPage() {
     } finally {
       // setIsLoading(false);
     }
-  }, [currentPage, itemsPerPage, searchQuery, sortCol, sortDir, showDeleted]);
+  }, [currentPage, itemsPerPage, searchQuery, sortCol, sortDir, viewMode]);
 
   useEffect(() => {
     fetchWarehouses();
@@ -125,60 +126,57 @@ export default function WarehousesPage() {
       <PageBreadcrumb pageTitle="Warehouses" />
 
       <div className="space-y-6">
-        <ComponentCard
-          title="Warehouses"
-          action={
-            <div className="flex flex-wrap items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleExport}
-                className="flex items-center gap-2"
-              >
-                <Download className="w-4 h-4" /> Export
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setIsImportModalOpen(true)}
-                className="flex items-center gap-2"
-              >
-                <Upload className="w-4 h-4" /> Import
-              </Button>
-              <Button
-                onClick={() => setIsCreateModalOpen(true)}
-                size="sm"
-                className="flex items-center gap-2"
-              >
-                <Plus className="w-4 h-4" /> Add Warehouse
-              </Button>
-            </div>
-          }
-        >
+        <div className="p-5 border border-gray-200 rounded-2xl bg-gray-50 dark:bg-white/[0.03] dark:border-gray-800 shadow-sm">
           <TableToolbar
+            className="mb-0"
             searchTerm={searchQuery}
             onSearchChange={setSearchQuery}
             searchPlaceholder="Search warehouses..."
             perPage={itemsPerPage}
             onPerPageChange={(val) => setItemsPerPage(Number(val))}
-            extraFilters={
-              <label className="flex items-center space-x-2 text-sm text-gray-700 dark:text-gray-300">
-                <input
-                  type="checkbox"
-                  checked={showDeleted}
-                  onChange={(e) => setShowDeleted(e.target.checked)}
-                  className="rounded border-gray-300 text-brand-600 focus:ring-brand-500"
-                />
-                <span>Show Deleted</span>
-              </label>
-            }
           />
+        </div>
 
+        <ComponentCard
+          title={`Warehouses (${viewMode})`}
+          action={
+            <div className="flex flex-wrap items-center gap-4">
+              <ViewModeTabs viewMode={viewMode} setViewMode={setViewMode} />
+
+              <div className="flex flex-wrap items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleExport}
+                  className="flex items-center gap-2"
+                >
+                  <Download className="w-4 h-4" /> Export
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsImportModalOpen(true)}
+                  className="flex items-center gap-2"
+                >
+                  <Upload className="w-4 h-4" /> Import
+                </Button>
+                <Button
+                  onClick={() => setIsCreateModalOpen(true)}
+                  size="sm"
+                  className="flex items-center gap-2"
+                >
+                  <Plus className="w-4 h-4" /> Add Warehouse
+                </Button>
+              </div>
+            </div>
+          }
+        >
           <WarehouseTable
             warehouses={warehouses}
             onEdit={handleEdit}
             onDelete={handleDelete}
             onRestore={handleRestore}
+            viewMode={viewMode}
           />
 
           <Pagination

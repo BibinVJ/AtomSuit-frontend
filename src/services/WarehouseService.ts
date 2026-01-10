@@ -1,5 +1,5 @@
 import { Warehouse, WarehouseInput } from '../types/Warehouse';
-import axios from '../utils/axios';
+import axios from './api';
 
 interface GetWarehousesParams {
   page?: number;

@@ -10,6 +10,7 @@ interface WarehouseTableProps {
   onEdit: (warehouse: Warehouse) => void;
   onDelete: (warehouse: Warehouse) => void;
   onRestore?: (warehouse: Warehouse) => void;
+  viewMode?: 'active' | 'trashed';
 }
 
 export default function WarehouseTable({
