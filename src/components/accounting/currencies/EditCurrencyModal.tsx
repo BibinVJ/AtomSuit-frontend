@@ -22,11 +22,6 @@ export default function EditCurrencyModal({ isOpen, onClose, onSuccess, currency
     code: '',
     name: '',
     symbol: '',
-    is_default: false,
-    thousand_separator: '',
-    decimal_separator: '',
-    precision: 2,
-    symbol_position: 'before' as 'before' | 'after',
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -38,11 +33,6 @@ export default function EditCurrencyModal({ isOpen, onClose, onSuccess, currency
         code: currency.code,
         name: currency.name,
         symbol: currency.symbol || '',
-        is_default: currency.is_default,
-        thousand_separator: currency.thousand_separator || '',
-        decimal_separator: currency.decimal_separator || '',
-        precision: currency.precision ?? 2,
-        symbol_position: currency.symbol_position || 'before',
       });
     }
   }, [currency]);
@@ -130,69 +120,6 @@ export default function EditCurrencyModal({ isOpen, onClose, onSuccess, currency
             placeholder="e.g. $"
             value={formData.symbol}
             onChange={(e) => setFormData({ ...formData, symbol: e.target.value })}
-          />
-        </div>
-
-        <div>
-          <Label>Precision</Label>
-          <Input
-            type="number"
-            value={formData.precision}
-            onChange={(e) => setFormData({ ...formData, precision: parseInt(e.target.value) })}
-          />
-        </div>
-
-        <div>
-          <Label>Thousand Separator</Label>
-          <Input
-            type="text"
-            placeholder="e.g. ,"
-            value={formData.thousand_separator}
-            onChange={(e) => setFormData({ ...formData, thousand_separator: e.target.value })}
-          />
-        </div>
-
-        <div>
-          <Label>Decimal Separator</Label>
-          <Input
-            type="text"
-            placeholder="e.g. ."
-            value={formData.decimal_separator}
-            onChange={(e) => setFormData({ ...formData, decimal_separator: e.target.value })}
-          />
-        </div>
-
-        <div>
-          <Label>Symbol Position</Label>
-          <div className="flex gap-4 mt-2">
-            <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
-              <input
-                type="radio"
-                name="symbol_position"
-                value="before"
-                checked={formData.symbol_position === 'before'}
-                onChange={() => setFormData({ ...formData, symbol_position: 'before' })}
-              />
-              Before Number
-            </label>
-            <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
-              <input
-                type="radio"
-                name="symbol_position"
-                value="after"
-                checked={formData.symbol_position === 'after'}
-                onChange={() => setFormData({ ...formData, symbol_position: 'after' })}
-              />
-              After Number
-            </label>
-          </div>
-        </div>
-
-        <div className="lg:col-span-2">
-          <Switch
-            label="Default Currency"
-            checked={formData.is_default}
-            onChange={(checked) => setFormData({ ...formData, is_default: checked })}
           />
         </div>
       </div>

@@ -112,12 +112,6 @@ export default function CurrencyTable({
               </TableCell>
               <TableCell
                 isHeader
-                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-              >
-                Formatting
-              </TableCell>
-              <TableCell
-                isHeader
                 className="px-5 py-3 font-medium text-gray-500 text-end text-theme-xs dark:text-gray-400"
               >
                 Actions
@@ -129,7 +123,7 @@ export default function CurrencyTable({
             {data.length === 0 ? (
               <TableRow>
                 <TableCell
-                  colSpan={6}
+                  colSpan={5}
                   className="px-6 py-4 text-center text-gray-500 text-theme-sm"
                 >
                   No currencies found.
@@ -150,11 +144,6 @@ export default function CurrencyTable({
                       <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
                         {currency.code}
                       </p>
-                      {currency.is_default && (
-                        <span className="px-2 py-0.5 text-xs font-medium text-brand-600 bg-brand-50 border border-brand-200 rounded-full">
-                          Default
-                        </span>
-                      )}
                     </div>
                   </TableCell>
                   <TableCell className="px-5 py-4 sm:px-6 text-start text-gray-500 dark:text-gray-400 text-theme-sm">
@@ -162,11 +151,6 @@ export default function CurrencyTable({
                   </TableCell>
                   <TableCell className="px-5 py-4 sm:px-6 text-start text-gray-500 dark:text-gray-400 text-theme-sm">
                     {currency.symbol}
-                  </TableCell>
-                  <TableCell className="px-5 py-4 sm:px-6 text-start text-gray-500 dark:text-gray-400 text-theme-sm">
-                    {currency.precision !== null ? `${currency.precision} dec` : 'Global'} |
-                    {currency.thousand_separator ? ` '${currency.thousand_separator}'` : ' Global'}{' '}
-                    |{currency.decimal_separator ? ` '${currency.decimal_separator}'` : ' Global'}
                   </TableCell>
                   <TableCell className="px-5 py-4 sm:px-6 text-end text-gray-500 dark:text-gray-400 text-theme-sm">
                     <TableActions

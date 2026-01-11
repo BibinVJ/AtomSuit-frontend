@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Setting } from '../../types';
 import Button from '../ui/button/Button';
 import FileInput from '../form/input/FileInput';
@@ -11,6 +11,8 @@ import Select from '../form/Select';
 import MultiSelect from '../form/MultiSelect';
 import { Save, Trash2, Clock } from 'lucide-react';
 import { updateSetting, deleteSettingFile } from '../../services/SettingsService';
+import { getChartOfAccounts } from '../../services/ChartOfAccountService';
+import { getCurrencies } from '../../services/CurrencyService';
 import { toast } from 'sonner';
 import { formatLabel } from '../../utils/string';
 import { useSettings } from '../../hooks/useSettings';
@@ -58,11 +60,54 @@ const DAY_OPTIONS = [
   { value: '0', label: 'Sunday' },
 ];
 
+const TAX_ALGORITHM_OPTIONS = [
+  { value: 'sum_per_line', label: 'Sum Per Line' },
+  { value: 'total_based', label: 'Total Based' },
+];
+
 export default function SettingField({ setting, onUpdate }: Props) {
   const { refreshSettings } = useSettings();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [value, setValue] = useState<any>(setting.value);
   const [isLoading, setIsLoading] = useState(false);
+  const [accountOptions, setAccountOptions] = useState<{ value: string; label: string }[]>([]);
+  const [currencyOptions, setCurrencyOptions] = useState<{ value: string; label: string }[]>([]);
+
+  useEffect(() => {
+    const fetchOptions = async () => {
+      if (setting.key.endsWith('_account')) {
+        try {
+          const response = await getChartOfAccounts({
+            unpaginated: true,
+            sort_by: 'code',
+            sort_direction: 'asc',
+          });
+          setAccountOptions(
+            response.data.map((account) => ({
+              value: String(account.id),
+              label: `${account.code} - ${account.name}`,
+            }))
+          );
+        } catch (error) {
+          console.error('Error fetching accounts:', error);
+        }
+      } else if (setting.key === 'currency') {
+        try {
+          const response = await getCurrencies({ unpaginated: true });
+          setCurrencyOptions(
+            response.data.map((currency) => ({
+              value: String(currency.id),
+              label: `${currency.code} (${currency.symbol}) - ${currency.name}`,
+            }))
+          );
+        } catch (error) {
+          console.error('Error fetching currencies:', error);
+        }
+      }
+    };
+
+    fetchOptions();
+  }, [setting.key]);
 
   const handleSave = async () => {
     setIsLoading(true);
@@ -116,6 +161,9 @@ export default function SettingField({ setting, onUpdate }: Props) {
     const isBusinessDays = setting.key === 'business_days';
     const isWeekStart = setting.key === 'week_start';
     const isTimeField = setting.key.includes('business_hours');
+    const isAccountField = setting.key.endsWith('_account');
+    const isCurrencyField = setting.key === 'currency';
+    const isTaxAlgorithm = setting.key === 'tax_algorithm';
 
     // Handle special cases before type-based rendering
     if (isBusinessDays) {
@@ -137,6 +185,39 @@ export default function SettingField({ setting, onUpdate }: Props) {
           onChange={(selectedValue) => setValue(parseInt(selectedValue))}
           placeholder="Select week start day"
           defaultValue={String(value || 1)}
+        />
+      );
+    }
+
+    if (isAccountField) {
+      return (
+        <Select
+          options={accountOptions}
+          onChange={(selectedValue) => setValue(parseInt(selectedValue))}
+          placeholder="Select account"
+          defaultValue={String(value || '')}
+        />
+      );
+    }
+
+    if (isCurrencyField) {
+      return (
+        <Select
+          options={currencyOptions}
+          onChange={(selectedValue) => setValue(parseInt(selectedValue))}
+          placeholder="Select currency"
+          defaultValue={String(value || '')}
+        />
+      );
+    }
+
+    if (isTaxAlgorithm) {
+      return (
+        <Select
+          options={TAX_ALGORITHM_OPTIONS}
+          onChange={(selectedValue) => setValue(selectedValue)}
+          placeholder="Select tax algorithm"
+          defaultValue={value || 'sum_per_line'}
         />
       );
     }
