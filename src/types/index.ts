@@ -22,3 +22,4 @@ export * from './ExchangeRate';
 export * from './AccountType';
 export * from './AccountGroup';
 export * from './ChartOfAccount';
+export * from './Tax';

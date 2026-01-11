@@ -6,12 +6,14 @@ import Input from '../../form/input/InputField';
 import Label from '../../form/Label';
 import TextArea from '../../form/input/TextArea';
 import Select from '../../form/Select';
+import Switch from '../../form/switch/Switch';
 import { toast } from 'sonner';
 import { addItem } from '../../../services/ItemService';
 import { getCategories } from '../../../services/CategoryService';
 import { getUnits } from '../../../services/UnitService';
 import { getChartOfAccounts } from '../../../services/ChartOfAccountService';
-import { Category, Unit, ItemInput, ChartOfAccount } from '../../../types';
+import { getTaxGroups } from '../../../services/TaxService';
+import { Category, Unit, ItemInput, ChartOfAccount, TaxGroup } from '../../../types';
 import CollapsibleSection from '../../common/CollapsibleSection';
 import { isApiError } from '../../../utils/errors';
 
@@ -35,33 +37,13 @@ export default function AddItemModal({ isOpen, onClose, onSuccess }: Props) {
     inventory_account_id: '',
     inventory_adjustment_account_id: '',
     purchase_account_id: '',
+    tax_group_id: '',
+    is_tax_inclusive: false,
   });
-
-  const handleCategoryChange = (categoryId: string) => {
-    const selectedCategory = categories.find((c) => String(c.id) === categoryId);
-
-    const newFormData = { ...formData, category_id: categoryId };
-
-    if (selectedCategory) {
-      if (selectedCategory.sales_account_id)
-        newFormData.sales_account_id = String(selectedCategory.sales_account_id);
-      if (selectedCategory.cogs_account_id)
-        newFormData.cogs_account_id = String(selectedCategory.cogs_account_id);
-      if (selectedCategory.inventory_account_id)
-        newFormData.inventory_account_id = String(selectedCategory.inventory_account_id);
-      if (selectedCategory.inventory_adjustment_account_id)
-        newFormData.inventory_adjustment_account_id = String(
-          selectedCategory.inventory_adjustment_account_id
-        );
-      if (selectedCategory.purchase_account_id)
-        newFormData.purchase_account_id = String(selectedCategory.purchase_account_id);
-    }
-
-    setFormData(newFormData);
-  };
 
   const [categories, setCategories] = useState<Category[]>([]);
   const [units, setUnits] = useState<Unit[]>([]);
+  const [taxGroups, setTaxGroups] = useState<TaxGroup[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -75,6 +57,7 @@ export default function AddItemModal({ isOpen, onClose, onSuccess }: Props) {
       fetchCategories();
       fetchUnits();
       fetchAccounts();
+      fetchTaxGroups();
     }
   }, [isOpen]);
 
@@ -109,6 +92,41 @@ export default function AddItemModal({ isOpen, onClose, onSuccess }: Props) {
     }
   };
 
+  const fetchTaxGroups = async () => {
+    try {
+      const response = await getTaxGroups({ unpaginated: true });
+      setTaxGroups(response.data);
+    } catch (error) {
+      console.error('Error fetching tax groups:', error);
+    }
+  };
+
+  const handleCategoryChange = (categoryId: string) => {
+    const selectedCategory = categories.find((c) => String(c.id) === categoryId);
+
+    const newFormData = { ...formData, category_id: categoryId };
+
+    if (selectedCategory) {
+      if (selectedCategory.sales_account_id)
+        newFormData.sales_account_id = String(selectedCategory.sales_account_id);
+      if (selectedCategory.cogs_account_id)
+        newFormData.cogs_account_id = String(selectedCategory.cogs_account_id);
+      if (selectedCategory.inventory_account_id)
+        newFormData.inventory_account_id = String(selectedCategory.inventory_account_id);
+      if (selectedCategory.inventory_adjustment_account_id)
+        newFormData.inventory_adjustment_account_id = String(
+          selectedCategory.inventory_adjustment_account_id
+        );
+      if (selectedCategory.purchase_account_id)
+        newFormData.purchase_account_id = String(selectedCategory.purchase_account_id);
+      if (selectedCategory.tax_group_id) {
+        newFormData.tax_group_id = String(selectedCategory.tax_group_id);
+      }
+    }
+
+    setFormData(newFormData);
+  };
+
   const resetForm = () => {
     setFormData({
       sku: '',
@@ -123,6 +141,8 @@ export default function AddItemModal({ isOpen, onClose, onSuccess }: Props) {
       inventory_account_id: '',
       inventory_adjustment_account_id: '',
       purchase_account_id: '',
+      tax_group_id: '',
+      is_tax_inclusive: false,
     });
     setErrors({});
   };
@@ -137,7 +157,10 @@ export default function AddItemModal({ isOpen, onClose, onSuccess }: Props) {
     setIsSubmitting(true);
 
     try {
-      await addItem(formData);
+      await addItem({
+        ...formData,
+        tax_group_id: formData.tax_group_id ? Number(formData.tax_group_id) : undefined,
+      });
       onSuccess();
       toast.success('Item added successfully');
       handleClose();
@@ -258,6 +281,34 @@ export default function AddItemModal({ isOpen, onClose, onSuccess }: Props) {
             />
             {errors.type && <p className="mt-1 text-xs text-red-500">{errors.type}</p>}
           </div>
+
+          <div>
+            <Label>
+              Tax Group <span className="text-red-500">*</span>
+            </Label>
+            <Select
+              options={taxGroups.map((tg) => ({ value: String(tg.id), label: tg.name }))}
+              value={String(formData.tax_group_id || '')}
+              onChange={(val) => setFormData({ ...formData, tax_group_id: val })}
+              placeholder="Select Tax Group"
+              error={!!errors.tax_group_id}
+            />
+            {errors.tax_group_id && (
+              <p className="mt-1 text-xs text-red-500">{errors.tax_group_id}</p>
+            )}
+          </div>
+
+          <div>
+            <Label>&nbsp;</Label>
+            <div className="flex items-center gap-2 mt-2">
+              <Switch
+                label="Tax Inclusive Price"
+                checked={formData.is_tax_inclusive}
+                onChange={(checked) => setFormData({ ...formData, is_tax_inclusive: checked })}
+              />
+            </div>
+          </div>
+
           <div className="lg:col-span-2">
             <Label>Description</Label>
             <TextArea

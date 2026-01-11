@@ -2,8 +2,8 @@
 
 import { Warehouse } from '../../../types/Warehouse';
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '../../ui/table';
-import { Edit, Trash, RotateCcw } from 'lucide-react';
-import Badge from '../../ui/badge/Badge';
+import { TableActions } from '../../common/TableActions';
+import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide } from 'lucide-react';
 
 interface WarehouseTableProps {
   warehouses: Warehouse[];
@@ -11,6 +11,9 @@ interface WarehouseTableProps {
   onDelete: (warehouse: Warehouse) => void;
   onRestore?: (warehouse: Warehouse) => void;
   viewMode?: 'active' | 'trashed';
+  onSort: (column: string) => void;
+  sortBy: string;
+  sortDirection: string;
 }
 
 export default function WarehouseTable({
@@ -18,7 +21,22 @@ export default function WarehouseTable({
   onEdit,
   onDelete,
   onRestore,
+  viewMode = 'active',
+  onSort,
+  sortBy,
+  sortDirection,
 }: WarehouseTableProps) {
+  const renderSortIcon = (column: string) => {
+    if (sortBy !== column) {
+      return <ChevronsUpDown className="inline-block w-4 h-4 ml-1 text-gray-400" />;
+    }
+    return sortDirection === 'asc' ? (
+      <ArrowUpWideNarrow className="inline-block w-4 h-4 ml-1" />
+    ) : (
+      <ArrowDownNarrowWide className="inline-block w-4 h-4 ml-1" />
+    );
+  };
+
   return (
     <div className="overflow-hidden bg-white border border-gray-200 rounded-xl shadow-sm dark:border-gray-800 dark:bg-gray-900">
       <div className="overflow-x-auto relative">
@@ -27,15 +45,17 @@ export default function WarehouseTable({
             <TableRow>
               <TableCell
                 isHeader
-                className="px-5 py-4 sm:px-6 text-start text-xs font-medium text-gray-500 uppercase dark:text-gray-400"
+                className="px-5 py-4 sm:px-6 text-start text-xs font-medium text-gray-500 uppercase dark:text-gray-400 cursor-pointer"
+                onClick={() => onSort('name')}
               >
-                Name
+                Name {renderSortIcon('name')}
               </TableCell>
               <TableCell
                 isHeader
-                className="px-5 py-4 sm:px-6 text-start text-xs font-medium text-gray-500 uppercase dark:text-gray-400"
+                className="px-5 py-4 sm:px-6 text-start text-xs font-medium text-gray-500 uppercase dark:text-gray-400 cursor-pointer"
+                onClick={() => onSort('code')}
               >
-                Code
+                Code {renderSortIcon('code')}
               </TableCell>
               <TableCell
                 isHeader
@@ -65,16 +85,16 @@ export default function WarehouseTable({
                   className="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
                 >
                   <TableCell className="px-5 py-4 sm:px-6 text-start text-gray-800 dark:text-white/90 text-sm font-medium">
-                    {warehouse.deleted_at ? (
-                      <span className="flex items-center gap-2">
-                        <span className="line-through text-gray-500">{warehouse.name}</span>
-                        <Badge variant="light" color="error" size="sm">
-                          Deleted
-                        </Badge>
-                      </span>
-                    ) : (
-                      warehouse.name
-                    )}
+                    <span
+                      className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+                        warehouse.deleted_at
+                          ? 'bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-500'
+                          : ''
+                      }`}
+                    >
+                      {warehouse.name}
+                      {warehouse.deleted_at ? ' (Deleted)' : ''}
+                    </span>
                   </TableCell>
                   <TableCell className="px-5 py-4 sm:px-6 text-start text-gray-500 dark:text-gray-400 text-sm">
                     {warehouse.code || 'N/A'}
@@ -94,32 +114,12 @@ export default function WarehouseTable({
                     </div>
                   </TableCell>
                   <TableCell className="px-5 py-4 sm:px-6 text-end">
-                    <div className="flex items-center justify-end gap-2">
-                      {warehouse.deleted_at && onRestore ? (
-                        <button
-                          onClick={() => onRestore(warehouse)}
-                          className="p-1.5 text-gray-500 hover:text-green-600 transition-colors bg-gray-100 hover:bg-green-50 rounded-lg dark:bg-white/5 dark:hover:bg-green-500/10 dark:text-gray-400 dark:hover:text-green-500"
-                          title="Restore"
-                        >
-                          <RotateCcw className="size-4" />
-                        </button>
-                      ) : (
-                        <>
-                          <button
-                            onClick={() => onEdit(warehouse)}
-                            className="p-1.5 text-gray-500 hover:text-primary-600 transition-colors bg-gray-100 hover:bg-primary-50 rounded-lg dark:bg-white/5 dark:hover:bg-indigo-500/10 dark:text-gray-400 dark:hover:text-white"
-                          >
-                            <Edit className="size-4" />
-                          </button>
-                          <button
-                            onClick={() => onDelete(warehouse)}
-                            className="p-1.5 text-gray-500 hover:text-red-500 transition-colors bg-gray-100 hover:bg-red-50 rounded-lg dark:bg-white/5 dark:hover:bg-red-500/10 dark:text-gray-400 dark:hover:text-red-500"
-                          >
-                            <Trash className="size-4" />
-                          </button>
-                        </>
-                      )}
-                    </div>
+                    <TableActions
+                      isTrashed={viewMode === 'trashed'}
+                      onEdit={() => onEdit(warehouse)}
+                      onDelete={() => onDelete(warehouse)}
+                      onRestore={onRestore ? () => onRestore(warehouse) : undefined}
+                    />
                   </TableCell>
                 </TableRow>
               ))

@@ -6,12 +6,14 @@ import Input from '../../form/input/InputField';
 import Label from '../../form/Label';
 import TextArea from '../../form/input/TextArea';
 import Select from '../../form/Select';
+import Switch from '../../form/switch/Switch';
 import { toast } from 'sonner';
 import { updateItem } from '../../../services/ItemService';
 import { getCategories } from '../../../services/CategoryService';
 import { getUnits } from '../../../services/UnitService';
 import { getChartOfAccounts } from '../../../services/ChartOfAccountService';
-import { Category, Item, Unit, ItemInput, ChartOfAccount } from '../../../types';
+import { getTaxGroups } from '../../../services/TaxService';
+import { Category, Item, Unit, ItemInput, ChartOfAccount, TaxGroup } from '../../../types';
 import CollapsibleSection from '../../common/CollapsibleSection';
 import { isApiError } from '../../../utils/errors';
 
@@ -31,10 +33,13 @@ export default function EditItemModal({ isOpen, onClose, onSuccess, item }: Prop
     description: '',
     type: 'product',
     selling_price: 0,
+    tax_group_id: '',
+    is_tax_inclusive: false,
   });
 
   const [categories, setCategories] = useState<Category[]>([]);
   const [units, setUnits] = useState<Unit[]>([]);
+  const [taxGroups, setTaxGroups] = useState<TaxGroup[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -58,6 +63,8 @@ export default function EditItemModal({ isOpen, onClose, onSuccess, item }: Prop
         inventory_account_id: String(item.inventory_account_id || ''),
         inventory_adjustment_account_id: String(item.inventory_adjustment_account_id || ''),
         purchase_account_id: String(item.purchase_account_id || ''),
+        tax_group_id: String(item.tax_group_id || ''),
+        is_tax_inclusive: item.is_tax_inclusive || false,
       });
     }
   }, [item]);
@@ -67,6 +74,7 @@ export default function EditItemModal({ isOpen, onClose, onSuccess, item }: Prop
       fetchCategories();
       fetchUnits();
       fetchAccounts();
+      fetchTaxGroups();
     }
   }, [isOpen]);
 
@@ -101,12 +109,24 @@ export default function EditItemModal({ isOpen, onClose, onSuccess, item }: Prop
     }
   };
 
+  const fetchTaxGroups = async () => {
+    try {
+      const response = await getTaxGroups({ unpaginated: true });
+      setTaxGroups(response.data);
+    } catch (error) {
+      console.error('Error fetching tax groups:', error);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
     try {
-      await updateItem(item.id, formData);
+      await updateItem(item.id, {
+        ...formData,
+        tax_group_id: formData.tax_group_id ? Number(formData.tax_group_id) : undefined,
+      });
       onSuccess();
       toast.success('Item updated successfully');
       onClose();
@@ -179,7 +199,7 @@ export default function EditItemModal({ isOpen, onClose, onSuccess, item }: Prop
                 .map((cat) => ({
                   value: String(cat.id),
                   label: cat.deleted_at ? `${cat.name} (Deleted)` : cat.name,
-                  className: cat.deleted_at ? 'text-red-500' : '',
+                  variant: (cat.deleted_at ? 'danger' : 'default') as 'danger' | 'default',
                 }))}
               value={String(formData.category_id)}
               onChange={(val) => setFormData({ ...formData, category_id: val })}
@@ -202,7 +222,7 @@ export default function EditItemModal({ isOpen, onClose, onSuccess, item }: Prop
                   label: unit.deleted_at
                     ? `${unit.name} (${unit.code}) (Deleted)`
                     : `${unit.name} (${unit.code})`,
-                  className: unit.deleted_at ? 'text-red-500' : '',
+                  variant: (unit.deleted_at ? 'danger' : 'default') as 'danger' | 'default',
                 }))}
               value={String(formData.unit_id)}
               onChange={(val) => setFormData({ ...formData, unit_id: val })}
@@ -238,6 +258,34 @@ export default function EditItemModal({ isOpen, onClose, onSuccess, item }: Prop
             />
             {errors.type && <p className="mt-1 text-xs text-red-500">{errors.type}</p>}
           </div>
+
+          <div>
+            <Label>
+              Tax Group <span className="text-red-500">*</span>
+            </Label>
+            <Select
+              options={taxGroups.map((tg) => ({ value: String(tg.id), label: tg.name }))}
+              value={String(formData.tax_group_id || '')}
+              onChange={(val) => setFormData({ ...formData, tax_group_id: val })}
+              placeholder="Select Tax Group"
+              error={!!errors.tax_group_id}
+            />
+            {errors.tax_group_id && (
+              <p className="mt-1 text-xs text-red-500">{errors.tax_group_id}</p>
+            )}
+          </div>
+
+          <div>
+            <Label>&nbsp;</Label>
+            <div className="flex items-center gap-2 mt-2">
+              <Switch
+                label="Tax Inclusive Price"
+                checked={formData.is_tax_inclusive}
+                onChange={(checked) => setFormData({ ...formData, is_tax_inclusive: checked })}
+              />
+            </div>
+          </div>
+
           <div className="lg:col-span-2">
             <Label>Description</Label>
             <TextArea

@@ -8,7 +8,8 @@ import CollapsibleSection from '../../common/CollapsibleSection';
 import { toast } from 'sonner';
 import { addCategory } from '../../../services/CategoryService';
 import { getChartOfAccounts } from '../../../services/ChartOfAccountService';
-import { ChartOfAccount } from '../../../types';
+import { getTaxGroups } from '../../../services/TaxService';
+import { ChartOfAccount, TaxGroup } from '../../../types';
 import { isApiError } from '../../../utils/errors';
 
 interface Props {
@@ -26,12 +27,14 @@ export default function AddCategoryModal({ isOpen, onClose, onSuccess }: Props) 
     inventory_account_id: '',
     inventory_adjustment_account_id: '',
     purchase_account_id: '',
+    tax_group_id: '',
   });
 
   const [salesAccounts, setSalesAccounts] = useState<ChartOfAccount[]>([]);
   const [cogsAccounts, setCogsAccounts] = useState<ChartOfAccount[]>([]);
   const [inventoryAccounts, setInventoryAccounts] = useState<ChartOfAccount[]>([]);
   const [expenseAccounts, setExpenseAccounts] = useState<ChartOfAccount[]>([]);
+  const [taxGroups, setTaxGroups] = useState<TaxGroup[]>([]);
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -39,6 +42,7 @@ export default function AddCategoryModal({ isOpen, onClose, onSuccess }: Props) 
   useEffect(() => {
     if (isOpen) {
       fetchAccounts();
+      fetchTaxGroups();
     }
   }, [isOpen]);
 
@@ -55,6 +59,15 @@ export default function AddCategoryModal({ isOpen, onClose, onSuccess }: Props) 
     }
   };
 
+  const fetchTaxGroups = async () => {
+    try {
+      const response = await getTaxGroups({ unpaginated: true });
+      setTaxGroups(response.data);
+    } catch (error) {
+      console.error('Error fetching tax groups:', error);
+    }
+  };
+
   const resetForm = () => {
     setFormData({
       name: '',
@@ -64,6 +77,7 @@ export default function AddCategoryModal({ isOpen, onClose, onSuccess }: Props) 
       inventory_account_id: '',
       inventory_adjustment_account_id: '',
       purchase_account_id: '',
+      tax_group_id: '',
     });
     setErrors({ name: '' });
   };
@@ -90,6 +104,7 @@ export default function AddCategoryModal({ isOpen, onClose, onSuccess }: Props) 
       purchase_account_id: formData.purchase_account_id
         ? Number(formData.purchase_account_id)
         : null,
+      tax_group_id: formData.tax_group_id ? Number(formData.tax_group_id) : null,
     };
 
     try {
@@ -148,6 +163,22 @@ export default function AddCategoryModal({ isOpen, onClose, onSuccess }: Props) 
             value={formData.description}
             onChange={(val) => setFormData({ ...formData, description: val })}
           />
+        </div>
+
+        <div>
+          <Label>
+            Default Tax Group <span className="text-red-500">*</span>
+          </Label>
+          <Select
+            options={taxGroups.map((tg) => ({ value: String(tg.id), label: tg.name }))}
+            value={String(formData.tax_group_id || '')}
+            onChange={(val) => setFormData({ ...formData, tax_group_id: val })}
+            placeholder="Select Default Tax Group"
+            error={!!errors.tax_group_id}
+          />
+          <p className="mt-1 text-xs text-gray-500">
+            Items in this category will default to this tax group.
+          </p>
         </div>
       </div>
 

@@ -1,16 +1,17 @@
 'use client';
 
-import type React from 'react';
-import { useState, useEffect, useRef } from 'react';
-import { ChevronsUpDown, Check, X } from 'lucide-react';
+import React from 'react';
+import ReactSelect, { MultiValue } from 'react-select';
 
 interface Option {
   value: string;
   text: string;
+  className?: string;
+  variant?: 'default' | 'danger' | 'success';
 }
 
 interface MultiSelectProps {
-  label: string;
+  label?: string;
   options: Option[];
   defaultSelected?: string[];
   onChange?: (selected: string[]) => void;
@@ -28,53 +29,30 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
   placeholder = 'Select options',
   searchable = true,
 }) => {
-  const [selectedOptions, setSelectedOptions] = useState<string[]>(defaultSelected);
-  const [isOpen, setIsOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  const searchInputRef = useRef<HTMLInputElement>(null);
+  // Map strings to option objects
+  const selectedValues = options.filter((opt) => defaultSelected.includes(opt.value));
 
-  const toggleDropdown = () => {
-    if (!disabled) setIsOpen((prev) => !prev);
-  };
+  // React Select expects options with label, we have text
+  const adaptedOptions = options.map((opt) => ({
+    value: opt.value,
+    label: opt.text,
+    className: opt.className,
+    variant: opt.variant,
+  }));
+  const adaptedSelected = selectedValues.map((opt) => ({
+    value: opt.value,
+    label: opt.text,
+    className: opt.className,
+    variant: opt.variant,
+  }));
 
-  useEffect(() => {
-    if (isOpen && searchable) {
-      searchInputRef.current?.focus();
+  const handleChange = (
+    newValue: MultiValue<{ value: string; label: string; className?: string; variant?: string }>
+  ) => {
+    if (onChange) {
+      onChange(newValue.map((item) => item.value));
     }
-  }, [isOpen, searchable]);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
-
-  const handleSelect = (optionValue: string) => {
-    const newSelectedOptions = selectedOptions.includes(optionValue)
-      ? selectedOptions.filter((value) => value !== optionValue)
-      : [...selectedOptions, optionValue];
-
-    setSelectedOptions(newSelectedOptions);
-    onChange?.(newSelectedOptions);
   };
-
-  const removeOption = (value: string) => {
-    const newSelectedOptions = selectedOptions.filter((opt) => opt !== value);
-    setSelectedOptions(newSelectedOptions);
-    onChange?.(newSelectedOptions);
-  };
-
-  const filteredOptions = searchable
-    ? options.filter((option) => option.text.toLowerCase().includes(searchTerm.toLowerCase()))
-    : options;
 
   return (
     <div className="w-full">
@@ -84,70 +62,77 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
         </label>
       )}
 
-      <div ref={dropdownRef} className="relative">
-        <div
-          className="min-h-11 w-full flex items-center justify-between rounded-lg border bg-transparent px-4 py-2.5 text-sm shadow-theme-xs cursor-pointer border-gray-300 dark:border-gray-700"
-          onClick={toggleDropdown}
-        >
-          <div className="flex flex-wrap gap-1 flex-1">
-            {selectedOptions.length > 0 ? (
-              selectedOptions.map((value) => {
-                const option = options.find((opt) => opt.value === value);
-                return (
-                  <span
-                    key={value}
-                    className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded text-xs"
-                  >
-                    {option?.text}
-                    <X
-                      className="w-3 h-3 cursor-pointer hover:text-blue-600"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        removeOption(value);
-                      }}
-                    />
-                  </span>
-                );
-              })
-            ) : (
-              <span className="text-gray-400">{placeholder}</span>
-            )}
-          </div>
-          <ChevronsUpDown className="h-4 w-4 text-gray-400 ml-2 flex-shrink-0" />
-        </div>
+      <ReactSelect
+        isMulti
+        value={adaptedSelected}
+        onChange={handleChange}
+        options={adaptedOptions}
+        placeholder={placeholder}
+        isDisabled={disabled}
+        isSearchable={searchable}
+        menuPortalTarget={typeof document !== 'undefined' ? document.body : null}
+        menuPosition="fixed"
+        classNames={{
+          menuPortal: () => '!z-[1000005]',
+          control: ({ isFocused }) =>
+            `!min-h-[2.75rem] !rounded-lg !border !bg-white dark:!bg-gray-900 !px-3 !py-1.5 !text-sm !shadow-theme-xs ${
+              isFocused
+                ? '!border-brand-500 !ring-1 !ring-brand-500'
+                : '!border-gray-300 dark:!border-gray-700'
+            }`,
+          option: ({ isFocused, isSelected, data }) => {
+            const isDanger = data.variant === 'danger';
 
-        {isOpen && (
-          <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-lg">
-            {searchable && (
-              <div className="p-2">
-                <input
-                  ref={searchInputRef}
-                  type="text"
-                  placeholder="Search..."
-                  className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
-            )}
-            <ul className="max-h-60 overflow-y-auto">
-              {filteredOptions.map((option) => (
-                <li
-                  key={option.value}
-                  className="flex items-center justify-between px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
-                  onClick={() => handleSelect(option.value)}
-                >
-                  <span>{option.text}</span>
-                  {selectedOptions.includes(option.value) && <Check className="h-4 w-4" />}
-                </li>
-              ))}
-              {filteredOptions.length === 0 && (
-                <li className="px-4 py-2 text-sm text-gray-500">No options found</li>
-              )}
-            </ul>
-          </div>
-        )}
-      </div>
+            let classes = '!px-4 !py-2 !text-sm !cursor-pointer';
+
+            if (isSelected) {
+              if (isDanger) {
+                classes += ' !bg-red-100 dark:!bg-red-900/40 !text-red-600 dark:!text-red-400';
+              } else {
+                classes += ' !bg-brand-500 !text-white';
+              }
+            } else if (isFocused) {
+              if (isDanger) {
+                classes += ' !bg-red-50 dark:!bg-red-900/20 !text-red-500';
+              } else {
+                classes += ' !bg-gray-100 dark:!bg-gray-700 dark:text-gray-300 text-gray-700';
+              }
+            } else {
+              if (isDanger) {
+                classes += ' !bg-red-50 dark:!bg-red-900/10 !text-red-500';
+              } else {
+                classes += ' text-gray-700 dark:text-gray-300';
+              }
+            }
+
+            return `${classes} ${data.className || ''}`;
+          },
+          menu: () =>
+            '!bg-white dark:!bg-gray-800 !border !border-gray-300 dark:!border-gray-700 !rounded-lg !shadow-lg !mt-1',
+          input: () => '!text-gray-800 dark:!text-gray-200',
+          multiValue: ({ data }) => {
+            // @ts-ignore
+            const isDanger = data.variant === 'danger';
+            return `!rounded !text-sm !m-1 ${isDanger ? '!bg-red-100 dark:!bg-red-900' : '!bg-blue-100 dark:!bg-blue-900'}`;
+          },
+          multiValueLabel: ({ data }) => {
+            // @ts-ignore
+            const isDanger = data.variant === 'danger';
+            return `!px-2 !py-0.5 ${isDanger ? '!text-red-800 dark:!text-red-200' : '!text-blue-800 dark:!text-blue-200'}`;
+          },
+          multiValueRemove: ({ data }) => {
+            // @ts-ignore
+            const isDanger = data.variant === 'danger';
+            return `!rounded-r cursor-pointer ${
+              isDanger
+                ? '!text-red-600 dark:!text-red-300 hover:!bg-red-200 dark:hover:!bg-red-800'
+                : '!text-blue-600 dark:!text-blue-300 hover:!bg-blue-200 dark:hover:!bg-blue-800'
+            }`;
+          },
+          placeholder: () => '!text-gray-400',
+        }}
+        unstyled
+      />
     </div>
   );
 };

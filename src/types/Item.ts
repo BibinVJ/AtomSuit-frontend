@@ -20,6 +20,8 @@ export interface Item {
   inventory_account_id?: number | null;
   inventory_adjustment_account_id?: number | null;
   purchase_account_id?: number | null;
+  tax_group_id?: number | null;
+  is_tax_inclusive?: boolean;
 }
 
 export interface ItemInput {
@@ -35,6 +37,8 @@ export interface ItemInput {
   inventory_account_id?: string | number | null;
   inventory_adjustment_account_id?: string | number | null;
   purchase_account_id?: string | number | null;
+  tax_group_id?: string | number | null;
+  is_tax_inclusive?: boolean;
 }
 
 export interface ItemApiResponse {

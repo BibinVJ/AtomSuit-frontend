@@ -54,7 +54,16 @@ const navItems: NavItem[] = [
         path: '/accounting/account-groups',
         permission: 'view-account-group',
       },
-      { name: 'Account Types', path: '/accounting/account-types', permission: 'view-account-type' },
+      {
+        name: 'Account Methods',
+        path: '/accounting/account-types',
+        permission: 'view-account-type',
+      },
+      {
+        name: 'Taxes',
+        path: '/accounting/taxes',
+        permission: 'view-tax-rate', // Assuming user needs at least view-tax-rate to access the page
+      },
     ],
   },
   {

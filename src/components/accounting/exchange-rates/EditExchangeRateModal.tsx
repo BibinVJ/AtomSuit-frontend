@@ -107,8 +107,8 @@ export default function EditExchangeRateModal({ isOpen, onClose, onSuccess, exch
               .filter((c) => !c.deleted_at || c.id === exchangeRate?.base_currency_id)
               .map((c) => ({
                 value: String(c.id),
-                label: `${c.code} - ${c.name}${c.deleted_at ? ' (Deleted)' : ''}`,
-                className: c.deleted_at ? 'text-red-500' : '',
+                label: c.deleted_at ? `${c.code} - ${c.name} (Deleted)` : `${c.code} - ${c.name}`,
+                variant: (c.deleted_at ? 'danger' : 'default') as 'danger' | 'default',
               }))}
             value={String(formData.base_currency_id)}
             onChange={(val) => setFormData({ ...formData, base_currency_id: Number(val) })}
@@ -128,8 +128,8 @@ export default function EditExchangeRateModal({ isOpen, onClose, onSuccess, exch
               .filter((c) => !c.deleted_at || c.id === exchangeRate?.target_currency_id)
               .map((c) => ({
                 value: String(c.id),
-                label: `${c.code} - ${c.name}${c.deleted_at ? ' (Deleted)' : ''}`,
-                className: c.deleted_at ? 'text-red-500' : '',
+                label: c.deleted_at ? `${c.code} - ${c.name} (Deleted)` : `${c.code} - ${c.name}`,
+                variant: (c.deleted_at ? 'danger' : 'default') as 'danger' | 'default',
               }))}
             value={String(formData.target_currency_id)}
             onChange={(val) => setFormData({ ...formData, target_currency_id: Number(val) })}

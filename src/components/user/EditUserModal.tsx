@@ -112,7 +112,7 @@ export default function EditUserModal({ isOpen, onClose, onUserUpdated, user }: 
     .map((r) => ({
       value: String(r.id),
       label: `${formatKebabCase(r.name)}${r.deleted_at ? ' (Deleted)' : ''}`,
-      className: r.deleted_at ? 'text-red-500' : '',
+      variant: (r.deleted_at ? 'danger' : 'default') as 'danger' | 'default',
     }));
 
   return (

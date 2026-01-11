@@ -22,6 +22,7 @@ export interface Customer {
   shipping_state?: string;
   shipping_country?: string;
   shipping_zip_code?: string;
+  tax_group_id?: number | null;
 }
 
 export interface CustomerInput {
@@ -45,6 +46,7 @@ export interface CustomerInput {
   shipping_state?: string;
   shipping_country?: string;
   shipping_zip_code?: string;
+  tax_group_id?: number | null;
 }
 
 export interface CustomerApiResponse {

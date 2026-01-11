@@ -60,3 +60,21 @@ export interface UserFormData {
 }
 
 export type UserInput = UserUpdatePayload;
+
+export interface UserLoginDetail {
+  id: number;
+  user_id: number;
+  token_id: string | null;
+  login_at: string;
+  logout_at: string | null;
+  ip_address: string;
+  user_agent: string;
+  login_method: string;
+  city: string | null;
+  country: string | null;
+  iso_code: string | null;
+  os: string | null;
+  browser: string | null;
+  device_type: string | null;
+  user?: User;
+}

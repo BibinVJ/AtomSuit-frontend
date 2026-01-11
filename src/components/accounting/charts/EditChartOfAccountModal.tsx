@@ -151,13 +151,12 @@ export default function EditChartOfAccountModal({
               setErrors((prev) => ({ ...prev, account_group_id: '' }));
             }}
             options={[
-              { value: '', label: 'Select Group' },
               ...accountGroups
                 .filter((group) => !group.deleted_at || group.id.toString() === accountGroupId)
                 .map((group) => ({
                   value: group.id.toString(),
                   label: group.deleted_at ? `${group.name} (Deleted)` : group.name,
-                  className: group.deleted_at ? 'text-red-500' : '',
+                  variant: (group.deleted_at ? 'danger' : 'default') as 'danger' | 'default',
                 })),
             ]}
             error={!!errors.account_group_id}

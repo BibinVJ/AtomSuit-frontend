@@ -1,10 +1,10 @@
-import Warehouses from '@/pages/Inventory/Warehouses/Warehouses';
+import Taxes from '@/pages/Accounting/Taxes/Taxes';
 import ProtectedLayout from '@/components/layout/ProtectedLayout';
 
-export default function WarehousesPage() {
+export default function TaxesPage() {
   return (
     <ProtectedLayout>
-      <Warehouses />
+      <Taxes />
     </ProtectedLayout>
   );
 }

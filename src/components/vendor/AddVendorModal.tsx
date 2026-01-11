@@ -9,8 +9,9 @@ import { toast } from 'sonner';
 import { addVendor } from '../../services/VendorService';
 import { getCurrencies } from '../../services/CurrencyService';
 import { getChartOfAccounts } from '../../services/ChartOfAccountService';
+import { getTaxGroups } from '../../services/TaxService';
 import { isApiError } from '../../utils/errors';
-import { VendorInput, Currency, ChartOfAccount } from '../../types';
+import { VendorInput, Currency, ChartOfAccount, TaxGroup } from '../../types';
 
 import CollapsibleSection from '../common/CollapsibleSection';
 import Button from '../ui/button/Button';
@@ -43,10 +44,12 @@ export default function AddVendorModal({ isOpen, onClose, onSuccess }: Props) {
     shipping_state: '',
     shipping_country: '',
     shipping_zip_code: '',
+    tax_group_id: undefined,
   });
 
   const [currencies, setCurrencies] = useState<Currency[]>([]);
   const [chartOfAccounts, setChartOfAccounts] = useState<ChartOfAccount[]>([]);
+  const [taxGroups, setTaxGroups] = useState<TaxGroup[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -58,12 +61,14 @@ export default function AddVendorModal({ isOpen, onClose, onSuccess }: Props) {
 
   const fetchCurrencies = async () => {
     try {
-      const [currencyRes, coaRes] = await Promise.all([
+      const [currencyRes, coaRes, taxGroupRes] = await Promise.all([
         getCurrencies({ unpaginated: true }),
         getChartOfAccounts({ unpaginated: true }),
+        getTaxGroups({ unpaginated: true }),
       ]);
       setCurrencies(currencyRes.data);
       setChartOfAccounts(coaRes.data);
+      setTaxGroups(taxGroupRes.data);
     } catch (error) {
       console.error('Failed to fetch data:', error);
       toast.error('Failed to load form data');
@@ -92,6 +97,7 @@ export default function AddVendorModal({ isOpen, onClose, onSuccess }: Props) {
       shipping_state: '',
       shipping_country: '',
       shipping_zip_code: '',
+      tax_group_id: undefined,
     });
     setErrors({});
   };
@@ -204,6 +210,20 @@ export default function AddVendorModal({ isOpen, onClose, onSuccess }: Props) {
             />
             {errors.currency_id && (
               <p className="mt-1 text-xs text-red-500">{errors.currency_id}</p>
+            )}
+          </div>
+
+          <div>
+            <Label>Tax Group</Label>
+            <Select
+              options={taxGroups.map((tg) => ({ value: String(tg.id), label: tg.name }))}
+              value={String(formData.tax_group_id || '')}
+              onChange={(val) => setFormData({ ...formData, tax_group_id: Number(val) })}
+              placeholder="Select Default Tax Group"
+              error={!!errors.tax_group_id}
+            />
+            {errors.tax_group_id && (
+              <p className="mt-1 text-xs text-red-500">{errors.tax_group_id}</p>
             )}
           </div>
         </div>

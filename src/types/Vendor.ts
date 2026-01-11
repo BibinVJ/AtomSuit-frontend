@@ -27,6 +27,7 @@ export interface Vendor {
   shipping_state?: string;
   shipping_country?: string;
   shipping_zip_code?: string;
+  tax_group_id?: number | null;
 }
 
 export interface VendorInput {
@@ -50,6 +51,7 @@ export interface VendorInput {
   shipping_state?: string;
   shipping_country?: string;
   shipping_zip_code?: string;
+  tax_group_id?: number | null;
 }
 
 export interface VendorApiResponse {

@@ -7,8 +7,9 @@ import { toast } from 'sonner';
 import { updateCustomer } from '../../services/CustomerService';
 import { getCurrencies } from '../../services/CurrencyService';
 import { getChartOfAccounts } from '../../services/ChartOfAccountService';
+import { getTaxGroups } from '../../services/TaxService';
 import { isApiError } from '../../utils/errors';
-import { Customer, CustomerInput, Currency, ChartOfAccount } from '../../types';
+import { Customer, CustomerInput, Currency, ChartOfAccount, TaxGroup } from '../../types';
 
 interface Props {
   isOpen: boolean;
@@ -39,10 +40,12 @@ export default function EditCustomerModal({ isOpen, onClose, onSuccess, customer
     shipping_state: '',
     shipping_country: '',
     shipping_zip_code: '',
+    tax_group_id: undefined,
   });
 
   const [currencies, setCurrencies] = useState<Currency[]>([]);
   const [chartOfAccounts, setChartOfAccounts] = useState<ChartOfAccount[]>([]);
+  const [taxGroups, setTaxGroups] = useState<TaxGroup[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -69,6 +72,7 @@ export default function EditCustomerModal({ isOpen, onClose, onSuccess, customer
         shipping_state: customer.shipping_state || '',
         shipping_country: customer.shipping_country || '',
         shipping_zip_code: customer.shipping_zip_code || '',
+        tax_group_id: customer.tax_group_id,
       });
     }
   }, [customer]);
@@ -81,12 +85,14 @@ export default function EditCustomerModal({ isOpen, onClose, onSuccess, customer
 
   const fetchData = async () => {
     try {
-      const [currencyRes, coaRes] = await Promise.all([
+      const [currencyRes, coaRes, taxGroupRes] = await Promise.all([
         getCurrencies({ unpaginated: true, trashed: 'with' }),
         getChartOfAccounts({ unpaginated: true, trashed: 'with' }),
+        getTaxGroups({ unpaginated: true }),
       ]);
       setCurrencies(currencyRes.data);
       setChartOfAccounts(coaRes.data);
+      setTaxGroups(taxGroupRes.data);
     } catch (error) {
       console.error('Failed to fetch data:', error);
       toast.error('Failed to load form data');
@@ -131,7 +137,7 @@ export default function EditCustomerModal({ isOpen, onClose, onSuccess, customer
       .map((c) => ({
         value: String(c.id),
         label: c.deleted_at ? `${c.code} - ${c.name} (Deleted)` : `${c.code} - ${c.name}`,
-        className: c.deleted_at ? 'text-red-500' : '',
+        variant: (c.deleted_at ? 'danger' : 'default') as 'danger' | 'default',
       }));
   };
 
@@ -189,7 +195,7 @@ export default function EditCustomerModal({ isOpen, onClose, onSuccess, customer
                 .map((c) => ({
                   value: String(c.id),
                   label: c.deleted_at ? `${c.code} - ${c.name} (Deleted)` : `${c.code} - ${c.name}`,
-                  className: c.deleted_at ? 'text-red-500' : '',
+                  variant: (c.deleted_at ? 'danger' : 'default') as 'danger' | 'default',
                 }))}
               value={formData.currency_id ? String(formData.currency_id) : ''}
               onChange={(val) => setFormData({ ...formData, currency_id: Number(val) })}
@@ -198,6 +204,19 @@ export default function EditCustomerModal({ isOpen, onClose, onSuccess, customer
             />
             {errors.currency_id && (
               <p className="mt-1 text-xs text-red-500">{errors.currency_id}</p>
+            )}
+          </div>
+          <div>
+            <Label>Default Tax Group</Label>
+            <Select
+              options={taxGroups.map((tg) => ({ value: String(tg.id), label: tg.name }))}
+              value={String(formData.tax_group_id || '')}
+              onChange={(val) => setFormData({ ...formData, tax_group_id: Number(val) })}
+              placeholder="Select Default Tax Group"
+              error={!!errors.tax_group_id}
+            />
+            {errors.tax_group_id && (
+              <p className="mt-1 text-xs text-red-500">{errors.tax_group_id}</p>
             )}
           </div>
         </div>

@@ -3,6 +3,7 @@
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '../ui/table';
 import { useState } from 'react';
 import Badge from '../ui/badge/Badge';
+import ViewUserModal from './ViewUserModal';
 import EditUserModal from './EditUserModal';
 import DeleteUserModal from './DeleteUserModal';
 import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide } from 'lucide-react';
@@ -39,6 +40,7 @@ export default function UserTable({
 }: Props) {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
   const handleEdit = (user: User) => {
@@ -51,9 +53,15 @@ export default function UserTable({
     setIsDeleteModalOpen(true);
   };
 
+  const handleView = (user: User) => {
+    setSelectedUser(user);
+    setIsViewModalOpen(true);
+  };
+
   const handleCloseModals = () => {
     setIsEditModalOpen(false);
     setIsDeleteModalOpen(false);
+    setIsViewModalOpen(false);
     setSelectedUser(null);
   };
 
@@ -193,6 +201,7 @@ export default function UserTable({
                   <TableCell className="px-4 py-3 text-gray-500 text-end text-theme-sm dark:text-gray-400">
                     <TableActions
                       isTrashed={viewMode === 'trashed'}
+                      onView={() => handleView(user)}
                       onEdit={() => handleEdit(user)}
                       onDelete={() => handleDelete(user)}
                       onRestore={() => handleRestore(user.id)}
@@ -206,6 +215,7 @@ export default function UserTable({
       </div>
       {selectedUser && (
         <>
+          <ViewUserModal isOpen={isViewModalOpen} onClose={handleCloseModals} user={selectedUser} />
           <EditUserModal
             isOpen={isEditModalOpen}
             onClose={handleCloseModals}

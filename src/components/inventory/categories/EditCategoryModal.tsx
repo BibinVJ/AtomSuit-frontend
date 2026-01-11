@@ -8,7 +8,8 @@ import CollapsibleSection from '../../common/CollapsibleSection';
 import { toast } from 'sonner';
 import { updateCategory } from '../../../services/CategoryService';
 import { getChartOfAccounts } from '../../../services/ChartOfAccountService';
-import { ChartOfAccount, Category } from '../../../types';
+import { getTaxGroups } from '../../../services/TaxService';
+import { ChartOfAccount, Category, TaxGroup } from '../../../types';
 import { isApiError } from '../../../utils/errors';
 
 interface Props {
@@ -27,12 +28,14 @@ export default function EditCategoryModal({ isOpen, onClose, onSuccess, category
     inventory_account_id: '',
     inventory_adjustment_account_id: '',
     purchase_account_id: '',
+    tax_group_id: '',
   });
 
   const [salesAccounts, setSalesAccounts] = useState<ChartOfAccount[]>([]);
   const [cogsAccounts, setCogsAccounts] = useState<ChartOfAccount[]>([]);
   const [inventoryAccounts, setInventoryAccounts] = useState<ChartOfAccount[]>([]);
   const [expenseAccounts, setExpenseAccounts] = useState<ChartOfAccount[]>([]);
+  const [taxGroups, setTaxGroups] = useState<TaxGroup[]>([]);
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -40,6 +43,7 @@ export default function EditCategoryModal({ isOpen, onClose, onSuccess, category
   useEffect(() => {
     if (isOpen) {
       fetchAccounts();
+      fetchTaxGroups();
     }
   }, [isOpen]);
 
@@ -59,6 +63,7 @@ export default function EditCategoryModal({ isOpen, onClose, onSuccess, category
         purchase_account_id: category.purchase_account_id
           ? String(category.purchase_account_id)
           : '',
+        tax_group_id: category.tax_group_id ? String(category.tax_group_id) : '',
       });
     }
   }, [category]);
@@ -73,6 +78,15 @@ export default function EditCategoryModal({ isOpen, onClose, onSuccess, category
       setExpenseAccounts(accounts);
     } catch (error) {
       console.error('Error fetching accounts:', error);
+    }
+  };
+
+  const fetchTaxGroups = async () => {
+    try {
+      const response = await getTaxGroups({ unpaginated: true });
+      setTaxGroups(response.data);
+    } catch (error) {
+      console.error('Error fetching tax groups:', error);
     }
   };
 
@@ -93,6 +107,7 @@ export default function EditCategoryModal({ isOpen, onClose, onSuccess, category
       purchase_account_id: formData.purchase_account_id
         ? Number(formData.purchase_account_id)
         : null,
+      tax_group_id: formData.tax_group_id ? Number(formData.tax_group_id) : null,
     };
 
     try {
@@ -152,6 +167,21 @@ export default function EditCategoryModal({ isOpen, onClose, onSuccess, category
             onChange={(val) => setFormData({ ...formData, description: val })}
           />
         </div>
+        <div>
+          <Label>
+            Default Tax Group <span className="text-red-500">*</span>
+          </Label>
+          <Select
+            options={taxGroups.map((tg) => ({ value: String(tg.id), label: tg.name }))}
+            value={String(formData.tax_group_id || '')}
+            onChange={(val) => setFormData({ ...formData, tax_group_id: val })}
+            placeholder="Select Default Tax Group"
+            error={!!errors.tax_group_id}
+          />
+          <p className="mt-1 text-xs text-gray-500">
+            Items in this category will default to this tax group.
+          </p>
+        </div>
       </div>
 
       <div className="mt-5">
@@ -162,10 +192,17 @@ export default function EditCategoryModal({ isOpen, onClose, onSuccess, category
                 Sales Account <span className="text-red-500">*</span>
               </Label>
               <Select
-                options={salesAccounts.map((acc) => ({
-                  value: String(acc.id),
-                  label: `${acc.code} - ${acc.name}`,
-                }))}
+                options={salesAccounts
+                  .filter(
+                    (acc) => !acc.deleted_at || String(acc.id) === String(formData.sales_account_id)
+                  )
+                  .map((acc) => ({
+                    value: String(acc.id),
+                    label: acc.deleted_at
+                      ? `${acc.code} - ${acc.name} (Deleted)`
+                      : `${acc.code} - ${acc.name}`,
+                    variant: (acc.deleted_at ? 'danger' : 'default') as 'danger' | 'default',
+                  }))}
                 value={String(formData.sales_account_id)}
                 onChange={(val) => setFormData({ ...formData, sales_account_id: val })}
                 placeholder="Select Sales Account"
@@ -180,10 +217,17 @@ export default function EditCategoryModal({ isOpen, onClose, onSuccess, category
                 Cost of Goods Sold Account <span className="text-red-500">*</span>
               </Label>
               <Select
-                options={cogsAccounts.map((acc) => ({
-                  value: String(acc.id),
-                  label: `${acc.code} - ${acc.name}`,
-                }))}
+                options={cogsAccounts
+                  .filter(
+                    (acc) => !acc.deleted_at || String(acc.id) === String(formData.cogs_account_id)
+                  )
+                  .map((acc) => ({
+                    value: String(acc.id),
+                    label: acc.deleted_at
+                      ? `${acc.code} - ${acc.name} (Deleted)`
+                      : `${acc.code} - ${acc.name}`,
+                    variant: (acc.deleted_at ? 'danger' : 'default') as 'danger' | 'default',
+                  }))}
                 value={String(formData.cogs_account_id)}
                 onChange={(val) => setFormData({ ...formData, cogs_account_id: val })}
                 placeholder="Select COGS Account"
@@ -198,10 +242,18 @@ export default function EditCategoryModal({ isOpen, onClose, onSuccess, category
                 Inventory Account <span className="text-red-500">*</span>
               </Label>
               <Select
-                options={inventoryAccounts.map((acc) => ({
-                  value: String(acc.id),
-                  label: `${acc.code} - ${acc.name}`,
-                }))}
+                options={inventoryAccounts
+                  .filter(
+                    (acc) =>
+                      !acc.deleted_at || String(acc.id) === String(formData.inventory_account_id)
+                  )
+                  .map((acc) => ({
+                    value: String(acc.id),
+                    label: acc.deleted_at
+                      ? `${acc.code} - ${acc.name} (Deleted)`
+                      : `${acc.code} - ${acc.name}`,
+                    variant: (acc.deleted_at ? 'danger' : 'default') as 'danger' | 'default',
+                  }))}
                 value={String(formData.inventory_account_id)}
                 onChange={(val) => setFormData({ ...formData, inventory_account_id: val })}
                 placeholder="Select Inventory Account"
@@ -216,10 +268,19 @@ export default function EditCategoryModal({ isOpen, onClose, onSuccess, category
                 Inventory Adjustments Account <span className="text-red-500">*</span>
               </Label>
               <Select
-                options={expenseAccounts.map((acc) => ({
-                  value: String(acc.id),
-                  label: `${acc.code} - ${acc.name}`,
-                }))}
+                options={expenseAccounts
+                  .filter(
+                    (acc) =>
+                      !acc.deleted_at ||
+                      String(acc.id) === String(formData.inventory_adjustment_account_id)
+                  )
+                  .map((acc) => ({
+                    value: String(acc.id),
+                    label: acc.deleted_at
+                      ? `${acc.code} - ${acc.name} (Deleted)`
+                      : `${acc.code} - ${acc.name}`,
+                    variant: (acc.deleted_at ? 'danger' : 'default') as 'danger' | 'default',
+                  }))}
                 value={String(formData.inventory_adjustment_account_id)}
                 onChange={(val) =>
                   setFormData({ ...formData, inventory_adjustment_account_id: val })
@@ -236,10 +297,18 @@ export default function EditCategoryModal({ isOpen, onClose, onSuccess, category
             <div className="lg:col-span-2">
               <Label>Purchase Account (Optional)</Label>
               <Select
-                options={cogsAccounts.map((acc) => ({
-                  value: String(acc.id),
-                  label: `${acc.code} - ${acc.name}`,
-                }))}
+                options={cogsAccounts
+                  .filter(
+                    (acc) =>
+                      !acc.deleted_at || String(acc.id) === String(formData.purchase_account_id)
+                  )
+                  .map((acc) => ({
+                    value: String(acc.id),
+                    label: acc.deleted_at
+                      ? `${acc.code} - ${acc.name} (Deleted)`
+                      : `${acc.code} - ${acc.name}`,
+                    variant: (acc.deleted_at ? 'danger' : 'default') as 'danger' | 'default',
+                  }))}
                 value={String(formData.purchase_account_id)}
                 onChange={(val) => setFormData({ ...formData, purchase_account_id: val })}
                 placeholder="Select Purchase Account"
