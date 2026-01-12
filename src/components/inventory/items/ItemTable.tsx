@@ -23,6 +23,7 @@ interface Props {
   perPage: number;
   startIndex?: number;
   viewMode?: 'active' | 'trashed';
+  onManagePricing?: (item: Item) => void;
 }
 
 export default function ItemTable({
@@ -35,6 +36,7 @@ export default function ItemTable({
   perPage,
   startIndex,
   viewMode = 'active',
+  onManagePricing,
 }: Props) {
   const { hasPermission } = usePermissions();
   const { formatCurrency } = useSettings();
@@ -133,13 +135,7 @@ export default function ItemTable({
               >
                 Type {renderSortIcon('type')}
               </TableCell>
-              <TableCell
-                isHeader
-                className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400"
-                onClick={() => onSort('selling_price')}
-              >
-                Selling Price {renderSortIcon('selling_price')}
-              </TableCell>
+
               <TableCell
                 isHeader
                 className="px-5 py-3 font-medium text-gray-500 text-end text-theme-xs dark:text-gray-400"
@@ -199,20 +195,27 @@ export default function ItemTable({
                 <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
                   {item.type}
                 </TableCell>
-                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
-                  {formatCurrency(item.selling_price)}
-                </TableCell>
 
                 <TableCell className="px-4 py-3 text-end">
-                  <TableActions
-                    isTrashed={viewMode === 'trashed'}
-                    onView={() => handleView(item)}
-                    onEdit={hasPermission('update-item') ? () => handleEdit(item) : undefined}
-                    onDelete={hasPermission('delete-item') ? () => handleDelete(item) : undefined}
-                    onRestore={
-                      hasPermission('update-item') ? () => handleRestore(item.id) : undefined
-                    }
-                  />
+                  <div className="flex justify-end gap-2">
+                    {onManagePricing && (
+                      <button
+                        onClick={() => onManagePricing(item)}
+                        className="px-2 py-1 text-xs font-medium text-brand-500 hover:text-brand-600 border border-brand-200 rounded hover:bg-brand-50 dark:border-brand-500/30 dark:hover:bg-brand-500/10 transition-colors"
+                      >
+                        Pricing
+                      </button>
+                    )}
+                    <TableActions
+                      isTrashed={viewMode === 'trashed'}
+                      onView={() => handleView(item)}
+                      onEdit={hasPermission('update-item') ? () => handleEdit(item) : undefined}
+                      onDelete={hasPermission('delete-item') ? () => handleDelete(item) : undefined}
+                      onRestore={
+                        hasPermission('update-item') ? () => handleRestore(item.id) : undefined
+                      }
+                    />
+                  </div>
                 </TableCell>
               </TableRow>
             ))}
@@ -227,6 +230,7 @@ export default function ItemTable({
             onClose={handleCloseModals}
             onSuccess={onAction}
             item={selectedItem}
+            onManagePricing={onManagePricing}
           />
           <DeleteItemModal
             isOpen={isDeleteModalOpen}

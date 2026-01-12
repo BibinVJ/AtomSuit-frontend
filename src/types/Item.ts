@@ -9,7 +9,6 @@ export interface Item {
   category: Category;
   unit: Unit;
   type: string;
-  selling_price: number;
   deleted_at?: string;
   stock_on_hand?: number;
   non_expired_stock?: number;
@@ -21,7 +20,6 @@ export interface Item {
   inventory_adjustment_account_id?: number | null;
   purchase_account_id?: number | null;
   tax_group_id?: number | null;
-  is_tax_inclusive?: boolean;
 }
 
 export interface ItemInput {
@@ -31,14 +29,12 @@ export interface ItemInput {
   unit_id: string | number;
   description: string;
   type: string;
-  selling_price: number;
   sales_account_id?: string | number | null;
   cogs_account_id?: string | number | null;
   inventory_account_id?: string | number | null;
   inventory_adjustment_account_id?: string | number | null;
   purchase_account_id?: string | number | null;
   tax_group_id?: string | number | null;
-  is_tax_inclusive?: boolean;
 }
 
 export interface ItemApiResponse {

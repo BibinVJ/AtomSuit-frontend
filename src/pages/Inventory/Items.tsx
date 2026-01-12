@@ -7,6 +7,7 @@ import PageMeta from '../../components/common/PageMeta';
 import ItemTable from '../../components/inventory/items/ItemTable';
 import AddItemModal from '../../components/inventory/items/AddItemModal';
 import ImportItemModal from '../../components/inventory/items/ImportItemModal';
+import ItemPricingModal from '../../components/inventory/items/ItemPricingModal';
 import { useModal } from '../../hooks/useModal';
 import Pagination from '../../components/common/Pagination';
 import Button from '../../components/ui/button/Button';
@@ -33,6 +34,13 @@ export default function Items() {
     openModal: openImportModal,
     closeModal: closeImportModal,
   } = useModal();
+  const {
+    isOpen: isPricingOpen,
+    openModal: openPricingModal,
+    closeModal: closePricingModal,
+  } = useModal();
+
+  const [selectedItemForPricing, setSelectedItemForPricing] = useState<Item | null>(null);
 
   const [selectedCategory, setSelectedCategory] = useState<string | number>('');
   const [selectedUnit, setSelectedUnit] = useState<string | number>('');
@@ -99,6 +107,16 @@ export default function Items() {
       exportFunction: exportItems,
       entityName: 'Items',
     });
+  };
+
+  const handleManagePricing = (item: Item) => {
+    setSelectedItemForPricing(item);
+    openPricingModal();
+  };
+
+  const handlePricingModalClose = () => {
+    closePricingModal();
+    setSelectedItemForPricing(null);
   };
 
   const handleReset = () => {
@@ -228,6 +246,7 @@ export default function Items() {
             perPage={perPage}
             startIndex={rangeFrom !== '' ? Number(rangeFrom) : undefined}
             viewMode={viewMode}
+            onManagePricing={handleManagePricing}
           />
           <Pagination
             currentPage={currentPage}
@@ -241,6 +260,11 @@ export default function Items() {
       </div>
       <AddItemModal isOpen={isAddOpen} onClose={closeAddModal} onSuccess={refresh} />
       <ImportItemModal isOpen={isImportOpen} onClose={closeImportModal} onSuccess={refresh} />
+      <ItemPricingModal
+        isOpen={isPricingOpen}
+        onClose={handlePricingModalClose}
+        item={selectedItemForPricing}
+      />
     </>
   );
 }

@@ -31,14 +31,13 @@ export default function AddItemModal({ isOpen, onClose, onSuccess }: Props) {
     unit_id: '',
     description: '',
     type: 'product',
-    selling_price: 0,
+
     sales_account_id: '',
     cogs_account_id: '',
     inventory_account_id: '',
     inventory_adjustment_account_id: '',
     purchase_account_id: '',
     tax_group_id: '',
-    is_tax_inclusive: false,
   });
 
   const [categories, setCategories] = useState<Category[]>([]);
@@ -135,14 +134,13 @@ export default function AddItemModal({ isOpen, onClose, onSuccess }: Props) {
       unit_id: '',
       description: '',
       type: 'product',
-      selling_price: 0,
+
       sales_account_id: '',
       cogs_account_id: '',
       inventory_account_id: '',
       inventory_adjustment_account_id: '',
       purchase_account_id: '',
       tax_group_id: '',
-      is_tax_inclusive: false,
     });
     setErrors({});
   };
@@ -254,18 +252,7 @@ export default function AddItemModal({ isOpen, onClose, onSuccess }: Props) {
             />
             {errors.unit_id && <p className="mt-1 text-xs text-red-500">{errors.unit_id}</p>}
           </div>
-          <div>
-            <Label>
-              Selling Price <span className="text-red-500">*</span>
-            </Label>
-            <Input
-              type="number"
-              value={formData.selling_price}
-              onChange={(e) => setFormData({ ...formData, selling_price: Number(e.target.value) })}
-              error={!!errors.selling_price}
-              hint={errors.selling_price}
-            />
-          </div>
+
           <div>
             <Label>
               Type <span className="text-red-500">*</span>
@@ -296,17 +283,6 @@ export default function AddItemModal({ isOpen, onClose, onSuccess }: Props) {
             {errors.tax_group_id && (
               <p className="mt-1 text-xs text-red-500">{errors.tax_group_id}</p>
             )}
-          </div>
-
-          <div>
-            <Label>&nbsp;</Label>
-            <div className="flex items-center gap-2 mt-2">
-              <Switch
-                label="Tax Inclusive Price"
-                checked={formData.is_tax_inclusive}
-                onChange={(checked) => setFormData({ ...formData, is_tax_inclusive: checked })}
-              />
-            </div>
           </div>
 
           <div className="lg:col-span-2">

@@ -73,6 +73,7 @@ const navItems: NavItem[] = [
       { name: 'Categories', path: '/inventory/categories', permission: 'view-category' },
       { name: 'Units', path: '/inventory/units', permission: 'view-unit' },
       { name: 'Items', path: '/inventory/items', permission: 'view-item' },
+      { name: 'Price Lists', path: '/inventory/price-lists', permission: 'view-price-list' },
       { name: 'Warehouses', path: '/inventory/warehouses', permission: 'view-warehouse' },
     ],
   },

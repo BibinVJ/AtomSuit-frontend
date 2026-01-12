@@ -53,13 +53,6 @@ export default function ViewItemModal({ isOpen, onClose, item }: Props) {
             </p>
           </div>
 
-          <div>
-            <h3 className="text-sm font-medium text-gray-500 mb-1">Selling Price</h3>
-            <p className="text-base text-gray-900 dark:text-gray-100">
-              {formatCurrency(item.selling_price)}
-            </p>
-          </div>
-
           <div className="md:col-span-2">
             <h3 className="text-sm font-medium text-gray-500 mb-1">Description</h3>
             <p className="text-base text-gray-900 dark:text-gray-100">{item.description || '-'}</p>

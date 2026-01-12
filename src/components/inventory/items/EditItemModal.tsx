@@ -22,9 +22,16 @@ interface Props {
   onClose: () => void;
   onSuccess: () => void;
   item: Item;
+  onManagePricing?: (item: Item) => void;
 }
 
-export default function EditItemModal({ isOpen, onClose, onSuccess, item }: Props) {
+export default function EditItemModal({
+  isOpen,
+  onClose,
+  onSuccess,
+  item,
+  onManagePricing,
+}: Props) {
   const [formData, setFormData] = useState<ItemInput>({
     sku: '',
     name: '',
@@ -32,9 +39,8 @@ export default function EditItemModal({ isOpen, onClose, onSuccess, item }: Prop
     unit_id: '',
     description: '',
     type: 'product',
-    selling_price: 0,
+
     tax_group_id: '',
-    is_tax_inclusive: false,
   });
 
   const [categories, setCategories] = useState<Category[]>([]);
@@ -57,14 +63,13 @@ export default function EditItemModal({ isOpen, onClose, onSuccess, item }: Prop
         unit_id: String(item.unit?.id || ''),
         description: item.description || '',
         type: item.type,
-        selling_price: item.selling_price,
+
         sales_account_id: String(item.sales_account_id || ''),
         cogs_account_id: String(item.cogs_account_id || ''),
         inventory_account_id: String(item.inventory_account_id || ''),
         inventory_adjustment_account_id: String(item.inventory_adjustment_account_id || ''),
         purchase_account_id: String(item.purchase_account_id || ''),
         tax_group_id: String(item.tax_group_id || ''),
-        is_tax_inclusive: item.is_tax_inclusive || false,
       });
     }
   }, [item]);
@@ -231,17 +236,16 @@ export default function EditItemModal({ isOpen, onClose, onSuccess, item }: Prop
             />
             {errors.unit_id && <p className="mt-1 text-xs text-red-500">{errors.unit_id}</p>}
           </div>
-          <div>
-            <Label>
-              Selling Price <span className="text-red-500">*</span>
-            </Label>
-            <Input
-              type="number"
-              value={formData.selling_price}
-              onChange={(e) => setFormData({ ...formData, selling_price: Number(e.target.value) })}
-              error={!!errors.selling_price}
-              hint={errors.selling_price}
-            />
+          <div className="flex items-end">
+            {onManagePricing && (
+              <button
+                type="button"
+                onClick={() => onManagePricing(item)}
+                className="mb-2 text-sm font-medium text-brand-500 hover:text-brand-600 hover:underline flex items-center gap-1"
+              >
+                Configure Item Pricing
+              </button>
+            )}
           </div>
           <div>
             <Label>
@@ -273,17 +277,6 @@ export default function EditItemModal({ isOpen, onClose, onSuccess, item }: Prop
             {errors.tax_group_id && (
               <p className="mt-1 text-xs text-red-500">{errors.tax_group_id}</p>
             )}
-          </div>
-
-          <div>
-            <Label>&nbsp;</Label>
-            <div className="flex items-center gap-2 mt-2">
-              <Switch
-                label="Tax Inclusive Price"
-                checked={formData.is_tax_inclusive}
-                onChange={(checked) => setFormData({ ...formData, is_tax_inclusive: checked })}
-              />
-            </div>
           </div>
 
           <div className="lg:col-span-2">

@@ -10,6 +10,7 @@ export interface Customer {
   sales_discount_account?: { id: number; name: string };
   receivables_account?: { id: number; name: string };
   sales_return_account?: { id: number; name: string };
+  price_list_id?: number | null;
   billing_address_line_1?: string;
   billing_address_line_2?: string;
   billing_city?: string;
@@ -34,6 +35,7 @@ export interface CustomerInput {
   sales_discount_account_id?: number;
   receivables_account_id?: number;
   sales_return_account_id?: number;
+  price_list_id?: number;
   billing_address_line_1?: string;
   billing_address_line_2?: string;
   billing_city?: string;

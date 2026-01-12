@@ -16,6 +16,7 @@ interface DataTableOptions<T> {
   initialSortDirection?: 'asc' | 'desc';
   initialPerPage?: number;
   extraParams?: Record<string, unknown>;
+  enabled?: boolean;
 }
 
 export function useDataTable<T>({
@@ -24,6 +25,7 @@ export function useDataTable<T>({
   initialSortDirection = 'desc',
   initialPerPage = 10,
   extraParams = {},
+  enabled = true,
 }: DataTableOptions<T>) {
   const [data, setData] = useState<T[]>([]);
   const [loading, setLoading] = useState(false);
@@ -54,6 +56,8 @@ export function useDataTable<T>({
   );
 
   const refresh = useCallback(async () => {
+    if (!enabled) return;
+
     setLoading(true);
     try {
       const response = await fetchData({
@@ -92,6 +96,7 @@ export function useDataTable<T>({
     debouncedRangeTo,
     viewMode,
     memoizedExtraParams,
+    enabled,
   ]);
 
   useEffect(() => {

@@ -7,6 +7,7 @@ export interface Vendor {
   phone: string;
   currency?: Currency;
   currency_id?: number;
+  price_list_id?: number | null;
   payables_account_id?: number;
   purchase_account_id?: number;
   purchase_discount_account_id?: number;
@@ -35,6 +36,7 @@ export interface VendorInput {
   email: string;
   phone: string;
   currency_id?: number;
+  price_list_id?: number;
   payables_account_id?: number;
   purchase_account_id?: number;
   purchase_discount_account_id?: number;

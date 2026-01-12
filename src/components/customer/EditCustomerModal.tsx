@@ -8,8 +8,10 @@ import { updateCustomer } from '../../services/CustomerService';
 import { getCurrencies } from '../../services/CurrencyService';
 import { getChartOfAccounts } from '../../services/ChartOfAccountService';
 import { getTaxGroups } from '../../services/TaxService';
+import { getPriceLists } from '../../services/PriceListService';
 import { isApiError } from '../../utils/errors';
 import { Customer, CustomerInput, Currency, ChartOfAccount, TaxGroup } from '../../types';
+import { PriceList } from '../../types/PriceList';
 
 interface Props {
   isOpen: boolean;
@@ -41,9 +43,11 @@ export default function EditCustomerModal({ isOpen, onClose, onSuccess, customer
     shipping_country: '',
     shipping_zip_code: '',
     tax_group_id: undefined,
+    price_list_id: undefined,
   });
 
   const [currencies, setCurrencies] = useState<Currency[]>([]);
+  const [priceLists, setPriceLists] = useState<PriceList[]>([]);
   const [chartOfAccounts, setChartOfAccounts] = useState<ChartOfAccount[]>([]);
   const [taxGroups, setTaxGroups] = useState<TaxGroup[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -73,6 +77,7 @@ export default function EditCustomerModal({ isOpen, onClose, onSuccess, customer
         shipping_country: customer.shipping_country || '',
         shipping_zip_code: customer.shipping_zip_code || '',
         tax_group_id: customer.tax_group_id,
+        price_list_id: customer.price_list_id ?? undefined,
       });
     }
   }, [customer]);
@@ -85,14 +90,16 @@ export default function EditCustomerModal({ isOpen, onClose, onSuccess, customer
 
   const fetchData = async () => {
     try {
-      const [currencyRes, coaRes, taxGroupRes] = await Promise.all([
+      const [currencyRes, coaRes, taxGroupRes, priceListRes] = await Promise.all([
         getCurrencies({ unpaginated: true, trashed: 'with' }),
         getChartOfAccounts({ unpaginated: true, trashed: 'with' }),
         getTaxGroups({ unpaginated: true }),
+        getPriceLists({ unpaginated: true, type: 'sales' }),
       ]);
       setCurrencies(currencyRes.data);
       setChartOfAccounts(coaRes.data);
       setTaxGroups(taxGroupRes.data);
+      setPriceLists(priceListRes.data);
     } catch (error) {
       console.error('Failed to fetch data:', error);
       toast.error('Failed to load form data');
@@ -204,6 +211,21 @@ export default function EditCustomerModal({ isOpen, onClose, onSuccess, customer
             />
             {errors.currency_id && (
               <p className="mt-1 text-xs text-red-500">{errors.currency_id}</p>
+            )}
+          </div>
+          <div>
+            <Label>
+              Price List <span className="text-red-500">*</span>
+            </Label>
+            <Select
+              options={priceLists.map((pl) => ({ value: String(pl.id), label: pl.name }))}
+              value={formData.price_list_id ? String(formData.price_list_id) : ''}
+              onChange={(val) => setFormData({ ...formData, price_list_id: Number(val) })}
+              placeholder="Select Price List"
+              error={!!errors.price_list_id}
+            />
+            {errors.price_list_id && (
+              <p className="mt-1 text-xs text-red-500">{errors.price_list_id}</p>
             )}
           </div>
           <div>
