@@ -53,6 +53,13 @@ export default function ViewItemModal({ isOpen, onClose, item }: Props) {
             </p>
           </div>
 
+          <div>
+            <h3 className="text-sm font-medium text-gray-500 mb-1">Tax Group</h3>
+            <p className="text-base text-gray-900 dark:text-gray-100">
+              {item.tax_group ? item.tax_group.name : '-'}
+            </p>
+          </div>
+
           <div className="md:col-span-2">
             <h3 className="text-sm font-medium text-gray-500 mb-1">Description</h3>
             <p className="text-base text-gray-900 dark:text-gray-100">{item.description || '-'}</p>
@@ -93,15 +100,6 @@ export default function ViewItemModal({ isOpen, onClose, item }: Props) {
             <p className="text-base text-gray-900 dark:text-gray-100">
               {item.inventory_adjustment_account
                 ? `${item.inventory_adjustment_account.code} - ${item.inventory_adjustment_account.name}`
-                : '-'}
-            </p>
-          </div>
-
-          <div>
-            <h3 className="text-sm font-medium text-gray-500 mb-1">Purchase Account</h3>
-            <p className="text-base text-gray-900 dark:text-gray-100">
-              {item.purchase_account
-                ? `${item.purchase_account.code} - ${item.purchase_account.name}`
                 : '-'}
             </p>
           </div>

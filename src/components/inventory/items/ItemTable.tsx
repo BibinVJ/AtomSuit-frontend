@@ -5,13 +5,20 @@ import { useState } from 'react';
 import EditItemModal from './EditItemModal';
 import DeleteItemModal from './DeleteItemModal';
 import ViewItemModal from './ViewItemModal';
-import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide } from 'lucide-react';
+import {
+  ChevronsUpDown,
+  ArrowUpWideNarrow,
+  ArrowDownNarrowWide,
+  BadgeDollarSign,
+} from 'lucide-react';
 import { restoreItem } from '../../../services/ItemService';
 import { toast } from 'sonner';
 import { Item } from '../../../types';
 import { usePermissions } from '../../../hooks/usePermissions';
 import { useSettings } from '../../../hooks/useSettings';
 import { TableActions } from '../../common/TableActions';
+import Button from '../../ui/button/Button';
+import Tooltip from '../../ui/tooltip/Tooltip';
 
 interface Props {
   data: Item[];
@@ -199,12 +206,16 @@ export default function ItemTable({
                 <TableCell className="px-4 py-3 text-end">
                   <div className="flex justify-end gap-2">
                     {onManagePricing && (
-                      <button
-                        onClick={() => onManagePricing(item)}
-                        className="px-2 py-1 text-xs font-medium text-brand-500 hover:text-brand-600 border border-brand-200 rounded hover:bg-brand-50 dark:border-brand-500/30 dark:hover:bg-brand-500/10 transition-colors"
-                      >
-                        Pricing
-                      </button>
+                      <Tooltip text="Manage Pricing">
+                        <Button
+                          variant="ghost"
+                          size="xs"
+                          onClick={() => onManagePricing(item)}
+                          className="text-gray-500 hover:text-emerald-600"
+                        >
+                          <BadgeDollarSign size={18} />
+                        </Button>
+                      </Tooltip>
                     )}
                     <TableActions
                       isTrashed={viewMode === 'trashed'}

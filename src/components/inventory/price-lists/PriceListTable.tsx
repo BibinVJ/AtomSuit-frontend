@@ -23,7 +23,7 @@ interface Props {
   loading?: boolean;
   onEdit: (priceList: PriceList) => void;
   onDelete: (priceList: PriceList) => void;
-  onManagePrices: (priceList: PriceList) => void;
+  onViewDetails: (priceList: PriceList) => void;
 }
 
 export default function PriceListTable({
@@ -39,7 +39,7 @@ export default function PriceListTable({
   loading,
   onEdit,
   onDelete,
-  onManagePrices,
+  onViewDetails,
 }: Props) {
   const handleRestore = async (id: number) => {
     try {
@@ -147,7 +147,7 @@ export default function PriceListTable({
                   <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
                     <span
                       className="hover:text-brand-500 hover:underline cursor-pointer"
-                      onClick={() => onManagePrices(list)}
+                      onClick={() => onViewDetails(list)}
                     >
                       {list.name}
                     </span>
@@ -168,16 +168,9 @@ export default function PriceListTable({
                   </TableCell>
                   <TableCell className="px-4 py-3 text-gray-500 text-end text-theme-sm dark:text-gray-400">
                     <div className="flex justify-end gap-2">
-                      <Button
-                        variant="outline"
-                        className="h-7 px-2 text-xs"
-                        onClick={() => onManagePrices(list)}
-                      >
-                        Items
-                      </Button>
                       <TableActions
                         isTrashed={viewMode === 'trashed'}
-                        onView={() => onManagePrices(list)}
+                        onView={() => onViewDetails(list)}
                         onEdit={() => onEdit(list)}
                         onDelete={() => onDelete(list)}
                         onRestore={() => handleRestore(list.id)}

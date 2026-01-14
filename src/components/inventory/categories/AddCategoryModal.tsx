@@ -26,7 +26,6 @@ export default function AddCategoryModal({ isOpen, onClose, onSuccess }: Props) 
     cogs_account_id: '',
     inventory_account_id: '',
     inventory_adjustment_account_id: '',
-    purchase_account_id: '',
     tax_group_id: '',
   });
 
@@ -76,7 +75,6 @@ export default function AddCategoryModal({ isOpen, onClose, onSuccess }: Props) 
       cogs_account_id: '',
       inventory_account_id: '',
       inventory_adjustment_account_id: '',
-      purchase_account_id: '',
       tax_group_id: '',
     });
     setErrors({ name: '' });
@@ -100,9 +98,6 @@ export default function AddCategoryModal({ isOpen, onClose, onSuccess }: Props) 
         : null,
       inventory_adjustment_account_id: formData.inventory_adjustment_account_id
         ? Number(formData.inventory_adjustment_account_id)
-        : null,
-      purchase_account_id: formData.purchase_account_id
-        ? Number(formData.purchase_account_id)
         : null,
       tax_group_id: formData.tax_group_id ? Number(formData.tax_group_id) : null,
     };
@@ -260,18 +255,6 @@ export default function AddCategoryModal({ isOpen, onClose, onSuccess }: Props) 
                   {errors.inventory_adjustment_account_id}
                 </p>
               )}
-            </div>
-            <div className="lg:col-span-2">
-              <Label>Purchase Account (Optional)</Label>
-              <Select
-                options={cogsAccounts.map((acc) => ({
-                  value: String(acc.id),
-                  label: `${acc.code} - ${acc.name}`,
-                }))}
-                value={String(formData.purchase_account_id)}
-                onChange={(val) => setFormData({ ...formData, purchase_account_id: val })}
-                placeholder="Select Purchase Account"
-              />
             </div>
           </div>
         </CollapsibleSection>

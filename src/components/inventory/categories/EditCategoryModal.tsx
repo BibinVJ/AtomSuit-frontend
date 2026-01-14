@@ -27,7 +27,6 @@ export default function EditCategoryModal({ isOpen, onClose, onSuccess, category
     cogs_account_id: '',
     inventory_account_id: '',
     inventory_adjustment_account_id: '',
-    purchase_account_id: '',
     tax_group_id: '',
   });
 
@@ -59,9 +58,6 @@ export default function EditCategoryModal({ isOpen, onClose, onSuccess, category
           : '',
         inventory_adjustment_account_id: category.inventory_adjustment_account_id
           ? String(category.inventory_adjustment_account_id)
-          : '',
-        purchase_account_id: category.purchase_account_id
-          ? String(category.purchase_account_id)
           : '',
         tax_group_id: category.tax_group_id ? String(category.tax_group_id) : '',
       });
@@ -103,9 +99,6 @@ export default function EditCategoryModal({ isOpen, onClose, onSuccess, category
         : null,
       inventory_adjustment_account_id: formData.inventory_adjustment_account_id
         ? Number(formData.inventory_adjustment_account_id)
-        : null,
-      purchase_account_id: formData.purchase_account_id
-        ? Number(formData.purchase_account_id)
         : null,
       tax_group_id: formData.tax_group_id ? Number(formData.tax_group_id) : null,
     };
@@ -293,26 +286,6 @@ export default function EditCategoryModal({ isOpen, onClose, onSuccess, category
                   {errors.inventory_adjustment_account_id}
                 </p>
               )}
-            </div>
-            <div className="lg:col-span-2">
-              <Label>Purchase Account (Optional)</Label>
-              <Select
-                options={cogsAccounts
-                  .filter(
-                    (acc) =>
-                      !acc.deleted_at || String(acc.id) === String(formData.purchase_account_id)
-                  )
-                  .map((acc) => ({
-                    value: String(acc.id),
-                    label: acc.deleted_at
-                      ? `${acc.code} - ${acc.name} (Deleted)`
-                      : `${acc.code} - ${acc.name}`,
-                    variant: (acc.deleted_at ? 'danger' : 'default') as 'danger' | 'default',
-                  }))}
-                value={String(formData.purchase_account_id)}
-                onChange={(val) => setFormData({ ...formData, purchase_account_id: val })}
-                placeholder="Select Purchase Account"
-              />
             </div>
           </div>
         </CollapsibleSection>

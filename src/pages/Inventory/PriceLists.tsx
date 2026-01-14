@@ -8,7 +8,7 @@ import PriceListTable from '../../components/inventory/price-lists/PriceListTabl
 import AddPriceListModal from '../../components/inventory/price-lists/AddPriceListModal';
 import EditPriceListModal from '../../components/inventory/price-lists/EditPriceListModal';
 import DeletePriceListModal from '../../components/inventory/price-lists/DeletePriceListModal';
-import ManageItemPricesModal from '../../components/inventory/item-prices/ManageItemPricesModal';
+import ViewPriceListModal from '../../components/inventory/price-lists/ViewPriceListModal';
 import { useModal } from '../../hooks/useModal';
 import Pagination from '../../components/common/Pagination';
 import Button from '../../components/ui/button/Button';
@@ -25,11 +25,7 @@ import { toast } from 'sonner';
 export default function PriceLists() {
   const { isOpen, openModal, closeModal } = useModal();
   const { isOpen: isEditOpen, openModal: openEditModal, closeModal: closeEditModal } = useModal();
-  const {
-    isOpen: isManageOpen,
-    openModal: openManageModal,
-    closeModal: closeManageModal,
-  } = useModal();
+  const { isOpen: isViewOpen, openModal: openViewModal, closeModal: closeViewModal } = useModal();
 
   const [selectedType, setSelectedType] = useState('');
 
@@ -79,9 +75,9 @@ export default function PriceLists() {
     openEditModal();
   };
 
-  const handleManage = (pl: PriceList) => {
+  const handleView = (pl: PriceList) => {
     setSelectedPriceList(pl);
-    openManageModal();
+    openViewModal();
   };
 
   const handleDelete = (pl: PriceList) => {
@@ -99,8 +95,8 @@ export default function PriceLists() {
     setSelectedPriceList(null);
   };
 
-  const handleManageModalClose = () => {
-    closeManageModal();
+  const handleViewModalClose = () => {
+    closeViewModal();
     setSelectedPriceList(null);
   };
 
@@ -205,7 +201,7 @@ export default function PriceLists() {
             viewMode={viewMode}
             onEdit={handleEdit}
             onDelete={handleDelete}
-            onManagePrices={handleManage}
+            onViewDetails={handleView}
           />
           <Pagination
             currentPage={currentPage}
@@ -229,9 +225,9 @@ export default function PriceLists() {
         )}
 
         {selectedPriceList && (
-          <ManageItemPricesModal
-            isOpen={isManageOpen}
-            onClose={handleManageModalClose}
+          <ViewPriceListModal
+            isOpen={isViewOpen}
+            onClose={handleViewModalClose}
             priceList={selectedPriceList}
           />
         )}

@@ -69,15 +69,6 @@ export default function ViewCategoryModal({ isOpen, onClose, category }: Props) 
                 : '-'}
             </p>
           </div>
-
-          <div>
-            <h3 className="text-sm font-medium text-gray-500 mb-1">Purchase Account</h3>
-            <p className="text-base text-gray-900 dark:text-gray-100">
-              {category.purchase_account
-                ? `${category.purchase_account.code} - ${category.purchase_account.name}`
-                : '-'}
-            </p>
-          </div>
         </div>
       </div>
     </Modal>

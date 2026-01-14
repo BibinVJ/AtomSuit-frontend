@@ -6,7 +6,6 @@ export interface Category {
   cogs_account_id?: number | null;
   inventory_account_id?: number | null;
   inventory_adjustment_account_id?: number | null;
-  purchase_account_id?: number | null;
   tax_group_id?: number | null;
   deleted_at?: string;
 }

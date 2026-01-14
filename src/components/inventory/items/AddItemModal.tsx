@@ -13,9 +13,13 @@ import { getCategories } from '../../../services/CategoryService';
 import { getUnits } from '../../../services/UnitService';
 import { getChartOfAccounts } from '../../../services/ChartOfAccountService';
 import { getTaxGroups } from '../../../services/TaxService';
-import { Category, Unit, ItemInput, ChartOfAccount, TaxGroup } from '../../../types';
+import { getPriceLists } from '../../../services/PriceListService';
+import { createItemPrice } from '../../../services/ItemPriceService';
+import { Category, Unit, ItemInput, ChartOfAccount, TaxGroup, PriceList } from '../../../types';
 import CollapsibleSection from '../../common/CollapsibleSection';
 import { isApiError } from '../../../utils/errors';
+import { Plus, Trash2 } from 'lucide-react';
+import Button from '../../ui/button/Button';
 
 interface Props {
   isOpen: boolean;
@@ -36,13 +40,22 @@ export default function AddItemModal({ isOpen, onClose, onSuccess }: Props) {
     cogs_account_id: '',
     inventory_account_id: '',
     inventory_adjustment_account_id: '',
-    purchase_account_id: '',
     tax_group_id: '',
   });
 
   const [categories, setCategories] = useState<Category[]>([]);
   const [units, setUnits] = useState<Unit[]>([]);
   const [taxGroups, setTaxGroups] = useState<TaxGroup[]>([]);
+  const [priceLists, setPriceLists] = useState<PriceList[]>([]);
+
+  // Price States
+  const [sellingPrices, setSellingPrices] = useState<
+    { price_list_id: string; price: string; min_quantity: string }[]
+  >([]);
+  const [purchasePrices, setPurchasePrices] = useState<
+    { price_list_id: string; price: string; min_quantity: string }[]
+  >([]);
+
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -57,6 +70,7 @@ export default function AddItemModal({ isOpen, onClose, onSuccess }: Props) {
       fetchUnits();
       fetchAccounts();
       fetchTaxGroups();
+      fetchPriceLists();
     }
   }, [isOpen]);
 
@@ -100,6 +114,72 @@ export default function AddItemModal({ isOpen, onClose, onSuccess }: Props) {
     }
   };
 
+  const fetchPriceLists = async () => {
+    try {
+      const response = await getPriceLists({ unpaginated: true, sort_by: 'id', sort_order: 'asc' });
+      setPriceLists(response.data);
+
+      // Auto-initialize rows if empty
+      const salesLists = response.data.filter((pl: PriceList) => pl.type === 'sales');
+      const purchaseLists = response.data.filter((pl: PriceList) => pl.type === 'purchase');
+
+      if (salesLists.length > 0) {
+        setSellingPrices([
+          { price_list_id: String(salesLists[0].id), price: '', min_quantity: '1' },
+        ]);
+      }
+      if (purchaseLists.length > 0) {
+        setPurchasePrices([
+          { price_list_id: String(purchaseLists[0].id), price: '', min_quantity: '1' },
+        ]);
+      }
+    } catch (error) {
+      console.error('Error fetching price lists:', error);
+    }
+  };
+
+  // Selling Price Handlers
+  const handleAddSellingRow = () => {
+    setSellingPrices([...sellingPrices, { price_list_id: '', price: '', min_quantity: '1' }]);
+  };
+
+  const handleDeleteSellingRow = (index: number) => {
+    const newRows = [...sellingPrices];
+    newRows.splice(index, 1);
+    setSellingPrices(newRows);
+  };
+
+  const handleUpdateSellingRow = (
+    index: number,
+    field: 'price_list_id' | 'price' | 'min_quantity',
+    value: string
+  ) => {
+    const newRows = [...sellingPrices];
+    newRows[index] = { ...newRows[index], [field]: value };
+    setSellingPrices(newRows);
+  };
+
+  // Purchase Price Handlers
+  const handleAddPurchaseRow = () => {
+    setPurchasePrices([...purchasePrices, { price_list_id: '', price: '', min_quantity: '1' }]);
+  };
+
+  const handleDeletePurchaseRow = (index: number) => {
+    const newRows = [...purchasePrices];
+    newRows.splice(index, 1);
+    setPurchasePrices(newRows);
+  };
+
+  const handleUpdatePurchaseRow = (
+    index: number,
+    field: 'price_list_id' | 'price' | 'min_quantity',
+    value: string
+  ) => {
+    const newRows = [...purchasePrices];
+    newRows[index] = { ...newRows[index], [field]: value };
+    setPurchasePrices(newRows);
+  };
+
   const handleCategoryChange = (categoryId: string) => {
     const selectedCategory = categories.find((c) => String(c.id) === categoryId);
 
@@ -116,8 +196,6 @@ export default function AddItemModal({ isOpen, onClose, onSuccess }: Props) {
         newFormData.inventory_adjustment_account_id = String(
           selectedCategory.inventory_adjustment_account_id
         );
-      if (selectedCategory.purchase_account_id)
-        newFormData.purchase_account_id = String(selectedCategory.purchase_account_id);
       if (selectedCategory.tax_group_id) {
         newFormData.tax_group_id = String(selectedCategory.tax_group_id);
       }
@@ -139,9 +217,10 @@ export default function AddItemModal({ isOpen, onClose, onSuccess }: Props) {
       cogs_account_id: '',
       inventory_account_id: '',
       inventory_adjustment_account_id: '',
-      purchase_account_id: '',
       tax_group_id: '',
     });
+    setSellingPrices([]);
+    setPurchasePrices([]);
     setErrors({});
   };
 
@@ -155,10 +234,21 @@ export default function AddItemModal({ isOpen, onClose, onSuccess }: Props) {
     setIsSubmitting(true);
 
     try {
+      const allRows = [...sellingPrices, ...purchasePrices];
+      const pricesPayload = allRows
+        .filter((row) => row.price_list_id && row.price && Number(row.price) >= 0)
+        .map((row) => ({
+          price_list_id: Number(row.price_list_id),
+          price: Number(row.price),
+          min_quantity: row.min_quantity ? Number(row.min_quantity) : 1,
+        }));
+
       await addItem({
         ...formData,
         tax_group_id: formData.tax_group_id ? Number(formData.tax_group_id) : undefined,
+        prices: pricesPayload,
       });
+
       onSuccess();
       toast.success('Item added successfully');
       handleClose();
@@ -295,6 +385,175 @@ export default function AddItemModal({ isOpen, onClose, onSuccess }: Props) {
           </div>
         </div>
 
+        {/* Selling Prices Section */}
+        <CollapsibleSection
+          title="Selling Prices"
+          defaultOpen={true}
+          rightElement={
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleAddSellingRow();
+              }}
+              className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors"
+            >
+              <Plus size={16} className="text-brand-600 dark:text-brand-400" />
+            </button>
+          }
+        >
+          <div className="overflow-x-auto">
+            <div className="space-y-3 min-w-[500px] pb-2">
+              <div className="grid grid-cols-12 gap-4 text-xs font-medium text-gray-500 uppercase">
+                <div className="col-span-5">Price List</div>
+                <div className="col-span-2 text-center">Currency</div>
+                <div className="col-span-2">Price</div>
+                <div className="col-span-2">Min Qty</div>
+                <div className="col-span-1"></div>
+              </div>
+              {sellingPrices.map((row, index) => {
+                const selectedPl = priceLists.find((pl) => String(pl.id) === row.price_list_id);
+                return (
+                  <div key={index} className="grid grid-cols-12 gap-4 items-start">
+                    <div className="col-span-5">
+                      <Select
+                        options={priceLists
+                          .filter((pl) => pl.type === 'sales')
+                          .map((pl) => ({ value: String(pl.id), label: pl.name }))}
+                        value={row.price_list_id}
+                        onChange={(val) => handleUpdateSellingRow(index, 'price_list_id', val)}
+                        placeholder="Select List"
+                        className="text-sm"
+                      />
+                    </div>
+                    <div className="col-span-2 py-2 text-sm text-center text-gray-700 dark:text-gray-300">
+                      {selectedPl?.currency?.code || '-'}
+                    </div>
+                    <div className="col-span-2">
+                      <div className="relative">
+                        <span className="absolute left-3 top-2 text-gray-500 text-sm">
+                          {selectedPl?.currency?.symbol || ''}
+                        </span>
+                        <input
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          value={row.price}
+                          onChange={(e) => handleUpdateSellingRow(index, 'price', e.target.value)}
+                          className={`w-full h-10 pl-7 pr-3 rounded-lg border bg-white dark:bg-white/5 text-gray-900 dark:text-white focus:ring-1 focus:ring-brand-500/20 focus:border-brand-500 transition-colors border-gray-200 dark:border-white/10`}
+                          placeholder="0.00"
+                        />
+                      </div>
+                    </div>
+                    <div className="col-span-2">
+                      <input
+                        type="number"
+                        min="1"
+                        step="1"
+                        value={row.min_quantity}
+                        onChange={(e) =>
+                          handleUpdateSellingRow(index, 'min_quantity', e.target.value)
+                        }
+                        className={`w-full h-10 px-3 rounded-lg border bg-white dark:bg-white/5 text-gray-900 dark:text-white focus:ring-1 focus:ring-brand-500/20 focus:border-brand-500 transition-colors border-gray-200 dark:border-white/10`}
+                        placeholder="1"
+                      />
+                    </div>
+                    <div className="col-span-1 flex justify-center py-2">
+                      {sellingPrices.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteSellingRow(index)}
+                          className="text-red-500 hover:text-red-700"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </CollapsibleSection>
+
+        {/* Purchase Prices Section */}
+        <CollapsibleSection
+          title="Purchase Prices"
+          rightElement={
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleAddPurchaseRow();
+              }}
+              className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors"
+            >
+              <Plus size={16} className="text-brand-600 dark:text-brand-400" />
+            </button>
+          }
+        >
+          <div className="overflow-x-auto">
+            <div className="space-y-3 min-w-[600px] pb-2">
+              <div className="grid grid-cols-12 gap-4 text-xs font-medium text-gray-500 uppercase">
+                <div className="col-span-6">Price List</div>
+                <div className="col-span-2 text-center">Currency</div>
+                <div className="col-span-3">Price</div>
+                <div className="col-span-1"></div>
+              </div>
+              {purchasePrices.map((row, index) => {
+                const selectedPl = priceLists.find((pl) => String(pl.id) === row.price_list_id);
+                return (
+                  <div key={index} className="grid grid-cols-12 gap-4 items-start">
+                    <div className="col-span-6">
+                      <Select
+                        options={priceLists
+                          .filter((pl) => pl.type === 'purchase')
+                          .map((pl) => ({ value: String(pl.id), label: pl.name }))}
+                        value={row.price_list_id}
+                        onChange={(val) => handleUpdatePurchaseRow(index, 'price_list_id', val)}
+                        placeholder="Select List"
+                        className="text-sm"
+                      />
+                    </div>
+                    <div className="col-span-2 py-2 text-sm text-center text-gray-700 dark:text-gray-300">
+                      {selectedPl?.currency?.code || '-'}
+                    </div>
+                    <div className="col-span-3">
+                      <div className="relative">
+                        <span className="absolute left-3 top-2 text-gray-500 text-sm">
+                          {selectedPl?.currency?.symbol || ''}
+                        </span>
+                        <input
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          value={row.price}
+                          onChange={(e) => handleUpdatePurchaseRow(index, 'price', e.target.value)}
+                          className={`w-full h-10 pl-7 pr-3 rounded-lg border bg-white dark:bg-white/5 text-gray-900 dark:text-white focus:ring-1 focus:ring-brand-500/20 focus:border-brand-500 transition-colors ${
+                            false ? 'border-red-500' : 'border-gray-200 dark:border-white/10'
+                          }`}
+                          placeholder="0.00"
+                        />
+                      </div>
+                    </div>
+                    <div className="col-span-1 flex justify-center py-2">
+                      {purchasePrices.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => handleDeletePurchaseRow(index)}
+                          className="text-red-500 hover:text-red-700"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </CollapsibleSection>
+
         <CollapsibleSection title="Accounting Details">
           <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
             <div>
@@ -373,22 +632,7 @@ export default function AddItemModal({ isOpen, onClose, onSuccess }: Props) {
                 </p>
               )}
             </div>
-            <div className="lg:col-span-2">
-              <Label>Purchase Account (Optional)</Label>
-              <Select
-                options={cogsAccounts.map((acc) => ({
-                  value: String(acc.id),
-                  label: `${acc.code} - ${acc.name}`,
-                }))}
-                value={String(formData.purchase_account_id)}
-                onChange={(val) => setFormData({ ...formData, purchase_account_id: val })}
-                placeholder="Select Purchase Account"
-                error={!!errors.purchase_account_id}
-              />
-              <p className="mt-1 text-xs text-gray-500">
-                Usually COGS or Expense account for non-inventory items.
-              </p>
-            </div>
+            {/* Purchase Account Field Removed */}
           </div>
         </CollapsibleSection>
       </div>

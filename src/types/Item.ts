@@ -1,5 +1,7 @@
 import { Category } from './Category';
 import { Unit } from './Unit';
+import { TaxGroup } from './Tax';
+import { ChartOfAccount } from './ChartOfAccount';
 
 export interface Item {
   id: number;
@@ -13,13 +15,17 @@ export interface Item {
   stock_on_hand?: number;
   non_expired_stock?: number;
   expired_stock?: number;
-  is_expired_sale_enabled?: boolean;
   sales_account_id?: number | null;
   cogs_account_id?: number | null;
   inventory_account_id?: number | null;
   inventory_adjustment_account_id?: number | null;
-  purchase_account_id?: number | null;
+  sales_account?: ChartOfAccount;
+  cogs_account?: ChartOfAccount;
+  inventory_account?: ChartOfAccount;
+  inventory_adjustment_account?: ChartOfAccount;
   tax_group_id?: number | null;
+  tax_group?: TaxGroup;
+  item_prices?: any[]; // Using any[] to avoid circular dep or heavy imports for now, or ItemPrice[]
 }
 
 export interface ItemInput {
@@ -33,8 +39,8 @@ export interface ItemInput {
   cogs_account_id?: string | number | null;
   inventory_account_id?: string | number | null;
   inventory_adjustment_account_id?: string | number | null;
-  purchase_account_id?: string | number | null;
   tax_group_id?: string | number | null;
+  prices?: any[];
 }
 
 export interface ItemApiResponse {
