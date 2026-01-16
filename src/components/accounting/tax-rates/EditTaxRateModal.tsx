@@ -45,7 +45,7 @@ export default function EditTaxRateModal({ isOpen, onClose, onSuccess, taxRate }
         name: taxRate.name,
         rate: taxRate.rate,
         type: taxRate.type,
-        sales_account_id: taxRate.sales_account_id ?? null,
+        sales_account_id: taxRate.sales_account?.id ?? null,
         purchase_account_id: taxRate.purchase_account_id ?? null,
       });
     }

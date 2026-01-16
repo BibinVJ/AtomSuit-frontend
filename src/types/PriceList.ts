@@ -3,7 +3,6 @@ export interface PriceList {
   name: string;
   code: string;
   type: 'sales' | 'purchase';
-  currency_id: number;
   currency?: {
     id: number;
     code: string;

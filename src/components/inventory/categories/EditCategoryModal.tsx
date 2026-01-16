@@ -51,15 +51,15 @@ export default function EditCategoryModal({ isOpen, onClose, onSuccess, category
       setFormData({
         name: category.name,
         description: category.description || '',
-        sales_account_id: category.sales_account_id ? String(category.sales_account_id) : '',
-        cogs_account_id: category.cogs_account_id ? String(category.cogs_account_id) : '',
-        inventory_account_id: category.inventory_account_id
-          ? String(category.inventory_account_id)
+        sales_account_id: category.sales_account?.id ? String(category.sales_account.id) : '',
+        cogs_account_id: category.cogs_account?.id ? String(category.cogs_account.id) : '',
+        inventory_account_id: category.inventory_account?.id
+          ? String(category.inventory_account.id)
           : '',
-        inventory_adjustment_account_id: category.inventory_adjustment_account_id
-          ? String(category.inventory_adjustment_account_id)
+        inventory_adjustment_account_id: category.inventory_adjustment_account?.id
+          ? String(category.inventory_adjustment_account.id)
           : '',
-        tax_group_id: category.tax_group_id ? String(category.tax_group_id) : '',
+        tax_group_id: category.tax_group?.id ? String(category.tax_group.id) : '',
       });
     }
   }, [category]);

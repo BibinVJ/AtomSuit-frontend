@@ -112,6 +112,10 @@ const Select: React.FC<SelectProps> = ({
             return `${variantClass} ${data.className || ''}`;
           },
           placeholder: () => '!text-gray-400',
+          dropdownIndicator: () => '!text-gray-500 dark:!text-gray-400',
+          clearIndicator: () => '!text-gray-500 dark:!text-gray-400',
+          indicatorSeparator: () => '!hidden',
+          menuList: () => '!py-1 custom-scrollbar',
         }}
         unstyled // Use strict tailwind classes by disabling default styles
       />

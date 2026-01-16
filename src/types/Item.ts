@@ -15,15 +15,10 @@ export interface Item {
   stock_on_hand?: number;
   non_expired_stock?: number;
   expired_stock?: number;
-  sales_account_id?: number | null;
-  cogs_account_id?: number | null;
-  inventory_account_id?: number | null;
-  inventory_adjustment_account_id?: number | null;
   sales_account?: ChartOfAccount;
   cogs_account?: ChartOfAccount;
   inventory_account?: ChartOfAccount;
   inventory_adjustment_account?: ChartOfAccount;
-  tax_group_id?: number | null;
   tax_group?: TaxGroup;
   item_prices?: any[]; // Using any[] to avoid circular dep or heavy imports for now, or ItemPrice[]
 }

@@ -39,8 +39,8 @@ export default function EditExchangeRateModal({ isOpen, onClose, onSuccess, exch
   useEffect(() => {
     if (exchangeRate) {
       setFormData({
-        base_currency_id: exchangeRate.base_currency_id,
-        target_currency_id: exchangeRate.target_currency_id,
+        base_currency_id: exchangeRate.base_currency?.id ?? 0,
+        target_currency_id: exchangeRate.target_currency?.id ?? 0,
         rate: exchangeRate.rate,
         effective_date: exchangeRate.effective_date,
       });
@@ -104,7 +104,7 @@ export default function EditExchangeRateModal({ isOpen, onClose, onSuccess, exch
           </Label>
           <Select
             options={currencies
-              .filter((c) => !c.deleted_at || c.id === exchangeRate?.base_currency_id)
+              .filter((c) => !c.deleted_at || c.id === exchangeRate?.base_currency?.id)
               .map((c) => ({
                 value: String(c.id),
                 label: c.deleted_at ? `${c.code} - ${c.name} (Deleted)` : `${c.code} - ${c.name}`,
@@ -125,7 +125,7 @@ export default function EditExchangeRateModal({ isOpen, onClose, onSuccess, exch
           </Label>
           <Select
             options={currencies
-              .filter((c) => !c.deleted_at || c.id === exchangeRate?.target_currency_id)
+              .filter((c) => !c.deleted_at || c.id === exchangeRate?.target_currency?.id)
               .map((c) => ({
                 value: String(c.id),
                 label: c.deleted_at ? `${c.code} - ${c.name} (Deleted)` : `${c.code} - ${c.name}`,

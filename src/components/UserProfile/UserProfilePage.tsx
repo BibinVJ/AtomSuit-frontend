@@ -1,18 +1,18 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import PageBreadcrumb from '../components/common/PageBreadCrumb';
-import UserMetaCard from '../components/UserProfile/UserMetaCard';
-import UserInfoCard from '../components/UserProfile/UserInfoCard';
-import PageMeta from '../components/common/PageMeta';
-import { useAuth } from '../hooks/useAuth';
-import UserAddressCard from '../components/UserProfile/UserAddressCard';
-import EditProfileModal from '../components/UserProfile/EditProfileModal';
-import EditAddressModal from '../components/UserProfile/EditAddressModal';
-import EditSocialLinksModal from '../components/UserProfile/EditSocialLinksModal';
-import EditProfileImageModal from '../components/UserProfile/EditProfileImageModal';
+import PageBreadcrumb from '../common/PageBreadCrumb';
+import UserMetaCard from './UserMetaCard';
+import UserInfoCard from './UserInfoCard';
+import PageMeta from '../common/PageMeta';
+import { useAuth } from '../../hooks/useAuth';
+import UserAddressCard from './UserAddressCard';
+import EditProfileModal from './EditProfileModal';
+import EditAddressModal from './EditAddressModal';
+import EditSocialLinksModal from './EditSocialLinksModal';
+import EditProfileImageModal from './EditProfileImageModal';
 
-export default function UserProfiles() {
+export default function UserProfilePage() {
   const { fetchProfile, user, loading } = useAuth();
   const [isProfileModalOpen, setProfileModalOpen] = useState(false);
   const [isAddressModalOpen, setAddressModalOpen] = useState(false);

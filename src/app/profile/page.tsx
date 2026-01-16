@@ -1,4 +1,4 @@
-import UserProfiles from '@/pages/UserProfiles';
+import UserProfiles from '@/components/UserProfile/UserProfilePage';
 import ProtectedLayout from '@/components/layout/ProtectedLayout';
 
 export default function UserProfilesPage() {

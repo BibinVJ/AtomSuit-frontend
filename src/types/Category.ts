@@ -1,12 +1,17 @@
+import { ChartOfAccount } from './ChartOfAccount';
+import { TaxGroup } from './Tax';
+
 export interface Category {
   id: number;
   name: string;
   description: string;
-  sales_account_id?: number | null;
-  cogs_account_id?: number | null;
-  inventory_account_id?: number | null;
-  inventory_adjustment_account_id?: number | null;
-  tax_group_id?: number | null;
+  sales_account?: ChartOfAccount;
+  cogs_account?: ChartOfAccount;
+  inventory_account?: ChartOfAccount;
+  inventory_adjustment_account?: ChartOfAccount;
+  tax_group?: TaxGroup;
+  created_at?: string;
+  updated_at?: string;
   deleted_at?: string;
 }
 

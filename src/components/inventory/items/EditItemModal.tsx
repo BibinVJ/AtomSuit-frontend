@@ -96,11 +96,11 @@ export default function EditItemModal({
         description: item.description || '',
         type: item.type,
 
-        sales_account_id: String(item.sales_account_id || ''),
-        cogs_account_id: String(item.cogs_account_id || ''),
-        inventory_account_id: String(item.inventory_account_id || ''),
-        inventory_adjustment_account_id: String(item.inventory_adjustment_account_id || ''),
-        tax_group_id: String(item.tax_group_id || ''),
+        sales_account_id: String(item.sales_account?.id || ''),
+        cogs_account_id: String(item.cogs_account?.id || ''),
+        inventory_account_id: String(item.inventory_account?.id || ''),
+        inventory_adjustment_account_id: String(item.inventory_adjustment_account?.id || ''),
+        tax_group_id: String(item.tax_group?.id || ''),
       });
     }
   }, [item]);
@@ -207,12 +207,12 @@ export default function EditItemModal({
       const pRows: PriceRow[] = [];
 
       prices.forEach((p) => {
-        const pl = priceLists.find((l) => l.id === p.price_list_id);
+        const pl = priceLists.find((l) => l.id === p.price_list?.id);
         if (pl) {
           const row: PriceRow = {
             uniqueId: `existing-${p.id}`,
             id: p.id,
-            price_list_id: String(p.price_list_id),
+            price_list_id: String(p.price_list?.id || ''),
             price: String(p.price),
             min_quantity: String(p.min_quantity || 1),
           };
@@ -598,7 +598,7 @@ export default function EditItemModal({
               }}
               className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors"
             >
-              <Plus size={16} className="text-brand-600 dark:text-brand-400" />
+              <Plus size={16} strokeWidth={4} className="text-brand-600 dark:text-gray-400" />
             </button>
           }
         >
@@ -687,7 +687,7 @@ export default function EditItemModal({
               }}
               className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors"
             >
-              <Plus size={16} className="text-brand-600 dark:text-brand-400" />
+              <Plus size={16} strokeWidth={4} className="text-brand-600 dark:text-gray-400" />
             </button>
           }
         >

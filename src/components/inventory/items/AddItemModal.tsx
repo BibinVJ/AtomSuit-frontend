@@ -413,7 +413,7 @@ export default function AddItemModal({ isOpen, onClose, onSuccess }: Props) {
               }}
               className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors"
             >
-              <Plus size={16} className="text-brand-600 dark:text-brand-400" />
+              <Plus size={16} strokeWidth={4} className="text-brand-600 dark:text-gray-400" />
             </button>
           }
         >
@@ -503,7 +503,7 @@ export default function AddItemModal({ isOpen, onClose, onSuccess }: Props) {
               }}
               className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors"
             >
-              <Plus size={16} className="text-brand-600 dark:text-brand-400" />
+              <Plus size={16} strokeWidth={4} className="text-brand-600 dark:text-gray-400" />
             </button>
           }
         >

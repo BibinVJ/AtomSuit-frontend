@@ -91,17 +91,15 @@ export default function ExchangeRateTable({
               </TableCell>
               <TableCell
                 isHeader
-                className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400"
-                onClick={() => onSort('base_currency_id')}
+                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
               >
-                Base Currency {renderSortIcon('base_currency_id')}
+                Base Currency
               </TableCell>
               <TableCell
                 isHeader
-                className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400"
-                onClick={() => onSort('target_currency_id')}
+                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
               >
-                Target Currency {renderSortIcon('target_currency_id')}
+                Target Currency
               </TableCell>
               <TableCell
                 isHeader

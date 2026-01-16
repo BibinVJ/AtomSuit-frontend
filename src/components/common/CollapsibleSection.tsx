@@ -24,9 +24,9 @@ export default function CollapsibleSection({
       >
         <div className="flex items-center gap-2">
           {isOpen ? (
-            <ChevronDown size={18} className="text-gray-500" />
+            <ChevronDown size={18} className="text-gray-500 dark:text-gray-400" />
           ) : (
-            <ChevronRight size={18} className="text-gray-500" />
+            <ChevronRight size={18} className="text-gray-500 dark:text-gray-400" />
           )}
           <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100">{title}</h4>
         </div>

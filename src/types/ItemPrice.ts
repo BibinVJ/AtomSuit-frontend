@@ -2,9 +2,7 @@ import { PriceList } from './PriceList';
 
 export interface ItemPrice {
   id: number;
-  price_list_id: number;
   price_list?: PriceList;
-  item_id: number;
   item?: {
     id: number;
     name: string;
