@@ -20,6 +20,7 @@ import CollapsibleSection from '../../common/CollapsibleSection';
 import { isApiError } from '../../../utils/errors';
 import { Plus, Trash2 } from 'lucide-react';
 import Button from '../../ui/button/Button';
+import { useSettings } from '../../../hooks/useSettings';
 
 interface Props {
   isOpen: boolean;
@@ -28,6 +29,7 @@ interface Props {
 }
 
 export default function AddItemModal({ isOpen, onClose, onSuccess }: Props) {
+  const { getSetting } = useSettings();
   const [formData, setFormData] = useState<ItemInput>({
     sku: '',
     name: '',
@@ -70,7 +72,20 @@ export default function AddItemModal({ isOpen, onClose, onSuccess }: Props) {
       fetchUnits();
       fetchAccounts();
       fetchTaxGroups();
+      fetchTaxGroups();
       fetchPriceLists();
+
+      // Set default accounts if not already set
+      setFormData((prev) => ({
+        ...prev,
+        sales_account_id: prev.sales_account_id || getSetting('default_sales_account', ''),
+        cogs_account_id: prev.cogs_account_id || getSetting('default_cogs_account', ''),
+        inventory_account_id:
+          prev.inventory_account_id || getSetting('default_inventory_account', ''),
+        inventory_adjustment_account_id:
+          prev.inventory_adjustment_account_id ||
+          getSetting('default_inventory_adjustment_account', ''),
+      }));
     }
   }, [isOpen]);
 
@@ -632,7 +647,6 @@ export default function AddItemModal({ isOpen, onClose, onSuccess }: Props) {
                 </p>
               )}
             </div>
-            {/* Purchase Account Field Removed */}
           </div>
         </CollapsibleSection>
       </div>

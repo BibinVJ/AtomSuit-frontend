@@ -111,19 +111,6 @@ export default function EditVendorModal({ isOpen, onClose, onSuccess, vendor }: 
     }
   };
 
-  const copyBillingToShipping = () => {
-    setFormData((prev) => ({
-      ...prev,
-      shipping_address_line_1: prev.billing_address_line_1,
-      shipping_address_line_2: prev.billing_address_line_2,
-      shipping_city: prev.billing_city,
-      shipping_state: prev.billing_state,
-      shipping_country: prev.billing_country,
-      shipping_zip_code: prev.billing_zip_code,
-    }));
-    toast.info('Copied Billing Address to Shipping Address');
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -154,6 +141,19 @@ export default function EditVendorModal({ isOpen, onClose, onSuccess, vendor }: 
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const copyBillingToShipping = () => {
+    setFormData((prev) => ({
+      ...prev,
+      shipping_address_line_1: prev.billing_address_line_1,
+      shipping_address_line_2: prev.billing_address_line_2,
+      shipping_city: prev.billing_city,
+      shipping_state: prev.billing_state,
+      shipping_country: prev.billing_country,
+      shipping_zip_code: prev.billing_zip_code,
+    }));
+    toast.info('Copied Billing Address to Shipping Address');
   };
 
   const getFilteredAccounts = (selectedId?: number | undefined) => {
@@ -261,10 +261,7 @@ export default function EditVendorModal({ isOpen, onClose, onSuccess, vendor }: 
           </div>
         </div>
 
-        <div>
-          <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-4 border-b pb-2 border-gray-200 dark:border-gray-700">
-            Accounting Details
-          </h4>
+        <CollapsibleSection title="Accounting Details">
           <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
             <div>
               <Label>
@@ -339,7 +336,7 @@ export default function EditVendorModal({ isOpen, onClose, onSuccess, vendor }: 
               )}
             </div>
           </div>
-        </div>
+        </CollapsibleSection>
 
         <CollapsibleSection title="Billing Address">
           <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">

@@ -7,6 +7,6 @@ export const formatKebabCase = (str: string): string => {
 };
 export const formatLabel = (str: string): string => {
   if (!str) return '';
-  const formatted = str.replace(/_/g, ' ');
+  const formatted = str.replace(/[_-]/g, ' ');
   return formatted.charAt(0).toUpperCase() + formatted.slice(1);
 };

@@ -14,6 +14,7 @@ import { getPriceLists } from '../../services/PriceListService';
 import { isApiError } from '../../utils/errors';
 import { VendorInput, Currency, ChartOfAccount, TaxGroup } from '../../types';
 import { PriceList } from '../../types/PriceList';
+import { useSettings } from '../../hooks/useSettings';
 
 import CollapsibleSection from '../common/CollapsibleSection';
 import Button from '../ui/button/Button';
@@ -25,6 +26,7 @@ interface Props {
 }
 
 export default function AddVendorModal({ isOpen, onClose, onSuccess }: Props) {
+  const { getSetting } = useSettings();
   const [formData, setFormData] = useState<VendorInput>({
     name: '',
     email: '',
@@ -60,6 +62,17 @@ export default function AddVendorModal({ isOpen, onClose, onSuccess }: Props) {
   useEffect(() => {
     if (isOpen) {
       fetchCurrencies();
+      // Set default accounts if not already set
+      setFormData((prev) => ({
+        ...prev,
+        currency_id: prev.currency_id || getSetting('currency'),
+        payables_account_id: prev.payables_account_id || getSetting('default_payable_account'),
+        purchase_account_id: prev.purchase_account_id || getSetting('default_purchase_account'),
+        purchase_discount_account_id:
+          prev.purchase_discount_account_id || getSetting('default_purchase_discount_account'),
+        purchase_return_account_id:
+          prev.purchase_return_account_id || getSetting('default_purchase_return_account'),
+      }));
     }
   }, [isOpen]);
 

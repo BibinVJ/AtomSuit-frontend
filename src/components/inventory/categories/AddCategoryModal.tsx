@@ -10,6 +10,7 @@ import { addCategory } from '../../../services/CategoryService';
 import { getChartOfAccounts } from '../../../services/ChartOfAccountService';
 import { getTaxGroups } from '../../../services/TaxService';
 import { ChartOfAccount, TaxGroup } from '../../../types';
+import { useSettings } from '../../../hooks/useSettings';
 import { isApiError } from '../../../utils/errors';
 
 interface Props {
@@ -19,6 +20,7 @@ interface Props {
 }
 
 export default function AddCategoryModal({ isOpen, onClose, onSuccess }: Props) {
+  const { getSetting } = useSettings();
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -42,6 +44,17 @@ export default function AddCategoryModal({ isOpen, onClose, onSuccess }: Props) 
     if (isOpen) {
       fetchAccounts();
       fetchTaxGroups();
+      // Set default accounts if not already set
+      setFormData((prev) => ({
+        ...prev,
+        sales_account_id: prev.sales_account_id || getSetting('default_sales_account', ''),
+        cogs_account_id: prev.cogs_account_id || getSetting('default_cogs_account', ''),
+        inventory_account_id:
+          prev.inventory_account_id || getSetting('default_inventory_account', ''),
+        inventory_adjustment_account_id:
+          prev.inventory_adjustment_account_id ||
+          getSetting('default_inventory_adjustment_account', ''),
+      }));
     }
   }, [isOpen]);
 

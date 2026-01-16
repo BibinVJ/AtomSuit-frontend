@@ -12,6 +12,7 @@ import { getPriceLists } from '../../services/PriceListService';
 import { isApiError } from '../../utils/errors';
 import { CustomerInput, Currency, ChartOfAccount, TaxGroup } from '../../types';
 import { PriceList } from '../../types/PriceList';
+import { useSettings } from '../../hooks/useSettings';
 
 import CollapsibleSection from '../common/CollapsibleSection';
 import Button from '../ui/button/Button';
@@ -23,6 +24,7 @@ interface Props {
 }
 
 export default function AddCustomerModal({ isOpen, onClose, onSuccess }: Props) {
+  const { getSetting } = useSettings();
   const [formData, setFormData] = useState<CustomerInput>({
     name: '',
     email: '',
@@ -58,6 +60,18 @@ export default function AddCustomerModal({ isOpen, onClose, onSuccess }: Props) 
   useEffect(() => {
     if (isOpen) {
       fetchData();
+      // Set default accounts if not already set
+      setFormData((prev) => ({
+        ...prev,
+        currency_id: prev.currency_id || getSetting('currency'),
+        sales_account_id: prev.sales_account_id || getSetting('default_sales_account'),
+        sales_discount_account_id:
+          prev.sales_discount_account_id || getSetting('default_sales_discount_account'),
+        receivables_account_id:
+          prev.receivables_account_id || getSetting('default_receivable_account'),
+        sales_return_account_id:
+          prev.sales_return_account_id || getSetting('default_sales_return_account'),
+      }));
     }
   }, [isOpen]);
 

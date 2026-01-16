@@ -22,7 +22,6 @@ import {
 } from 'lucide-react';
 import { useSidebar } from '../hooks/useSidebar';
 import { usePermissions } from '../hooks/usePermissions';
-import { ListIcon } from '@/icons';
 
 type NavItem = {
   name: string;
@@ -62,7 +61,7 @@ const navItems: NavItem[] = [
       {
         name: 'Taxes',
         path: '/accounting/taxes',
-        permission: 'view-tax-rate', // Assuming user needs at least view-tax-rate to access the page
+        permission: 'view-tax-rate',
       },
     ],
   },
@@ -93,24 +92,6 @@ const navItems: NavItem[] = [
       { name: 'Purchases', path: '/purchases', permission: 'view-purchase' },
     ],
   },
-  {
-    name: 'Forms',
-    icon: <ListIcon />,
-    subItems: [{ name: 'Form Elements', path: '/form-elements' }],
-  },
-  // {
-  //   name: "Tables",
-  //   icon: <TableIcon />,
-  //   subItems: [{ name: "Basic Tables", path: "/basic-tables" }],
-  // },
-  // {
-  //   name: "Pages",
-  //   icon: <PageIcon />,
-  //   subItems: [
-  //     { name: "Blank Page", path: "/blank" },
-  //     { name: "404 Error", path: "/error-404" },
-  //   ],
-  // },
 ];
 
 const administrationItems: NavItem[] = [
@@ -150,8 +131,11 @@ const administrationItems: NavItem[] = [
   {
     icon: <Settings size={20} />,
     name: 'Settings',
-    path: '/settings',
-    permission: 'view-setting',
+    subItems: [
+      { name: 'General', path: '/settings/general', permission: 'view-setting' },
+      { name: 'Configurations', path: '/settings/configurations', permission: 'view-setting' },
+      { name: 'Default Accounts', path: '/settings/default-accounts', permission: 'view-setting' },
+    ],
   },
 ];
 
@@ -174,26 +158,6 @@ const othersItems: NavItem[] = [
     path: '/audits',
     permission: 'view-audit',
   },
-  // {
-  //   icon: <PieChartIcon />,
-  //   name: "Charts",
-  //   subItems: [
-  //     { name: "Line Chart", path: "/line-chart" },
-  //     { name: "Bar Chart", path: "/bar-chart" },
-  //   ],
-  // },
-  // {
-  //   icon: <BoxCubeIcon />,
-  //   name: "UI Elements",
-  //   subItems: [
-  //     { name: "Alerts", path: "/alerts" },
-  //     { name: "Avatar", path: "/avatars" },
-  //     { name: "Badge", path: "/badge" },
-  //     { name: "Buttons", path: "/buttons" },
-  //     { name: "Images", path: "/images" },
-  //     { name: "Videos", path: "/videos" },
-  //   ],
-  // },
 ];
 
 const AppSidebar: React.FC = () => {
