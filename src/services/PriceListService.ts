@@ -1,41 +1,27 @@
-import api from './api';
 import { PriceList } from '../types/PriceList';
+import { createBaseService, QueryParams, PaginatedResponse } from './BaseService';
 
-const BASE_URL = '/price-lists';
+const priceListService = createBaseService<PriceList, Partial<PriceList>>('/price-lists');
 
-export const getPriceLists = async (params: any = {}) => {
-  const response = await api.get(BASE_URL, { params });
-  return response.data;
+export const getPriceLists = (params: QueryParams = {}): Promise<PaginatedResponse<PriceList>> =>
+  priceListService.list(params);
+
+export const getPriceList = (id: number): Promise<PriceList> => priceListService.get(id);
+
+export const createPriceList = (data: Partial<PriceList>) => priceListService.create(data);
+
+export const updatePriceList = (id: number, data: Partial<PriceList>) =>
+  priceListService.update(id, data);
+
+export const deletePriceList = (id: number, force: boolean = false) =>
+  priceListService.delete(id, force);
+
+export const restorePriceList = (id: number) => priceListService.restore(id);
+
+export const exportPriceLists = () => priceListService.export('/price-lists/export/excel');
+
+const PriceListService = {
+  ...priceListService,
 };
 
-export const getPriceList = async (id: number) => {
-  const response = await api.get(`${BASE_URL}/${id}`);
-  return response.data.data;
-};
-
-export const createPriceList = async (data: Partial<PriceList>) => {
-  const response = await api.post(BASE_URL, data);
-  return response.data.data;
-};
-
-export const updatePriceList = async (id: number, data: Partial<PriceList>) => {
-  const response = await api.put(`${BASE_URL}/${id}`, data);
-  return response.data.data;
-};
-
-export const deletePriceList = async (id: number, force: boolean = false) => {
-  const response = await api.delete(`${BASE_URL}/${id}`, { params: { force } });
-  return response.data;
-};
-
-export const restorePriceList = async (id: number) => {
-  const response = await api.post(`${BASE_URL}/${id}/restore`);
-  return response.data.data;
-};
-
-export const exportPriceLists = async () => {
-  const response = await api.get(`${BASE_URL}/export/excel`, {
-    responseType: 'blob',
-  });
-  return response.data;
-};
+export default PriceListService;

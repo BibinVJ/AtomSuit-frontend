@@ -42,6 +42,7 @@ export default function AddPriceListModal({ isOpen, onClose, onSuccess }: Props)
           const res = await getCurrencies({ unpaginated: true });
           if (res && res.data) {
             setCurrencies(
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               res.data.map((c: any) => ({ value: String(c.id), label: `${c.name} (${c.code})` }))
             );
           }

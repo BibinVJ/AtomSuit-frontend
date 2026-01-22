@@ -1,16 +1,6 @@
 import api from './api';
-
-export interface PaginatedResponse<T> {
-  data: T[];
-  meta?: {
-    current_page: number;
-    last_page: number;
-    from: number;
-    to: number;
-    total: number;
-  };
-  links?: unknown;
-}
+import { PaginatedResponse, ApiResponse } from '../types/Common';
+export type { PaginatedResponse, ApiResponse };
 
 export interface QueryParams {
   page?: number;

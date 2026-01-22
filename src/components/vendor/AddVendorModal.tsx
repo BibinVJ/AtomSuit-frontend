@@ -74,7 +74,7 @@ export default function AddVendorModal({ isOpen, onClose, onSuccess }: Props) {
           prev.purchase_return_account_id || getSetting('default_purchase_return_account'),
       }));
     }
-  }, [isOpen]);
+  }, [isOpen, getSetting]);
 
   const fetchCurrencies = async () => {
     try {

@@ -15,7 +15,7 @@ import { restoreItem } from '../../../services/ItemService';
 import { toast } from 'sonner';
 import { Item } from '../../../types';
 import { usePermissions } from '../../../hooks/usePermissions';
-import { useSettings } from '../../../hooks/useSettings';
+
 import { TableActions } from '../../common/TableActions';
 import Button from '../../ui/button/Button';
 import Tooltip from '../../ui/tooltip/Tooltip';
@@ -46,7 +46,7 @@ export default function ItemTable({
   onManagePricing,
 }: Props) {
   const { hasPermission } = usePermissions();
-  const { formatCurrency } = useSettings();
+
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);

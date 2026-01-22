@@ -73,7 +73,7 @@ export default function AddCustomerModal({ isOpen, onClose, onSuccess }: Props) 
           prev.sales_return_account_id || getSetting('default_sales_return_account'),
       }));
     }
-  }, [isOpen]);
+  }, [isOpen, getSetting]);
 
   const fetchData = async () => {
     try {

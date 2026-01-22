@@ -1,14 +1,13 @@
 'use client';
 
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '../../ui/table';
-import { useState } from 'react';
+
 import Badge from '../../ui/badge/Badge';
 import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide } from 'lucide-react';
 import { toast } from 'sonner';
 import { TableActions } from '../../common/TableActions';
 import { PriceList } from '../../../types/PriceList';
 import { restorePriceList } from '../../../services/PriceListService';
-import Button from '../../ui/button/Button';
 
 interface Props {
   data: PriceList[];

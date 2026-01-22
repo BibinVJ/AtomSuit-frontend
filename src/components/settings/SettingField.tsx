@@ -17,6 +17,7 @@ import { toast } from 'sonner';
 import { formatLabel } from '../../utils/string';
 import { useSettings } from '../../hooks/useSettings';
 import Image from 'next/image';
+import AddCurrencyModal from '../accounting/currencies/AddCurrencyModal';
 
 interface Props {
   setting: Setting;
@@ -72,6 +73,7 @@ export default function SettingField({ setting, onUpdate }: Props) {
   const [isLoading, setIsLoading] = useState(false);
   const [accountOptions, setAccountOptions] = useState<{ value: string; label: string }[]>([]);
   const [currencyOptions, setCurrencyOptions] = useState<{ value: string; label: string }[]>([]);
+  const [isAddCurrencyModalOpen, setIsAddCurrencyModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchOptions = async () => {
@@ -108,6 +110,20 @@ export default function SettingField({ setting, onUpdate }: Props) {
 
     fetchOptions();
   }, [setting.key]);
+
+  const fetchCurrencyOptions = async () => {
+    try {
+      const response = await getCurrencies({ unpaginated: true });
+      setCurrencyOptions(
+        response.data.map((currency) => ({
+          value: String(currency.id),
+          label: `${currency.code} (${currency.symbol}) - ${currency.name}`,
+        }))
+      );
+    } catch (error) {
+      console.error('Error fetching currencies:', error);
+    }
+  };
 
   const handleSave = async () => {
     setIsLoading(true);
@@ -202,12 +218,30 @@ export default function SettingField({ setting, onUpdate }: Props) {
 
     if (isCurrencyField) {
       return (
-        <Select
-          options={currencyOptions}
-          onChange={(selectedValue) => setValue(parseInt(selectedValue))}
-          placeholder="Select currency"
-          defaultValue={String(value || '')}
-        />
+        <div className="space-y-2">
+          <Select
+            options={currencyOptions}
+            onChange={(selectedValue) => setValue(parseInt(selectedValue))}
+            placeholder="Select currency"
+            defaultValue={String(value || '')}
+          />
+          <button
+            type="button"
+            onClick={() => setIsAddCurrencyModalOpen(true)}
+            className="text-sm text-blue-600 hover:text-blue-700 hover:underline flex items-center gap-1"
+          >
+            + Add New Currency
+          </button>
+          <AddCurrencyModal
+            isOpen={isAddCurrencyModalOpen}
+            onClose={() => setIsAddCurrencyModalOpen(false)}
+            onSuccess={() => {
+              fetchCurrencyOptions();
+              // Optionally verify if we need to auto-select the new currency,
+              // but for now just refreshing the list is sufficient.
+            }}
+          />
+        </div>
       );
     }
 

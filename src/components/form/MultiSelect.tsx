@@ -111,17 +111,14 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
             '!bg-white dark:!bg-gray-800 !border !border-gray-300 dark:!border-gray-700 !rounded-lg !shadow-lg !mt-1',
           input: () => '!text-gray-800 dark:!text-gray-200',
           multiValue: ({ data }) => {
-            // @ts-ignore
             const isDanger = data.variant === 'danger';
             return `!rounded !text-sm !m-1 ${isDanger ? '!bg-red-100 dark:!bg-red-900' : '!bg-blue-100 dark:!bg-blue-900'}`;
           },
           multiValueLabel: ({ data }) => {
-            // @ts-ignore
             const isDanger = data.variant === 'danger';
             return `!px-2 !py-0.5 ${isDanger ? '!text-red-800 dark:!text-red-200' : '!text-blue-800 dark:!text-blue-200'}`;
           },
           multiValueRemove: ({ data }) => {
-            // @ts-ignore
             const isDanger = data.variant === 'danger';
             return `!rounded-r cursor-pointer ${
               isDanger

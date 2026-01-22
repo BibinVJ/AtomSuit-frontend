@@ -1,12 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import FormModal from '../../common/FormModal';
 import Input from '../../form/input/InputField';
 import Label from '../../form/Label';
 import TextArea from '../../form/input/TextArea';
 import Select from '../../form/Select';
-import Switch from '../../form/switch/Switch';
 import { toast } from 'sonner';
 import { updateItem } from '../../../services/ItemService';
 import { getCategories } from '../../../services/CategoryService';
@@ -26,14 +25,8 @@ import {
 import CollapsibleSection from '../../common/CollapsibleSection';
 import { isApiError } from '../../../utils/errors';
 import { getPriceLists } from '../../../services/PriceListService';
-import {
-  getItemPrices,
-  createItemPrice,
-  updateItemPrice,
-  deleteItemPrice,
-} from '../../../services/ItemPriceService';
+import { getItemPrices } from '../../../services/ItemPriceService';
 import { Plus, Trash2 } from 'lucide-react';
-import Button from '../../ui/button/Button';
 
 interface Props {
   isOpen: boolean;
@@ -43,13 +36,7 @@ interface Props {
   onManagePricing?: (item: Item) => void;
 }
 
-export default function EditItemModal({
-  isOpen,
-  onClose,
-  onSuccess,
-  item,
-  onManagePricing,
-}: Props) {
+export default function EditItemModal({ isOpen, onClose, onSuccess, item }: Props) {
   const [formData, setFormData] = useState<ItemInput>({
     sku: '',
     name: '',
@@ -164,41 +151,7 @@ export default function EditItemModal({
     }
   };
 
-  const fetchItemPrices = async () => {
-    if (!item) return;
-    try {
-      const response = await getItemPrices({ item_id: item.id, unpaginated: true });
-      const prices: ItemPrice[] = response.data;
-
-      // Map to rows
-      const salesRows: PriceRow[] = [];
-      const purchaseRows: PriceRow[] = [];
-
-      // We need to match with Price Lists to know the type
-      // Wait, we need price lists loaded first or map later.
-      // We can access price_list from the ItemPrice relation if eager loaded.
-      // But getItemPrices might not join price_list type efficiently or we rely on the ID.
-      // Let's assume we have priceLists state populated or we can derive type if we wait.
-      // Actually, we can just split by price_list type if we have the list.
-
-      // Better: Wait for priceLists?
-      // Or just map what we have. API usually returns price_list object.
-
-      // Let's use the local priceLists state if available, but it might be async race.
-      // We can just iterate prices and see.
-    } catch (error) {
-      console.error('Error fetching item prices:', error);
-    }
-  };
-
-  // Effect to load prices once item and priceLists are ready
-  useEffect(() => {
-    if (item && priceLists.length > 0) {
-      loadPricingData();
-    }
-  }, [item, priceLists]);
-
-  const loadPricingData = async () => {
+  const loadPricingData = useCallback(async () => {
     try {
       const response = await getItemPrices({ item_id: item.id, unpaginated: true });
       const prices: ItemPrice[] = response.data;
@@ -235,7 +188,14 @@ export default function EditItemModal({
     } catch (error) {
       console.error('Error loading pricing data', error);
     }
-  };
+  }, [item.id, priceLists]);
+
+  // Effect to load prices once item and priceLists are ready
+  useEffect(() => {
+    if (item && priceLists.length > 0) {
+      loadPricingData();
+    }
+  }, [item, priceLists, loadPricingData]);
 
   // Selling Price Handlers
   const handleAddSellingRow = () => {
@@ -320,11 +280,13 @@ export default function EditItemModal({
           is_deleted: row.is_deleted,
         }));
 
-      await updateItem(item.id, {
+      const payload: ItemInput & { prices: typeof pricesPayload } = {
         ...formData,
         tax_group_id: formData.tax_group_id ? Number(formData.tax_group_id) : undefined,
         prices: pricesPayload,
-      });
+      };
+
+      await updateItem(item.id, payload);
 
       onSuccess();
       toast.success('Item updated successfully');

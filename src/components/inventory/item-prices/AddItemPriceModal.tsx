@@ -48,6 +48,7 @@ export default function AddItemPriceModal({
           const res = await getItems({ unpaginated: true }); // Need to ensure getItems supports unpaginated or similar
           if (res && res.data) {
             setItems(
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               res.data.map((i: any) => ({
                 value: String(i.id),
                 label: `${i.name} (${i.sku || '-'})`,

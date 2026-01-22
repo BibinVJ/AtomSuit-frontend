@@ -27,7 +27,6 @@ export default function ViewUserModal({ isOpen, onClose, user }: ViewUserModalPr
     data: logs,
     loading: logsLoading,
     currentPage: logsPage,
-    perPage: logsPerPage,
     totalPages: logsTotalPages,
     total: logsTotal,
     from: logsFrom,

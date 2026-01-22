@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useMemo } from 'react';
 import { usePathname } from 'next/navigation';
 import PageBreadcrumb from '../../components/common/PageBreadCrumb';
 import ComponentCard from '../../components/common/ComponentCard';
@@ -69,7 +69,7 @@ export default function Settings() {
   const currentCategory = pathname?.split('/').pop() || 'general';
 
   // Determine available groups for this category
-  const targetGroups = ROUTE_GROUP_MAPPING[currentCategory] || [];
+  const targetGroups = useMemo(() => ROUTE_GROUP_MAPPING[currentCategory] || [], [currentCategory]);
 
   // Local state for the active sub-group (sidebar selection)
   const [activeSubGroup, setActiveSubGroup] = useState<string>('');
@@ -78,7 +78,7 @@ export default function Settings() {
     try {
       setIsLoading(true);
       const response = await getSettings();
-      const allSettingsGroups = response.data;
+      const allSettingsGroups = response.data as unknown as Record<string, Setting[]>;
 
       // Process settings to separate default accounts if needed
       const processedGroups: Record<string, Setting[]> = { ...allSettingsGroups };
@@ -143,7 +143,7 @@ export default function Settings() {
     } finally {
       setIsLoading(false);
     }
-  }, [currentCategory, targetGroups]); // Depend on currentCategory and targetGroups to re-eval default activeSubGroup
+  }, [targetGroups]); // Depend on currentCategory and targetGroups to re-eval default activeSubGroup
 
   useEffect(() => {
     fetchSettings();

@@ -20,7 +20,7 @@ export interface Item {
   cogs_account?: ChartOfAccount;
   inventory_account?: ChartOfAccount;
   inventory_adjustment_account?: ChartOfAccount;
-  item_prices?: any[];
+  item_prices?: unknown[];
   deleted_at?: string;
   created_at?: string;
   updated_at?: string;
@@ -38,7 +38,7 @@ export interface ItemInput {
   cogs_account_id?: string | number | null;
   inventory_account_id?: string | number | null;
   inventory_adjustment_account_id?: string | number | null;
-  prices?: any[];
+  item_prices?: unknown[];
 }
 
 export type ItemApiResponse = PaginatedResponse<Item>;

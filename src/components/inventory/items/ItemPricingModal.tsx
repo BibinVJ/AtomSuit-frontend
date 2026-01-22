@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Modal } from '../../ui/modal';
 import Button from '../../ui/button/Button';
 import { toast } from 'sonner';
@@ -44,13 +44,7 @@ export default function ItemPricingModal({ isOpen, onClose, item }: Props) {
   const [sellingPrices, setSellingPrices] = useState<PriceRow[]>([]);
   const [purchasePrices, setPurchasePrices] = useState<PriceRow[]>([]);
 
-  useEffect(() => {
-    if (isOpen && item) {
-      fetchData();
-    }
-  }, [isOpen, item]);
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     if (!item) return;
     setLoading(true);
     try {
@@ -68,11 +62,11 @@ export default function ItemPricingModal({ isOpen, onClose, item }: Props) {
       const pRows: PriceRow[] = [];
 
       existingPrices.forEach((ip) => {
-        const pl = allPriceLists.find((p: PriceList) => p.id === ip.price_list_id);
+        const pl = allPriceLists.find((p: PriceList) => p.id === ip.price_list?.id);
         const row: PriceRow = {
           uniqueId: `existing-${ip.id}`,
           id: ip.id,
-          price_list_id: String(ip.price_list_id),
+          price_list_id: String(ip.price_list?.id || ''),
           price: String(ip.price),
           min_quantity: String(ip.min_quantity || 1),
           priceListName: pl ? pl.name : 'Unknown',
@@ -100,7 +94,13 @@ export default function ItemPricingModal({ isOpen, onClose, item }: Props) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [item]);
+
+  useEffect(() => {
+    if (isOpen && item) {
+      fetchData();
+    }
+  }, [isOpen, item, fetchData]);
 
   // Selling Price Handlers
   const handleAddSellingRow = () => {

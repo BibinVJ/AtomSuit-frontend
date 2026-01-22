@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import FormModal from '../../common/FormModal';
 import Input from '../../form/input/InputField';
 import Label from '../../form/Label';
-import Switch from '../../form/switch/Switch';
 import { toast } from 'sonner';
 import { updateCurrency } from '../../../services/CurrencyService';
 import { Currency } from '../../../types';

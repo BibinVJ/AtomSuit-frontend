@@ -6,7 +6,6 @@ import Input from '../../form/input/InputField';
 import Label from '../../form/Label';
 import TextArea from '../../form/input/TextArea';
 import Select from '../../form/Select';
-import Switch from '../../form/switch/Switch';
 import { toast } from 'sonner';
 import { addItem } from '../../../services/ItemService';
 import { getCategories } from '../../../services/CategoryService';
@@ -14,12 +13,11 @@ import { getUnits } from '../../../services/UnitService';
 import { getChartOfAccounts } from '../../../services/ChartOfAccountService';
 import { getTaxGroups } from '../../../services/TaxService';
 import { getPriceLists } from '../../../services/PriceListService';
-import { createItemPrice } from '../../../services/ItemPriceService';
+
 import { Category, Unit, ItemInput, ChartOfAccount, TaxGroup, PriceList } from '../../../types';
 import CollapsibleSection from '../../common/CollapsibleSection';
 import { isApiError } from '../../../utils/errors';
 import { Plus, Trash2 } from 'lucide-react';
-import Button from '../../ui/button/Button';
 import { useSettings } from '../../../hooks/useSettings';
 
 interface Props {
@@ -87,7 +85,7 @@ export default function AddItemModal({ isOpen, onClose, onSuccess }: Props) {
           getSetting('default_inventory_adjustment_account', ''),
       }));
     }
-  }, [isOpen]);
+  }, [isOpen, getSetting]);
 
   const fetchCategories = async () => {
     try {
@@ -201,18 +199,16 @@ export default function AddItemModal({ isOpen, onClose, onSuccess }: Props) {
     const newFormData = { ...formData, category_id: categoryId };
 
     if (selectedCategory) {
-      if (selectedCategory.sales_account_id)
-        newFormData.sales_account_id = String(selectedCategory.sales_account_id);
-      if (selectedCategory.cogs_account_id)
-        newFormData.cogs_account_id = String(selectedCategory.cogs_account_id);
-      if (selectedCategory.inventory_account_id)
-        newFormData.inventory_account_id = String(selectedCategory.inventory_account_id);
-      if (selectedCategory.inventory_adjustment_account_id)
-        newFormData.inventory_adjustment_account_id = String(
-          selectedCategory.inventory_adjustment_account_id
-        );
-      if (selectedCategory.tax_group_id) {
-        newFormData.tax_group_id = String(selectedCategory.tax_group_id);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const cat = selectedCategory as any;
+      if (cat.sales_account_id) newFormData.sales_account_id = String(cat.sales_account_id);
+      if (cat.cogs_account_id) newFormData.cogs_account_id = String(cat.cogs_account_id);
+      if (cat.inventory_account_id)
+        newFormData.inventory_account_id = String(cat.inventory_account_id);
+      if (cat.inventory_adjustment_account_id)
+        newFormData.inventory_adjustment_account_id = String(cat.inventory_adjustment_account_id);
+      if (cat.tax_group_id) {
+        newFormData.tax_group_id = String(cat.tax_group_id);
       }
     }
 
@@ -258,11 +254,13 @@ export default function AddItemModal({ isOpen, onClose, onSuccess }: Props) {
           min_quantity: row.min_quantity ? Number(row.min_quantity) : 1,
         }));
 
-      await addItem({
+      const payload: ItemInput & { prices: typeof pricesPayload } = {
         ...formData,
         tax_group_id: formData.tax_group_id ? Number(formData.tax_group_id) : undefined,
         prices: pricesPayload,
-      });
+      };
+
+      await addItem(payload);
 
       onSuccess();
       toast.success('Item added successfully');

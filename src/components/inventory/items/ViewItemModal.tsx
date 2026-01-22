@@ -1,6 +1,5 @@
 import { Item } from '../../../types';
 import { Modal } from '../../ui/modal';
-import { useSettings } from '../../../hooks/useSettings';
 
 interface Props {
   isOpen: boolean;
@@ -9,8 +8,6 @@ interface Props {
 }
 
 export default function ViewItemModal({ isOpen, onClose, item }: Props) {
-  const { formatCurrency } = useSettings();
-
   return (
     <Modal isOpen={isOpen} onClose={onClose} className="max-w-3xl">
       <div className="p-6">

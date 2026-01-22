@@ -29,15 +29,6 @@ export default function Users() {
   const [selectedRole, setSelectedRole] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
 
-  // Refetch data when tab changes
-  useEffect(() => {
-    if (activeTab === 'users') {
-      refreshUsers();
-    } else {
-      refreshLogs();
-    }
-  }, [activeTab]);
-
   // --- Users Data ---
   const userExtraParams = useMemo(
     () => ({
@@ -115,6 +106,15 @@ export default function Users() {
     initialSortBy: 'login_at',
     initialSortDirection: 'desc',
   });
+
+  // Refetch data when tab changes
+  useEffect(() => {
+    if (activeTab === 'users') {
+      refreshUsers();
+    } else {
+      refreshLogs();
+    }
+  }, [activeTab, refreshUsers, refreshLogs]);
 
   const handleResetLogs = () => {
     resetLogsFilters();
@@ -210,7 +210,6 @@ export default function Users() {
                         ]}
                         onChange={(value) => setSelectedStatus(value)}
                         defaultValue={selectedStatus}
-                        showPlaceholder={true}
                         placeholder="Status"
                         className="w-full"
                         searchable={false}

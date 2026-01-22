@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import ReactSelect, { SingleValue, GroupBase, StylesConfig } from 'react-select';
+import ReactSelect, { SingleValue } from 'react-select';
 
 interface Option {
   value: string;
@@ -105,7 +105,6 @@ const Select: React.FC<SelectProps> = ({
               danger: '!text-red-500',
               success: '!text-green-500',
             };
-            // @ts-ignore
             const variantClass = data.variant
               ? variantClasses[data.variant] || variantClasses.default
               : variantClasses.default;

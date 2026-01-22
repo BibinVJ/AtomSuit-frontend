@@ -6,7 +6,6 @@ import { toast } from 'sonner';
 import { TableActions } from '../../common/TableActions';
 import { ItemPrice } from '../../../types/ItemPrice';
 import { restoreItemPrice } from '../../../services/ItemPriceService';
-import Button from '../../ui/button/Button';
 
 interface Props {
   data: ItemPrice[];
