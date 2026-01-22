@@ -22,16 +22,9 @@ export interface Sale {
   items: SaleItem[];
 }
 
-export interface SaleApiResponse {
-  data: Sale[];
-  meta: {
-    total: number;
-    current_page: number;
-    last_page: number;
-    from: number;
-    to: number;
-  };
-}
+import { PaginatedResponse } from './Common';
+
+export type SaleApiResponse = PaginatedResponse<Sale>;
 
 export interface SalePayload {
   customer_id: string;

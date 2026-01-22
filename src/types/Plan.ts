@@ -23,25 +23,8 @@ export interface PlanFeature {
   display_order: number;
 }
 
-export interface PlanApiResponse {
-  message: string;
-  error: boolean;
-  code: number;
-  data: Plan | Plan[];
-  meta?: {
-    current_page: number;
-    last_page: number;
-    per_page: number;
-    total: number;
-    from?: number;
-    to?: number;
-  };
-  links?: {
-    first: string;
-    last: string;
-    prev: string | null;
-    next: string | null;
-  };
-}
+import { ApiResponse } from './Common';
+
+export type PlanApiResponse = ApiResponse<Plan>;
 
 export type PlanInput = Partial<Plan>;

@@ -1,3 +1,5 @@
+import { ApiResponse } from './Common';
+
 export interface Layout {
   id?: number;
   dashboard_card_id: number;
@@ -24,3 +26,5 @@ export interface Layout {
   component?: string;
   props?: Record<string, unknown>;
 }
+
+export type LayoutApiResponse = ApiResponse<Layout>;

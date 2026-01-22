@@ -1,4 +1,5 @@
 import { Permission } from './Permission';
+import { PaginatedResponse } from './Common';
 
 export interface Role {
   id: number;
@@ -6,13 +7,5 @@ export interface Role {
   permissions: Permission[];
   deleted_at?: string;
 }
-export interface RoleApiResponse {
-  data: Role[];
-  meta: {
-    total: number;
-    current_page: number;
-    last_page: number;
-    from: number;
-    to: number;
-  };
-}
+
+export type RoleApiResponse = PaginatedResponse<Role>;

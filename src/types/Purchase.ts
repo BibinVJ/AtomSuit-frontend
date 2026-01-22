@@ -25,16 +25,9 @@ export interface Purchase {
   items: PurchaseItemDetail[];
 }
 
-export interface PurchaseApiResponse {
-  data: Purchase[];
-  meta: {
-    total: number;
-    current_page: number;
-    last_page: number;
-    from: number;
-    to: number;
-  };
-}
+import { PaginatedResponse } from './Common';
+
+export type PurchaseApiResponse = PaginatedResponse<Purchase>;
 
 export interface PurchasePayload {
   vendor_id: string;

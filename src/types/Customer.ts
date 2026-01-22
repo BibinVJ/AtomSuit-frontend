@@ -1,4 +1,8 @@
 import { Currency } from './Currency';
+import { PaginatedResponse } from './Common';
+import { ChartOfAccount } from './ChartOfAccount';
+import { PriceList } from './PriceList';
+import { TaxGroup } from './Tax';
 
 export interface Customer {
   id: number;
@@ -6,11 +10,12 @@ export interface Customer {
   email: string;
   phone: string;
   currency?: Currency;
-  sales_account?: { id: number; name: string };
-  sales_discount_account?: { id: number; name: string };
-  receivables_account?: { id: number; name: string };
-  sales_return_account?: { id: number; name: string };
-  price_list_id?: number | null;
+  tax_group?: TaxGroup;
+  price_list?: PriceList;
+  sales_account?: ChartOfAccount;
+  sales_discount_account?: ChartOfAccount;
+  receivables_account?: ChartOfAccount;
+  sales_return_account?: ChartOfAccount;
   billing_address_line_1?: string;
   billing_address_line_2?: string;
   billing_city?: string;
@@ -23,7 +28,6 @@ export interface Customer {
   shipping_state?: string;
   shipping_country?: string;
   shipping_zip_code?: string;
-  tax_group_id?: number | null;
 }
 
 export interface CustomerInput {
@@ -31,11 +35,12 @@ export interface CustomerInput {
   email: string;
   phone: string;
   currency_id?: number;
+  tax_group_id?: number | null;
+  price_list_id?: number;
   sales_account_id?: number;
   sales_discount_account_id?: number;
   receivables_account_id?: number;
   sales_return_account_id?: number;
-  price_list_id?: number;
   billing_address_line_1?: string;
   billing_address_line_2?: string;
   billing_city?: string;
@@ -48,16 +53,6 @@ export interface CustomerInput {
   shipping_state?: string;
   shipping_country?: string;
   shipping_zip_code?: string;
-  tax_group_id?: number | null;
 }
 
-export interface CustomerApiResponse {
-  data: Customer[];
-  meta: {
-    total: number;
-    current_page: number;
-    last_page: number;
-    from: number;
-    to: number;
-  };
-}
+export type CustomerApiResponse = PaginatedResponse<Customer>;

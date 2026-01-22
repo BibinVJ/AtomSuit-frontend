@@ -10,9 +10,6 @@ export interface Setting {
   updated_at: string;
 }
 
-export interface SettingApiResponse {
-  message: string;
-  error: boolean;
-  code: number;
-  data: Setting | Setting[] | string[];
-}
+import { ApiResponse } from './Common';
+
+export type SettingApiResponse = ApiResponse<Setting | string>;

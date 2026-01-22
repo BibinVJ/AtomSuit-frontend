@@ -1,3 +1,5 @@
+import { PaginatedResponse } from './Common';
+
 export interface AuditEntry {
   id: number;
   log_name: string;
@@ -22,13 +24,4 @@ export interface AuditEntry {
   };
 }
 
-export interface AuditApiResponse {
-  data: AuditEntry[];
-  meta: {
-    total: number;
-    current_page: number;
-    last_page: number;
-    from: number;
-    to: number;
-  };
-}
+export type AuditApiResponse = PaginatedResponse<AuditEntry>;

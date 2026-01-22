@@ -27,7 +27,7 @@ export default function EditUnitModal({ isOpen, onClose, onSuccess, unit }: Prop
   useEffect(() => {
     if (unit) {
       setName(unit.name);
-      setCode(unit.code || unit.short_name || '');
+      setCode(unit.code || '');
       setDescription(unit.description || '');
     }
   }, [unit]);
@@ -40,7 +40,6 @@ export default function EditUnitModal({ isOpen, onClose, onSuccess, unit }: Prop
       await updateUnit(unit.id, {
         name,
         code,
-        is_active: unit.is_active,
         description,
       });
       onSuccess();

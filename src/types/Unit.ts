@@ -1,22 +1,19 @@
+import { PaginatedResponse } from './Common';
+
 export interface Unit {
   id: number;
   name: string;
   code: string;
   description: string;
-  is_active?: boolean;
-  short_name?: string; // Add as alias for compatibility if needed, but we'll try to use code
   deleted_at?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
-export interface UnitApiResponse {
-  data: Unit[];
-  meta: {
-    total: number;
-    current_page: number;
-    last_page: number;
-    from: number;
-    to: number;
-  };
+export interface UnitInput {
+  name: string;
+  code: string;
+  description: string;
 }
 
-export type UnitInput = Partial<Unit>;
+export type UnitApiResponse = PaginatedResponse<Unit>;

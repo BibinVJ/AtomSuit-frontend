@@ -1,3 +1,5 @@
+import { PaginatedResponse } from './Common';
+
 export interface Currency {
   id: number;
   code: string;
@@ -13,3 +15,5 @@ export interface CurrencyInput {
   name: string;
   symbol?: string;
 }
+
+export type CurrencyApiResponse = PaginatedResponse<Currency>;

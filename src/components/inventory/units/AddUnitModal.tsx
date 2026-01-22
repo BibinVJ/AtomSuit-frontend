@@ -39,7 +39,7 @@ export default function AddUnitModal({ isOpen, onClose, onSuccess }: Props) {
     setIsSubmitting(true);
 
     try {
-      await addUnit({ name, code, is_active: true, description });
+      await addUnit({ name, code, description });
       onSuccess();
       toast.success('Unit added successfully');
       handleClose();
