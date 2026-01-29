@@ -2,11 +2,10 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
-
 import Link from 'next/link';
 import { useSidebar } from '../hooks/useSidebar';
 import { ThemeToggleButton } from '../components/common/ThemeToggleButton';
-// import NotificationDropdown from "../components/header/NotificationDropdown";
+import NotificationDropdown from '../components/header/NotificationDropdown';
 import UserDropdown from '../components/header/UserDropdown';
 import Tooltip from '../components/ui/tooltip/Tooltip';
 
@@ -164,7 +163,7 @@ const AppHeader: React.FC = () => {
             <ThemeToggleButton />
 
             {/* <!-- Notification Menu Area --> */}
-            {/* <NotificationDropdown /> */}
+            <NotificationDropdown />
           </div>
 
           {/* <!-- User Area --> */}

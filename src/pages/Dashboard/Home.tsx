@@ -273,10 +273,10 @@ function Home() {
         // Backend automatically filters cards based on user permissions
         // Only cards the user has permission to view are returned
         const layoutRes = await getLayout();
-        if (layoutRes.data.data && layoutRes.data.data.length > 0) {
+        if (layoutRes.data && layoutRes.data.length > 0) {
           // Backend returned permission-filtered layouts
           const adaptedLayout = (
-            layoutRes.data.data as Record<string, string | number | boolean | null>[]
+            layoutRes.data as Record<string, string | number | boolean | null>[]
           ).map((item) => {
             return {
               ...item,
