@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Dropdown } from '../ui/dropdown/Dropdown';
 import { DropdownItem } from '../ui/dropdown/DropdownItem';
 import Link from 'next/link';
-import Image from 'next/image';
+
 import { useNotifications } from '../../hooks/useNotifications';
 
 export default function NotificationDropdown() {
@@ -138,7 +138,7 @@ export default function NotificationDropdown() {
               </svg>
               <p className="text-sm font-medium">No notifications yet</p>
               <p className="text-xs mt-1 text-gray-400">
-                We'll let you know when something arrives.
+                We&apos;ll let you know when something arrives.
               </p>
             </li>
           ) : (
