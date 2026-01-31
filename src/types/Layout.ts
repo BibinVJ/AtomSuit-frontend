@@ -27,4 +27,4 @@ export interface Layout {
   props?: Record<string, unknown>;
 }
 
-export type LayoutApiResponse = ApiResponse<Layout>;
+export type LayoutApiResponse = ApiResponse<Layout[]>;

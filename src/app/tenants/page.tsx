@@ -1,4 +1,4 @@
-import Tenants from '@/pages/Tenant/Tenants';
+import Tenants from '@/pages/Tenants';
 import ProtectedLayout from '@/components/layout/ProtectedLayout';
 
 export default function TenantsPage() {

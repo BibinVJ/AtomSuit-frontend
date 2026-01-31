@@ -1,4 +1,4 @@
-import Domains from '@/pages/Domain/Domains';
+import Domains from '@/pages/Domains';
 import ProtectedLayout from '@/components/layout/ProtectedLayout';
 
 export default function DomainsPage() {
