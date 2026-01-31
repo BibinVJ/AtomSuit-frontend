@@ -10,7 +10,6 @@ import {
 } from '../services/AuthService';
 import api from '../services/api';
 import { useTenant } from '../hooks/useTenant';
-
 import { User } from '../types';
 import { AuthContext } from './AuthContext';
 

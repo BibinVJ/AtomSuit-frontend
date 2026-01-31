@@ -11,7 +11,6 @@ export const useNotifications = () => {
     try {
       setLoading(true);
       const res = await api.get<NotificationApiResponse>('/notifications');
-      // API currently wraps response in "data", so we access data.data
       setNotifications(res.data.data);
       setLoading(false);
     } catch (error) {
@@ -23,13 +22,9 @@ export const useNotifications = () => {
   const fetchUnreadCount = useCallback(async () => {
     try {
       const res = await api.get<UnreadNotificationApiResponse>('/notifications/unread');
-      // The unread endpoint returns { unread_count: number, notifications: Notification[] }
-      // wrapped in ApiResponse which puts it in 'data'.
 
       if (res.data.data) {
         setUnreadCount(res.data.data.unread_count);
-        // Optionally update notifications list too if we want
-        // setNotifications(payload.data.notifications);
       }
     } catch (error) {
       console.error('Failed to fetch unread count', error);

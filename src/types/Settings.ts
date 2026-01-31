@@ -12,4 +12,4 @@ export interface Setting {
 
 import { ApiResponse } from './Common';
 
-export type SettingApiResponse = ApiResponse<Setting | string>;
+export type SettingApiResponse = ApiResponse<Record<string, Setting[]>>;

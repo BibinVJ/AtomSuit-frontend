@@ -18,11 +18,9 @@ export default function NotificationDropdown() {
     markAllAsRead,
   } = useNotifications();
 
-  // Fetch unread count on mount and set up polling
+  // Fetch unread count on mount
   useEffect(() => {
     fetchUnreadCount();
-    const interval = setInterval(fetchUnreadCount, 60000);
-    return () => clearInterval(interval);
   }, [fetchUnreadCount]);
 
   // Fetch notifications when dropdown opens

@@ -13,8 +13,6 @@ const LayoutContent: React.FC = () => {
     useSidebar();
 
   useEffect(() => {
-    // Remove location dependency since it's not available in Next.js
-    // const shouldGoFullScreen = location.state?.goFullScreen;
     const shouldGoFullScreen = false;
     if (shouldGoFullScreen) {
       enterFullScreen();
