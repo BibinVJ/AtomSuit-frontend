@@ -69,15 +69,15 @@ export default function Pagination({
   };
 
   return (
-    <div className="flex items-center justify-between mt-4">
+    <div className="flex flex-col md:flex-row items-center justify-between mt-4 gap-4">
       <div className="text-sm text-gray-700 dark:text-gray-400">
         Showing {from} to {to} of {total} results
       </div>
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap justify-center items-center gap-2">
         <Button size="sm" onClick={handlePrevious} disabled={currentPage === 1} variant="outline">
           Previous
         </Button>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center justify-center gap-2">
           {getPageNumbers().map((page, index) =>
             typeof page === 'number' ? (
               <Button
