@@ -5,8 +5,8 @@ import { useDataTable } from '@/hooks/useDataTable';
 import { useModal } from '@/hooks/useModal';
 import PageBreadcrumb from '@/components/common/PageBreadCrumb';
 import PageMeta from '@/components/common/PageMeta';
-import AddChartOfAccountModal from '@/components/accounting/charts/AddChartOfAccountModal';
-import ChartOfAccountTable from '@/components/accounting/charts/ChartOfAccountTable';
+import AddChartOfAccountModal from '@/app/accounting/_components/chart-of-accounts/AddChartOfAccountModal';
+import ChartOfAccountTable from '@/app/accounting/_components/chart-of-accounts/ChartOfAccountTable';
 import {
   getChartOfAccounts,
   exportChartOfAccounts,

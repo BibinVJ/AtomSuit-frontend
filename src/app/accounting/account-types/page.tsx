@@ -3,7 +3,7 @@
 import { useDataTable } from '@/hooks/useDataTable';
 import PageBreadcrumb from '@/components/common/PageBreadCrumb';
 import PageMeta from '@/components/common/PageMeta';
-import AccountTypeTable from '@/components/accounting/types/AccountTypeTable';
+import AccountTypeTable from '@/app/accounting/_components/account-types/AccountTypeTable';
 import { getAccountTypes } from '@/services/AccountTypeService';
 import { AccountType } from '@/types';
 import TableToolbar from '@/components/common/TableToolbar';

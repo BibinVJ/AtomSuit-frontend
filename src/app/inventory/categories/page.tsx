@@ -3,8 +3,8 @@
 import PageBreadcrumb from '@/components/common/PageBreadCrumb';
 import ComponentCard from '@/components/common/ComponentCard';
 import PageMeta from '@/components/common/PageMeta';
-import CategoryTable from '@/components/inventory/categories/CategoryTable';
-import AddCategoryModal from '@/components/inventory/categories/AddCategoryModal';
+import CategoryTable from '@/app/inventory/_components/categories/CategoryTable';
+import AddCategoryModal from '@/app/inventory/_components/categories/AddCategoryModal';
 import { useModal } from '@/hooks/useModal';
 import Pagination from '@/components/common/Pagination';
 import Button from '@/components/ui/button/Button';

@@ -1,72 +1,84 @@
 # Architecture & Best Practices Guide
 
-## 1. Project Structure
+> **Why this file exists?**
+> This document is the **Single Source of Truth** for technical decision-making in this project. It is intended for both new developers onboarding to the codebase and existing team members to ensure consistency.
 
-We follow a **Feature-based** or **Domain-driven** structure where possible, combined with Next.js App Router conventions.
+## 1. Tech Stack Overview
+
+- **Framework**: Next.js 14+ (App Router)
+- **Language**: TypeScript
+- **Styling**: TailwindCSS
+- **State/Caching**: TanStack Query (React Query)
+- **Forms**: React Hook Form (Recommended)
+
+## 2. Project Structure (Co-location First)
+
+We follow a **Feature-based Co-location** strategy. Everything related to a feature stays with that feature until it needs to be shared.
 
 ```
 src/
-├── app/                 # Next.js App Router Pages (Routing & Layouts only)
-│   ├── [feature]/       # Feature routes (e.g., /sales, /audits)
-│   │   ├── page.tsx     # Page Logic & Data Fetching (Client or Server)
-│   │   └── layout.tsx   # Feature-specific layout
-├── components/          # Reusable UI & Feature Components
-│   ├── common/          # Global reusable atoms (Button, Input, Modal)
-│   ├── layout/          # Layout specific components (Sidebar, Header)
-│   ├── [feature]/       # Feature-specific components (e.g., AuditTable)
-├── hooks/               # Custom React Hooks
-├── services/            # API Service Layer (Axios)
-├── context/             # Global State (Auth, Theme, Tenant)
-└── types/               # TypeScript Definitions
+├── app/
+│   ├── [feature]/                 # Feature Route (e.g., /sales, /audits)
+│   │   ├── _components/           # ✅ CO-LOCATED COMPONENTS (Private to this feature)
+│   │   │   ├── SalesTable.tsx
+│   │   │   └── CreateOrderModal.tsx
+│   │   ├── page.tsx               # Entry point
+│   │   └── layout.tsx             # Layout
+├── components/                    # shared components ONLY
+│   ├── common/                    # Global atoms (Button, Input, Modal)
+│   ├── layout/                    # Global layout (Sidebar, Header)
+│   └── features/                  # Components shared across MULTIPLE features
+├── hooks/                         # Global hooks
+└── services/                      # API services
 ```
 
-## 2. Data Fetching Strategy (High Load Ready)
+## 3. Key Architectural Patterns
 
-For a high-load multi-tenant application, we recommend moving from **useEffect** to **Stale-While-Revalidate (SWR)** or **TanStack Query**.
+### A. Data Fetching (TanStack Query)
 
-**Current (useEffect + useState)**:
+We generally avoid `useEffect` for data fetching. Instead, we use **TanStack Query** for:
 
-- Pros: Simple, no extra deps.
-- Cons: No caching, race conditions, waterfalls, manual revalidation.
+- Automatic Caching & Background Refetching
+- Deduplication
+- Loading/Error states
 
-**Recommended (TanStack Query/SWR)**:
+**Example**:
 
-- Pros: Automatic caching, deduplication, background revalidation, optimistic updates.
-- **Action**: Migrate `useDataTable` to wrap `useQuery`.
+```tsx
+// ✅ Correct
+const { data, isLoading } = useQuery({
+  queryKey: ['sales'],
+  queryFn: fetchSales,
+});
+```
 
-## 3. Best Practices Rules
+### B. Imports (Absolute Paths)
 
-### A. Imports
-
-Always use absolute imports (`@/`) instead of relative (`../../`).
+Always use absolute imports (`@/`) to avoid brittle `../../` chains.
 
 ```typescript
 // ✅ Good
 import Button from '@/components/ui/Button';
-
 // ❌ Bad
 import Button from '../../../../components/ui/Button';
 ```
 
-### B. Component Design
+### C. Component Sharing Strategy
 
-- **Single Responsibility**: Components should do one thing.
-- **Props Interface**: Always define `interface Props` or `[ComponentName]Props`.
-- **"Client" vs "Server"**: Mark `'use client'` at the top only when necessary (interactivity/hooks). Leaf components should be client, parent pages can be server (if fetching data server-side).
+1.  **Start Private**: Put components in `src/app/[feature]/_components`.
+2.  **Promote Later**: If a component is needed by a _second_ feature, move it to `src/components/features/[domain]`.
+3.  **Never Duplicate**: Don't copy-paste code. Refactor to share.
 
-### C. Multi-Tenancy
+## 4. Multi-Tenancy & Performance
 
-- **Tenant Context**: Always access tenant info via `useTenant()` or `getTenantFromBrowser()`.
-- **API Isolation**: Ensure `X-Tenant` header is present (handled by `api.ts` interceptor).
+- **Tenancy**: Handled via `X-Tenant` header in `api.ts`.
+- **Performance**:
+  - Use `next/dynamic` for heavy visual components (Charts, Maps).
+  - Use `useDebounce` for search inputs.
+  - Server-side pagination is mandatory for list views.
 
-### D. Performance
+## 5. Coding Standards
 
-- **Lazy Loading**: Use `next/dynamic` for heavy charts/maps.
-- **Debouncing**: Use `useDebounce` for search inputs.
-- **Pagination**: Always server-side paginate lists (already implemented in `useDataTable`).
-
-## 4. Coding Standards
-
-- **Naming**: PascalCase for components (`UserProfile.tsx`), camelCase for hooks/functions (`useAuth.ts`, `fetchData`).
-- **Types**: No `any`. Use strict interfaces.
-- **Exports**: Named exports preferred for utilities, Default exports for Pages/Components.
+- **Naming**: PascalCase for components, camelCase for functions/vars.
+- **Types**: Strict TypeScript (no `any`). Define interfaces.
+- **Exports**: Named exports for utils, Default for Components/Pages.

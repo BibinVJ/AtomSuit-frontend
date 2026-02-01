@@ -8,7 +8,7 @@ import ComponentCard from '@/components/common/ComponentCard';
 import Button from '@/components/ui/button/Button';
 import Badge from '@/components/ui/badge/Badge';
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '@/components/ui/table';
-import VoidSaleModal from '@/components/sales/VoidSaleModal';
+import VoidSaleModal from '@/app/sales/_components/VoidSaleModal';
 import { getSale } from '@/services/SaleService';
 import { useSettings } from '@/hooks/useSettings';
 

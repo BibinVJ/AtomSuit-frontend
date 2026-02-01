@@ -3,8 +3,8 @@
 import { useState } from 'react';
 import PageBreadcrumb from '@/components/common/PageBreadCrumb';
 import PageMeta from '@/components/common/PageMeta';
-import TaxGroupList from '@/components/accounting/tax-groups/TaxGroupList';
-import TaxRateList from '@/components/accounting/tax-rates/TaxRateList';
+import TaxGroupList from '@/app/accounting/_components/tax-groups/TaxGroupList';
+import TaxRateList from '@/app/accounting/_components/tax-rates/TaxRateList';
 
 export default function Taxes() {
   const [activeTab, setActiveTab] = useState<'groups' | 'rates'>('groups');

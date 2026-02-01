@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import PlanCard from '@/components/plan/PlanCard';
-import LifetimePlanCard from '@/components/plan/LifetimePlanCard';
+import PlanCard from '@/app/plans/_components/PlanCard';
+import LifetimePlanCard from '@/app/plans/_components/LifetimePlanCard';
 import { getPlans } from '@/services/PlanService';
 import { Plan } from '@/types/Plan';
 import Navbar from '@/components/home/Navbar';

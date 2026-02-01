@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import PageBreadcrumb from '@/components/common/PageBreadCrumb';
 import ComponentCard from '@/components/common/ComponentCard';
 import PageMeta from '@/components/common/PageMeta';
-import RoleTable from '@/components/role/RoleTable';
+import RoleTable from '@/app/roles/_components/RoleTable';
 import Pagination from '@/components/common/Pagination';
 import Button from '@/components/ui/button/Button';
 import Tooltip from '@/components/ui/tooltip/Tooltip';

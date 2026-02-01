@@ -3,8 +3,8 @@
 import PageBreadcrumb from '@/components/common/PageBreadCrumb';
 import ComponentCard from '@/components/common/ComponentCard';
 import PageMeta from '@/components/common/PageMeta';
-import CustomerTable from '@/components/customer/CustomerTable';
-import AddCustomerModal from '@/components/customer/AddCustomerModal';
+import CustomerTable from '@/app/customers/_components/CustomerTable';
+import AddCustomerModal from '@/app/customers/_components/AddCustomerModal';
 import { useModal } from '@/hooks/useModal';
 import Pagination from '@/components/common/Pagination';
 import Button from '@/components/ui/button/Button';

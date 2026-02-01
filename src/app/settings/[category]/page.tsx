@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import PageBreadcrumb from '@/components/common/PageBreadCrumb';
 import ComponentCard from '@/components/common/ComponentCard';
 import PageMeta from '@/components/common/PageMeta';
-import SettingsGroup from '@/components/settings/SettingsGroup';
+import SettingsGroup from '@/app/settings/_components/SettingsGroup';
 import { getSettings } from '@/services/SettingsService';
 import { Setting } from '@/types';
 import { formatLabel } from '@/utils/string';

@@ -3,8 +3,8 @@
 import PageBreadcrumb from '@/components/common/PageBreadCrumb';
 import ComponentCard from '@/components/common/ComponentCard';
 import PageMeta from '@/components/common/PageMeta';
-import VendorTable from '@/components/vendor/VendorTable';
-import AddVendorModal from '@/components/vendor/AddVendorModal';
+import VendorTable from '@/app/vendors/_components/VendorTable';
+import AddVendorModal from '@/app/vendors/_components/AddVendorModal';
 import { useModal } from '@/hooks/useModal';
 import Pagination from '@/components/common/Pagination';
 import Button from '@/components/ui/button/Button';

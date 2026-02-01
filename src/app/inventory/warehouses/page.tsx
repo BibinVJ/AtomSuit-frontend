@@ -9,10 +9,10 @@ import {
   importWarehouses,
   downloadSampleWarehouseExcel,
 } from '@/services/WarehouseService';
-import WarehouseTable from '@/components/inventory/warehouses/WarehouseTable';
-import CreateWarehouseModal from '@/components/inventory/warehouses/CreateWarehouseModal';
-import EditWarehouseModal from '@/components/inventory/warehouses/EditWarehouseModal';
-import DeleteWarehouseModal from '@/components/inventory/warehouses/DeleteWarehouseModal';
+import WarehouseTable from '@/app/inventory/_components/warehouses/WarehouseTable';
+import CreateWarehouseModal from '@/app/inventory/_components/warehouses/CreateWarehouseModal';
+import EditWarehouseModal from '@/app/inventory/_components/warehouses/EditWarehouseModal';
+import DeleteWarehouseModal from '@/app/inventory/_components/warehouses/DeleteWarehouseModal';
 import { Warehouse } from '@/types/Warehouse';
 import Pagination from '@/components/common/Pagination';
 import TableToolbar from '@/components/common/TableToolbar';

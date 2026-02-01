@@ -3,7 +3,7 @@
 import PageBreadcrumb from '@/components/common/PageBreadCrumb';
 import ComponentCard from '@/components/common/ComponentCard';
 import PageMeta from '@/components/common/PageMeta';
-import DomainTable from '@/components/domain/DomainTable';
+import DomainTable from '@/app/domains/_components/DomainTable';
 import Pagination from '@/components/common/Pagination';
 import { getDomains } from '@/services/DomainService';
 import { Domain } from '@/types';

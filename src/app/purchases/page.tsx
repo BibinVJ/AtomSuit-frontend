@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import PageBreadcrumb from '@/components/common/PageBreadCrumb';
 import ComponentCard from '@/components/common/ComponentCard';
 import PageMeta from '@/components/common/PageMeta';
-import PurchaseTable from '@/components/purchase/PurchaseTable';
+import PurchaseTable from '@/app/purchases/_components/PurchaseTable';
 import Pagination from '@/components/common/Pagination';
 import Button from '@/components/ui/button/Button';
 import Tooltip from '@/components/ui/tooltip/Tooltip';

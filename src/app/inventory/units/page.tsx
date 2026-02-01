@@ -3,8 +3,8 @@
 import PageBreadcrumb from '@/components/common/PageBreadCrumb';
 import ComponentCard from '@/components/common/ComponentCard';
 import PageMeta from '@/components/common/PageMeta';
-import UnitTable from '@/components/inventory/units/UnitTable';
-import AddUnitModal from '@/components/inventory/units/AddUnitModal';
+import UnitTable from '@/app/inventory/_components/units/UnitTable';
+import AddUnitModal from '@/app/inventory/_components/units/AddUnitModal';
 import { useModal } from '@/hooks/useModal';
 import Pagination from '@/components/common/Pagination';
 import Button from '@/components/ui/button/Button';

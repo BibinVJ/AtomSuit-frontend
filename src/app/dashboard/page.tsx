@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback, lazy, Suspense } from 'react';
+import { useEffect, useState, useCallback, Suspense } from 'react';
 import { Responsive, WidthProvider } from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
@@ -36,8 +36,14 @@ import { DashboardData } from '@/types/Dashboard';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
-const MonthlySalesChart = lazy(() => import('../../components/ecommerce/MonthlySalesChart'));
-const StatisticsChart = lazy(() => import('../../components/ecommerce/StatisticsChart'));
+import dynamic from 'next/dynamic';
+
+const MonthlySalesChart = dynamic(() => import('@/components/ecommerce/MonthlySalesChart'), {
+  loading: () => <SkeletonCard />,
+});
+const StatisticsChart = dynamic(() => import('@/components/ecommerce/StatisticsChart'), {
+  loading: () => <SkeletonCard />,
+});
 
 const componentMap = {
   MetricCard,

@@ -5,8 +5,8 @@ import { useDataTable } from '@/hooks/useDataTable';
 import { useModal } from '@/hooks/useModal';
 import PageBreadcrumb from '@/components/common/PageBreadCrumb';
 import PageMeta from '@/components/common/PageMeta';
-import AddAccountGroupModal from '@/components/accounting/groups/AddAccountGroupModal';
-import AccountGroupTable from '@/components/accounting/groups/AccountGroupTable';
+import AddAccountGroupModal from '@/app/accounting/_components/account-groups/AddAccountGroupModal';
+import AccountGroupTable from '@/app/accounting/_components/account-groups/AccountGroupTable';
 import {
   getAccountGroups,
   exportAccountGroups,

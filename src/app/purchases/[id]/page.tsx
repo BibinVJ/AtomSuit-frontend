@@ -8,7 +8,7 @@ import ComponentCard from '@/components/common/ComponentCard';
 import Button from '@/components/ui/button/Button';
 import Badge from '@/components/ui/badge/Badge';
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '@/components/ui/table';
-import VoidPurchaseModal from '@/components/purchase/VoidPurchaseModal';
+import VoidPurchaseModal from '@/app/purchases/_components/VoidPurchaseModal';
 import { getPurchase } from '@/services/PurchaseService';
 import { useSettings } from '@/hooks/useSettings';
 

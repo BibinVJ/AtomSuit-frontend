@@ -5,8 +5,8 @@ import { toast } from 'sonner';
 import { getCurrentSubscription, changePlan } from '@/services/TenantSubscriptionService';
 import { getPlans } from '@/services/PlanService';
 import { RefreshCw, Star } from 'lucide-react';
-import PlanCard from '@/components/plan/PlanCard';
-import LifetimePlanCard from '@/components/plan/LifetimePlanCard';
+import PlanCard from '@/app/plans/_components/PlanCard';
+import LifetimePlanCard from '@/app/plans/_components/LifetimePlanCard';
 import { Plan, Subscription } from '@/types';
 import { useSettings } from '@/hooks/useSettings';
 

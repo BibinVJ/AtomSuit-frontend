@@ -3,7 +3,7 @@
 import PageBreadcrumb from '@/components/common/PageBreadCrumb';
 import ComponentCard from '@/components/common/ComponentCard';
 import PageMeta from '@/components/common/PageMeta';
-import TenantTable from '@/components/tenant/TenantTable';
+import TenantTable from '@/app/tenants/_components/TenantTable';
 import Pagination from '@/components/common/Pagination';
 import { getTenants } from '@/services/TenantService';
 import { Tenant } from '@/types';

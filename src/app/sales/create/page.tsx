@@ -17,7 +17,7 @@ import { getCustomers } from '@/services/CustomerService';
 import { getItems, getItem } from '@/services/ItemService';
 import { getNextInvoiceNumber, addSale } from '@/services/SaleService';
 
-import AddCustomerModal from '@/components/customer/AddCustomerModal';
+import AddCustomerModal from '@/app/customers/_components/AddCustomerModal';
 import { useModal } from '@/hooks/useModal';
 import { Customer, Item } from '@/types';
 import { Plus } from 'lucide-react';
