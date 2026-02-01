@@ -47,7 +47,7 @@ export default function PurchaseTable({
   };
 
   const handleEdit = (id: number) => {
-    router.push(`/purchases/edit/${id}`);
+    router.push(`/purchases/${id}/edit`);
   };
 
   const handleDelete = (purchase: Purchase) => {

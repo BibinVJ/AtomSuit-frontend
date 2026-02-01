@@ -42,7 +42,7 @@ export default function RoleTable({
   const router = useRouter();
 
   const handleEdit = (role: Role) => {
-    router.push(`/roles/edit/${role.id}`);
+    router.push(`/roles/${role.id}/edit`);
   };
 
   const handleDelete = (role: Role) => {

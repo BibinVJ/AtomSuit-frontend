@@ -47,7 +47,7 @@ export default function SaleTable({
   };
 
   const handleEdit = (id: number) => {
-    router.push(`/sales/edit/${id}`);
+    router.push(`/sales/${id}/edit`);
   };
 
   const handleDelete = (sale: Sale) => {

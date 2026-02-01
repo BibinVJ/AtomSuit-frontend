@@ -1,5 +1,10 @@
-import SignIn from '@/pages/AuthPages/SignIn';
+import SignIn from '@/components/auth/SignInForm';
+import AuthLayout from '@/layout/AuthLayout';
 
 export default function SignInPage() {
-  return <SignIn />;
+  return (
+    <AuthLayout>
+      <SignIn />
+    </AuthLayout>
+  );
 }

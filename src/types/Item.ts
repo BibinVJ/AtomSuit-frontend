@@ -24,6 +24,7 @@ export interface Item {
   deleted_at?: string;
   created_at?: string;
   updated_at?: string;
+  is_expired_sale_enabled?: boolean;
 }
 
 export interface ItemInput {

@@ -3,7 +3,8 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { getTenantFromBrowser } from '@/utils/tenant';
-import SignUp from '@/pages/AuthPages/SignUp';
+import SignUp from '@/components/auth/SignUpForm';
+import AuthLayout from '@/layout/AuthLayout';
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -24,5 +25,9 @@ export default function SignUpPage() {
     return null;
   }
 
-  return <SignUp />;
+  return (
+    <AuthLayout>
+      <SignUp />
+    </AuthLayout>
+  );
 }
