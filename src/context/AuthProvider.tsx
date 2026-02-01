@@ -87,10 +87,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     if (loading || !isInitialized) return;
 
     // Define public routes differently for central vs tenant domains
-    const centralPublicRoutes = ['/signin', '/signup', '/', '/pricing'];
-    const tenantPublicRoutes = ['/signin', '/signup'];
-    const publicRoutes = tenant.isCentral ? centralPublicRoutes : tenantPublicRoutes;
-    const isPublicRoute = pathname ? publicRoutes.includes(pathname) : false;
+    const tenantPublicRoutes = ['/signin', '/signup', '/forgot-password', '/reset-password'];
+
+    // For central domain, everything is public EXCEPT dashboard
+    // For tenant domain, only specific routes are public
+    let isPublicRoute = false;
+
+    if (tenant.isCentral) {
+      isPublicRoute = !pathname?.startsWith('/dashboard');
+    } else {
+      isPublicRoute = pathname ? tenantPublicRoutes.includes(pathname) : false;
+    }
 
     if (user) {
       // User is authenticated - redirect away from auth pages

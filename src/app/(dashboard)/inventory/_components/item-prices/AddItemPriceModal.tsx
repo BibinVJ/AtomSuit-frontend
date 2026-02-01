@@ -64,7 +64,7 @@ export default function AddItemPriceModal({
       fetchItems();
 
       if (itemPrice) {
-        setItemId(itemPrice.item_id);
+        setItemId(itemPrice.item?.id);
         setMinQuantity(String(itemPrice.min_quantity));
         setPrice(String(itemPrice.price));
       } else {

@@ -1,5 +1,5 @@
 import { ArrowDown, ArrowUp, Package, Users, DollarSign, FileText } from 'lucide-react';
-import Badge from '../ui/badge/Badge';
+import Badge from '@/components/ui/badge/Badge';
 import { ReactNode } from 'react';
 
 interface MetricCardProps {

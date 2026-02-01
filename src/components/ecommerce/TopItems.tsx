@@ -1,5 +1,5 @@
-import TableSection from '../ui/table/TableSection';
-import { Table, TableBody, TableCell, TableHeader, TableRow } from '../ui/table';
+import TableSection from '@/components/ui/table/TableSection';
+import { Table, TableBody, TableCell, TableHeader, TableRow } from '@/components/ui/table';
 
 interface TopItem {
   id: number;

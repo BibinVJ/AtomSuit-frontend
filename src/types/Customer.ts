@@ -28,6 +28,8 @@ export interface Customer {
   shipping_state?: string;
   shipping_country?: string;
   shipping_zip_code?: string;
+  profile_image?: string | null;
+  total_spent?: number;
 }
 
 export interface CustomerInput {

@@ -3,13 +3,13 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import Input from '../form/input/InputField';
-import Label from '../form/Label';
-import Checkbox from '../form/input/Checkbox';
-import Button from '../ui/button/Button';
+import Input from '@/components/form/input/InputField';
+import Label from '@/components/form/Label';
+import Checkbox from '@/components/form/input/Checkbox';
+import Button from '@/components/ui/button/Button';
 import { useAuth } from '@/hooks/useAuth';
-import Divider from '../common/Divider';
-import SocialButton from '../ui/button/SocialButton';
+import Divider from '@/components/common/Divider';
+import SocialButton from '@/components/ui/button/SocialButton';
 import { toast } from 'sonner';
 import { isApiError } from '@/utils/errors';
 import { Eye, EyeClosed } from 'lucide-react';
@@ -190,7 +190,7 @@ export default function SignInForm() {
                   </span>
                 </div>
                 <Link
-                  href="/reset-password"
+                  href="/forgot-password"
                   className="text-sm text-brand-500 hover:text-brand-600 dark:text-brand-400"
                 >
                   Forgot password?

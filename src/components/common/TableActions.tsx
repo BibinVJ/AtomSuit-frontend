@@ -1,7 +1,7 @@
 import React from 'react';
-import Tooltip from '../ui/tooltip/Tooltip';
+import Tooltip from '@/components/ui/tooltip/Tooltip';
 import { Edit, Trash, RotateCcw, Eye } from 'lucide-react';
-import Button from '../ui/button/Button';
+import Button from '@/components/ui/button/Button';
 
 interface TableActionsProps {
   isTrashed?: boolean;

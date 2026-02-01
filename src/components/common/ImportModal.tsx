@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { Modal } from '../ui/modal';
-import Button from '../ui/button/Button';
-import FileInput from '../form/input/FileInput';
+import { Modal } from '@/components/ui/modal';
+import Button from '@/components/ui/button/Button';
+import FileInput from '@/components/form/input/FileInput';
 import { toast } from 'sonner';
 import { isApiError } from '@/utils/errors';
 import { Download, Upload } from 'lucide-react';

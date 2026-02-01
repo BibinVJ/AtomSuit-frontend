@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { getTenantFromBrowser } from '@/utils/tenant';
-import SignUp from '@/components/auth/SignUpForm';
+import SignUp from './_components/SignUpForm';
 import AuthLayout from '@/layout/AuthLayout';
 
 export default function SignUpPage() {

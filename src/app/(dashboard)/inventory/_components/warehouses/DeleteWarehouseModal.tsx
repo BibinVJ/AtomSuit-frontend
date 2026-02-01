@@ -66,9 +66,8 @@ export default function DeleteWarehouseModal({
             className="bg-red-500 hover:bg-red-600 border-red-500"
             onClick={handleDelete}
             disabled={isSubmitting}
-            isLoading={isSubmitting}
           >
-            Delete Warehouse
+            {isSubmitting ? 'Deleting...' : 'Delete Warehouse'}
           </Button>
         </div>
       </div>

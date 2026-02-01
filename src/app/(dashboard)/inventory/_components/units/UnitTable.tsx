@@ -99,9 +99,9 @@ export default function UnitTable({
               <TableCell
                 isHeader
                 className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400"
-                onClick={() => onSort('short_name')}
+                onClick={() => onSort('code')}
               >
-                Short Name {renderSortIcon('short_name')}
+                Code {renderSortIcon('code')}
               </TableCell>
               <TableCell
                 isHeader
@@ -135,7 +135,7 @@ export default function UnitTable({
                   </p>
                 </TableCell>
                 <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                  {unit.short_name}
+                  {unit.code}
                 </TableCell>
                 <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
                   {unit.description}

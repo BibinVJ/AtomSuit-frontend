@@ -1,4 +1,5 @@
-import Button from '../ui/button/Button';
+// import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
+import Button from '@/components/ui/button/Button';
 
 interface Props {
   currentPage: number;

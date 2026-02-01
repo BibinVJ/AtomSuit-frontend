@@ -1,4 +1,4 @@
-import { extractTenant, isDevelopment, getMainDomainUrl } from '../tenant';
+import { extractTenant, isDevelopment, getMainDomainUrl } from '@/utils/tenant';
 
 describe('tenant utilities (simple tests)', () => {
   const originalEnv = process.env;

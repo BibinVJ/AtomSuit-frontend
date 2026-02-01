@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Tooltip from '../../ui/tooltip/Tooltip';
+import Tooltip from '@/components/ui/tooltip/Tooltip';
 
 interface SwitchProps {
   label: string;

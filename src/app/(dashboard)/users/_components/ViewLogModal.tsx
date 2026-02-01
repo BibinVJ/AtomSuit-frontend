@@ -53,7 +53,7 @@ export default function ViewLogModal({ isOpen, onClose, log }: ViewLogModalProps
             </label>
             <div className="text-sm text-gray-900 dark:text-white">
               {log.logout_at ? (
-                <Badge size="sm" color="gray">
+                <Badge size="sm" color="secondary">
                   Logged Out
                 </Badge>
               ) : (

@@ -3,9 +3,9 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { EyeOff, Eye } from 'lucide-react';
-import Label from '../form/Label';
-import Input from '../form/input/InputField';
-import Checkbox from '../form/input/Checkbox';
+import Label from '@/components/form/Label';
+import Input from '@/components/form/input/InputField';
+import Checkbox from '@/components/form/input/Checkbox';
 
 export default function SignUpForm() {
   const [showPassword, setShowPassword] = useState(false);

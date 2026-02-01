@@ -78,8 +78,8 @@ export default function EditCustomerModal({ isOpen, onClose, onSuccess, customer
         shipping_state: customer.shipping_state || '',
         shipping_country: customer.shipping_country || '',
         shipping_zip_code: customer.shipping_zip_code || '',
-        tax_group_id: customer.tax_group_id,
-        price_list_id: customer.price_list_id ?? undefined,
+        tax_group_id: customer.tax_group?.id,
+        price_list_id: customer.price_list?.id ?? undefined,
       });
     }
   }, [customer]);

@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import TenantInfo from '../TenantInfo';
+import TenantInfo from '@/app/(dashboard)/tenants/_components/TenantInfo';
 import { useTenant } from '@/hooks/useTenant';
 
 // Mock the useTenant hook

@@ -62,7 +62,7 @@ export default function EditPriceListModal({ isOpen, onClose, onSuccess, priceLi
       setName(priceList.name);
       setCode(priceList.code);
       setType(priceList.type);
-      setCurrencyId(priceList.currency_id);
+      setCurrencyId(priceList.currency?.id);
       setIsTaxInclusive(priceList.is_tax_inclusive);
       setDescription(priceList.description || '');
     }

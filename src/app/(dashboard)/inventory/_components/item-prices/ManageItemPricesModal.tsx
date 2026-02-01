@@ -92,8 +92,8 @@ export default function ManageItemPricesModal({ isOpen, onClose, priceList }: Pr
 
   const handleExport = async () => {
     try {
-      const blob = await exportItemPrices();
-      const url = window.URL.createObjectURL(blob);
+      const response = await exportItemPrices();
+      const url = window.URL.createObjectURL(response.data as Blob);
       const link = document.createElement('a');
       link.href = url;
       link.setAttribute(

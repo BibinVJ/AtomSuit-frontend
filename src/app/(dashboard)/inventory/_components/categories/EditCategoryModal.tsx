@@ -92,15 +92,15 @@ export default function EditCategoryModal({ isOpen, onClose, onSuccess, category
 
     const dataToSubmit = {
       ...formData,
-      sales_account_id: formData.sales_account_id ? Number(formData.sales_account_id) : null,
-      cogs_account_id: formData.cogs_account_id ? Number(formData.cogs_account_id) : null,
+      sales_account_id: formData.sales_account_id ? Number(formData.sales_account_id) : undefined,
+      cogs_account_id: formData.cogs_account_id ? Number(formData.cogs_account_id) : undefined,
       inventory_account_id: formData.inventory_account_id
         ? Number(formData.inventory_account_id)
-        : null,
+        : undefined,
       inventory_adjustment_account_id: formData.inventory_adjustment_account_id
         ? Number(formData.inventory_adjustment_account_id)
-        : null,
-      tax_group_id: formData.tax_group_id ? Number(formData.tax_group_id) : null,
+        : undefined,
+      tax_group_id: formData.tax_group_id ? Number(formData.tax_group_id) : undefined,
     };
 
     try {

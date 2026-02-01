@@ -1,6 +1,7 @@
 import React from 'react';
-import Select from '../form/Select';
-import Tooltip from '../ui/tooltip/Tooltip';
+// import { Search, ChevronDown } from 'lucide-react';
+import Select from '@/components/form/Select';
+import Tooltip from '@/components/ui/tooltip/Tooltip';
 
 interface TableToolbarProps {
   // Search

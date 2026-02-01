@@ -81,8 +81,8 @@ export default function EditVendorModal({ isOpen, onClose, onSuccess, vendor }: 
         shipping_state: vendor.shipping_state || '',
         shipping_country: vendor.shipping_country || '',
         shipping_zip_code: vendor.shipping_zip_code || '',
-        tax_group_id: vendor.tax_group_id,
-        price_list_id: vendor.price_list_id ?? undefined,
+        tax_group_id: vendor.tax_group?.id,
+        price_list_id: vendor.price_list?.id ?? undefined,
       });
     }
   }, [vendor]);
