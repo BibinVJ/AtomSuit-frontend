@@ -1,10 +1,10 @@
 'use client';
 
-import { Table, TableBody, TableCell, TableHeader, TableRow } from '../ui/table';
-import Badge from '../ui/badge/Badge';
-import { TableActions } from '../common/TableActions';
+import { Table, TableBody, TableCell, TableHeader, TableRow } from '@/components/ui/table';
+import Badge from '@/components/ui/badge/Badge';
+import { TableActions } from '@/components/common/TableActions';
 import { useContext } from 'react';
-import { SettingsContext } from '../../context/SettingsContext';
+import { SettingsContext } from '@/context/SettingsContext';
 
 interface AuditEntry {
   id: number;

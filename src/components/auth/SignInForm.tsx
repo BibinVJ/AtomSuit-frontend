@@ -7,13 +7,13 @@ import Input from '../form/input/InputField';
 import Label from '../form/Label';
 import Checkbox from '../form/input/Checkbox';
 import Button from '../ui/button/Button';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '@/hooks/useAuth';
 import Divider from '../common/Divider';
 import SocialButton from '../ui/button/SocialButton';
 import { toast } from 'sonner';
-import { isApiError } from '../../utils/errors';
+import { isApiError } from '@/utils/errors';
 import { Eye, EyeClosed } from 'lucide-react';
-import { getTenantFromBrowser, buildTenantUrl } from '../../utils/tenant';
+import { getTenantFromBrowser, buildTenantUrl } from '@/utils/tenant';
 
 export default function SignInForm() {
   const [form, setForm] = useState({ identifier: '', password: '' }); // email or mobile

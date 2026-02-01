@@ -1,5 +1,5 @@
 import { createContext } from 'react';
-import { TenantInfo } from '../utils/tenant';
+import { TenantInfo } from '@/utils/tenant';
 
 export interface TenantContextType {
   tenant: TenantInfo;

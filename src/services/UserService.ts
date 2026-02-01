@@ -1,5 +1,5 @@
 import { createBaseService, QueryParams, PaginatedResponse } from './BaseService';
-import { User, UserInput, UserLoginDetail } from '../types/User';
+import { User, UserInput, UserLoginDetail } from '@/types/User';
 
 const userService = createBaseService<User, UserInput>('/users');
 

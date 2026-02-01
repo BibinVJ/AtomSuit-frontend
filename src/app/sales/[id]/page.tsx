@@ -2,17 +2,17 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import PageMeta from '../../../components/common/PageMeta';
-import PageBreadcrumb from '../../../components/common/PageBreadCrumb';
-import ComponentCard from '../../../components/common/ComponentCard';
-import Button from '../../../components/ui/button/Button';
-import Badge from '../../../components/ui/badge/Badge';
-import { Table, TableBody, TableCell, TableHeader, TableRow } from '../../../components/ui/table';
-import VoidSaleModal from '../../../components/sales/VoidSaleModal';
-import { getSale } from '../../../services/SaleService';
-import { useSettings } from '../../../hooks/useSettings';
+import PageMeta from '@/components/common/PageMeta';
+import PageBreadcrumb from '@/components/common/PageBreadCrumb';
+import ComponentCard from '@/components/common/ComponentCard';
+import Button from '@/components/ui/button/Button';
+import Badge from '@/components/ui/badge/Badge';
+import { Table, TableBody, TableCell, TableHeader, TableRow } from '@/components/ui/table';
+import VoidSaleModal from '@/components/sales/VoidSaleModal';
+import { getSale } from '@/services/SaleService';
+import { useSettings } from '@/hooks/useSettings';
 
-import { Sale } from '../../../types';
+import { Sale } from '@/types';
 
 export default function ViewSale() {
   const params = useParams<{ id: string }>();

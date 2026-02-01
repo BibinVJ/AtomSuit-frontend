@@ -1,8 +1,8 @@
 import { Modal } from '../../ui/modal';
 import Button from '../../ui/button/Button';
 import { toast } from 'sonner';
-import { deleteItem } from '../../../services/ItemService';
-import { Item } from '../../../types';
+import { deleteItem } from '@/services/ItemService';
+import { Item } from '@/types';
 
 interface Props {
   isOpen: boolean;

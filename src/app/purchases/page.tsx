@@ -1,18 +1,18 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import PageBreadcrumb from '../../components/common/PageBreadCrumb';
-import ComponentCard from '../../components/common/ComponentCard';
-import PageMeta from '../../components/common/PageMeta';
-import PurchaseTable from '../../components/purchase/PurchaseTable';
-import Pagination from '../../components/common/Pagination';
-import Button from '../../components/ui/button/Button';
-import Tooltip from '../../components/ui/tooltip/Tooltip';
-import { getPurchases } from '../../services/PurchaseService';
-import { Purchase } from '../../types';
-import { usePermissions } from '../../hooks/usePermissions';
-import { useDataTable } from '../../hooks/useDataTable';
-import TableToolbar from '../../components/common/TableToolbar';
+import PageBreadcrumb from '@/components/common/PageBreadCrumb';
+import ComponentCard from '@/components/common/ComponentCard';
+import PageMeta from '@/components/common/PageMeta';
+import PurchaseTable from '@/components/purchase/PurchaseTable';
+import Pagination from '@/components/common/Pagination';
+import Button from '@/components/ui/button/Button';
+import Tooltip from '@/components/ui/tooltip/Tooltip';
+import { getPurchases } from '@/services/PurchaseService';
+import { Purchase } from '@/types';
+import { usePermissions } from '@/hooks/usePermissions';
+import { useDataTable } from '@/hooks/useDataTable';
+import TableToolbar from '@/components/common/TableToolbar';
 import { Plus } from 'lucide-react';
 
 export default function Purchases() {

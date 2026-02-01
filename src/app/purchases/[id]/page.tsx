@@ -2,17 +2,17 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import PageMeta from '../../../components/common/PageMeta';
-import PageBreadcrumb from '../../../components/common/PageBreadCrumb';
-import ComponentCard from '../../../components/common/ComponentCard';
-import Button from '../../../components/ui/button/Button';
-import Badge from '../../../components/ui/badge/Badge';
-import { Table, TableBody, TableCell, TableHeader, TableRow } from '../../../components/ui/table';
-import VoidPurchaseModal from '../../../components/purchase/VoidPurchaseModal';
-import { getPurchase } from '../../../services/PurchaseService';
-import { useSettings } from '../../../hooks/useSettings';
+import PageMeta from '@/components/common/PageMeta';
+import PageBreadcrumb from '@/components/common/PageBreadCrumb';
+import ComponentCard from '@/components/common/ComponentCard';
+import Button from '@/components/ui/button/Button';
+import Badge from '@/components/ui/badge/Badge';
+import { Table, TableBody, TableCell, TableHeader, TableRow } from '@/components/ui/table';
+import VoidPurchaseModal from '@/components/purchase/VoidPurchaseModal';
+import { getPurchase } from '@/services/PurchaseService';
+import { useSettings } from '@/hooks/useSettings';
 
-import { Purchase } from '../../../types';
+import { Purchase } from '@/types';
 
 export default function ViewPurchase() {
   const params = useParams<{ id: string }>();

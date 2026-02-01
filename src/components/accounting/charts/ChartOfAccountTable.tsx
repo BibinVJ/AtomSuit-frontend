@@ -5,11 +5,11 @@ import { useState } from 'react';
 import EditChartOfAccountModal from './EditChartOfAccountModal';
 import DeleteChartOfAccountModal from './DeleteChartOfAccountModal';
 import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide } from 'lucide-react';
-import { restoreChartOfAccount } from '../../../services/ChartOfAccountService';
+import { restoreChartOfAccount } from '@/services/ChartOfAccountService';
 import { toast } from 'sonner';
 import { TableActions } from '../../common/TableActions';
-import { ChartOfAccount } from '../../../types';
-import { usePermissions } from '../../../hooks/usePermissions';
+import { ChartOfAccount } from '@/types';
+import { usePermissions } from '@/hooks/usePermissions';
 
 interface Props {
   data: ChartOfAccount[];

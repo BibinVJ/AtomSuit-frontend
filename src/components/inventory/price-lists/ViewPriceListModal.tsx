@@ -1,6 +1,6 @@
 import { Modal } from '../../ui/modal';
 import Button from '../../ui/button/Button';
-import { PriceList } from '../../../types/PriceList';
+import { PriceList } from '@/types/PriceList';
 import Label from '../../form/Label';
 
 interface Props {

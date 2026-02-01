@@ -1,21 +1,21 @@
 'use client';
 
-import PageBreadcrumb from '../../../components/common/PageBreadCrumb';
-import ComponentCard from '../../../components/common/ComponentCard';
-import PageMeta from '../../../components/common/PageMeta';
-import UnitTable from '../../../components/inventory/units/UnitTable';
-import AddUnitModal from '../../../components/inventory/units/AddUnitModal';
-import { useModal } from '../../../hooks/useModal';
-import Pagination from '../../../components/common/Pagination';
-import Button from '../../../components/ui/button/Button';
-import Tooltip from '../../../components/ui/tooltip/Tooltip';
-import { getUnits, exportUnits } from '../../../services/UnitService';
-import { Unit } from '../../../types';
+import PageBreadcrumb from '@/components/common/PageBreadCrumb';
+import ComponentCard from '@/components/common/ComponentCard';
+import PageMeta from '@/components/common/PageMeta';
+import UnitTable from '@/components/inventory/units/UnitTable';
+import AddUnitModal from '@/components/inventory/units/AddUnitModal';
+import { useModal } from '@/hooks/useModal';
+import Pagination from '@/components/common/Pagination';
+import Button from '@/components/ui/button/Button';
+import Tooltip from '@/components/ui/tooltip/Tooltip';
+import { getUnits, exportUnits } from '@/services/UnitService';
+import { Unit } from '@/types';
 import { Download, Plus } from 'lucide-react';
-import ViewModeTabs from '../../../components/common/ViewModeTabs';
-import TableToolbar from '../../../components/common/TableToolbar';
-import { useDataTable } from '../../../hooks/useDataTable';
-import { useExport } from '../../../hooks/useExport';
+import ViewModeTabs from '@/components/common/ViewModeTabs';
+import TableToolbar from '@/components/common/TableToolbar';
+import { useDataTable } from '@/hooks/useDataTable';
+import { useExport } from '@/hooks/useExport';
 
 export default function Units() {
   const { isOpen, openModal, closeModal } = useModal();

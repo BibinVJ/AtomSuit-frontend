@@ -2,10 +2,10 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useSidebar } from '../../hooks/useSidebar';
-import { useAuth } from '../../hooks/useAuth';
+import { useSidebar } from '@/hooks/useSidebar';
+import { useAuth } from '@/hooks/useAuth';
 import { usePathname } from 'next/navigation';
-import { useTenant } from '../../hooks/useTenant';
+import { useTenant } from '@/hooks/useTenant';
 import AppHeader from '../../layout/AppHeader';
 import Backdrop from '../../layout/Backdrop';
 import AppSidebar from '../../layout/AppSidebar';

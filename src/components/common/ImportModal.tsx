@@ -5,7 +5,7 @@ import { Modal } from '../ui/modal';
 import Button from '../ui/button/Button';
 import FileInput from '../form/input/FileInput';
 import { toast } from 'sonner';
-import { isApiError } from '../../utils/errors';
+import { isApiError } from '@/utils/errors';
 import { Download, Upload } from 'lucide-react';
 
 interface Props {

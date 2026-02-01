@@ -1,11 +1,11 @@
 'use client';
 
-import { Modal } from '../ui/modal';
-import Button from '../ui/button/Button';
-import { AuditEntry } from '../../types';
-import { formatLabel } from '../../utils/string';
+import { Modal } from '@/components/ui/modal';
+import Button from '@/components/ui/button/Button';
+import { AuditEntry } from '@/types';
+import { formatLabel } from '@/utils/string';
 import { useContext } from 'react';
-import { SettingsContext } from '../../context/SettingsContext';
+import { SettingsContext } from '@/context/SettingsContext';
 
 interface Props {
   isOpen: boolean;

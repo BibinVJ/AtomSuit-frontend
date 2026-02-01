@@ -5,8 +5,8 @@ import FormModal from '../../common/FormModal';
 import Input from '../../form/input/InputField';
 import Label from '../../form/Label';
 import { toast } from 'sonner';
-import { addCurrency } from '../../../services/CurrencyService';
-import { isApiError } from '../../../utils/errors';
+import { addCurrency } from '@/services/CurrencyService';
+import { isApiError } from '@/utils/errors';
 
 interface Props {
   isOpen: boolean;

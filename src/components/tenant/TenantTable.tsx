@@ -7,8 +7,8 @@ import DeleteTenantModal from './DeleteTenantModal';
 import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide } from 'lucide-react';
 import { TableActions } from '../common/TableActions';
 
-import { Tenant } from '../../types';
-import { usePermissions } from '../../hooks/usePermissions';
+import { Tenant } from '@/types';
+import { usePermissions } from '@/hooks/usePermissions';
 
 interface Props {
   data: Tenant[];

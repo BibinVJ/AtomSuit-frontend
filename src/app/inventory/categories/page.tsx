@@ -1,21 +1,21 @@
 'use client';
 
-import PageBreadcrumb from '../../../components/common/PageBreadCrumb';
-import ComponentCard from '../../../components/common/ComponentCard';
-import PageMeta from '../../../components/common/PageMeta';
-import CategoryTable from '../../../components/inventory/categories/CategoryTable';
-import AddCategoryModal from '../../../components/inventory/categories/AddCategoryModal';
-import { useModal } from '../../../hooks/useModal';
-import Pagination from '../../../components/common/Pagination';
-import Button from '../../../components/ui/button/Button';
-import Tooltip from '../../../components/ui/tooltip/Tooltip';
-import { getCategories, exportCategories } from '../../../services/CategoryService';
-import { Category } from '../../../types';
+import PageBreadcrumb from '@/components/common/PageBreadCrumb';
+import ComponentCard from '@/components/common/ComponentCard';
+import PageMeta from '@/components/common/PageMeta';
+import CategoryTable from '@/components/inventory/categories/CategoryTable';
+import AddCategoryModal from '@/components/inventory/categories/AddCategoryModal';
+import { useModal } from '@/hooks/useModal';
+import Pagination from '@/components/common/Pagination';
+import Button from '@/components/ui/button/Button';
+import Tooltip from '@/components/ui/tooltip/Tooltip';
+import { getCategories, exportCategories } from '@/services/CategoryService';
+import { Category } from '@/types';
 import { Download, Plus } from 'lucide-react';
-import ViewModeTabs from '../../../components/common/ViewModeTabs';
-import TableToolbar from '../../../components/common/TableToolbar';
-import { useDataTable } from '../../../hooks/useDataTable';
-import { useExport } from '../../../hooks/useExport';
+import ViewModeTabs from '@/components/common/ViewModeTabs';
+import TableToolbar from '@/components/common/TableToolbar';
+import { useDataTable } from '@/hooks/useDataTable';
+import { useExport } from '@/hooks/useExport';
 
 export default function Categories() {
   const { isOpen, openModal, closeModal } = useModal();

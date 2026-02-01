@@ -6,11 +6,11 @@ import {
   getCurrentSubscription,
   changePlan,
   cancelSubscription,
-} from '../../../services/TenantSubscriptionService';
-import { getPlans } from '../../../services/PlanService';
+} from '@/services/TenantSubscriptionService';
+import { getPlans } from '@/services/PlanService';
 import { RefreshCw, Calendar, CreditCard, AlertTriangle, CheckCircle } from 'lucide-react';
 import { Plan, Subscription } from '@/types';
-import { useSettings } from '../../../hooks/useSettings';
+import { useSettings } from '@/hooks/useSettings';
 
 export default function BillingSubscription() {
   const { formatCurrency, formatDate: globalFormatDate } = useSettings();

@@ -3,27 +3,21 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { toast } from 'sonner';
-import { getRole, updateRole } from '../../../../services/RoleService';
-import { getPermissions } from '../../../../services/PermissionService';
-import PageMeta from '../../../../components/common/PageMeta';
-import PageBreadcrumb from '../../../../components/common/PageBreadCrumb';
-import ComponentCard from '../../../../components/common/ComponentCard';
-import Label from '../../../../components/form/Label';
-import Input from '../../../../components/form/input/InputField';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHeader,
-  TableRow,
-} from '../../../../components/ui/table';
-import Checkbox from '../../../../components/form/input/Checkbox';
-import Button from '../../../../components/ui/button/Button';
+import { getRole, updateRole } from '@/services/RoleService';
+import { getPermissions } from '@/services/PermissionService';
+import PageMeta from '@/components/common/PageMeta';
+import PageBreadcrumb from '@/components/common/PageBreadCrumb';
+import ComponentCard from '@/components/common/ComponentCard';
+import Label from '@/components/form/Label';
+import Input from '@/components/form/input/InputField';
+import { Table, TableBody, TableCell, TableHeader, TableRow } from '@/components/ui/table';
+import Checkbox from '@/components/form/input/Checkbox';
+import Button from '@/components/ui/button/Button';
 
-import { formatKebabCase } from '../../../../utils/string';
-import { Permission } from '../../../../types/Permission';
-import { Role } from '../../../../types/Role';
-import { isApiError } from '../../../../utils/errors';
+import { formatKebabCase } from '@/utils/string';
+import { Permission } from '@/types/Permission';
+import { Role } from '@/types/Role';
+import { isApiError } from '@/utils/errors';
 
 export default function EditRole() {
   const params = useParams<{ id: string }>();

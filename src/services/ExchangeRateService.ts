@@ -1,4 +1,4 @@
-import { ExchangeRate, ExchangeRateInput } from '../types';
+import { ExchangeRate, ExchangeRateInput } from '@/types';
 import { createBaseService, QueryParams, PaginatedResponse } from './BaseService';
 
 export interface ExchangeRateQueryParams extends QueryParams {

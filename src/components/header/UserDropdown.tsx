@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { DropdownItem } from '../ui/dropdown/DropdownItem';
 import { Dropdown } from '../ui/dropdown/Dropdown';
 import { User, Settings, HelpCircle, LogOut } from 'lucide-react';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '@/hooks/useAuth';
 import Image from 'next/image';
 import Tooltip from '../ui/tooltip/Tooltip';
 

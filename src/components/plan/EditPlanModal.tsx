@@ -8,9 +8,9 @@ import Switch from '../form/switch/Switch';
 import Button from '../ui/button/Button';
 import Select from '../form/Select';
 import { toast } from 'sonner';
-import { updatePlan } from '../../services/PlanService';
-import { isApiError } from '../../utils/errors';
-import { Plan, PlanFeature } from '../../types';
+import { updatePlan } from '@/services/PlanService';
+import { isApiError } from '@/utils/errors';
+import { Plan, PlanFeature } from '@/types';
 import { Plus, Trash2 } from 'lucide-react';
 
 interface Props {

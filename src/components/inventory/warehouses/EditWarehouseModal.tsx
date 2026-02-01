@@ -5,10 +5,10 @@ import FormModal from '../../common/FormModal';
 import Input from '../../form/input/InputField';
 import Label from '../../form/Label';
 import { toast } from 'sonner';
-import { updateWarehouse } from '../../../services/WarehouseService';
-import { isApiError } from '../../../utils/errors';
+import { updateWarehouse } from '@/services/WarehouseService';
+import { isApiError } from '@/utils/errors';
 import TextArea from '../../form/input/TextArea';
-import { Warehouse } from '../../../types/Warehouse';
+import { Warehouse } from '@/types/Warehouse';
 
 interface Props {
   isOpen: boolean;

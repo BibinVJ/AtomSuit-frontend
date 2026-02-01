@@ -7,10 +7,10 @@ import {
   storeUser,
   logout as logoutService,
   login as loginService,
-} from '../services/AuthService';
-import api from '../services/api';
-import { useTenant } from '../hooks/useTenant';
-import { User } from '../types';
+} from '@/services/AuthService';
+import api from '@/services/api';
+import { useTenant } from '@/hooks/useTenant';
+import { User } from '@/types';
 import { AuthContext } from './AuthContext';
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {

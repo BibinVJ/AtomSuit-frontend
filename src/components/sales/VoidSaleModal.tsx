@@ -1,10 +1,10 @@
 import { Modal } from '../ui/modal';
 import Button from '../ui/button/Button';
 import { toast } from 'sonner';
-import { voidSale } from '../../services/SaleService';
+import { voidSale } from '@/services/SaleService';
 
-import { Sale } from '../../types';
-import { isApiError } from '../../utils/errors';
+import { Sale } from '@/types';
+import { isApiError } from '@/utils/errors';
 
 interface Props {
   isOpen: boolean;

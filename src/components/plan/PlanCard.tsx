@@ -1,6 +1,6 @@
 import { Check } from 'lucide-react';
-import { Plan, PlanFeature } from '../../types';
-import { useSettings } from '../../hooks/useSettings';
+import { Plan, PlanFeature } from '@/types';
+import { useSettings } from '@/hooks/useSettings';
 
 interface Props {
   plan: Plan;

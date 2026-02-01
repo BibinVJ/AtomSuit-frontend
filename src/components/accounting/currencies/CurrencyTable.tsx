@@ -3,13 +3,13 @@
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '../../ui/table';
 import { useState } from 'react';
 import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide } from 'lucide-react';
-import { restoreCurrency } from '../../../services/CurrencyService';
+import { restoreCurrency } from '@/services/CurrencyService';
 import { toast } from 'sonner';
-import { Currency } from '../../../types';
+import { Currency } from '@/types';
 import EditCurrencyModal from './EditCurrencyModal';
 import DeleteCurrencyModal from './DeleteCurrencyModal';
 import { TableActions } from '../../common/TableActions';
-import { usePermissions } from '../../../hooks/usePermissions';
+import { usePermissions } from '@/hooks/usePermissions';
 
 interface Props {
   data: Currency[];

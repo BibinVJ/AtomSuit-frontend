@@ -3,9 +3,9 @@
 import { Modal } from '../../ui/modal';
 import Button from '../../ui/button/Button';
 import { toast } from 'sonner';
-import { deleteChartOfAccount } from '../../../services/ChartOfAccountService';
-import { ChartOfAccount } from '../../../types';
-import { isApiError } from '../../../utils/errors';
+import { deleteChartOfAccount } from '@/services/ChartOfAccountService';
+import { ChartOfAccount } from '@/types';
+import { isApiError } from '@/utils/errors';
 
 interface Props {
   isOpen: boolean;

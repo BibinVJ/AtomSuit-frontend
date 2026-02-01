@@ -1,5 +1,5 @@
 import api from './api';
-import { Layout, LayoutApiResponse } from '../types';
+import { Layout, LayoutApiResponse } from '@/types';
 
 export const getLayout = async (): Promise<LayoutApiResponse> => {
   const response = await api.get('/dashboard/layout');

@@ -1,4 +1,4 @@
-import { Customer, CustomerInput } from '../types';
+import { Customer, CustomerInput } from '@/types';
 import { createBaseService, QueryParams, PaginatedResponse } from './BaseService';
 
 const customerService = createBaseService<Customer, CustomerInput>('/customers');

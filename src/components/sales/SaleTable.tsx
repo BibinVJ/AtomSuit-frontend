@@ -8,7 +8,7 @@ import { TableActions } from '../common/TableActions';
 import { useRouter } from 'next/navigation';
 import VoidSaleModal from './VoidSaleModal';
 
-import { Sale } from '../../types';
+import { Sale } from '@/types';
 
 interface Props {
   data: Sale[];
@@ -22,8 +22,8 @@ interface Props {
   loading?: boolean;
 }
 
-import { usePermissions } from '../../hooks/usePermissions';
-import { useSettings } from '../../hooks/useSettings';
+import { usePermissions } from '@/hooks/usePermissions';
+import { useSettings } from '@/hooks/useSettings';
 
 export default function SaleTable({
   data,

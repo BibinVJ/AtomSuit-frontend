@@ -1,5 +1,5 @@
-import { User } from '../../types';
-import { formatDate } from '../../utils/date';
+import { User } from '@/types';
+import { formatDate } from '@/utils/date';
 import { Pencil } from 'lucide-react';
 
 interface UserInfoCardProps {

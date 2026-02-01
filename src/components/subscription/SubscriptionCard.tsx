@@ -1,6 +1,6 @@
 'use client';
 
-import { Subscription } from '../../types';
+import { Subscription } from '@/types';
 import { Calendar, CreditCard, AlertTriangle, CheckCircle } from 'lucide-react';
 
 interface Props {

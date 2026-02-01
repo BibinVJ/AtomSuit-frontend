@@ -3,13 +3,13 @@
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '../../ui/table';
 import { useState } from 'react';
 import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide } from 'lucide-react';
-import { restoreExchangeRate } from '../../../services/ExchangeRateService';
+import { restoreExchangeRate } from '@/services/ExchangeRateService';
 import { toast } from 'sonner';
-import { ExchangeRate } from '../../../types';
+import { ExchangeRate } from '@/types';
 import EditExchangeRateModal from './EditExchangeRateModal';
 import DeleteExchangeRateModal from './DeleteExchangeRateModal';
 import { TableActions } from '../../common/TableActions';
-import { usePermissions } from '../../../hooks/usePermissions';
+import { usePermissions } from '@/hooks/usePermissions';
 
 interface Props {
   data: ExchangeRate[];

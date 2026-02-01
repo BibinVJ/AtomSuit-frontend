@@ -1,5 +1,5 @@
 import { createBaseService } from './BaseService';
-import { AuditEntry } from '../types';
+import { AuditEntry } from '@/types';
 
 const baseService = createBaseService<AuditEntry, unknown>('/audits');
 

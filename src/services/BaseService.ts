@@ -1,5 +1,5 @@
 import api from './api';
-import { PaginatedResponse, ApiResponse } from '../types/Common';
+import { PaginatedResponse, ApiResponse } from '@/types/Common';
 export type { PaginatedResponse, ApiResponse };
 
 export interface QueryParams {

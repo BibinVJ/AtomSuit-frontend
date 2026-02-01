@@ -1,4 +1,4 @@
-import { Category } from '../../../types';
+import { Category } from '@/types';
 import { Modal } from '../../ui/modal';
 
 interface Props {

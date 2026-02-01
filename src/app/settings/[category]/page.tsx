@@ -2,13 +2,13 @@
 
 import { useCallback, useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import PageBreadcrumb from '../../../components/common/PageBreadCrumb';
-import ComponentCard from '../../../components/common/ComponentCard';
-import PageMeta from '../../../components/common/PageMeta';
-import SettingsGroup from '../../../components/settings/SettingsGroup';
-import { getSettings } from '../../../services/SettingsService';
-import { Setting } from '../../../types';
-import { formatLabel } from '../../../utils/string';
+import PageBreadcrumb from '@/components/common/PageBreadCrumb';
+import ComponentCard from '@/components/common/ComponentCard';
+import PageMeta from '@/components/common/PageMeta';
+import SettingsGroup from '@/components/settings/SettingsGroup';
+import { getSettings } from '@/services/SettingsService';
+import { Setting } from '@/types';
+import { formatLabel } from '@/utils/string';
 
 // Define the mapping of URL paths to settings groups
 const ROUTE_GROUP_MAPPING: Record<string, string[]> = {

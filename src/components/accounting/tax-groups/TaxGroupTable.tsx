@@ -3,13 +3,13 @@
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '../../ui/table';
 import { useState } from 'react';
 import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide } from 'lucide-react';
-import { restoreTaxGroup } from '../../../services/TaxService';
+import { restoreTaxGroup } from '@/services/TaxService';
 import { toast } from 'sonner';
-import { TaxGroup } from '../../../types';
+import { TaxGroup } from '@/types';
 import EditTaxGroupModal from './EditTaxGroupModal';
 import DeleteTaxGroupModal from './DeleteTaxGroupModal';
 import { TableActions } from '../../common/TableActions';
-import { usePermissions } from '../../../hooks/usePermissions';
+import { usePermissions } from '@/hooks/usePermissions';
 
 interface Props {
   data: TaxGroup[];

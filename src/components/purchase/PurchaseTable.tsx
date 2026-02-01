@@ -8,7 +8,7 @@ import { TableActions } from '../common/TableActions';
 import { useRouter } from 'next/navigation';
 import VoidPurchaseModal from './VoidPurchaseModal';
 
-import { Purchase } from '../../types';
+import { Purchase } from '@/types';
 
 interface Props {
   data: Purchase[];
@@ -22,8 +22,8 @@ interface Props {
   loading?: boolean;
 }
 
-import { usePermissions } from '../../hooks/usePermissions';
-import { useSettings } from '../../hooks/useSettings';
+import { usePermissions } from '@/hooks/usePermissions';
+import { useSettings } from '@/hooks/useSettings';
 
 export default function PurchaseTable({
   data,

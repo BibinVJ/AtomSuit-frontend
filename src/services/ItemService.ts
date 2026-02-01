@@ -1,4 +1,4 @@
-import { Item, ItemInput } from '../types';
+import { Item, ItemInput } from '@/types';
 import { createBaseService, QueryParams, PaginatedResponse } from './BaseService';
 
 export interface ItemQueryParams extends QueryParams {

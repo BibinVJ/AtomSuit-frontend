@@ -6,11 +6,11 @@ import Input from '../../form/input/InputField';
 import Label from '../../form/Label';
 import Button from '../../ui/button/Button';
 import { toast } from 'sonner';
-import { createItemPrice, updateItemPrice } from '../../../services/ItemPriceService';
-import { getItems } from '../../../services/ItemService';
+import { createItemPrice, updateItemPrice } from '@/services/ItemPriceService';
+import { getItems } from '@/services/ItemService';
 import Select from '../../form/Select';
-import { ItemPrice } from '../../../types/ItemPrice';
-import { isApiError } from '../../../utils/errors';
+import { ItemPrice } from '@/types/ItemPrice';
+import { isApiError } from '@/utils/errors';
 
 interface Props {
   isOpen: boolean;

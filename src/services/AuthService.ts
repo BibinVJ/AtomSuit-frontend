@@ -1,5 +1,5 @@
 import api from './api';
-import { LoginResponse } from '../types';
+import { LoginResponse } from '@/types';
 
 export const login = async (identifier: string, password: string): Promise<LoginResponse> => {
   const formData = new FormData();

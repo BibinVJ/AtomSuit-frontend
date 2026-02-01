@@ -1,4 +1,4 @@
-import { Warehouse, WarehouseInput } from '../types/Warehouse';
+import { Warehouse, WarehouseInput } from '@/types/Warehouse';
 import { createBaseService, PaginatedResponse, QueryParams } from './BaseService';
 
 const warehouseService = createBaseService<Warehouse, WarehouseInput>('/warehouses');

@@ -1,9 +1,9 @@
 import { Modal } from '../ui/modal';
 import Button from '../ui/button/Button';
 import { toast } from 'sonner';
-import { voidPurchase } from '../../services/PurchaseService';
+import { voidPurchase } from '@/services/PurchaseService';
 
-import { Purchase } from '../../types';
+import { Purchase } from '@/types';
 
 interface Props {
   isOpen: boolean;

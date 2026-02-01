@@ -6,10 +6,10 @@ import Input from '../../form/input/InputField';
 import Label from '../../form/Label';
 import Button from '../../ui/button/Button';
 import { toast } from 'sonner';
-import { createPriceList } from '../../../services/PriceListService';
-import { getCurrencies } from '../../../services/CurrencyService';
+import { createPriceList } from '@/services/PriceListService';
+import { getCurrencies } from '@/services/CurrencyService';
 import Select from '../../form/Select';
-import { isApiError } from '../../../utils/errors';
+import { isApiError } from '@/utils/errors';
 import Switch from '../../form/switch/Switch';
 
 interface Props {

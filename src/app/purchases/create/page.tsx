@@ -1,23 +1,23 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import PageBreadcrumb from '../../../components/common/PageBreadCrumb';
-import ComponentCard from '../../../components/common/ComponentCard';
-import PageMeta from '../../../components/common/PageMeta';
-import Button from '../../../components/ui/button/Button';
-import Select from '../../../components/form/Select';
-import Input from '../../../components/form/input/InputField';
-import Label from '../../../components/form/Label';
-import TextArea from '../../../components/form/input/TextArea';
+import PageBreadcrumb from '@/components/common/PageBreadCrumb';
+import ComponentCard from '@/components/common/ComponentCard';
+import PageMeta from '@/components/common/PageMeta';
+import Button from '@/components/ui/button/Button';
+import Select from '@/components/form/Select';
+import Input from '@/components/form/input/InputField';
+import Label from '@/components/form/Label';
+import TextArea from '@/components/form/input/TextArea';
 import { useRouter } from 'next/navigation';
-import DatePicker from '../../../components/form/date-picker';
-import { useSettings } from '../../../hooks/useSettings';
+import DatePicker from '@/components/form/date-picker';
+import { useSettings } from '@/hooks/useSettings';
 import { toast } from 'sonner';
-import { getVendors } from '../../../services/VendorService';
-import { getItems } from '../../../services/ItemService';
-import { getNextPurchaseInvoiceNumber, addPurchase } from '../../../services/PurchaseService';
-import { isApiError } from '../../../utils/errors';
-import { Item, Vendor } from '../../../types';
+import { getVendors } from '@/services/VendorService';
+import { getItems } from '@/services/ItemService';
+import { getNextPurchaseInvoiceNumber, addPurchase } from '@/services/PurchaseService';
+import { isApiError } from '@/utils/errors';
+import { Item, Vendor } from '@/types';
 
 interface PurchaseItem {
   item_id: string;

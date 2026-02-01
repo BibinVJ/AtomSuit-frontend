@@ -6,8 +6,8 @@ import Input from '../../form/input/InputField';
 import Label from '../../form/Label';
 import TextArea from '../../form/input/TextArea';
 import { toast } from 'sonner';
-import { addUnit } from '../../../services/UnitService';
-import { isApiError } from '../../../utils/errors';
+import { addUnit } from '@/services/UnitService';
+import { isApiError } from '@/utils/errors';
 
 interface Props {
   isOpen: boolean;

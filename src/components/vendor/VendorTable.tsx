@@ -6,10 +6,10 @@ import { useState } from 'react';
 import EditVendorModal from './EditVendorModal';
 import DeleteVendorModal from './DeleteVendorModal';
 import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide } from 'lucide-react';
-import { restoreVendor } from '../../services/VendorService';
+import { restoreVendor } from '@/services/VendorService';
 import { toast } from 'sonner';
-import { Vendor } from '../../types';
-import { usePermissions } from '../../hooks/usePermissions';
+import { Vendor } from '@/types';
+import { usePermissions } from '@/hooks/usePermissions';
 import { TableActions } from '../common/TableActions';
 
 interface Props {

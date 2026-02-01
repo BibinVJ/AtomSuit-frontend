@@ -2,13 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
-import { getCurrentSubscription, changePlan } from '../../../services/TenantSubscriptionService';
-import { getPlans } from '../../../services/PlanService';
+import { getCurrentSubscription, changePlan } from '@/services/TenantSubscriptionService';
+import { getPlans } from '@/services/PlanService';
 import { RefreshCw, Star } from 'lucide-react';
-import PlanCard from '../../../components/plan/PlanCard';
-import LifetimePlanCard from '../../../components/plan/LifetimePlanCard';
+import PlanCard from '@/components/plan/PlanCard';
+import LifetimePlanCard from '@/components/plan/LifetimePlanCard';
 import { Plan, Subscription } from '@/types';
-import { useSettings } from '../../../hooks/useSettings';
+import { useSettings } from '@/hooks/useSettings';
 
 export default function BillingPlans() {
   const {} = useSettings();

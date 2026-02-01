@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { UserLoginDetail } from '../../types/User';
+import { UserLoginDetail } from '@/types/User';
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '../ui/table';
 import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide, Eye } from 'lucide-react';
 import Badge from '../ui/badge/Badge';
-import { formatKebabCase } from '../../utils/string';
+import { formatKebabCase } from '@/utils/string';
 import ViewLogModal from './ViewLogModal';
 
 interface Props {

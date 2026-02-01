@@ -5,12 +5,12 @@ import { Modal } from '../ui/modal';
 import Button from '../ui/button/Button';
 import Input from '../form/input/InputField';
 import Label from '../form/Label';
-import { Address, User } from '../../types';
-import { updateAddress } from '../../services/ProfileService';
-import { useAuth } from '../../hooks/useAuth';
+import { Address, User } from '@/types';
+import { updateAddress } from '@/services/ProfileService';
+import { useAuth } from '@/hooks/useAuth';
 import Select from '../form/Select';
 import { toast } from 'sonner';
-import { isApiError } from '../../utils/errors';
+import { isApiError } from '@/utils/errors';
 
 interface EditAddressModalProps {
   isOpen: boolean;

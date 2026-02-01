@@ -5,11 +5,11 @@ import { useState } from 'react';
 import EditAccountGroupModal from './EditAccountGroupModal';
 import DeleteAccountGroupModal from './DeleteAccountGroupModal';
 import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide } from 'lucide-react';
-import { restoreAccountGroup } from '../../../services/AccountGroupService';
+import { restoreAccountGroup } from '@/services/AccountGroupService';
 import { toast } from 'sonner';
 import { TableActions } from '../../common/TableActions';
-import { AccountGroup } from '../../../types';
-import { usePermissions } from '../../../hooks/usePermissions';
+import { AccountGroup } from '@/types';
+import { usePermissions } from '@/hooks/usePermissions';
 
 interface Props {
   data: AccountGroup[];

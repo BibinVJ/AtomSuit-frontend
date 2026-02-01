@@ -7,11 +7,11 @@ import Label from '../../form/Label';
 import TextArea from '../../form/input/TextArea';
 import Select from '../../form/Select';
 import { toast } from 'sonner';
-import { updateItem } from '../../../services/ItemService';
-import { getCategories } from '../../../services/CategoryService';
-import { getUnits } from '../../../services/UnitService';
-import { getChartOfAccounts } from '../../../services/ChartOfAccountService';
-import { getTaxGroups } from '../../../services/TaxService';
+import { updateItem } from '@/services/ItemService';
+import { getCategories } from '@/services/CategoryService';
+import { getUnits } from '@/services/UnitService';
+import { getChartOfAccounts } from '@/services/ChartOfAccountService';
+import { getTaxGroups } from '@/services/TaxService';
 import {
   Category,
   Item,
@@ -21,11 +21,11 @@ import {
   TaxGroup,
   PriceList,
   ItemPrice,
-} from '../../../types';
+} from '@/types';
 import CollapsibleSection from '../../common/CollapsibleSection';
-import { isApiError } from '../../../utils/errors';
-import { getPriceLists } from '../../../services/PriceListService';
-import { getItemPrices } from '../../../services/ItemPriceService';
+import { isApiError } from '@/utils/errors';
+import { getPriceLists } from '@/services/PriceListService';
+import { getItemPrices } from '@/services/ItemPriceService';
 import { Plus, Trash2 } from 'lucide-react';
 
 interface Props {

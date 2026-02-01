@@ -1,4 +1,4 @@
-import { Unit, UnitInput } from '../types';
+import { Unit, UnitInput } from '@/types';
 import { createBaseService, QueryParams, PaginatedResponse } from './BaseService';
 
 const unitService = createBaseService<Unit, UnitInput>('/units');

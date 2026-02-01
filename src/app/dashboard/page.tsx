@@ -5,16 +5,16 @@ import { Responsive, WidthProvider } from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 
-import PageMeta from '../../components/common/PageMeta';
-import { getDashboardData } from '../../services/DashboardService';
-import TopItems from '../../components/ecommerce/TopItems';
-import StockAlerts from '../../components/ecommerce/StockAlerts';
-import CustomersTable from '../../components/ecommerce/CustomersTable';
-import ExpiryItems from '../../components/ecommerce/ExpiryItems';
-import PlanDistributionChart from '../../components/ecommerce/PlanDistributionChart';
-import TenantOverviewCard from '../../components/ecommerce/TenantOverviewCard';
-import RevenueCard from '../../components/ecommerce/RevenueCard';
-import GrowthCard from '../../components/ecommerce/GrowthCard';
+import PageMeta from '@/components/common/PageMeta';
+import { getDashboardData } from '@/services/DashboardService';
+import TopItems from '@/components/ecommerce/TopItems';
+import StockAlerts from '@/components/ecommerce/StockAlerts';
+import CustomersTable from '@/components/ecommerce/CustomersTable';
+import ExpiryItems from '@/components/ecommerce/ExpiryItems';
+import PlanDistributionChart from '@/components/ecommerce/PlanDistributionChart';
+import TenantOverviewCard from '@/components/ecommerce/TenantOverviewCard';
+import RevenueCard from '@/components/ecommerce/RevenueCard';
+import GrowthCard from '@/components/ecommerce/GrowthCard';
 import {
   PencilIcon,
   SaveIcon,
@@ -26,13 +26,13 @@ import {
   Users,
   FileText,
 } from 'lucide-react';
-import { getLayout, saveLayout } from '../../services/LayoutService';
-import MetricCard from '../../components/ecommerce/MetricCard';
-import SkeletonCard from '../../components/common/SkeletonCard';
-import { useAuth } from '../../hooks/useAuth';
-import { useTenant } from '../../hooks/useTenant';
-import { Layout } from '../../types/Layout';
-import { DashboardData } from '../../types/Dashboard';
+import { getLayout, saveLayout } from '@/services/LayoutService';
+import MetricCard from '@/components/ecommerce/MetricCard';
+import SkeletonCard from '@/components/common/SkeletonCard';
+import { useAuth } from '@/hooks/useAuth';
+import { useTenant } from '@/hooks/useTenant';
+import { Layout } from '@/types/Layout';
+import { DashboardData } from '@/types/Dashboard';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 

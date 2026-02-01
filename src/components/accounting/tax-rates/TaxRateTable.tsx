@@ -3,13 +3,13 @@
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '../../ui/table';
 import { useState } from 'react';
 import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide } from 'lucide-react';
-import { restoreTaxRate } from '../../../services/TaxService';
+import { restoreTaxRate } from '@/services/TaxService';
 import { toast } from 'sonner';
-import { TaxRate } from '../../../types';
+import { TaxRate } from '@/types';
 import EditTaxRateModal from './EditTaxRateModal';
 import DeleteTaxRateModal from './DeleteTaxRateModal';
 import { TableActions } from '../../common/TableActions';
-import { usePermissions } from '../../../hooks/usePermissions';
+import { usePermissions } from '@/hooks/usePermissions';
 
 interface Props {
   data: TaxRate[];

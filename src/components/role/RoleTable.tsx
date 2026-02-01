@@ -4,13 +4,13 @@ import { Table, TableBody, TableCell, TableHeader, TableRow } from '../ui/table'
 import { useState } from 'react';
 import DeleteRoleModal from './DeleteRoleModal';
 import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide } from 'lucide-react';
-import { restoreRole } from '../../services/RoleService';
+import { restoreRole } from '@/services/RoleService';
 import { toast } from 'sonner';
 import { TableActions } from '../common/TableActions';
-import { Role } from '../../types';
+import { Role } from '@/types';
 import { useRouter } from 'next/navigation';
 
-import { formatKebabCase } from '../../utils/string';
+import { formatKebabCase } from '@/utils/string';
 
 interface Props {
   data: Role[];

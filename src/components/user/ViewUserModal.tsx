@@ -2,13 +2,13 @@
 
 import { useState, useMemo } from 'react';
 import { Modal } from '../ui/modal';
-import { User, UserLoginDetail } from '../../types/User';
+import { User, UserLoginDetail } from '@/types/User';
 import Button from '../ui/button/Button';
 import Badge from '../ui/badge/Badge';
-import { formatKebabCase } from '../../utils/string';
+import { formatKebabCase } from '@/utils/string';
 import UserLogsTable from './UserLogsTable';
-import { useDataTable } from '../../hooks/useDataTable';
-import { getUserLoginHistory } from '../../services/UserService';
+import { useDataTable } from '@/hooks/useDataTable';
+import { getUserLoginHistory } from '@/services/UserService';
 import Pagination from '../common/Pagination';
 
 interface ViewUserModalProps {

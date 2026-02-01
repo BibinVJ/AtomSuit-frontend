@@ -11,10 +11,10 @@ import {
   ArrowDownNarrowWide,
   BadgeDollarSign,
 } from 'lucide-react';
-import { restoreItem } from '../../../services/ItemService';
+import { restoreItem } from '@/services/ItemService';
 import { toast } from 'sonner';
-import { Item } from '../../../types';
-import { usePermissions } from '../../../hooks/usePermissions';
+import { Item } from '@/types';
+import { usePermissions } from '@/hooks/usePermissions';
 
 import { TableActions } from '../../common/TableActions';
 import Button from '../../ui/button/Button';

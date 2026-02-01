@@ -6,8 +6,8 @@ import Badge from '../../ui/badge/Badge';
 import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide } from 'lucide-react';
 import { toast } from 'sonner';
 import { TableActions } from '../../common/TableActions';
-import { PriceList } from '../../../types/PriceList';
-import { restorePriceList } from '../../../services/PriceListService';
+import { PriceList } from '@/types/PriceList';
+import { restorePriceList } from '@/services/PriceListService';
 
 interface Props {
   data: PriceList[];

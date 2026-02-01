@@ -6,11 +6,11 @@ import EditCategoryModal from './EditCategoryModal';
 import DeleteCategoryModal from './DeleteCategoryModal';
 import ViewCategoryModal from './ViewCategoryModal';
 import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide } from 'lucide-react';
-import { restoreCategory } from '../../../services/CategoryService';
+import { restoreCategory } from '@/services/CategoryService';
 import { toast } from 'sonner';
 import { TableActions } from '../../common/TableActions';
-import { Category } from '../../../types';
-import { usePermissions } from '../../../hooks/usePermissions';
+import { Category } from '@/types';
+import { usePermissions } from '@/hooks/usePermissions';
 
 interface Props {
   data: Category[];

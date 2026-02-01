@@ -4,16 +4,16 @@ import { useState, useEffect, useCallback } from 'react';
 import { Modal } from '../../ui/modal';
 import Button from '../../ui/button/Button';
 import { toast } from 'sonner';
-import { getPriceLists } from '../../../services/PriceListService';
+import { getPriceLists } from '@/services/PriceListService';
 import {
   getItemPrices,
   createItemPrice,
   updateItemPrice,
   deleteItemPrice,
-} from '../../../services/ItemPriceService';
-import { PriceList } from '../../../types/PriceList';
-import { ItemPrice } from '../../../types/ItemPrice';
-import { Item } from '../../../types';
+} from '@/services/ItemPriceService';
+import { PriceList } from '@/types/PriceList';
+import { ItemPrice } from '@/types/ItemPrice';
+import { Item } from '@/types';
 import Select from '../../form/Select';
 import { Trash2, Plus } from 'lucide-react';
 import CollapsibleSection from '../../common/CollapsibleSection';

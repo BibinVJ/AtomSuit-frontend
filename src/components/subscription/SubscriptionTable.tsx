@@ -10,10 +10,10 @@ import { TableActions } from '../common/TableActions';
 import Button from '../ui/button/Button';
 import Tooltip from '../ui/tooltip/Tooltip';
 
-import { Subscription } from '../../types';
-import { usePermissions } from '../../hooks/usePermissions';
-import { useSettings } from '../../hooks/useSettings';
-import { getSubscription } from '../../services/SubscriptionService';
+import { Subscription } from '@/types';
+import { usePermissions } from '@/hooks/usePermissions';
+import { useSettings } from '@/hooks/useSettings';
+import { getSubscription } from '@/services/SubscriptionService';
 import { toast } from 'sonner';
 
 interface Props {

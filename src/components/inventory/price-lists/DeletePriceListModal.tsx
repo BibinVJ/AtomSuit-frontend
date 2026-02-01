@@ -3,8 +3,8 @@
 import { Modal } from '../../ui/modal';
 import Button from '../../ui/button/Button';
 import { toast } from 'sonner';
-import { deletePriceList } from '../../../services/PriceListService';
-import { PriceList } from '../../../types/PriceList';
+import { deletePriceList } from '@/services/PriceListService';
+import { PriceList } from '@/types/PriceList';
 
 interface Props {
   isOpen: boolean;

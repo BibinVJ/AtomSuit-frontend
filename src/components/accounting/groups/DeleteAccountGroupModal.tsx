@@ -3,9 +3,9 @@
 import { Modal } from '../../ui/modal';
 import Button from '../../ui/button/Button';
 import { toast } from 'sonner';
-import { deleteAccountGroup } from '../../../services/AccountGroupService';
-import { AccountGroup } from '../../../types';
-import { isApiError } from '../../../utils/errors';
+import { deleteAccountGroup } from '@/services/AccountGroupService';
+import { AccountGroup } from '@/types';
+import { isApiError } from '@/utils/errors';
 
 interface Props {
   isOpen: boolean;

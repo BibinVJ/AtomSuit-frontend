@@ -1,14 +1,14 @@
 'use client';
 
-import PageBreadcrumb from '../../components/common/PageBreadCrumb';
-import ComponentCard from '../../components/common/ComponentCard';
-import PageMeta from '../../components/common/PageMeta';
-import TenantTable from '../../components/tenant/TenantTable';
-import Pagination from '../../components/common/Pagination';
-import { getTenants } from '../../services/TenantService';
-import { Tenant } from '../../types';
-import { useDataTable } from '../../hooks/useDataTable';
-import TableToolbar from '../../components/common/TableToolbar';
+import PageBreadcrumb from '@/components/common/PageBreadCrumb';
+import ComponentCard from '@/components/common/ComponentCard';
+import PageMeta from '@/components/common/PageMeta';
+import TenantTable from '@/components/tenant/TenantTable';
+import Pagination from '@/components/common/Pagination';
+import { getTenants } from '@/services/TenantService';
+import { Tenant } from '@/types';
+import { useDataTable } from '@/hooks/useDataTable';
+import TableToolbar from '@/components/common/TableToolbar';
 
 export default function Tenants() {
   const {

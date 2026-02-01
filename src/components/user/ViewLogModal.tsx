@@ -2,7 +2,7 @@
 
 import { Modal } from '../ui/modal';
 import Button from '../ui/button/Button';
-import { UserLoginDetail } from '../../types/User';
+import { UserLoginDetail } from '@/types/User';
 import Badge from '../ui/badge/Badge';
 
 interface ViewLogModalProps {

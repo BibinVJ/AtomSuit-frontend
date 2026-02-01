@@ -1,8 +1,8 @@
 import { Modal } from '../ui/modal';
 import Button from '../ui/button/Button';
 import { toast } from 'sonner';
-import { cancelSubscription } from '../../services/SubscriptionService';
-import { Subscription } from '../../types';
+import { cancelSubscription } from '@/services/SubscriptionService';
+import { Subscription } from '@/types';
 
 interface Props {
   isOpen: boolean;

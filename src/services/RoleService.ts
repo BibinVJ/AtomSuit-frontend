@@ -1,5 +1,5 @@
 import { createBaseService } from './BaseService';
-import { Role } from '../types';
+import { Role } from '@/types';
 
 const baseService = createBaseService<Role, unknown>('/roles');
 

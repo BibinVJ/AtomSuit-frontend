@@ -1,23 +1,23 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import PageBreadcrumb from '../../../../components/common/PageBreadCrumb';
-import ComponentCard from '../../../../components/common/ComponentCard';
-import PageMeta from '../../../../components/common/PageMeta';
-import Button from '../../../../components/ui/button/Button';
-import Select from '../../../../components/form/Select';
-import Input from '../../../../components/form/input/InputField';
-import Label from '../../../../components/form/Label';
+import PageBreadcrumb from '@/components/common/PageBreadCrumb';
+import ComponentCard from '@/components/common/ComponentCard';
+import PageMeta from '@/components/common/PageMeta';
+import Button from '@/components/ui/button/Button';
+import Select from '@/components/form/Select';
+import Input from '@/components/form/input/InputField';
+import Label from '@/components/form/Label';
 import { useRouter, useParams } from 'next/navigation';
-import DatePicker from '../../../../components/form/date-picker';
+import DatePicker from '@/components/form/date-picker';
 import { toast } from 'sonner';
-import TextArea from '../../../../components/form/input/TextArea';
-import { getCustomers } from '../../../../services/CustomerService';
-import { getItems, getItem } from '../../../../services/ItemService';
-import { Customer, Item } from '../../../../types';
-import { getSale, updateSale } from '../../../../services/SaleService';
-import { SaleItem as SaleItemType } from '../../../../types';
-import { isApiError } from '../../../../utils/errors';
+import TextArea from '@/components/form/input/TextArea';
+import { getCustomers } from '@/services/CustomerService';
+import { getItems, getItem } from '@/services/ItemService';
+import { Customer, Item } from '@/types';
+import { getSale, updateSale } from '@/services/SaleService';
+import { SaleItem as SaleItemType } from '@/types';
+import { isApiError } from '@/utils/errors';
 
 interface SaleItem {
   id?: number;

@@ -1,4 +1,4 @@
-import { TaxRate, TaxRateInput, TaxGroup, TaxGroupInput } from '../types';
+import { TaxRate, TaxRateInput, TaxGroup, TaxGroupInput } from '@/types';
 import { createBaseService, QueryParams, PaginatedResponse } from './BaseService';
 
 // -- Tax Rates --

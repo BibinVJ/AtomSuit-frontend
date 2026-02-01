@@ -6,10 +6,10 @@ import Input from '../../form/input/InputField';
 import Label from '../../form/Label';
 import Select from '../../form/Select';
 import { toast } from 'sonner';
-import { addTaxRate } from '../../../services/TaxService';
-import { getChartOfAccounts } from '../../../services/ChartOfAccountService';
-import { isApiError } from '../../../utils/errors';
-import { ChartOfAccount } from '../../../types';
+import { addTaxRate } from '@/services/TaxService';
+import { getChartOfAccounts } from '@/services/ChartOfAccountService';
+import { isApiError } from '@/utils/errors';
+import { ChartOfAccount } from '@/types';
 
 interface Props {
   isOpen: boolean;

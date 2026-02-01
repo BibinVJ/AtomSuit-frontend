@@ -5,8 +5,8 @@ import FormModal from '../../common/FormModal';
 import Input from '../../form/input/InputField';
 import Label from '../../form/Label';
 import { toast } from 'sonner';
-import { createWarehouse } from '../../../services/WarehouseService';
-import { isApiError } from '../../../utils/errors';
+import { createWarehouse } from '@/services/WarehouseService';
+import { isApiError } from '@/utils/errors';
 import TextArea from '../../form/input/TextArea';
 
 interface Props {

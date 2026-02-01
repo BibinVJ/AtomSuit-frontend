@@ -1,4 +1,4 @@
-import { Category, CategoryInput } from '../types';
+import { Category, CategoryInput } from '@/types';
 import { createBaseService, QueryParams, PaginatedResponse } from './BaseService';
 
 const categoryService = createBaseService<Category, CategoryInput>('/categories');

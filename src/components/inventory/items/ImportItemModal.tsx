@@ -5,8 +5,8 @@ import { Modal } from '../../ui/modal';
 import Button from '../../ui/button/Button';
 import FileInput from '../../form/input/FileInput';
 import { toast } from 'sonner';
-import { importItems, downloadSampleItemExcel } from '../../../services/ItemService';
-import { isApiError } from '../../../utils/errors';
+import { importItems, downloadSampleItemExcel } from '@/services/ItemService';
+import { isApiError } from '@/utils/errors';
 import { Download, Upload } from 'lucide-react';
 
 interface Props {

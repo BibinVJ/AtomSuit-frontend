@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect } from 'react';
-import { SidebarProvider } from '../context/SidebarContext';
-import { useSidebar } from '../hooks/useSidebar';
+import { SidebarProvider } from '@/context/SidebarContext';
+import { useSidebar } from '@/hooks/useSidebar';
 
 import AppHeader from './AppHeader';
 import Backdrop from './Backdrop';

@@ -6,10 +6,10 @@ import { useState } from 'react';
 import EditCustomerModal from './EditCustomerModal';
 import DeleteCustomerModal from './DeleteCustomerModal';
 import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide } from 'lucide-react';
-import { restoreCustomer } from '../../services/CustomerService';
+import { restoreCustomer } from '@/services/CustomerService';
 import { toast } from 'sonner';
-import { Customer } from '../../types';
-import { usePermissions } from '../../hooks/usePermissions';
+import { Customer } from '@/types';
+import { usePermissions } from '@/hooks/usePermissions';
 import { TableActions } from '../common/TableActions';
 
 interface Props {

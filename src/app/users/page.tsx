@@ -1,26 +1,26 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import PageBreadcrumb from '../../components/common/PageBreadCrumb';
-import ComponentCard from '../../components/common/ComponentCard';
-import PageMeta from '../../components/common/PageMeta';
-import UserTable from '../../components/user/UserTable';
-import UserLogsTable from '../../components/user/UserLogsTable';
-import AddUserModal from '../../components/user/AddUserModal';
-import { useModal } from '../../hooks/useModal';
-import Pagination from '../../components/common/Pagination';
-import Button from '../../components/ui/button/Button';
-import Tooltip from '../../components/ui/tooltip/Tooltip';
-import Select from '../../components/form/Select';
-import { getUsers, getUserLoginHistory } from '../../services/UserService';
-import { getRoles } from '../../services/RoleService';
-import { User, UserLoginDetail } from '../../types/User';
-import { Role } from '../../types/Role';
-import { useDataTable } from '../../hooks/useDataTable';
+import PageBreadcrumb from '@/components/common/PageBreadCrumb';
+import ComponentCard from '@/components/common/ComponentCard';
+import PageMeta from '@/components/common/PageMeta';
+import UserTable from '@/components/user/UserTable';
+import UserLogsTable from '@/components/user/UserLogsTable';
+import AddUserModal from '@/components/user/AddUserModal';
+import { useModal } from '@/hooks/useModal';
+import Pagination from '@/components/common/Pagination';
+import Button from '@/components/ui/button/Button';
+import Tooltip from '@/components/ui/tooltip/Tooltip';
+import Select from '@/components/form/Select';
+import { getUsers, getUserLoginHistory } from '@/services/UserService';
+import { getRoles } from '@/services/RoleService';
+import { User, UserLoginDetail } from '@/types/User';
+import { Role } from '@/types/Role';
+import { useDataTable } from '@/hooks/useDataTable';
 
 import { Plus } from 'lucide-react';
-import TableToolbar from '../../components/common/TableToolbar';
-import ViewModeTabs from '../../components/common/ViewModeTabs';
+import TableToolbar from '@/components/common/TableToolbar';
+import ViewModeTabs from '@/components/common/ViewModeTabs';
 
 export default function Users() {
   const [activeTab, setActiveTab] = useState<'users' | 'logs'>('users');

@@ -5,7 +5,7 @@ import { Dropdown } from '../ui/dropdown/Dropdown';
 import { DropdownItem } from '../ui/dropdown/DropdownItem';
 import Link from 'next/link';
 
-import { useNotifications } from '../../hooks/useNotifications';
+import { useNotifications } from '@/hooks/useNotifications';
 
 export default function NotificationDropdown() {
   const [isOpen, setIsOpen] = useState(false);

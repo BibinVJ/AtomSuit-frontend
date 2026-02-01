@@ -3,7 +3,7 @@
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '../ui/table';
 import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide } from 'lucide-react';
 
-import { Domain } from '../../types';
+import { Domain } from '@/types';
 
 interface Props {
   data: Domain[];

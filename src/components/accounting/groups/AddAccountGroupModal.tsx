@@ -7,10 +7,10 @@ import Label from '../../form/Label';
 import Select from '../../form/Select';
 import TextArea from '../../form/input/TextArea';
 import { toast } from 'sonner';
-import { addAccountGroup, getAccountGroups } from '../../../services/AccountGroupService';
-import { getAccountTypes } from '../../../services/AccountTypeService';
-import { isApiError } from '../../../utils/errors';
-import { AccountType, AccountGroup } from '../../../types';
+import { addAccountGroup, getAccountGroups } from '@/services/AccountGroupService';
+import { getAccountTypes } from '@/services/AccountTypeService';
+import { isApiError } from '@/utils/errors';
+import { AccountType, AccountGroup } from '@/types';
 
 interface Props {
   isOpen: boolean;

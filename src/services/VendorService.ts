@@ -1,4 +1,4 @@
-import { Vendor, VendorInput } from '../types';
+import { Vendor, VendorInput } from '@/types';
 import { createBaseService, QueryParams, PaginatedResponse } from './BaseService';
 
 const vendorService = createBaseService<Vendor, VendorInput>('/vendors');

@@ -1,12 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import PlanCard from '../../components/plan/PlanCard';
-import LifetimePlanCard from '../../components/plan/LifetimePlanCard';
-import { getPlans } from '../../services/PlanService';
-import { Plan } from '../../types/Plan';
-import Navbar from '../../components/home/Navbar';
-import Footer from '../../components/home/Footer';
+import PlanCard from '@/components/plan/PlanCard';
+import LifetimePlanCard from '@/components/plan/LifetimePlanCard';
+import { getPlans } from '@/services/PlanService';
+import { Plan } from '@/types/Plan';
+import Navbar from '@/components/home/Navbar';
+import Footer from '@/components/home/Footer';
 
 export default function Pricing() {
   const [plans, setPlans] = useState<Plan[]>([]);

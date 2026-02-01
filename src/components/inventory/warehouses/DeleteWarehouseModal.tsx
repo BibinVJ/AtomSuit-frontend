@@ -4,8 +4,8 @@ import { useState } from 'react';
 import { Modal } from '../../ui/modal';
 import Button from '../../ui/button/Button';
 import { toast } from 'sonner';
-import { deleteWarehouse } from '../../../services/WarehouseService';
-import { Warehouse } from '../../../types/Warehouse';
+import { deleteWarehouse } from '@/services/WarehouseService';
+import { Warehouse } from '@/types/Warehouse';
 import { AlertTriangle } from 'lucide-react';
 
 interface Props {

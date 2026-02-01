@@ -5,11 +5,11 @@ import { Modal } from '../ui/modal';
 import Button from '../ui/button/Button';
 import Input from '../form/input/InputField';
 import Label from '../form/Label';
-import { User } from '../../types';
-import { updateSocialLinks } from '../../services/ProfileService';
-import { useAuth } from '../../hooks/useAuth';
+import { User } from '@/types';
+import { updateSocialLinks } from '@/services/ProfileService';
+import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
-import { isApiError } from '../../utils/errors';
+import { isApiError } from '@/utils/errors';
 
 interface EditSocialLinksModalProps {
   isOpen: boolean;

@@ -2,7 +2,7 @@
 
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '../../ui/table';
 import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide } from 'lucide-react';
-import { AccountType } from '../../../types';
+import { AccountType } from '@/types';
 import Badge from '../../ui/badge/Badge';
 
 interface Props {

@@ -2,9 +2,9 @@
 
 import React from 'react';
 import Image from 'next/image';
-import GridShape from '../components/common/GridShape';
+import GridShape from '@/components/common/GridShape';
 import Link from 'next/link';
-import ThemeTogglerTwo from '../components/common/ThemeTogglerTwo';
+import ThemeTogglerTwo from '@/components/common/ThemeTogglerTwo';
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (

@@ -1,6 +1,6 @@
 'use client';
 
-import { Plan } from '../../types/Plan';
+import { Plan } from '@/types/Plan';
 import Button from '../ui/button/Button';
 import { Check, Star } from 'lucide-react';
 

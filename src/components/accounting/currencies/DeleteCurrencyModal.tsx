@@ -3,9 +3,9 @@
 import { Modal } from '../../ui/modal';
 import Button from '../../ui/button/Button';
 import { toast } from 'sonner';
-import { deleteCurrency } from '../../../services/CurrencyService';
-import { Currency } from '../../../types/Currency';
-import { isApiError } from '../../../utils/errors';
+import { deleteCurrency } from '@/services/CurrencyService';
+import { Currency } from '@/types/Currency';
+import { isApiError } from '@/utils/errors';
 
 interface Props {
   isOpen: boolean;

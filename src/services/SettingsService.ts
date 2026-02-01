@@ -1,5 +1,5 @@
 import api from './api';
-import { SettingApiResponse } from '../types';
+import { SettingApiResponse } from '@/types';
 
 export const getSettings = async (): Promise<SettingApiResponse> => {
   const response = await api.get('/settings');

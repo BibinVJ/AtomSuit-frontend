@@ -7,10 +7,10 @@ import DeletePlanModal from './DeletePlanModal';
 import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide } from 'lucide-react';
 import { TableActions } from '../common/TableActions';
 
-import { Plan } from '../../types';
-import { usePermissions } from '../../hooks/usePermissions';
-import { useSettings } from '../../hooks/useSettings';
-import { getPlan } from '../../services/PlanService';
+import { Plan } from '@/types';
+import { usePermissions } from '@/hooks/usePermissions';
+import { useSettings } from '@/hooks/useSettings';
+import { getPlan } from '@/services/PlanService';
 import { toast } from 'sonner';
 
 interface Props {

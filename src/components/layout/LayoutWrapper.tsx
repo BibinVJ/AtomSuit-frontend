@@ -2,7 +2,7 @@
 
 import { usePathname } from 'next/navigation';
 import ProtectedLayout from './ProtectedLayout';
-import { SidebarProvider } from '../../context/SidebarContext';
+import { SidebarProvider } from '@/context/SidebarContext';
 
 interface LayoutWrapperProps {
   children: React.ReactNode;

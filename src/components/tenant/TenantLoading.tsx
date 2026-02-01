@@ -1,6 +1,6 @@
 'use client';
 
-import { useTenant } from '../../hooks/useTenant';
+import { useTenant } from '@/hooks/useTenant';
 import { AlertCircle } from 'lucide-react';
 
 interface TenantLoadingProps {

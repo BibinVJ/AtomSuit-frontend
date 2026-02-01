@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import * as TenantSubscriptionService from '../../services/TenantSubscriptionService';
-import { Subscription } from '../../types';
+import * as TenantSubscriptionService from '@/services/TenantSubscriptionService';
+import { Subscription } from '@/types';
 import Button from '../ui/button/Button';
 import { CreditCard, AlertTriangle, CheckCircle, Calendar } from 'lucide-react';
 

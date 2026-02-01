@@ -3,11 +3,11 @@
 import { useState, useEffect, useRef } from 'react';
 import { Modal } from '../ui/modal';
 import Button from '../ui/button/Button';
-import { updateProfileImage, deleteProfileImage } from '../../services/ProfileService';
-import { useAuth } from '../../hooks/useAuth';
+import { updateProfileImage, deleteProfileImage } from '@/services/ProfileService';
+import { useAuth } from '@/hooks/useAuth';
 import FileInput from '../form/input/FileInput';
 import { toast } from 'sonner';
-import { isApiError } from '../../utils/errors';
+import { isApiError } from '@/utils/errors';
 
 interface EditProfileImageModalProps {
   isOpen: boolean;

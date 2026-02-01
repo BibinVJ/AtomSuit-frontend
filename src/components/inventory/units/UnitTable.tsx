@@ -5,11 +5,11 @@ import { useState } from 'react';
 import EditUnitModal from './EditUnitModal';
 import DeleteUnitModal from './DeleteUnitModal';
 import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide } from 'lucide-react';
-import { restoreUnit } from '../../../services/UnitService';
+import { restoreUnit } from '@/services/UnitService';
 import { toast } from 'sonner';
 import { TableActions } from '../../common/TableActions';
-import { Unit } from '../../../types';
-import { usePermissions } from '../../../hooks/usePermissions';
+import { Unit } from '@/types';
+import { usePermissions } from '@/hooks/usePermissions';
 
 interface Props {
   data: Unit[];

@@ -5,7 +5,7 @@ import PageBreadcrumb from '../common/PageBreadCrumb';
 import UserMetaCard from './UserMetaCard';
 import UserInfoCard from './UserInfoCard';
 import PageMeta from '../common/PageMeta';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '@/hooks/useAuth';
 import UserAddressCard from './UserAddressCard';
 import EditProfileModal from './EditProfileModal';
 import EditAddressModal from './EditAddressModal';

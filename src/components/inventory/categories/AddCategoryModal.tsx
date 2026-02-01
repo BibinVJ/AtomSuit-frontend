@@ -6,12 +6,12 @@ import Select from '../../form/Select';
 import TextArea from '../../form/input/TextArea';
 import CollapsibleSection from '../../common/CollapsibleSection';
 import { toast } from 'sonner';
-import { addCategory } from '../../../services/CategoryService';
-import { getChartOfAccounts } from '../../../services/ChartOfAccountService';
-import { getTaxGroups } from '../../../services/TaxService';
-import { ChartOfAccount, TaxGroup } from '../../../types';
-import { useSettings } from '../../../hooks/useSettings';
-import { isApiError } from '../../../utils/errors';
+import { addCategory } from '@/services/CategoryService';
+import { getChartOfAccounts } from '@/services/ChartOfAccountService';
+import { getTaxGroups } from '@/services/TaxService';
+import { ChartOfAccount, TaxGroup } from '@/types';
+import { useSettings } from '@/hooks/useSettings';
+import { isApiError } from '@/utils/errors';
 
 interface Props {
   isOpen: boolean;

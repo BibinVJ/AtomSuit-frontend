@@ -30,7 +30,7 @@ const MetricCard = ({ icon, title, value, percentage, trend }: MetricCardProps) 
   </div>
 );
 
-import { useSettings } from '../../hooks/useSettings';
+import { useSettings } from '@/hooks/useSettings';
 
 export default function EcommerceMetrics({
   data,

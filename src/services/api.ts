@@ -1,6 +1,6 @@
 import axios from 'axios';
 import NProgress from 'nprogress';
-import { getTenantFromBrowser } from '../utils/tenant';
+import { getTenantFromBrowser } from '@/utils/tenant';
 // import { toast } from 'sonner';
 
 const api = axios.create({

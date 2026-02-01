@@ -1,5 +1,5 @@
 import api from './api';
-import { Purchase, PurchaseInput } from '../types';
+import { Purchase, PurchaseInput } from '@/types';
 import { createBaseService } from './BaseService';
 
 const baseService = createBaseService<Purchase, PurchaseInput>('/purchases');

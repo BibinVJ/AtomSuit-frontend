@@ -6,9 +6,9 @@ import Input from '../../form/input/InputField';
 import Label from '../../form/Label';
 import MultiSelect from '../../form/MultiSelect';
 import { toast } from 'sonner';
-import { addTaxGroup, getTaxRates } from '../../../services/TaxService';
-import { isApiError } from '../../../utils/errors';
-import { TaxRate } from '../../../types';
+import { addTaxGroup, getTaxRates } from '@/services/TaxService';
+import { isApiError } from '@/utils/errors';
+import { TaxRate } from '@/types';
 
 interface Props {
   isOpen: boolean;

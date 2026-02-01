@@ -6,9 +6,9 @@ import {
   getCurrentSubscription,
   changePlan,
   cancelSubscription,
-} from '../../services/TenantSubscriptionService';
-import { getPlans } from '../../services/PlanService';
-import { Plan, Subscription } from '../../types';
+} from '@/services/TenantSubscriptionService';
+import { getPlans } from '@/services/PlanService';
+import { Plan, Subscription } from '@/types';
 import SubscriptionCard from './SubscriptionCard';
 import Button from '../ui/button/Button';
 import { Modal } from '../ui/modal';

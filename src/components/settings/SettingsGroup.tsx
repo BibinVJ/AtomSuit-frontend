@@ -1,6 +1,6 @@
 'use client';
 
-import { Setting } from '../../types';
+import { Setting } from '@/types';
 import SettingField from './SettingField';
 
 interface Props {

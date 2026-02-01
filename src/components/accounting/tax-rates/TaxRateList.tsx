@@ -1,19 +1,19 @@
 'use client';
 
-import ComponentCard from '../../../components/common/ComponentCard';
+import ComponentCard from '@/components/common/ComponentCard';
 import TaxRateTable from './TaxRateTable';
 import AddTaxRateModal from './AddTaxRateModal';
-import { useModal } from '../../../hooks/useModal';
-import Pagination from '../../../components/common/Pagination';
-import Button from '../../../components/ui/button/Button';
-import Tooltip from '../../../components/ui/tooltip/Tooltip';
-import { getTaxRates } from '../../../services/TaxService';
-import { TaxRate } from '../../../types';
+import { useModal } from '@/hooks/useModal';
+import Pagination from '@/components/common/Pagination';
+import Button from '@/components/ui/button/Button';
+import Tooltip from '@/components/ui/tooltip/Tooltip';
+import { getTaxRates } from '@/services/TaxService';
+import { TaxRate } from '@/types';
 import { Plus } from 'lucide-react';
-import ViewModeTabs from '../../../components/common/ViewModeTabs';
-import TableToolbar from '../../../components/common/TableToolbar';
-import { useDataTable } from '../../../hooks/useDataTable';
-import { usePermissions } from '../../../hooks/usePermissions';
+import ViewModeTabs from '@/components/common/ViewModeTabs';
+import TableToolbar from '@/components/common/TableToolbar';
+import { useDataTable } from '@/hooks/useDataTable';
+import { usePermissions } from '@/hooks/usePermissions';
 
 export default function TaxRateList() {
   const { isOpen, openModal, closeModal } = useModal();

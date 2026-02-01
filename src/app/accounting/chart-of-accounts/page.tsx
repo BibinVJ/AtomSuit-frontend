@@ -1,27 +1,27 @@
 'use client';
 
 import { useRef, useCallback } from 'react';
-import { useDataTable } from '../../../hooks/useDataTable';
-import { useModal } from '../../../hooks/useModal';
-import PageBreadcrumb from '../../../components/common/PageBreadCrumb';
-import PageMeta from '../../../components/common/PageMeta';
-import AddChartOfAccountModal from '../../../components/accounting/charts/AddChartOfAccountModal';
-import ChartOfAccountTable from '../../../components/accounting/charts/ChartOfAccountTable';
+import { useDataTable } from '@/hooks/useDataTable';
+import { useModal } from '@/hooks/useModal';
+import PageBreadcrumb from '@/components/common/PageBreadCrumb';
+import PageMeta from '@/components/common/PageMeta';
+import AddChartOfAccountModal from '@/components/accounting/charts/AddChartOfAccountModal';
+import ChartOfAccountTable from '@/components/accounting/charts/ChartOfAccountTable';
 import {
   getChartOfAccounts,
   exportChartOfAccounts,
   importChartOfAccounts,
-} from '../../../services/ChartOfAccountService';
-import { ChartOfAccount } from '../../../types';
-import Button from '../../../components/ui/button/Button';
+} from '@/services/ChartOfAccountService';
+import { ChartOfAccount } from '@/types';
+import Button from '@/components/ui/button/Button';
 import { Plus, Download, Upload } from 'lucide-react';
 import { toast } from 'sonner';
-import TableToolbar from '../../../components/common/TableToolbar';
-import Pagination from '../../../components/common/Pagination';
-import ComponentCard from '../../../components/common/ComponentCard';
-import ViewModeTabs from '../../../components/common/ViewModeTabs';
-import Tooltip from '../../../components/ui/tooltip/Tooltip';
-import { useExport } from '../../../hooks/useExport';
+import TableToolbar from '@/components/common/TableToolbar';
+import Pagination from '@/components/common/Pagination';
+import ComponentCard from '@/components/common/ComponentCard';
+import ViewModeTabs from '@/components/common/ViewModeTabs';
+import Tooltip from '@/components/ui/tooltip/Tooltip';
+import { useExport } from '@/hooks/useExport';
 
 export default function ChartOfAccounts() {
   const fileInputRef = useRef<HTMLInputElement>(null);

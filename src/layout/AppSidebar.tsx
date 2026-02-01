@@ -19,8 +19,8 @@ import {
   Settings,
   Activity,
 } from 'lucide-react';
-import { useSidebar } from '../hooks/useSidebar';
-import { usePermissions } from '../hooks/usePermissions';
+import { useSidebar } from '@/hooks/useSidebar';
+import { usePermissions } from '@/hooks/usePermissions';
 
 type NavItem = {
   name: string;

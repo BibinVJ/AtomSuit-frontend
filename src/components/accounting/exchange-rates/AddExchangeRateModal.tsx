@@ -5,10 +5,10 @@ import FormModal from '../../common/FormModal';
 import Input from '../../form/input/InputField';
 import Label from '../../form/Label';
 import { toast } from 'sonner';
-import { addExchangeRate } from '../../../services/ExchangeRateService';
-import { getCurrencies } from '../../../services/CurrencyService';
-import { Currency } from '../../../types';
-import { isApiError } from '../../../utils/errors';
+import { addExchangeRate } from '@/services/ExchangeRateService';
+import { getCurrencies } from '@/services/CurrencyService';
+import { Currency } from '@/types';
+import { isApiError } from '@/utils/errors';
 import Select from '../../form/Select';
 
 interface Props {

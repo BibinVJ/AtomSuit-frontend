@@ -8,10 +8,10 @@ import Switch from '../form/switch/Switch';
 import Button from '../ui/button/Button';
 import Select from '../form/Select';
 import { toast } from 'sonner';
-import { createTenant } from '../../services/TenantService';
-import { getPlans } from '../../services/PlanService';
-import { isApiError } from '../../utils/errors';
-import { Plan, Tenant, TenantInput } from '../../types';
+import { createTenant } from '@/services/TenantService';
+import { getPlans } from '@/services/PlanService';
+import { isApiError } from '@/utils/errors';
+import { Plan, Tenant, TenantInput } from '@/types';
 
 interface Props {
   isOpen: boolean;

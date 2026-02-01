@@ -1,4 +1,4 @@
-import { AccountType } from '../types';
+import { AccountType } from '@/types';
 import { createBaseService, QueryParams, PaginatedResponse } from './BaseService';
 
 const accountTypeService = createBaseService<AccountType, Partial<AccountType>>('/account-types');

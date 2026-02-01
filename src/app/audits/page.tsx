@@ -1,18 +1,18 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import PageBreadcrumb from '../../components/common/PageBreadCrumb';
-import ComponentCard from '../../components/common/ComponentCard';
-import PageMeta from '../../components/common/PageMeta';
-import AuditTable from '../../components/audit/AuditTable';
-import AuditDetailsModal from '../../components/audit/AuditDetailsModal';
-import { useModal } from '../../hooks/useModal';
-import Pagination from '../../components/common/Pagination';
-import Select from '../../components/form/Select';
-import AuditService from '../../services/AuditService';
-import { AuditEntry } from '../../types';
-import { useDataTable } from '../../hooks/useDataTable';
-import TableToolbar from '../../components/common/TableToolbar';
+import PageBreadcrumb from '@/components/common/PageBreadCrumb';
+import ComponentCard from '@/components/common/ComponentCard';
+import PageMeta from '@/components/common/PageMeta';
+import AuditTable from './_components/AuditTable';
+import AuditDetailsModal from './_components/AuditDetailsModal';
+import { useModal } from '@/hooks/useModal';
+import Pagination from '@/components/common/Pagination';
+import Select from '@/components/form/Select';
+import AuditService from '@/services/AuditService';
+import { AuditEntry } from '@/types';
+import { useDataTable } from '@/hooks/useDataTable';
+import TableToolbar from '@/components/common/TableToolbar';
 
 export default function Audits() {
   const { isOpen, openModal, closeModal } = useModal();

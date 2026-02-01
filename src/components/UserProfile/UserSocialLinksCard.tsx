@@ -1,4 +1,4 @@
-import { User } from '../../types';
+import { User } from '@/types';
 import { Pencil } from 'lucide-react';
 
 interface UserSocialLinksCardProps {

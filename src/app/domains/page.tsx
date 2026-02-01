@@ -1,14 +1,14 @@
 'use client';
 
-import PageBreadcrumb from '../../components/common/PageBreadCrumb';
-import ComponentCard from '../../components/common/ComponentCard';
-import PageMeta from '../../components/common/PageMeta';
-import DomainTable from '../../components/domain/DomainTable';
-import Pagination from '../../components/common/Pagination';
-import { getDomains } from '../../services/DomainService';
-import { Domain } from '../../types';
-import { useDataTable } from '../../hooks/useDataTable';
-import TableToolbar from '../../components/common/TableToolbar';
+import PageBreadcrumb from '@/components/common/PageBreadCrumb';
+import ComponentCard from '@/components/common/ComponentCard';
+import PageMeta from '@/components/common/PageMeta';
+import DomainTable from '@/components/domain/DomainTable';
+import Pagination from '@/components/common/Pagination';
+import { getDomains } from '@/services/DomainService';
+import { Domain } from '@/types';
+import { useDataTable } from '@/hooks/useDataTable';
+import TableToolbar from '@/components/common/TableToolbar';
 
 export default function Domains() {
   const {

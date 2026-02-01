@@ -1,5 +1,5 @@
 import api from './api';
-import { Subscription } from '../types';
+import { Subscription } from '@/types';
 
 export const getCurrentSubscription = async (): Promise<Subscription> => {
   const response = await api.get('/tenant-subscription/current');

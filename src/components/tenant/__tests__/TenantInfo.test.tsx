@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import TenantInfo from '../TenantInfo';
-import { useTenant } from '../../../hooks/useTenant';
+import { useTenant } from '@/hooks/useTenant';
 
 // Mock the useTenant hook
 jest.mock('../../../hooks/useTenant');

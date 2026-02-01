@@ -1,6 +1,6 @@
 'use client';
 
-import { useTenant } from '../../hooks/useTenant';
+import { useTenant } from '@/hooks/useTenant';
 import { Building, Crown } from 'lucide-react';
 
 export default function TenantInfo() {

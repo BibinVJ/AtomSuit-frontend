@@ -1,7 +1,7 @@
 'use client';
 
 import { DollarSign, TrendingUp } from 'lucide-react';
-import { useSettings } from '../../hooks/useSettings';
+import { useSettings } from '@/hooks/useSettings';
 
 interface RevenueCardProps {
   data: {

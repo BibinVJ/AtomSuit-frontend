@@ -1,19 +1,19 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import PageBreadcrumb from '../../components/common/PageBreadCrumb';
-import ComponentCard from '../../components/common/ComponentCard';
-import PageMeta from '../../components/common/PageMeta';
-import PlanTable from '../../components/plan/PlanTable';
-import AddPlanModal from '../../components/plan/AddPlanModal';
-import { useModal } from '../../hooks/useModal';
-import Pagination from '../../components/common/Pagination';
-import Button from '../../components/ui/button/Button';
-import Tooltip from '../../components/ui/tooltip/Tooltip';
-import { getPlans } from '../../services/PlanService';
-import { usePermissions } from '../../hooks/usePermissions';
-import { Plan } from '../../types';
-import TableToolbar from '../../components/common/TableToolbar';
+import PageBreadcrumb from '@/components/common/PageBreadCrumb';
+import ComponentCard from '@/components/common/ComponentCard';
+import PageMeta from '@/components/common/PageMeta';
+import PlanTable from '@/components/plan/PlanTable';
+import AddPlanModal from '@/components/plan/AddPlanModal';
+import { useModal } from '@/hooks/useModal';
+import Pagination from '@/components/common/Pagination';
+import Button from '@/components/ui/button/Button';
+import Tooltip from '@/components/ui/tooltip/Tooltip';
+import { getPlans } from '@/services/PlanService';
+import { usePermissions } from '@/hooks/usePermissions';
+import { Plan } from '@/types';
+import TableToolbar from '@/components/common/TableToolbar';
 
 export default function Plans() {
   const { hasPermission } = usePermissions();

@@ -1,4 +1,4 @@
-import { User } from '../../types';
+import { User } from '@/types';
 import { Pencil, Plus } from 'lucide-react';
 
 interface UserAddressCardProps {

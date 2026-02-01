@@ -1,10 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import PageBreadcrumb from '../../../components/common/PageBreadCrumb';
-import PageMeta from '../../../components/common/PageMeta';
-import ExchangeRatesList from '../../../components/accounting/exchange-rates/ExchangeRatesList';
-import CurrencyList from '../../../components/accounting/currencies/CurrencyList';
+import PageBreadcrumb from '@/components/common/PageBreadCrumb';
+import PageMeta from '@/components/common/PageMeta';
+import ExchangeRatesList from '@/components/accounting/exchange-rates/ExchangeRatesList';
+import CurrencyList from '@/components/accounting/currencies/CurrencyList';
 
 export default function Currencies() {
   const [activeTab, setActiveTab] = useState<'currencies' | 'rates'>('currencies');

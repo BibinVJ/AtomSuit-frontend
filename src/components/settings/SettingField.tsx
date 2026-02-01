@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Setting } from '../../types';
+import { Setting } from '@/types';
 import Button from '../ui/button/Button';
 import FileInput from '../form/input/FileInput';
 import Input from '../form/input/InputField';
@@ -10,12 +10,12 @@ import Switch from '../form/switch/Switch';
 import Select from '../form/Select';
 import MultiSelect from '../form/MultiSelect';
 import { Save, Trash2, Clock } from 'lucide-react';
-import { updateSetting, deleteSettingFile } from '../../services/SettingsService';
-import { getChartOfAccounts } from '../../services/ChartOfAccountService';
-import { getCurrencies } from '../../services/CurrencyService';
+import { updateSetting, deleteSettingFile } from '@/services/SettingsService';
+import { getChartOfAccounts } from '@/services/ChartOfAccountService';
+import { getCurrencies } from '@/services/CurrencyService';
 import { toast } from 'sonner';
-import { formatLabel } from '../../utils/string';
-import { useSettings } from '../../hooks/useSettings';
+import { formatLabel } from '@/utils/string';
+import { useSettings } from '@/hooks/useSettings';
 import Image from 'next/image';
 import AddCurrencyModal from '../accounting/currencies/AddCurrencyModal';
 

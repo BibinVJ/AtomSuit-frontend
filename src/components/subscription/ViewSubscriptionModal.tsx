@@ -1,7 +1,7 @@
 import { Modal } from '../ui/modal';
 import Button from '../ui/button/Button';
 import Badge from '../ui/badge/Badge';
-import { Subscription } from '../../types';
+import { Subscription } from '@/types';
 
 interface Props {
   isOpen: boolean;

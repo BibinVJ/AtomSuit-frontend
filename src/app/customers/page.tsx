@@ -1,29 +1,29 @@
 'use client';
 
-import PageBreadcrumb from '../../components/common/PageBreadCrumb';
-import ComponentCard from '../../components/common/ComponentCard';
-import PageMeta from '../../components/common/PageMeta';
-import CustomerTable from '../../components/customer/CustomerTable';
-import AddCustomerModal from '../../components/customer/AddCustomerModal';
-import { useModal } from '../../hooks/useModal';
-import Pagination from '../../components/common/Pagination';
-import Button from '../../components/ui/button/Button';
-import Tooltip from '../../components/ui/tooltip/Tooltip';
+import PageBreadcrumb from '@/components/common/PageBreadCrumb';
+import ComponentCard from '@/components/common/ComponentCard';
+import PageMeta from '@/components/common/PageMeta';
+import CustomerTable from '@/components/customer/CustomerTable';
+import AddCustomerModal from '@/components/customer/AddCustomerModal';
+import { useModal } from '@/hooks/useModal';
+import Pagination from '@/components/common/Pagination';
+import Button from '@/components/ui/button/Button';
+import Tooltip from '@/components/ui/tooltip/Tooltip';
 
 import {
   getCustomers,
   exportCustomers,
   importCustomers,
   downloadSampleCustomerExcel,
-} from '../../services/CustomerService';
-import ImportModal from '../../components/common/ImportModal';
+} from '@/services/CustomerService';
+import ImportModal from '@/components/common/ImportModal';
 import { Download, Upload, Plus } from 'lucide-react';
-import ViewModeTabs from '../../components/common/ViewModeTabs';
-import { usePermissions } from '../../hooks/usePermissions';
-import { Customer } from '../../types';
-import TableToolbar from '../../components/common/TableToolbar';
-import { useDataTable } from '../../hooks/useDataTable';
-import { useExport } from '../../hooks/useExport';
+import ViewModeTabs from '@/components/common/ViewModeTabs';
+import { usePermissions } from '@/hooks/usePermissions';
+import { Customer } from '@/types';
+import TableToolbar from '@/components/common/TableToolbar';
+import { useDataTable } from '@/hooks/useDataTable';
+import { useExport } from '@/hooks/useExport';
 
 export default function Customers() {
   const { hasPermission } = usePermissions();

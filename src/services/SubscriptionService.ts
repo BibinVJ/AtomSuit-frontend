@@ -1,4 +1,4 @@
-import { Subscription } from '../types';
+import { Subscription } from '@/types';
 import { createBaseService } from './BaseService';
 
 const baseService = createBaseService<Subscription, unknown>('/subscriptions');

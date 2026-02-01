@@ -1,4 +1,4 @@
-import { PriceList } from '../types/PriceList';
+import { PriceList } from '@/types/PriceList';
 import { createBaseService, QueryParams, PaginatedResponse } from './BaseService';
 
 const priceListService = createBaseService<PriceList, Partial<PriceList>>('/price-lists');

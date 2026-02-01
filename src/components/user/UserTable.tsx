@@ -7,11 +7,11 @@ import ViewUserModal from './ViewUserModal';
 import EditUserModal from './EditUserModal';
 import DeleteUserModal from './DeleteUserModal';
 import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide } from 'lucide-react';
-import { restoreUser } from '../../services/UserService';
+import { restoreUser } from '@/services/UserService';
 import { toast } from 'sonner';
 import { TableActions } from '../common/TableActions';
-import { formatKebabCase } from '../../utils/string';
-import { User } from '../../types';
+import { formatKebabCase } from '@/utils/string';
+import { User } from '@/types';
 
 interface Props {
   data: User[];

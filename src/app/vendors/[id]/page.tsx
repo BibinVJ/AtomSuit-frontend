@@ -2,11 +2,11 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useParams } from 'next/navigation';
-import PageMeta from '../../../components/common/PageMeta';
-import PageBreadcrumb from '../../../components/common/PageBreadCrumb';
-import ComponentCard from '../../../components/common/ComponentCard';
-import { getVendor } from '../../../services/VendorService';
-import { Vendor } from '../../../types';
+import PageMeta from '@/components/common/PageMeta';
+import PageBreadcrumb from '@/components/common/PageBreadCrumb';
+import ComponentCard from '@/components/common/ComponentCard';
+import { getVendor } from '@/services/VendorService';
+import { Vendor } from '@/types';
 
 export default function ViewVendor() {
   const params = useParams<{ id: string }>();

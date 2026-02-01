@@ -1,7 +1,7 @@
 import { Facebook, Instagram, Linkedin, Pencil } from 'lucide-react';
 import Image from 'next/image';
-import { User } from '../../types';
-import { formatKebabCase } from '../../utils/string';
+import { User } from '@/types';
+import { formatKebabCase } from '@/utils/string';
 
 interface UserMetaCardProps {
   user: User | null;

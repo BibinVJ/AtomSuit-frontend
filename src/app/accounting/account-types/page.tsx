@@ -1,13 +1,13 @@
 'use client';
 
-import { useDataTable } from '../../../hooks/useDataTable';
-import PageBreadcrumb from '../../../components/common/PageBreadCrumb';
-import PageMeta from '../../../components/common/PageMeta';
-import AccountTypeTable from '../../../components/accounting/types/AccountTypeTable';
-import { getAccountTypes } from '../../../services/AccountTypeService';
-import { AccountType } from '../../../types';
-import TableToolbar from '../../../components/common/TableToolbar';
-import Pagination from '../../../components/common/Pagination';
+import { useDataTable } from '@/hooks/useDataTable';
+import PageBreadcrumb from '@/components/common/PageBreadCrumb';
+import PageMeta from '@/components/common/PageMeta';
+import AccountTypeTable from '@/components/accounting/types/AccountTypeTable';
+import { getAccountTypes } from '@/services/AccountTypeService';
+import { AccountType } from '@/types';
+import TableToolbar from '@/components/common/TableToolbar';
+import Pagination from '@/components/common/Pagination';
 
 export default function AccountTypes() {
   const {

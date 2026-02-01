@@ -1,4 +1,4 @@
-import { AccountGroup, AccountGroupInput } from '../types';
+import { AccountGroup, AccountGroupInput } from '@/types';
 import { createBaseService, QueryParams, PaginatedResponse } from './BaseService';
 
 const accountGroupService = createBaseService<AccountGroup, AccountGroupInput>('/account-groups');

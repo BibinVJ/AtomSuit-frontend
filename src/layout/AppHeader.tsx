@@ -3,11 +3,11 @@
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useSidebar } from '../hooks/useSidebar';
-import { ThemeToggleButton } from '../components/common/ThemeToggleButton';
-import NotificationDropdown from '../components/header/NotificationDropdown';
-import UserDropdown from '../components/header/UserDropdown';
-import Tooltip from '../components/ui/tooltip/Tooltip';
+import { useSidebar } from '@/hooks/useSidebar';
+import { ThemeToggleButton } from '@/components/common/ThemeToggleButton';
+import NotificationDropdown from '@/components/header/NotificationDropdown';
+import UserDropdown from '@/components/header/UserDropdown';
+import Tooltip from '@/components/ui/tooltip/Tooltip';
 
 const AppHeader: React.FC = () => {
   const [isApplicationMenuOpen, setApplicationMenuOpen] = useState(false);

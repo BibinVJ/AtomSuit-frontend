@@ -1,5 +1,5 @@
 import api from './api';
-import { Currency, CurrencyInput } from '../types';
+import { Currency, CurrencyInput } from '@/types';
 import { createBaseService, QueryParams, PaginatedResponse } from './BaseService';
 
 const currencyService = createBaseService<Currency, CurrencyInput>('/currencies');

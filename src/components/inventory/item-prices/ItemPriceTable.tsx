@@ -4,8 +4,8 @@ import { Table, TableBody, TableCell, TableHeader, TableRow } from '../../ui/tab
 import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide } from 'lucide-react';
 import { toast } from 'sonner';
 import { TableActions } from '../../common/TableActions';
-import { ItemPrice } from '../../../types/ItemPrice';
-import { restoreItemPrice } from '../../../services/ItemPriceService';
+import { ItemPrice } from '@/types/ItemPrice';
+import { restoreItemPrice } from '@/services/ItemPriceService';
 
 interface Props {
   data: ItemPrice[];

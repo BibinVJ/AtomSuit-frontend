@@ -6,12 +6,12 @@ import Input from '../form/input/InputField';
 import Label from '../form/Label';
 import Button from '../ui/button/Button';
 import { toast } from 'sonner';
-import { addUser } from '../../services/UserService';
-import { getRoles } from '../../services/RoleService';
+import { addUser } from '@/services/UserService';
+import { getRoles } from '@/services/RoleService';
 import Select from '../form/Select';
-import { formatKebabCase } from '../../utils/string';
-import { Role } from '../../types/Role';
-import { isApiError } from '../../utils/errors';
+import { formatKebabCase } from '@/utils/string';
+import { Role } from '@/types/Role';
+import { isApiError } from '@/utils/errors';
 
 interface Props {
   isOpen: boolean;

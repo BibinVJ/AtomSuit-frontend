@@ -7,18 +7,18 @@ import Label from '../../form/Label';
 import TextArea from '../../form/input/TextArea';
 import Select from '../../form/Select';
 import { toast } from 'sonner';
-import { addItem } from '../../../services/ItemService';
-import { getCategories } from '../../../services/CategoryService';
-import { getUnits } from '../../../services/UnitService';
-import { getChartOfAccounts } from '../../../services/ChartOfAccountService';
-import { getTaxGroups } from '../../../services/TaxService';
-import { getPriceLists } from '../../../services/PriceListService';
+import { addItem } from '@/services/ItemService';
+import { getCategories } from '@/services/CategoryService';
+import { getUnits } from '@/services/UnitService';
+import { getChartOfAccounts } from '@/services/ChartOfAccountService';
+import { getTaxGroups } from '@/services/TaxService';
+import { getPriceLists } from '@/services/PriceListService';
 
-import { Category, Unit, ItemInput, ChartOfAccount, TaxGroup, PriceList } from '../../../types';
+import { Category, Unit, ItemInput, ChartOfAccount, TaxGroup, PriceList } from '@/types';
 import CollapsibleSection from '../../common/CollapsibleSection';
-import { isApiError } from '../../../utils/errors';
+import { isApiError } from '@/utils/errors';
 import { Plus, Trash2 } from 'lucide-react';
-import { useSettings } from '../../../hooks/useSettings';
+import { useSettings } from '@/hooks/useSettings';
 
 interface Props {
   isOpen: boolean;

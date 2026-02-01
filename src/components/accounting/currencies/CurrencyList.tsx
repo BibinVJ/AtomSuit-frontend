@@ -1,19 +1,19 @@
 'use client';
 
-import ComponentCard from '../../../components/common/ComponentCard';
+import ComponentCard from '@/components/common/ComponentCard';
 import CurrencyTable from './CurrencyTable';
 import AddCurrencyModal from './AddCurrencyModal';
-import { useModal } from '../../../hooks/useModal';
-import Pagination from '../../../components/common/Pagination';
-import Button from '../../../components/ui/button/Button';
-import Tooltip from '../../../components/ui/tooltip/Tooltip';
-import { getCurrencies, exportCurrencies } from '../../../services/CurrencyService';
-import { Currency } from '../../../types';
+import { useModal } from '@/hooks/useModal';
+import Pagination from '@/components/common/Pagination';
+import Button from '@/components/ui/button/Button';
+import Tooltip from '@/components/ui/tooltip/Tooltip';
+import { getCurrencies, exportCurrencies } from '@/services/CurrencyService';
+import { Currency } from '@/types';
 import { Download, Plus } from 'lucide-react';
-import ViewModeTabs from '../../../components/common/ViewModeTabs';
-import TableToolbar from '../../../components/common/TableToolbar';
-import { useDataTable } from '../../../hooks/useDataTable';
-import { useExport } from '../../../hooks/useExport';
+import ViewModeTabs from '@/components/common/ViewModeTabs';
+import TableToolbar from '@/components/common/TableToolbar';
+import { useDataTable } from '@/hooks/useDataTable';
+import { useExport } from '@/hooks/useExport';
 
 export default function CurrencyList() {
   const { isOpen, openModal, closeModal } = useModal();

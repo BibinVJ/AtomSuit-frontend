@@ -1,5 +1,5 @@
 import api from './api';
-import { Plan, PlanInput } from '../types';
+import { Plan, PlanInput } from '@/types';
 import { createBaseService } from './BaseService';
 
 const baseService = createBaseService<Plan, PlanInput>('/plans');

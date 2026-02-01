@@ -1,6 +1,6 @@
 'use client';
 
-import { Warehouse } from '../../../types/Warehouse';
+import { Warehouse } from '@/types/Warehouse';
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '../../ui/table';
 import { TableActions } from '../../common/TableActions';
 import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide } from 'lucide-react';

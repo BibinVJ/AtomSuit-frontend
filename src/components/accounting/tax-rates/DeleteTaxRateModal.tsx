@@ -3,9 +3,9 @@
 import { Modal } from '../../ui/modal';
 import Button from '../../ui/button/Button';
 import { toast } from 'sonner';
-import { deleteTaxRate } from '../../../services/TaxService';
-import { TaxRate } from '../../../types/Tax';
-import { isApiError } from '../../../utils/errors';
+import { deleteTaxRate } from '@/services/TaxService';
+import { TaxRate } from '@/types/Tax';
+import { isApiError } from '@/utils/errors';
 
 interface Props {
   isOpen: boolean;
