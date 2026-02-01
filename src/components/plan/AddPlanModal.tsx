@@ -223,7 +223,6 @@ export default function AddPlanModal({ isOpen, onClose, onPlanAdded }: Props) {
                     setInterval(value as 'day' | 'week' | 'month' | 'year' | 'lifetime')
                   }
                   defaultValue={interval}
-                  showPlaceholder={false}
                 />
               </div>
               <div>
@@ -341,7 +340,6 @@ export default function AddPlanModal({ isOpen, onClose, onPlanAdded }: Props) {
                           updateFeature(index, 'type', value as 'string' | 'integer' | 'boolean')
                         }
                         defaultValue={feature.type}
-                        showPlaceholder={false}
                       />
                     </div>
                     <div>
@@ -356,7 +354,6 @@ export default function AddPlanModal({ isOpen, onClose, onPlanAdded }: Props) {
                           ]}
                           onChange={(value) => updateFeature(index, 'value', value === 'true')}
                           defaultValue={String(feature.value)}
-                          showPlaceholder={false}
                           error={!!errors[`feature_${index}_value`]}
                           hint={errors[`feature_${index}_value`]}
                         />

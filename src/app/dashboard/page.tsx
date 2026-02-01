@@ -275,9 +275,7 @@ function Home() {
         const layoutRes = await getLayout();
         if (layoutRes.data && layoutRes.data.length > 0) {
           // Backend returned permission-filtered layouts
-          const adaptedLayout = (
-            layoutRes.data as Record<string, string | number | boolean | null>[]
-          ).map((item) => {
+          const adaptedLayout = (layoutRes.data as unknown as Record<string, any>[]).map((item) => {
             return {
               ...item,
               i:

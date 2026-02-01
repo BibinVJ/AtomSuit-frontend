@@ -84,7 +84,6 @@ export default function Audits() {
                     ]}
                     onChange={(value) => setSelectedEvent(value)}
                     defaultValue={selectedEvent}
-                    showPlaceholder={true}
                     placeholder="Event"
                     className="w-full"
                     searchable={false}
@@ -105,7 +104,6 @@ export default function Audits() {
                     ]}
                     onChange={(value) => setSelectedSubjectType(value)}
                     defaultValue={selectedSubjectType}
-                    showPlaceholder={true}
                     placeholder="Subject"
                     className="w-full"
                     searchable={false}

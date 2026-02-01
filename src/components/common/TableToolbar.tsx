@@ -134,7 +134,6 @@ const TableToolbar: React.FC<TableToolbarProps> = ({
                   ]}
                   onChange={onPerPageChange}
                   defaultValue={String(perPage)}
-                  showPlaceholder={false}
                   className="w-full"
                   searchable={false}
                 />

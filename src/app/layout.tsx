@@ -3,15 +3,10 @@ import { Outfit } from 'next/font/google';
 import './globals.css';
 import 'nprogress/nprogress.css';
 import './nprogress-custom.css';
-
-import { SidebarProvider } from '@/context/SidebarContext';
-import { ThemeProvider } from '@/context/ThemeContext';
-import { AuthProvider } from '@/context/AuthProvider';
-import { TenantProvider } from '@/context/TenantProvider';
-import { SettingsProvider } from '@/context/SettingsProvider';
-import { Toaster } from 'sonner';
 import { Suspense } from 'react';
 import NavigationEvents from '@/components/common/NavigationEvents';
+import LayoutWrapper from '@/components/layout/LayoutWrapper';
+import AppProviders from '@/components/common/AppProviders';
 
 const outfit = Outfit({
   subsets: ['latin'],
@@ -30,6 +25,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${outfit.className} dark:bg-gray-900`}>
+        {/* ... script ... */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -46,21 +42,12 @@ export default function RootLayout({
             `,
           }}
         />
-        <ThemeProvider>
-          <TenantProvider>
-            <AuthProvider>
-              <SettingsProvider>
-                <SidebarProvider>
-                  <Toaster richColors position="top-center" closeButton={true} />
-                  <Suspense fallback={null}>
-                    <NavigationEvents />
-                  </Suspense>
-                  {children}
-                </SidebarProvider>
-              </SettingsProvider>
-            </AuthProvider>
-          </TenantProvider>
-        </ThemeProvider>
+        <AppProviders>
+          <Suspense fallback={null}>
+            <NavigationEvents />
+          </Suspense>
+          <LayoutWrapper>{children}</LayoutWrapper>
+        </AppProviders>
       </body>
     </html>
   );
