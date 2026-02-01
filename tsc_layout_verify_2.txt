@@ -1,0 +1,20 @@
+src/app/(dashboard)/customers/_components/EditCustomerModal.tsx(81,32): error TS2551: Property 'tax_group_id' does not exist on type 'Customer'. Did you mean 'tax_group'?
+src/app/(dashboard)/customers/_components/EditCustomerModal.tsx(82,33): error TS2551: Property 'price_list_id' does not exist on type 'Customer'. Did you mean 'price_list'?
+src/app/(dashboard)/inventory/_components/categories/EditCategoryModal.tsx(107,41): error TS2345: Argument of type '{ sales_account_id: number | null; cogs_account_id: number | null; inventory_account_id: number | null; inventory_adjustment_account_id: number | null; tax_group_id: number | null; name: string; description: string; }' is not assignable to parameter of type 'CategoryInput'.
+  Types of property 'tax_group_id' are incompatible.
+    Type 'number | null' is not assignable to type 'number | undefined'.
+      Type 'null' is not assignable to type 'number | undefined'.
+src/app/(dashboard)/inventory/_components/item-prices/AddItemPriceModal.tsx(67,29): error TS2339: Property 'item_id' does not exist on type 'ItemPrice'.
+src/app/(dashboard)/inventory/_components/item-prices/AddItemPriceModal.tsx(182,21): error TS2322: Type 'string' is not assignable to type 'number'.
+src/app/(dashboard)/inventory/_components/item-prices/AddItemPriceModal.tsx(198,21): error TS2322: Type 'string' is not assignable to type 'number'.
+src/app/(dashboard)/inventory/_components/item-prices/ManageItemPricesModal.tsx(96,46): error TS2345: Argument of type 'AxiosResponse<any, any, {}>' is not assignable to parameter of type 'Blob | MediaSource'.
+src/app/(dashboard)/inventory/_components/price-lists/EditPriceListModal.tsx(65,31): error TS2551: Property 'currency_id' does not exist on type 'PriceList'. Did you mean 'currency'?
+src/app/(dashboard)/inventory/_components/units/UnitTable.tsx(138,25): error TS2339: Property 'short_name' does not exist on type 'Unit'.
+src/app/(dashboard)/inventory/_components/warehouses/DeleteWarehouseModal.tsx(69,13): error TS2322: Type '{ children: string; type: "button"; variant: "primary"; className: string; onClick: () => Promise<void>; disabled: boolean; isLoading: boolean; }' is not assignable to type 'IntrinsicAttributes & ButtonProps'.
+  Property 'isLoading' does not exist on type 'IntrinsicAttributes & ButtonProps'.
+src/app/(dashboard)/users/_components/ViewLogModal.tsx(56,34): error TS2322: Type '"gray"' is not assignable to type 'BadgeColor | undefined'.
+src/app/(dashboard)/vendors/_components/EditVendorModal.tsx(84,30): error TS2551: Property 'tax_group_id' does not exist on type 'Vendor'. Did you mean 'tax_group'?
+src/app/(dashboard)/vendors/_components/EditVendorModal.tsx(85,31): error TS2551: Property 'price_list_id' does not exist on type 'Vendor'. Did you mean 'price_list'?
+src/components/ecommerce/CustomersTable.tsx(64,37): error TS2339: Property 'profile_image' does not exist on type 'Customer'.
+src/components/ecommerce/CustomersTable.tsx(81,29): error TS2339: Property 'total_spent' does not exist on type 'Customer'.
+src/services/__mocks__/AuthService.ts(3,7): error TS2741: Property 'updated_at' is missing in type '{ id: number; name: string; email: string; email_verified_at: string; phone: string; phone_verified_at: string; status: string; status_updated_at: string; is_admin: false; role: { id: number; name: string; permissions: never[]; }; ... 10 more ...; created_at: string; }' but required in type 'User'.

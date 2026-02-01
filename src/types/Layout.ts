@@ -28,3 +28,17 @@ export interface Layout {
 }
 
 export type LayoutApiResponse = ApiResponse<Layout[]>;
+
+export interface BackendLayoutItem {
+  slug?: string;
+  dashboard_card_id?: number;
+  width?: number;
+  default_width?: number;
+  height?: number;
+  default_height?: number;
+  x?: number;
+  y?: number;
+  visible?: boolean;
+  component?: string;
+  [key: string]: unknown;
+}

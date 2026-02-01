@@ -44,11 +44,11 @@ const AppHeader: React.FC = () => {
   }, []);
 
   return (
-    <header className="sticky top-0 flex w-full h-16 bg-white dark:bg-gray-900 backdrop-blur-md border-gray-200 z-9999 dark:border-gray-800 lg:border-b">
+    <header className="sticky top-0 flex w-full h-16 bg-white dark:bg-gray-900 backdrop-blur-md border-gray-200 z-[999] dark:border-gray-800 lg:border-b">
       <div className="flex flex-col items-center justify-between grow lg:flex-row lg:px-6">
         <div className="flex items-center justify-between w-full h-16 gap-2 px-4 border-b border-gray-200 dark:border-gray-800 sm:gap-4 lg:justify-normal lg:border-b-0 lg:px-0 lg:h-auto lg:py-4">
           <button
-            className="flex items-center justify-center w-8 h-8 text-gray-500 border-gray-200 rounded-lg z-99999 dark:border-gray-800 lg:flex dark:text-gray-400 lg:h-11 lg:w-11 lg:border"
+            className="flex items-center justify-center w-8 h-8 text-gray-500 border-gray-200 rounded-lg dark:border-gray-800 lg:flex dark:text-gray-400 lg:h-11 lg:w-11 lg:border"
             onClick={handleToggle}
             aria-label="Toggle Sidebar"
           >
@@ -99,7 +99,7 @@ const AppHeader: React.FC = () => {
           <Tooltip text="More Applications" position="bottom">
             <button
               onClick={toggleApplicationMenu}
-              className="flex items-center justify-center w-8 h-8 text-gray-700 rounded-lg z-99999 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 lg:hidden"
+              className="flex items-center justify-center w-8 h-8 text-gray-700 rounded-lg hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 lg:hidden"
             >
               <svg
                 width="24"

@@ -5,7 +5,6 @@ import 'nprogress/nprogress.css';
 import './nprogress-custom.css';
 import { Suspense } from 'react';
 import NavigationEvents from '@/components/common/NavigationEvents';
-import LayoutWrapper from '@/components/layout/LayoutWrapper';
 import AppProviders from '@/components/common/AppProviders';
 
 const outfit = Outfit({
@@ -46,7 +45,7 @@ export default function RootLayout({
           <Suspense fallback={null}>
             <NavigationEvents />
           </Suspense>
-          <LayoutWrapper>{children}</LayoutWrapper>
+          {children}
         </AppProviders>
       </body>
     </html>

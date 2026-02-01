@@ -398,7 +398,7 @@ const AppSidebar: React.FC = () => {
       )}
 
       <aside
-        className={`fixed mt-16 lg:mt-0 flex flex-col top-0 px-5 left-0 text-gray-900 h-[calc(100vh-64px)] lg:h-screen transition-all duration-300 ease-in-out z-999999 border-r border-gray-200 dark:border-gray-800
+        className={`fixed mt-16 lg:mt-0 flex flex-col top-0 px-5 left-0 text-gray-900 h-[calc(100vh-64px)] lg:h-screen transition-all duration-300 ease-in-out z-[9999] border-r border-gray-200 dark:border-gray-800
         custom-sidebar-bg bg-white dark:bg-gray-900
         ${isExpanded || isMobileOpen ? 'w-[290px]' : isHovered ? 'w-[290px]' : 'w-[90px]'}
         ${isMobileOpen ? 'translate-x-0 opacity-100' : '-translate-x-full opacity-0 lg:opacity-100'}
@@ -434,7 +434,7 @@ const AppSidebar: React.FC = () => {
             )}
           </Link>
         </div>
-        <div className="flex flex-col flex-1 overflow-y-auto duration-300 ease-linear no-scrollbar">
+        <div className="flex flex-col flex-1 overflow-y-auto overscroll-y-contain duration-300 ease-linear no-scrollbar">
           <nav className="mb-6">
             <div className="flex flex-col gap-4">
               {hasAnyPermission(navItems) && (

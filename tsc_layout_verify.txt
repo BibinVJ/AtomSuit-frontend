@@ -1,0 +1,72 @@
+src/app/(dashboard)/accounting/account-groups/page.tsx(8,34): error TS2307: Cannot find module '@/app/accounting/_components/account-groups/AddAccountGroupModal' or its corresponding type declarations.
+src/app/(dashboard)/accounting/account-groups/page.tsx(9,31): error TS2307: Cannot find module '@/app/accounting/_components/account-groups/AccountGroupTable' or its corresponding type declarations.
+src/app/(dashboard)/accounting/account-types/page.tsx(6,30): error TS2307: Cannot find module '@/app/accounting/_components/account-types/AccountTypeTable' or its corresponding type declarations.
+src/app/(dashboard)/accounting/chart-of-accounts/page.tsx(8,36): error TS2307: Cannot find module '@/app/accounting/_components/chart-of-accounts/AddChartOfAccountModal' or its corresponding type declarations.
+src/app/(dashboard)/accounting/chart-of-accounts/page.tsx(9,33): error TS2307: Cannot find module '@/app/accounting/_components/chart-of-accounts/ChartOfAccountTable' or its corresponding type declarations.
+src/app/(dashboard)/accounting/currencies/page.tsx(6,31): error TS2307: Cannot find module '@/app/accounting/_components/exchange-rates/ExchangeRatesList' or its corresponding type declarations.
+src/app/(dashboard)/accounting/currencies/page.tsx(7,26): error TS2307: Cannot find module '@/app/accounting/_components/currencies/CurrencyList' or its corresponding type declarations.
+src/app/(dashboard)/accounting/taxes/page.tsx(6,26): error TS2307: Cannot find module '@/app/accounting/_components/tax-groups/TaxGroupList' or its corresponding type declarations.
+src/app/(dashboard)/accounting/taxes/page.tsx(7,25): error TS2307: Cannot find module '@/app/accounting/_components/tax-rates/TaxRateList' or its corresponding type declarations.
+src/app/(dashboard)/billing/plans/page.tsx(8,22): error TS2307: Cannot find module '@/app/plans/_components/PlanCard' or its corresponding type declarations.
+src/app/(dashboard)/billing/plans/page.tsx(9,30): error TS2307: Cannot find module '@/app/plans/_components/LifetimePlanCard' or its corresponding type declarations.
+src/app/(dashboard)/customers/_components/EditCustomerModal.tsx(81,32): error TS2551: Property 'tax_group_id' does not exist on type 'Customer'. Did you mean 'tax_group'?
+src/app/(dashboard)/customers/_components/EditCustomerModal.tsx(82,33): error TS2551: Property 'price_list_id' does not exist on type 'Customer'. Did you mean 'price_list'?
+src/app/(dashboard)/customers/page.tsx(6,27): error TS2307: Cannot find module '@/app/customers/_components/CustomerTable' or its corresponding type declarations.
+src/app/(dashboard)/customers/page.tsx(7,30): error TS2307: Cannot find module '@/app/customers/_components/AddCustomerModal' or its corresponding type declarations.
+src/app/(dashboard)/domains/page.tsx(6,25): error TS2307: Cannot find module '@/app/domains/_components/DomainTable' or its corresponding type declarations.
+src/app/(dashboard)/inventory/_components/categories/EditCategoryModal.tsx(107,41): error TS2345: Argument of type '{ sales_account_id: number | null; cogs_account_id: number | null; inventory_account_id: number | null; inventory_adjustment_account_id: number | null; tax_group_id: number | null; name: string; description: string; }' is not assignable to parameter of type 'CategoryInput'.
+  Types of property 'tax_group_id' are incompatible.
+    Type 'number | null' is not assignable to type 'number | undefined'.
+      Type 'null' is not assignable to type 'number | undefined'.
+src/app/(dashboard)/inventory/_components/item-prices/AddItemPriceModal.tsx(67,29): error TS2339: Property 'item_id' does not exist on type 'ItemPrice'.
+src/app/(dashboard)/inventory/_components/item-prices/AddItemPriceModal.tsx(182,21): error TS2322: Type 'string' is not assignable to type 'number'.
+src/app/(dashboard)/inventory/_components/item-prices/AddItemPriceModal.tsx(198,21): error TS2322: Type 'string' is not assignable to type 'number'.
+src/app/(dashboard)/inventory/_components/item-prices/ManageItemPricesModal.tsx(96,46): error TS2345: Argument of type 'AxiosResponse<any, any, {}>' is not assignable to parameter of type 'Blob | MediaSource'.
+src/app/(dashboard)/inventory/_components/price-lists/EditPriceListModal.tsx(65,31): error TS2551: Property 'currency_id' does not exist on type 'PriceList'. Did you mean 'currency'?
+src/app/(dashboard)/inventory/_components/units/UnitTable.tsx(138,25): error TS2339: Property 'short_name' does not exist on type 'Unit'.
+src/app/(dashboard)/inventory/_components/warehouses/DeleteWarehouseModal.tsx(69,13): error TS2322: Type '{ children: string; type: "button"; variant: "primary"; className: string; onClick: () => Promise<void>; disabled: boolean; isLoading: boolean; }' is not assignable to type 'IntrinsicAttributes & ButtonProps'.
+  Property 'isLoading' does not exist on type 'IntrinsicAttributes & ButtonProps'.
+src/app/(dashboard)/inventory/categories/page.tsx(6,27): error TS2307: Cannot find module '@/app/inventory/_components/categories/CategoryTable' or its corresponding type declarations.
+src/app/(dashboard)/inventory/categories/page.tsx(7,30): error TS2307: Cannot find module '@/app/inventory/_components/categories/AddCategoryModal' or its corresponding type declarations.
+src/app/(dashboard)/inventory/items/page.tsx(7,23): error TS2307: Cannot find module '@/app/inventory/_components/items/ItemTable' or its corresponding type declarations.
+src/app/(dashboard)/inventory/items/page.tsx(8,26): error TS2307: Cannot find module '@/app/inventory/_components/items/AddItemModal' or its corresponding type declarations.
+src/app/(dashboard)/inventory/items/page.tsx(9,29): error TS2307: Cannot find module '@/app/inventory/_components/items/ImportItemModal' or its corresponding type declarations.
+src/app/(dashboard)/inventory/items/page.tsx(10,30): error TS2307: Cannot find module '@/app/inventory/_components/items/ItemPricingModal' or its corresponding type declarations.
+src/app/(dashboard)/inventory/price-lists/page.tsx(7,28): error TS2307: Cannot find module '@/app/inventory/_components/price-lists/PriceListTable' or its corresponding type declarations.
+src/app/(dashboard)/inventory/price-lists/page.tsx(8,31): error TS2307: Cannot find module '@/app/inventory/_components/price-lists/AddPriceListModal' or its corresponding type declarations.
+src/app/(dashboard)/inventory/price-lists/page.tsx(9,32): error TS2307: Cannot find module '@/app/inventory/_components/price-lists/EditPriceListModal' or its corresponding type declarations.
+src/app/(dashboard)/inventory/price-lists/page.tsx(10,34): error TS2307: Cannot find module '@/app/inventory/_components/price-lists/DeletePriceListModal' or its corresponding type declarations.
+src/app/(dashboard)/inventory/price-lists/page.tsx(11,32): error TS2307: Cannot find module '@/app/inventory/_components/price-lists/ViewPriceListModal' or its corresponding type declarations.
+src/app/(dashboard)/inventory/units/page.tsx(6,23): error TS2307: Cannot find module '@/app/inventory/_components/units/UnitTable' or its corresponding type declarations.
+src/app/(dashboard)/inventory/units/page.tsx(7,26): error TS2307: Cannot find module '@/app/inventory/_components/units/AddUnitModal' or its corresponding type declarations.
+src/app/(dashboard)/inventory/warehouses/page.tsx(12,28): error TS2307: Cannot find module '@/app/inventory/_components/warehouses/WarehouseTable' or its corresponding type declarations.
+src/app/(dashboard)/inventory/warehouses/page.tsx(13,34): error TS2307: Cannot find module '@/app/inventory/_components/warehouses/CreateWarehouseModal' or its corresponding type declarations.
+src/app/(dashboard)/inventory/warehouses/page.tsx(14,32): error TS2307: Cannot find module '@/app/inventory/_components/warehouses/EditWarehouseModal' or its corresponding type declarations.
+src/app/(dashboard)/inventory/warehouses/page.tsx(15,34): error TS2307: Cannot find module '@/app/inventory/_components/warehouses/DeleteWarehouseModal' or its corresponding type declarations.
+src/app/(dashboard)/inventory/warehouses/page.tsx(146,50): error TS7006: Parameter 'u' implicitly has an 'any' type.
+src/app/(dashboard)/plans/page.tsx(7,23): error TS2307: Cannot find module '@/app/plans/_components/PlanTable' or its corresponding type declarations.
+src/app/(dashboard)/plans/page.tsx(8,26): error TS2307: Cannot find module '@/app/plans/_components/AddPlanModal' or its corresponding type declarations.
+src/app/(dashboard)/profile/page.tsx(1,26): error TS2307: Cannot find module '@/app/profile/_components/UserProfilePage' or its corresponding type declarations.
+src/app/(dashboard)/purchases/[id]/page.tsx(11,31): error TS2307: Cannot find module '@/app/purchases/_components/VoidPurchaseModal' or its corresponding type declarations.
+src/app/(dashboard)/purchases/page.tsx(7,27): error TS2307: Cannot find module '@/app/purchases/_components/PurchaseTable' or its corresponding type declarations.
+src/app/(dashboard)/roles/page.tsx(7,23): error TS2307: Cannot find module '@/app/roles/_components/RoleTable' or its corresponding type declarations.
+src/app/(dashboard)/sales/[id]/page.tsx(11,27): error TS2307: Cannot find module '@/app/sales/_components/VoidSaleModal' or its corresponding type declarations.
+src/app/(dashboard)/sales/create/page.tsx(20,30): error TS2307: Cannot find module '@/app/customers/_components/AddCustomerModal' or its corresponding type declarations.
+src/app/(dashboard)/sales/page.tsx(7,23): error TS2307: Cannot find module '@/app/sales/_components/SaleTable' or its corresponding type declarations.
+src/app/(dashboard)/settings/[category]/page.tsx(8,27): error TS2307: Cannot find module '@/app/settings/_components/SettingsGroup' or its corresponding type declarations.
+src/app/(dashboard)/settings/_components/SettingField.tsx(20,30): error TS2307: Cannot find module '@/app/accounting/_components/currencies/AddCurrencyModal' or its corresponding type declarations.
+src/app/(dashboard)/subscriptions/page.tsx(6,31): error TS2307: Cannot find module '@/app/subscriptions/_components/SubscriptionTable' or its corresponding type declarations.
+src/app/(dashboard)/tenants/page.tsx(6,25): error TS2307: Cannot find module '@/app/tenants/_components/TenantTable' or its corresponding type declarations.
+src/app/(dashboard)/users/_components/ViewLogModal.tsx(56,34): error TS2322: Type '"gray"' is not assignable to type 'BadgeColor | undefined'.
+src/app/(dashboard)/users/page.tsx(7,23): error TS2307: Cannot find module '@/app/users/_components/UserTable' or its corresponding type declarations.
+src/app/(dashboard)/users/page.tsx(8,27): error TS2307: Cannot find module '@/app/users/_components/UserLogsTable' or its corresponding type declarations.
+src/app/(dashboard)/users/page.tsx(9,26): error TS2307: Cannot find module '@/app/users/_components/AddUserModal' or its corresponding type declarations.
+src/app/(dashboard)/vendors/_components/EditVendorModal.tsx(84,30): error TS2551: Property 'tax_group_id' does not exist on type 'Vendor'. Did you mean 'tax_group'?
+src/app/(dashboard)/vendors/_components/EditVendorModal.tsx(85,31): error TS2551: Property 'price_list_id' does not exist on type 'Vendor'. Did you mean 'price_list'?
+src/app/(dashboard)/vendors/page.tsx(6,25): error TS2307: Cannot find module '@/app/vendors/_components/VendorTable' or its corresponding type declarations.
+src/app/(dashboard)/vendors/page.tsx(7,28): error TS2307: Cannot find module '@/app/vendors/_components/AddVendorModal' or its corresponding type declarations.
+src/app/(public)/pricing/page.tsx(4,22): error TS2307: Cannot find module '@/app/plans/_components/PlanCard' or its corresponding type declarations.
+src/app/(public)/pricing/page.tsx(5,30): error TS2307: Cannot find module '@/app/plans/_components/LifetimePlanCard' or its corresponding type declarations.
+src/components/ecommerce/CustomersTable.tsx(64,37): error TS2339: Property 'profile_image' does not exist on type 'Customer'.
+src/components/ecommerce/CustomersTable.tsx(81,29): error TS2339: Property 'total_spent' does not exist on type 'Customer'.
+src/services/__mocks__/AuthService.ts(3,7): error TS2741: Property 'updated_at' is missing in type '{ id: number; name: string; email: string; email_verified_at: string; phone: string; phone_verified_at: string; status: string; status_updated_at: string; is_admin: false; role: { id: number; name: string; permissions: never[]; }; ... 10 more ...; created_at: string; }' but required in type 'User'.
