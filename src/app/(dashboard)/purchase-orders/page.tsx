@@ -4,23 +4,23 @@ import { useRouter } from 'next/navigation';
 import PageBreadcrumb from '@/components/common/PageBreadCrumb';
 import ComponentCard from '@/components/common/ComponentCard';
 import PageMeta from '@/components/common/PageMeta';
-import PurchaseTable from '@/app/(dashboard)/purchases/_components/PurchaseTable';
+import PurchaseOrderTable from '@/app/(dashboard)/purchase-orders/_components/PurchaseOrderTable';
 import Pagination from '@/components/common/Pagination';
 import Button from '@/components/ui/button/Button';
 import Tooltip from '@/components/ui/tooltip/Tooltip';
-import { getPurchases } from '@/services/PurchaseService';
-import { Purchase } from '@/types';
+import { getPurchaseOrders } from '@/services/PurchaseOrderService';
+import { PurchaseOrder } from '@/types/PurchaseOrder';
 import { usePermissions } from '@/hooks/usePermissions';
 import { useDataTable } from '@/hooks/useDataTable';
 import TableToolbar from '@/components/common/TableToolbar';
 import { Plus } from 'lucide-react';
 
-export default function Purchases() {
+export default function PurchaseOrders() {
   const { hasPermission } = usePermissions();
   const router = useRouter();
 
   const {
-    data: purchases,
+    data: purchaseOrders,
     loading,
     currentPage,
     perPage,
@@ -40,14 +40,14 @@ export default function Purchases() {
     handlePerPageChange,
     handleSort,
     refresh,
-  } = useDataTable<Purchase>({
-    fetchData: getPurchases,
+  } = useDataTable<PurchaseOrder>({
+    fetchData: getPurchaseOrders,
   });
 
   return (
     <>
-      <PageMeta title="Purchases" description="List of purchases" />
-      <PageBreadcrumb pageTitle="Purchases" />
+      <PageMeta title="Purchase Orders" description="List of purchase orders" />
+      <PageBreadcrumb pageTitle="Purchase Orders" />
 
       <div className="space-y-6">
         <div className="p-5 border border-gray-200 rounded-2xl bg-gray-50 dark:bg-white/[0.03] dark:border-gray-800 shadow-sm">
@@ -55,7 +55,7 @@ export default function Purchases() {
             className="mb-0"
             searchTerm={searchTerm}
             onSearchChange={setSearchTerm}
-            searchPlaceholder="Search purchases..."
+            searchPlaceholder="Search purchase orders..."
             rangeFrom={rangeFrom}
             onRangeFromChange={(val) => setRangeFrom(val as number | '')}
             rangeTo={rangeTo}
@@ -71,25 +71,25 @@ export default function Purchases() {
         </div>
 
         <ComponentCard
-          title="Purchases"
+          title="Purchase Orders"
           action={
             <div className="flex flex-wrap items-center gap-2">
-              {hasPermission('create-purchase') && (
-                <Tooltip text="Add New Purchase">
+              {hasPermission('create-purchase-order') && (
+                <Tooltip text="Add New Purchase Order">
                   <Button
-                    onClick={() => router.push('/purchases/create')}
+                    onClick={() => router.push('/purchase-orders/create')}
                     size="sm"
                     startIcon={<Plus className="w-4 h-4" />}
                   >
-                    Add Purchase
+                    Add Purchase Order
                   </Button>
                 </Tooltip>
               )}
             </div>
           }
         >
-          <PurchaseTable
-            data={purchases}
+          <PurchaseOrderTable
+            data={purchaseOrders}
             loading={loading}
             onAction={refresh}
             onSort={handleSort}

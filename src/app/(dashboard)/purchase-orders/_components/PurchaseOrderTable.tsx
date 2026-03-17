@@ -1,17 +1,15 @@
 'use client';
 
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '@/components/ui/table';
-import { useState } from 'react';
 import Badge from '@/components/ui/badge/Badge';
 import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide } from 'lucide-react';
 import { TableActions } from '@/components/common/TableActions';
 import { useRouter } from 'next/navigation';
-import VoidPurchaseModal from './VoidPurchaseModal';
 
-import { Purchase } from '@/types';
+import { PurchaseOrder } from '@/types/PurchaseOrder';
 
 interface Props {
-  data: Purchase[];
+  data: PurchaseOrder[];
   onAction: () => void;
   onSort: (column: string) => void;
   sortBy: string;
@@ -25,7 +23,7 @@ interface Props {
 import { usePermissions } from '@/hooks/usePermissions';
 import { useSettings } from '@/hooks/useSettings';
 
-export default function PurchaseTable({
+export default function PurchaseOrderTable({
   data,
   onAction,
   onSort,
@@ -39,25 +37,34 @@ export default function PurchaseTable({
   const { hasPermission } = usePermissions();
   const { formatCurrency, formatDate } = useSettings();
   const router = useRouter();
-  const [isVoidModalOpen, setIsVoidModalOpen] = useState(false);
-  const [selectedPurchase, setSelectedPurchase] = useState<Purchase | null>(null);
+  // const [isVoidModalOpen, setIsVoidModalOpen] = useState(false); // Using standard delete for now
+  // const [selectedPurchase, setSelectedPurchase] = useState<PurchaseOrder | null>(null);
 
   const handleView = (id: number) => {
-    router.push(`/purchases/${id}`);
+    router.push(`/purchase-orders/${id}`);
   };
 
   const handleEdit = (id: number) => {
-    router.push(`/purchases/${id}/edit`);
+    router.push(`/purchase-orders/${id}/edit`);
   };
 
-  const handleDelete = (purchase: Purchase) => {
-    setSelectedPurchase(purchase);
-    setIsVoidModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setIsVoidModalOpen(false);
-    setSelectedPurchase(null);
+  const handleDelete = async (purchase: PurchaseOrder) => {
+    // Use a standard confirmation dialog or toast here.
+    // For now, assuming standard delete action structure or using the passed onAction(void)
+    // But typically we trigger a modal or call deleteService directly.
+    // Since this table is pure UI, we should probably emit 'onDelete' or similar.
+    // But the previous code opened a specialized VoidModal.
+    // I'll skip implementation of Delete for a moment or use a simple confirm.
+    if (confirm('Are you sure you want to delete this Purchase Order?')) {
+      const { deletePurchaseOrder } = await import('@/services/PurchaseOrderService');
+      try {
+        await deletePurchaseOrder(purchase.id);
+        onAction(); // Refresh
+      } catch (error) {
+        console.error(error);
+        alert('Failed to delete');
+      }
+    }
   };
 
   const renderSortIcon = (column: string) => {
@@ -86,16 +93,16 @@ export default function PurchaseTable({
               <TableCell
                 isHeader
                 className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400"
-                onClick={() => onSort('invoice_number')}
+                onClick={() => onSort('order_number')}
               >
-                Invoice # {renderSortIcon('invoice_number')}
+                Order # {renderSortIcon('order_number')}
               </TableCell>
               <TableCell
                 isHeader
                 className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400"
-                onClick={() => onSort('purchase_date')}
+                onClick={() => onSort('order_date')}
               >
-                Purchase Date {renderSortIcon('purchase_date')}
+                Order Date {renderSortIcon('order_date')}
               </TableCell>
               <TableCell
                 isHeader
@@ -106,17 +113,16 @@ export default function PurchaseTable({
               </TableCell>
               <TableCell
                 isHeader
-                className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400"
-                onClick={() => onSort('total_amount')}
+                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
               >
-                Total Amount {renderSortIcon('total_amount')}
+                Total Amount
               </TableCell>
               <TableCell
                 isHeader
                 className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400"
-                onClick={() => onSort('payment_status')}
+                onClick={() => onSort('status')}
               >
-                Payment Status {renderSortIcon('payment_status')}
+                Status {renderSortIcon('status')}
               </TableCell>
               <TableCell
                 isHeader
@@ -133,14 +139,14 @@ export default function PurchaseTable({
                 <TableCell colSpan={7} className="px-5 py-10 text-center">
                   <div className="flex flex-col items-center justify-center space-y-2">
                     <div className="w-10 h-10 border-4 border-brand-500 border-t-transparent rounded-full animate-spin"></div>
-                    <p className="text-gray-500">Loading purchases...</p>
+                    <p className="text-gray-500">Loading purchase orders...</p>
                   </div>
                 </TableCell>
               </TableRow>
             ) : data.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={7} className="px-5 py-10 text-center text-gray-500">
-                  No purchases found.
+                  No purchase orders found.
                 </TableCell>
               </TableRow>
             ) : (
@@ -154,37 +160,48 @@ export default function PurchaseTable({
                     </p>
                   </TableCell>
                   <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
-                    {purchase.invoice_number}
+                    {purchase.order_number}
                   </TableCell>
                   <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
-                    {formatDate(purchase.purchase_date)}
+                    {formatDate(purchase.order_date)}
                   </TableCell>
                   <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
-                    {purchase.vendor.name}
+                    {purchase.vendor?.name}
                   </TableCell>
                   <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
-                    {formatCurrency(purchase.total_amount)}
+                    {formatCurrency(purchase.total_amount || 0)}
                   </TableCell>
                   <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
                     <Badge
                       size="sm"
-                      color={purchase.payment_status === 'paid' ? 'success' : 'warning'}
+                      color={
+                        purchase.status === 'CONFIRMED' || purchase.status === 'COMPLETED'
+                          ? 'success'
+                          : purchase.status === 'DRAFT'
+                            ? 'warning'
+                            : 'error'
+                      }
                     >
-                      {purchase.payment_status}
+                      {purchase.status}
                     </Badge>
                   </TableCell>
                   <TableCell className="px-4 py-3 text-gray-500 text-end text-theme-sm dark:text-gray-400">
                     <TableActions
                       onView={
-                        hasPermission('view-purchase') ? () => handleView(purchase.id) : undefined
+                        hasPermission('view-purchase-order')
+                          ? () => handleView(purchase.id)
+                          : undefined
                       }
                       onEdit={
-                        hasPermission('update-purchase') ? () => handleEdit(purchase.id) : undefined
+                        hasPermission('update-purchase-order')
+                          ? () => handleEdit(purchase.id)
+                          : undefined
                       }
                       onDelete={
-                        hasPermission('delete-purchase') ? () => handleDelete(purchase) : undefined
+                        hasPermission('delete-purchase-order')
+                          ? () => handleDelete(purchase)
+                          : undefined
                       }
-                      deleteTooltip="Void"
                     />
                   </TableCell>
                 </TableRow>
@@ -193,14 +210,6 @@ export default function PurchaseTable({
           </TableBody>
         </Table>
       </div>
-      {selectedPurchase && (
-        <VoidPurchaseModal
-          isOpen={isVoidModalOpen}
-          onClose={handleCloseModal}
-          onPurchaseVoided={onAction}
-          purchase={selectedPurchase}
-        />
-      )}
     </div>
   );
 }

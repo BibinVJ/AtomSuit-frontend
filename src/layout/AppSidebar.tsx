@@ -62,6 +62,11 @@ const navItems: NavItem[] = [
         path: '/accounting/taxes',
         permission: 'view-tax-rate',
       },
+      {
+        name: 'Cost Centers',
+        path: '/accounting/cost-centers',
+        permission: 'view-cost-center',
+      },
     ],
   },
   {
@@ -88,7 +93,7 @@ const navItems: NavItem[] = [
     icon: <ShoppingCart size={20} />,
     subItems: [
       { name: 'Vendors', path: '/vendors', permission: 'view-vendor' },
-      { name: 'Purchases', path: '/purchases', permission: 'view-purchase' },
+      { name: 'Purchase Orders', path: '/purchase-orders', permission: 'view-purchase-order' },
     ],
   },
 ];

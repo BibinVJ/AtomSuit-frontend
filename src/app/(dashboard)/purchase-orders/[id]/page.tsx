@@ -8,30 +8,30 @@ import ComponentCard from '@/components/common/ComponentCard';
 import Button from '@/components/ui/button/Button';
 import Badge from '@/components/ui/badge/Badge';
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '@/components/ui/table';
-import VoidPurchaseModal from '@/app/(dashboard)/purchases/_components/VoidPurchaseModal';
-import { getPurchase } from '@/services/PurchaseService';
+import { getPurchaseOrder } from '@/services/PurchaseOrderService';
 import { useSettings } from '@/hooks/useSettings';
+import { PurchaseOrder, PurchaseOrderStatus } from '@/types/PurchaseOrder';
+import { toast } from 'sonner';
 
-import { Purchase } from '@/types';
-
-export default function ViewPurchase() {
+export default function ViewPurchaseOrder() {
   const params = useParams<{ id: string }>();
   const id = params?.id;
   const router = useRouter();
   const { formatCurrency, formatDate } = useSettings();
-  const [purchase, setPurchase] = useState<Purchase | null>(null);
-  const [isVoidModalOpen, setIsVoidModalOpen] = useState(false);
+  const [purchaseOrder, setPurchaseOrder] = useState<PurchaseOrder | null>(null);
 
   const fetchPurchaseDetails = useCallback(async () => {
     try {
       if (id) {
-        const response = await getPurchase(id);
-        setPurchase(response);
+        const response = await getPurchaseOrder(Number(id));
+        setPurchaseOrder(response);
       }
     } catch (error) {
-      console.error('Error fetching purchase details:', error);
+      console.error('Error fetching purchase order details:', error);
+      toast.error('Failed to load purchase order details');
+      router.push('/purchase-orders');
     }
-  }, [id]);
+  }, [id, router]);
 
   useEffect(() => {
     fetchPurchaseDetails();
@@ -41,77 +41,124 @@ export default function ViewPurchase() {
     window.print();
   };
 
-  const handleVoidSuccess = () => {
-    router.push('/purchases');
+  const getStatusColor = (status: PurchaseOrderStatus) => {
+    switch (status) {
+      case PurchaseOrderStatus.DRAFT:
+        return 'warning';
+      case PurchaseOrderStatus.SENT:
+        return 'info';
+      case PurchaseOrderStatus.CONFIRMED:
+        return 'success';
+      case PurchaseOrderStatus.COMPLETED:
+        return 'success';
+      case PurchaseOrderStatus.CANCELLED:
+        return 'error';
+      default:
+        return 'secondary';
+    }
   };
 
-  if (!purchase) {
+  if (!purchaseOrder) {
     return <div>Loading...</div>;
   }
 
   return (
     <>
       <PageMeta
-        title={`Purchase #${purchase.invoice_number}`}
-        description="View purchase details"
+        title={`Purchase Order #${purchaseOrder.order_number}`}
+        description="View purchase order details"
       />
       <PageBreadcrumb
-        pageTitle="Purchase Details"
-        breadcrumbs={[{ label: 'Purchases', path: '/purchases' }]}
+        pageTitle="Purchase Order Details"
+        breadcrumbs={[{ label: 'Purchase Orders', path: '/purchase-orders' }]}
         backButton={true}
       />
 
       <div className="flex justify-end gap-2 mb-4">
-        <Button variant="outline" onClick={() => router.push(`/purchases/${id}/edit`)}>
+        <Button variant="outline" onClick={() => router.push(`/purchase-orders/${id}/edit`)}>
           Edit
         </Button>
         <Button variant="outline" onClick={handlePrint}>
           Print
         </Button>
-        <Button variant="outline" onClick={() => setIsVoidModalOpen(true)}>
-          Void
-        </Button>
       </div>
 
-      <ComponentCard title={`Purchase #${purchase.invoice_number}`}>
+      <ComponentCard title={`Purchase Order #${purchaseOrder.order_number}`}>
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
               <h3 className="text-lg font-semibold mb-2 dark:text-gray-400">Vendor Details</h3>
               <p className="dark:text-gray-400">
-                <strong>Name:</strong> {purchase.vendor.name}
+                <strong>Name:</strong> {purchaseOrder.vendor.name}
               </p>
               <p className="dark:text-gray-400">
-                <strong>Email:</strong> {purchase.vendor.email}
+                <strong>Email:</strong> {purchaseOrder.vendor.email}
               </p>
               <p className="dark:text-gray-400">
-                <strong>Phone:</strong> {purchase.vendor.phone}
+                <strong>Phone:</strong> {purchaseOrder.vendor.phone}
               </p>
+              {purchaseOrder.vendor.billing_address_line_1 && (
+                <p className="dark:text-gray-400">
+                  <strong>Address:</strong>
+                  <span className="block">
+                    {purchaseOrder.vendor.billing_address_line_1}
+                    {purchaseOrder.vendor.billing_city && `, ${purchaseOrder.vendor.billing_city}`}
+                    {purchaseOrder.vendor.billing_state &&
+                      `, ${purchaseOrder.vendor.billing_state}`}
+                    {purchaseOrder.vendor.billing_country &&
+                      `, ${purchaseOrder.vendor.billing_country}`}
+                    {purchaseOrder.vendor.billing_zip_code &&
+                      ` - ${purchaseOrder.vendor.billing_zip_code}`}
+                  </span>
+                </p>
+              )}
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold mb-2 dark:text-gray-400">Order Details</h3>
               <p className="dark:text-gray-400">
-                <strong>Address:</strong>
-                <span className="block">
-                  {purchase.vendor.billing_address_line_1}
-                  {purchase.vendor.billing_city && `, ${purchase.vendor.billing_city}`}
-                  {purchase.vendor.billing_state && `, ${purchase.vendor.billing_state}`}
-                  {purchase.vendor.billing_country && `, ${purchase.vendor.billing_country}`}
-                  {purchase.vendor.billing_zip_code && ` - ${purchase.vendor.billing_zip_code}`}
-                </span>
+                <strong>Order #:</strong> {purchaseOrder.order_number}
+              </p>
+              {purchaseOrder.reference_number && (
+                <p className="dark:text-gray-400">
+                  <strong>Reference #:</strong> {purchaseOrder.reference_number}
+                </p>
+              )}
+              <p className="dark:text-gray-400">
+                <strong>Order Date:</strong> {formatDate(purchaseOrder.order_date)}
+              </p>
+              {purchaseOrder.expected_delivery_date && (
+                <p className="dark:text-gray-400">
+                  <strong>Expected Delivery:</strong>{' '}
+                  {formatDate(purchaseOrder.expected_delivery_date)}
+                </p>
+              )}
+              <p className="dark:text-gray-400">
+                <strong>Status:</strong>
+                <Badge size="sm" color={getStatusColor(purchaseOrder.status)}>
+                  {purchaseOrder.status}
+                </Badge>
               </p>
             </div>
             <div>
-              <h3 className="text-lg font-semibold mb-2 dark:text-gray-400">Purchase Details</h3>
-              <p className="dark:text-gray-400">
-                <strong>Invoice #:</strong> {purchase.invoice_number}
-              </p>
-              <p className="dark:text-gray-400">
-                <strong>Purchase Date:</strong> {formatDate(purchase.purchase_date)}
-              </p>
-              <p className="dark:text-gray-400">
-                <strong>Payment Status:</strong>
-                <Badge size="sm" color={purchase.payment_status === 'paid' ? 'success' : 'warning'}>
-                  {purchase.payment_status}
-                </Badge>
-              </p>
+              <h3 className="text-lg font-semibold mb-2 dark:text-gray-400">Additional Info</h3>
+              {purchaseOrder.cost_center && (
+                <p className="dark:text-gray-400">
+                  <strong>Cost Center:</strong> {purchaseOrder.cost_center.name}
+                </p>
+              )}
+              {purchaseOrder.warehouse && (
+                <p className="dark:text-gray-400">
+                  <strong>Warehouse:</strong> {purchaseOrder.warehouse.name}
+                </p>
+              )}
+              {purchaseOrder.notes && (
+                <div className="mt-2">
+                  <strong>Notes:</strong>
+                  <p className="text-sm dark:text-gray-400 mt-1 whitespace-pre-wrap border p-2 rounded bg-gray-50 dark:bg-gray-800">
+                    {purchaseOrder.notes}
+                  </p>
+                </div>
+              )}
             </div>
           </div>
 
@@ -130,19 +177,7 @@ export default function ViewPurchase() {
                       isHeader
                       className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                     >
-                      Batch #
-                    </TableCell>
-                    <TableCell
-                      isHeader
-                      className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-                    >
-                      MFG Date
-                    </TableCell>
-                    <TableCell
-                      isHeader
-                      className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-                    >
-                      Expiry Date
+                      Description
                     </TableCell>
                     <TableCell
                       isHeader
@@ -154,41 +189,33 @@ export default function ViewPurchase() {
                       isHeader
                       className="px-5 py-3 font-medium text-gray-500 text-end text-theme-xs dark:text-gray-400"
                     >
-                      Unit Cost
+                      Unit Price
                     </TableCell>
                     <TableCell
                       isHeader
                       className="px-5 py-3 font-medium text-gray-500 text-end text-theme-xs dark:text-gray-400"
                     >
-                      Total Cost
+                      Total Amount
                     </TableCell>
                   </TableRow>
                 </TableHeader>
                 <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-                  {purchase.items.map((item, index) => (
+                  {purchaseOrder.items.map((item, index) => (
                     <TableRow key={index}>
                       <TableCell className="px-5 py-4 text-gray-800 text-start text-theme-sm dark:text-gray-400">
                         {item.item.name}
                       </TableCell>
                       <TableCell className="px-5 py-4 text-gray-800 text-start text-theme-sm dark:text-gray-400">
-                        {item.batch.batch_number}
-                      </TableCell>
-                      <TableCell className="px-5 py-4 text-gray-800 text-start text-theme-sm dark:text-gray-400">
-                        {item.batch.manufacture_date
-                          ? formatDate(item.batch.manufacture_date)
-                          : '-'}
-                      </TableCell>
-                      <TableCell className="px-5 py-4 text-gray-800 text-start text-theme-sm dark:text-gray-400">
-                        {item.batch.expiry_date ? formatDate(item.batch.expiry_date) : '-'}
+                        {item.description || '-'}
                       </TableCell>
                       <TableCell className="px-5 py-4 text-gray-800 text-end text-theme-sm dark:text-gray-400">
-                        {item.quantity}
+                        {item.quantity} {item.item.unit?.code}
                       </TableCell>
                       <TableCell className="px-5 py-4 text-gray-800 text-end text-theme-sm dark:text-gray-400">
-                        {formatCurrency(item.unit_cost)}
+                        {formatCurrency(item.unit_price)}
                       </TableCell>
                       <TableCell className="px-5 py-4 text-gray-800 text-end text-theme-sm dark:text-gray-400">
-                        {formatCurrency(item.total_cost)}
+                        {formatCurrency(item.quantity * item.unit_price)}
                       </TableCell>
                     </TableRow>
                   ))}
@@ -196,13 +223,13 @@ export default function ViewPurchase() {
                 <tfoot className="border-t border-gray-100 dark:border-white/[0.05]">
                   <TableRow className="font-semibold">
                     <TableCell
-                      colSpan={6}
+                      colSpan={4}
                       className="px-5 py-4 text-end text-gray-800 dark:text-white/90"
                     >
                       Total Amount:
                     </TableCell>
                     <TableCell className="px-5 py-4 text-end text-gray-800 dark:text-white/90">
-                      {formatCurrency(purchase.total_amount)}
+                      {formatCurrency(purchaseOrder.total_amount)}
                     </TableCell>
                   </TableRow>
                 </tfoot>
@@ -211,15 +238,6 @@ export default function ViewPurchase() {
           </div>
         </div>
       </ComponentCard>
-
-      {purchase && (
-        <VoidPurchaseModal
-          isOpen={isVoidModalOpen}
-          onClose={() => setIsVoidModalOpen(false)}
-          onPurchaseVoided={handleVoidSuccess}
-          purchase={purchase}
-        />
-      )}
     </>
   );
 }

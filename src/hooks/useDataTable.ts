@@ -18,6 +18,7 @@ interface DataTableOptions<T> {
   initialPerPage?: number;
   extraParams?: Record<string, unknown>;
   enabled?: boolean;
+  staleTime?: number;
 }
 
 export function useDataTable<T>({
@@ -27,6 +28,7 @@ export function useDataTable<T>({
   initialPerPage = 10,
   extraParams = {},
   enabled = true,
+  staleTime = 0,
 }: DataTableOptions<T>) {
   // State
   const [currentPage, setCurrentPage] = useState(1);
@@ -91,7 +93,7 @@ export function useDataTable<T>({
     },
     enabled: enabled,
     placeholderData: keepPreviousData, // Keep previous data while fetching new page
-    staleTime: 30000, // Data stays fresh for 30 seconds
+    staleTime: staleTime, // Default to 0 for fresh data
   });
 
   // Handlers
