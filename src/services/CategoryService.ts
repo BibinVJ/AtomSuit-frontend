@@ -1,7 +1,7 @@
-import { Category, CategoryInput } from '../types';
+import { Category, CategoryInput } from '@/types';
 import { createBaseService, QueryParams, PaginatedResponse } from './BaseService';
 
-const categoryService = createBaseService<Category, CategoryInput>('/category');
+const categoryService = createBaseService<Category, CategoryInput>('/categories');
 
 export const getCategories = (params: QueryParams = {}): Promise<PaginatedResponse<Category>> =>
   categoryService.list(params);
@@ -17,7 +17,7 @@ export const deleteCategory = (id: number, force: boolean = false) =>
 
 export const restoreCategory = (id: number) => categoryService.restore(id);
 
-export const exportCategories = () => categoryService.export('/category/export');
+export const exportCategories = () => categoryService.export('/categories/export');
 
 const CategoryService = {
   ...categoryService,

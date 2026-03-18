@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { SettingsContext, SettingsContextType } from './SettingsContext';
-import { getSettings } from '../services/SettingsService';
+import { getSettings } from '@/services/SettingsService';
 import { AuthContext } from './AuthContext';
 import { useContext } from 'react';
 

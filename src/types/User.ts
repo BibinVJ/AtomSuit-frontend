@@ -1,4 +1,5 @@
 import { Role } from './Role';
+import { PaginatedResponse } from './Common';
 
 export interface Address {
   type: string;
@@ -36,27 +37,39 @@ export interface User {
   profile_image: string | null;
   addresses: Address[];
   social_links: SocialLink[];
+  deleted_at?: string | null;
   created_at: string;
+  updated_at: string;
 }
 
-export interface UserApiResponse {
-  data: User[];
-  meta: {
-    total: number;
-    current_page: number;
-    last_page: number;
-    from: number;
-    to: number;
-  };
-}
+export type UserApiResponse = PaginatedResponse<User>;
 
 export type UserUpdatePayload = Partial<Pick<User, 'name' | 'email' | 'phone' | 'status'>> & {
   role_id?: number;
   password?: string;
 };
+
 export interface UserFormData {
   phone: string;
   role_id: number | string;
 }
 
 export type UserInput = UserUpdatePayload;
+
+export interface UserLoginDetail {
+  id: number;
+  user_id: number;
+  token_id: string | null;
+  login_at: string;
+  logout_at: string | null;
+  ip_address: string;
+  user_agent: string;
+  login_method: string;
+  city: string | null;
+  country: string | null;
+  iso_code: string | null;
+  os: string | null;
+  browser: string | null;
+  device_type: string | null;
+  user?: User;
+}

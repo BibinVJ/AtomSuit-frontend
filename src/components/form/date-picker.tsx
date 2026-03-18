@@ -5,7 +5,7 @@ import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.css';
 import Label from './Label';
 import { Calendar } from 'lucide-react';
-import { useSettings } from '../../hooks/useSettings';
+import { useSettings } from '@/hooks/useSettings';
 import Hook = flatpickr.Options.Hook;
 import DateOption = flatpickr.Options.DateOption;
 

@@ -1,6 +1,6 @@
 import React from 'react';
-import { Modal } from '../ui/modal';
-import Button from '../ui/button/Button';
+import { Modal } from '@/components/ui/modal';
+import Button from '@/components/ui/button/Button';
 
 interface FormModalProps {
   isOpen: boolean;

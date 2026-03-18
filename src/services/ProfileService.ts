@@ -1,4 +1,4 @@
-import { Address, SocialLink, User } from '../types';
+import { Address, SocialLink, User } from '@/types';
 import api from './api';
 
 export const updateProfile = async (data: Partial<User>) => {

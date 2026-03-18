@@ -4,7 +4,6 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-
 import {
   LayoutDashboard,
   Package,
@@ -20,9 +19,8 @@ import {
   Settings,
   Activity,
 } from 'lucide-react';
-import { useSidebar } from '../hooks/useSidebar';
-import { usePermissions } from '../hooks/usePermissions';
-import { ListIcon } from '@/icons';
+import { useSidebar } from '@/hooks/useSidebar';
+import { usePermissions } from '@/hooks/usePermissions';
 
 type NavItem = {
   name: string;
@@ -54,11 +52,20 @@ const navItems: NavItem[] = [
         path: '/accounting/account-groups',
         permission: 'view-account-group',
       },
-      { name: 'Account Types', path: '/accounting/account-types', permission: 'view-account-type' },
       {
-        name: 'Exchange Rates',
-        path: '/accounting/exchange-rates',
-        permission: 'view-exchange-rate',
+        name: 'Account Methods',
+        path: '/accounting/account-types',
+        permission: 'view-account-type',
+      },
+      {
+        name: 'Taxes',
+        path: '/accounting/taxes',
+        permission: 'view-tax-rate',
+      },
+      {
+        name: 'Cost Centers',
+        path: '/accounting/cost-centers',
+        permission: 'view-cost-center',
       },
     ],
   },
@@ -69,6 +76,7 @@ const navItems: NavItem[] = [
       { name: 'Categories', path: '/inventory/categories', permission: 'view-category' },
       { name: 'Units', path: '/inventory/units', permission: 'view-unit' },
       { name: 'Items', path: '/inventory/items', permission: 'view-item' },
+      { name: 'Price Lists', path: '/inventory/price-lists', permission: 'view-price-list' },
       { name: 'Warehouses', path: '/inventory/warehouses', permission: 'view-warehouse' },
     ],
   },
@@ -85,27 +93,9 @@ const navItems: NavItem[] = [
     icon: <ShoppingCart size={20} />,
     subItems: [
       { name: 'Vendors', path: '/vendors', permission: 'view-vendor' },
-      { name: 'Purchases', path: '/purchases', permission: 'view-purchase' },
+      { name: 'Purchase Orders', path: '/purchase-orders', permission: 'view-purchase-order' },
     ],
   },
-  {
-    name: 'Forms',
-    icon: <ListIcon />,
-    subItems: [{ name: 'Form Elements', path: '/form-elements' }],
-  },
-  // {
-  //   name: "Tables",
-  //   icon: <TableIcon />,
-  //   subItems: [{ name: "Basic Tables", path: "/basic-tables" }],
-  // },
-  // {
-  //   name: "Pages",
-  //   icon: <PageIcon />,
-  //   subItems: [
-  //     { name: "Blank Page", path: "/blank" },
-  //     { name: "404 Error", path: "/error-404" },
-  //   ],
-  // },
 ];
 
 const administrationItems: NavItem[] = [
@@ -145,8 +135,11 @@ const administrationItems: NavItem[] = [
   {
     icon: <Settings size={20} />,
     name: 'Settings',
-    path: '/settings',
-    permission: 'view-setting',
+    subItems: [
+      { name: 'General', path: '/settings/general', permission: 'view-setting' },
+      { name: 'Configurations', path: '/settings/configurations', permission: 'view-setting' },
+      { name: 'Default Accounts', path: '/settings/default-accounts', permission: 'view-setting' },
+    ],
   },
 ];
 
@@ -169,26 +162,6 @@ const othersItems: NavItem[] = [
     path: '/audits',
     permission: 'view-audit',
   },
-  // {
-  //   icon: <PieChartIcon />,
-  //   name: "Charts",
-  //   subItems: [
-  //     { name: "Line Chart", path: "/line-chart" },
-  //     { name: "Bar Chart", path: "/bar-chart" },
-  //   ],
-  // },
-  // {
-  //   icon: <BoxCubeIcon />,
-  //   name: "UI Elements",
-  //   subItems: [
-  //     { name: "Alerts", path: "/alerts" },
-  //     { name: "Avatar", path: "/avatars" },
-  //     { name: "Badge", path: "/badge" },
-  //     { name: "Buttons", path: "/buttons" },
-  //     { name: "Images", path: "/images" },
-  //     { name: "Videos", path: "/videos" },
-  //   ],
-  // },
 ];
 
 const AppSidebar: React.FC = () => {
@@ -203,7 +176,6 @@ const AppSidebar: React.FC = () => {
   const [subMenuHeight, setSubMenuHeight] = useState<Record<string, number>>({});
   const subMenuRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
-  // const isActive = (path: string) => pathname === path;
   const isActive = useCallback(
     (path: string) => {
       if (!pathname) return false;
@@ -337,6 +309,9 @@ const AppSidebar: React.FC = () => {
             ) : nav.path ? (
               <Link
                 href={nav.path}
+                onClick={() => {
+                  if (isMobileOpen) toggleMobileSidebar();
+                }}
                 className={`menu-item group ${
                   isActive(nav.path) ? 'menu-item-active' : 'menu-item-inactive'
                 }`}
@@ -380,6 +355,7 @@ const AppSidebar: React.FC = () => {
                       <Link
                         href={subItem.path}
                         onClick={() => {
+                          if (isMobileOpen) toggleMobileSidebar();
                           if (subItem.name === 'Add Sale' && isExpanded) {
                             toggleSidebar();
                           }
@@ -427,7 +403,7 @@ const AppSidebar: React.FC = () => {
       )}
 
       <aside
-        className={`fixed mt-16 lg:mt-0 flex flex-col top-0 px-5 left-0 text-gray-900 h-[calc(100vh-64px)] lg:h-screen transition-all duration-300 ease-in-out z-999999 border-r border-gray-200 dark:border-gray-800
+        className={`fixed mt-16 lg:mt-0 flex flex-col top-0 px-5 left-0 text-gray-900 h-[calc(100vh-64px)] lg:h-screen transition-all duration-300 ease-in-out z-[9999] border-r border-gray-200 dark:border-gray-800
         custom-sidebar-bg bg-white dark:bg-gray-900
         ${isExpanded || isMobileOpen ? 'w-[290px]' : isHovered ? 'w-[290px]' : 'w-[90px]'}
         ${isMobileOpen ? 'translate-x-0 opacity-100' : '-translate-x-full opacity-0 lg:opacity-100'}
@@ -463,7 +439,7 @@ const AppSidebar: React.FC = () => {
             )}
           </Link>
         </div>
-        <div className="flex flex-col flex-1 overflow-y-auto duration-300 ease-linear no-scrollbar">
+        <div className="flex flex-col flex-1 overflow-y-auto overscroll-y-contain duration-300 ease-linear no-scrollbar">
           <nav className="mb-6">
             <div className="flex flex-col gap-4">
               {hasAnyPermission(navItems) && (

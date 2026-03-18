@@ -1,4 +1,4 @@
-import { ChartOfAccount, ChartOfAccountInput } from '../types';
+import { ChartOfAccount, ChartOfAccountInput } from '@/types';
 import { createBaseService, QueryParams, PaginatedResponse } from './BaseService';
 
 const chartOfAccountService = createBaseService<ChartOfAccount, ChartOfAccountInput>(

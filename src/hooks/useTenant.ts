@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-import { TenantContext, TenantContextType } from '../context/TenantContext';
+import { TenantContext, TenantContextType } from '@/context/TenantContext';
 
 export const useTenant = (): TenantContextType => {
   const context = useContext(TenantContext);

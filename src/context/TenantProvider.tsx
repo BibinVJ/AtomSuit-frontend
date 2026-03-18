@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, ReactNode } from 'react';
 import { TenantContext, TenantContextType } from './TenantContext';
-import { getTenantFromBrowser, TenantInfo, getMainDomainUrl } from '../utils/tenant';
+import { getTenantFromBrowser, TenantInfo, getMainDomainUrl } from '@/utils/tenant';
 
 interface TenantProviderProps {
   children: ReactNode;

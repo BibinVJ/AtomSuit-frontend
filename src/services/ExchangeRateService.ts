@@ -1,11 +1,11 @@
-import { ExchangeRate, ExchangeRateInput } from '../types';
+import { ExchangeRate, ExchangeRateInput } from '@/types';
 import { createBaseService, QueryParams, PaginatedResponse } from './BaseService';
 
 export interface ExchangeRateQueryParams extends QueryParams {
   currency_id?: number | string;
 }
 
-const exchangeRateService = createBaseService<ExchangeRate, ExchangeRateInput>('/exchange-rate');
+const exchangeRateService = createBaseService<ExchangeRate, ExchangeRateInput>('/exchange-rates');
 
 export const getExchangeRates = (
   params: ExchangeRateQueryParams = {}

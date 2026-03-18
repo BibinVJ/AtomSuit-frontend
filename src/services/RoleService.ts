@@ -1,7 +1,7 @@
 import { createBaseService } from './BaseService';
-import { Role } from '../types';
+import { Role } from '@/types';
 
-const baseService = createBaseService<Role, unknown>('/role');
+const baseService = createBaseService<Role, unknown>('/roles');
 
 export const getRoles = baseService.list;
 export const getRole = baseService.get;

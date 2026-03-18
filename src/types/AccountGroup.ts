@@ -1,4 +1,5 @@
 import { AccountType } from './AccountType';
+import { PaginatedResponse } from './Common';
 
 export interface AccountGroup {
   id: number;
@@ -9,21 +10,9 @@ export interface AccountGroup {
   parent_id: number | null;
   parent?: AccountGroup;
   description: string | null;
-  description: string | null;
   created_at: string;
   updated_at: string;
   deleted_at?: string | null;
-}
-
-export interface AccountGroupApiResponse {
-  data: AccountGroup[];
-  meta: {
-    total: number;
-    current_page: number;
-    last_page: number;
-    from: number;
-    to: number;
-  };
 }
 
 export interface AccountGroupInput {
@@ -33,3 +22,5 @@ export interface AccountGroupInput {
   parent_id?: number | null;
   description?: string;
 }
+
+export type AccountGroupApiResponse = PaginatedResponse<AccountGroup>;

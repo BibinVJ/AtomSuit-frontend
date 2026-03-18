@@ -1,4 +1,8 @@
 import { Currency } from './Currency';
+import { PaginatedResponse } from './Common';
+import { PriceList } from './PriceList';
+import { TaxGroup } from './Tax';
+import { ChartOfAccount } from './ChartOfAccount';
 
 export interface Vendor {
   id: number;
@@ -6,15 +10,12 @@ export interface Vendor {
   email: string;
   phone: string;
   currency?: Currency;
-  currency_id?: number;
-  payables_account_id?: number;
-  purchase_account_id?: number;
-  purchase_discount_account_id?: number;
-  purchase_return_account_id?: number;
-  payables_account?: { id: number; name: string };
-  purchase_account?: { id: number; name: string };
-  purchase_discount_account?: { id: number; name: string };
-  purchase_return_account?: { id: number; name: string };
+  price_list?: PriceList;
+  tax_group?: TaxGroup;
+  payables_account?: ChartOfAccount;
+  purchase_account?: ChartOfAccount;
+  purchase_discount_account?: ChartOfAccount;
+  purchase_return_account?: ChartOfAccount;
   billing_address_line_1?: string;
   billing_address_line_2?: string;
   billing_city?: string;
@@ -34,6 +35,8 @@ export interface VendorInput {
   email: string;
   phone: string;
   currency_id?: number;
+  price_list_id?: number | null;
+  tax_group_id?: number | null;
   payables_account_id?: number;
   purchase_account_id?: number;
   purchase_discount_account_id?: number;
@@ -52,13 +55,4 @@ export interface VendorInput {
   shipping_zip_code?: string;
 }
 
-export interface VendorApiResponse {
-  data: Vendor[];
-  meta: {
-    total: number;
-    current_page: number;
-    last_page: number;
-    from: number;
-    to: number;
-  };
-}
+export type VendorApiResponse = PaginatedResponse<Vendor>;

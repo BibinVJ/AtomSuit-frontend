@@ -1,5 +1,5 @@
 import api from './api';
-import { LoginResponse } from '../types';
+import { LoginResponse } from '@/types';
 
 export const login = async (identifier: string, password: string): Promise<LoginResponse> => {
   const formData = new FormData();
@@ -49,4 +49,30 @@ export const getUser = () => {
     return JSON.parse(userString);
   }
   return null;
+};
+export const sendResetOtp = async (identifier: string) => {
+  const response = await api.post('/auth/send-reset-otp', { identifier });
+  return response.data;
+};
+
+export const verifyOtp = async (identifier: string, otp: string) => {
+  const response = await api.post('/auth/verify-otp', { identifier, otp });
+  return response.data;
+};
+
+export const resetPassword = async (data: Record<string, string>) => {
+  const response = await api.post('/auth/reset-password', data);
+  return response.data;
+};
+
+// Use existing resetPassword for authenticated change as well
+export const changePassword = async (data: Record<string, string>) => {
+  const response = await api.post('/auth/reset-password', data);
+  return response.data;
+};
+
+// Use existing sendResetOtp for authenticated change as well
+export const sendChangePasswordOtp = async (identifier: string) => {
+  const response = await api.post('/auth/send-reset-otp', { identifier });
+  return response.data;
 };

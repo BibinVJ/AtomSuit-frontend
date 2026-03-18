@@ -1,12 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { DropdownItem } from '../ui/dropdown/DropdownItem';
-import { Dropdown } from '../ui/dropdown/Dropdown';
+import { DropdownItem } from '@/components/ui/dropdown/DropdownItem';
+import { Dropdown } from '@/components/ui/dropdown/Dropdown';
 import { User, Settings, HelpCircle, LogOut } from 'lucide-react';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '@/hooks/useAuth';
 import Image from 'next/image';
-import Tooltip from '../ui/tooltip/Tooltip';
+// import Link from 'next/link';
+import Tooltip from '@/components/ui/tooltip/Tooltip';
 
 export default function UserDropdown() {
   const [isOpen, setIsOpen] = useState(false);
@@ -93,7 +94,7 @@ export default function UserDropdown() {
             <DropdownItem
               onItemClick={closeDropdown}
               tag="a"
-              href="/settings"
+              href="/account-settings"
               className="flex items-center gap-3 px-3 py-2 font-medium text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
             >
               <Settings className="w-5 h-5" />

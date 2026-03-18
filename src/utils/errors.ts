@@ -1,4 +1,4 @@
-import { ApiError } from '../types/Error';
+import { ApiError } from '@/types/Error';
 
 export function isApiError(error: unknown): error is ApiError {
   return (

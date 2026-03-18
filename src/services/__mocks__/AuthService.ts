@@ -1,4 +1,4 @@
-import { User } from '../../types';
+import { User } from '@/types';
 
 const mockUser: User = {
   id: 1,
@@ -26,6 +26,7 @@ const mockUser: User = {
   addresses: [],
   social_links: [],
   created_at: '2023-01-01T00:00:00Z',
+  updated_at: '2023-01-01T00:00:00Z',
 };
 
 export const login = async () =>

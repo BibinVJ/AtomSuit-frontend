@@ -1,5 +1,6 @@
-import { useTheme } from '../../context/ThemeContext';
-import Tooltip from '../ui/tooltip/Tooltip';
+// import { Moon, Sun } from 'lucide-react';
+import { useTheme } from '@/context/ThemeContext';
+import Tooltip from '@/components/ui/tooltip/Tooltip';
 
 export const ThemeToggleButton: React.FC = () => {
   const { toggleTheme } = useTheme();

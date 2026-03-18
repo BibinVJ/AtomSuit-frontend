@@ -1,3 +1,5 @@
+import { PaginatedResponse } from './Common';
+
 export interface Warehouse {
   id: number;
   name: string;
@@ -29,3 +31,5 @@ export interface WarehouseInput {
   phone?: string;
   email?: string;
 }
+
+export type WarehouseApiResponse = PaginatedResponse<Warehouse>;

@@ -1,4 +1,4 @@
-import { Item, ItemInput } from '../types';
+import { Item, ItemInput } from '@/types';
 import { createBaseService, QueryParams, PaginatedResponse } from './BaseService';
 
 export interface ItemQueryParams extends QueryParams {
@@ -7,7 +7,7 @@ export interface ItemQueryParams extends QueryParams {
   type?: string;
 }
 
-const itemService = createBaseService<Item, ItemInput>('/item');
+const itemService = createBaseService<Item, ItemInput>('/items');
 
 export const getItems = (params: ItemQueryParams = {}): Promise<PaginatedResponse<Item>> =>
   itemService.list(params);
@@ -22,10 +22,10 @@ export const deleteItem = (id: number, force: boolean = false) => itemService.de
 
 export const restoreItem = (id: number) => itemService.restore(id);
 
-export const exportItems = () => itemService.export('/item/export');
+export const exportItems = () => itemService.export('/items/export');
 
-export const importItems = (file: File) => itemService.import(file, '/item/import');
+export const importItems = (file: File) => itemService.import(file, '/items/import');
 
-export const downloadSampleItemExcel = () => itemService.downloadSample('/item/sample-excel');
+export const downloadSampleItemExcel = () => itemService.downloadSample('/items/sample-excel');
 
 export default itemService;

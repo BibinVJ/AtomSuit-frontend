@@ -1,6 +1,6 @@
-import TableSection from '../ui/table/TableSection';
-import { Table, TableBody, TableCell, TableHeader, TableRow } from '../ui/table';
-import Badge from '../ui/badge/Badge';
+import TableSection from '@/components/ui/table/TableSection';
+import { Table, TableBody, TableCell, TableHeader, TableRow } from '@/components/ui/table';
+import Badge from '@/components/ui/badge/Badge';
 
 interface ExpiringItem {
   id: number;

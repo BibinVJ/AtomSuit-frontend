@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect } from 'react';
-import { SidebarProvider } from '../context/SidebarContext';
-import { useSidebar } from '../hooks/useSidebar';
+import { SidebarProvider } from '@/context/SidebarContext';
+import { useSidebar } from '@/hooks/useSidebar';
 
 import AppHeader from './AppHeader';
 import Backdrop from './Backdrop';
@@ -13,8 +13,6 @@ const LayoutContent: React.FC = () => {
     useSidebar();
 
   useEffect(() => {
-    // Remove location dependency since it's not available in Next.js
-    // const shouldGoFullScreen = location.state?.goFullScreen;
     const shouldGoFullScreen = false;
     if (shouldGoFullScreen) {
       enterFullScreen();

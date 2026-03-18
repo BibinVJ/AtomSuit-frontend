@@ -1,3 +1,5 @@
+import { PaginatedResponse } from './Common';
+
 export interface AccountType {
   id: number;
   name: string;
@@ -7,13 +9,4 @@ export interface AccountType {
   updated_at: string;
 }
 
-export interface AccountTypeApiResponse {
-  data: AccountType[];
-  meta: {
-    total: number;
-    current_page: number;
-    last_page: number;
-    from: number;
-    to: number;
-  };
-}
+export type AccountTypeApiResponse = PaginatedResponse<AccountType>;

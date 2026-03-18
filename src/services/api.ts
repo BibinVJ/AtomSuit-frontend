@@ -1,6 +1,6 @@
 import axios from 'axios';
 import NProgress from 'nprogress';
-import { getTenantFromBrowser } from '../utils/tenant';
+import { getTenantFromBrowser } from '@/utils/tenant';
 // import { toast } from 'sonner';
 
 const api = axios.create({
@@ -11,8 +11,14 @@ const api = axios.create({
   },
 });
 
+// Track active requests for consolidated progress bar
+let activeRequests = 0;
+
 api.interceptors.request.use((config) => {
-  NProgress.start();
+  if (activeRequests === 0) {
+    NProgress.start();
+  }
+  activeRequests++;
 
   // Add authentication token
   const token = localStorage.getItem('token') || sessionStorage.getItem('token');
@@ -37,14 +43,22 @@ api.interceptors.request.use((config) => {
 
 api.interceptors.response.use(
   (response) => {
-    NProgress.done();
+    activeRequests--;
+    if (activeRequests <= 0) {
+      activeRequests = 0;
+      NProgress.done();
+    }
     // if (response.data.message) {
     //   toast.success(response.data.message);
     // }
     return response;
   },
   (error) => {
-    NProgress.done();
+    activeRequests--;
+    if (activeRequests <= 0) {
+      activeRequests = 0;
+      NProgress.done();
+    }
 
     // Handle 401 Unauthorized errors
     if (error.response && error.response.status === 401) {

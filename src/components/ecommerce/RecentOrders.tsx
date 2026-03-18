@@ -1,6 +1,7 @@
-import { Table, TableBody, TableCell, TableHeader, TableRow } from '../ui/table';
-import Badge from '../ui/badge/Badge';
-import TableSection from '../ui/table/TableSection';
+import { Table, TableBody, TableCell, TableHeader, TableRow } from '@/components/ui/table';
+import Badge from '@/components/ui/badge/Badge';
+// import { useTheme } from '@/context/ThemeContext';
+import TableSection from '@/components/ui/table/TableSection';
 import Image from 'next/image';
 
 // Define the TypeScript interface for the table rows

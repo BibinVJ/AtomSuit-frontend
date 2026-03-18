@@ -1,7 +1,7 @@
 'use client';
 
 import { ArrowDown, ArrowUp } from 'lucide-react';
-import Badge from '../ui/badge/Badge';
+import Badge from '@/components/ui/badge/Badge';
 import { ReactNode, useState, useRef, useEffect } from 'react';
 
 interface MetricCardProps {

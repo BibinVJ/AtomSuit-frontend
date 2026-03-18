@@ -1,14 +1,14 @@
 import api from './api';
-import { Plan, PlanInput } from '../types';
+import { Plan, PlanInput } from '@/types';
 import { createBaseService } from './BaseService';
 
-const baseService = createBaseService<Plan, PlanInput>('/plan');
+const baseService = createBaseService<Plan, PlanInput>('/plans');
 
 export const getPlans = baseService.list;
 export const getPlan = baseService.get;
 export const createPlan = baseService.create;
 export const updatePlan = (id: number | string, data: PlanInput) =>
-  api.post(`/plan/${id}`, data).then((res) => res.data);
+  api.post(`/plans/${id}`, data).then((res) => res.data);
 export const deletePlan = baseService.delete;
 
 const PlanService = {

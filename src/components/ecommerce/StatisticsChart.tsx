@@ -2,7 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import { ApexOptions } from 'apexcharts';
-import ChartTab from '../common/ChartTab';
+import ChartTab from '@/components/common/ChartTab';
 import { useState, useEffect } from 'react';
 
 // Dynamically import Chart with no SSR

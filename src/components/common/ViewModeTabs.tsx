@@ -1,5 +1,6 @@
 import React from 'react';
-import Tooltip from '../ui/tooltip/Tooltip';
+// import { Grid, List as ListIcon } from 'lucide-react';
+import Tooltip from '@/components/ui/tooltip/Tooltip';
 
 interface ViewModeTabsProps {
   viewMode: 'active' | 'trashed';

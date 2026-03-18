@@ -1,3 +1,4 @@
+import { PaginatedResponse } from './Common';
 import { Currency } from './Currency';
 
 export interface ExchangeRate {
@@ -19,3 +20,5 @@ export interface ExchangeRateInput {
   rate: number;
   effective_date: string;
 }
+
+export type ExchangeRateApiResponse = PaginatedResponse<ExchangeRate>;

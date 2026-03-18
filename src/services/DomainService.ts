@@ -1,7 +1,7 @@
 import { createBaseService } from './BaseService';
-import { Domain } from '../types';
+import { Domain } from '@/types';
 
-const baseService = createBaseService<Domain, unknown>('/domain');
+const baseService = createBaseService<Domain, unknown>('/domains');
 
 export const getDomains = baseService.list;
 

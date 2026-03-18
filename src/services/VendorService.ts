@@ -1,7 +1,7 @@
-import { Vendor, VendorInput } from '../types';
+import { Vendor, VendorInput } from '@/types';
 import { createBaseService, QueryParams, PaginatedResponse } from './BaseService';
 
-const vendorService = createBaseService<Vendor, VendorInput>('/vendor');
+const vendorService = createBaseService<Vendor, VendorInput>('/vendors');
 
 export const getVendors = (params: QueryParams = {}): Promise<PaginatedResponse<Vendor>> =>
   vendorService.list(params);
@@ -16,7 +16,7 @@ export const deleteVendor = (id: number, force: boolean = false) => vendorServic
 
 export const restoreVendor = (id: number) => vendorService.restore(id);
 
-export const exportVendors = () => vendorService.export('/vendor/export');
+export const exportVendors = () => vendorService.export('/vendors/export');
 
 export const importVendors = (file: File) => vendorService.import(file);
 
