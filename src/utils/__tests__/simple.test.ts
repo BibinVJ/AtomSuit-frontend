@@ -61,12 +61,52 @@ describe('tenant utilities (simple tests)', () => {
       });
     });
 
-    it('should handle invalid hostnames', () => {
-      expect(extractTenant('invalid-domain.com')).toEqual({
+    it('should work when NEXT_PUBLIC_BASE_DOMAIN includes port', () => {
+      process.env.NEXT_PUBLIC_BASE_DOMAIN = 'cubet.test:3000';
+
+      expect(extractTenant('cubet.test:3000')).toEqual({
         subdomain: '',
         isCentral: true,
       });
 
+      expect(extractTenant('company.cubet.test:3000')).toEqual({
+        subdomain: 'company',
+        isCentral: false,
+      });
+
+      expect(extractTenant('cubet.test')).toEqual({
+        subdomain: '',
+        isCentral: true,
+      });
+    });
+
+    it('should detect custom domains', () => {
+      expect(extractTenant('app.clientname.com')).toEqual({
+        subdomain: 'app.clientname.com',
+        isCentral: false,
+        isCustomDomain: true,
+      });
+
+      expect(extractTenant('custom.example.org:8080')).toEqual({
+        subdomain: 'custom.example.org',
+        isCentral: false,
+        isCustomDomain: true,
+      });
+    });
+
+    it('should treat localhost as central', () => {
+      expect(extractTenant('localhost')).toEqual({
+        subdomain: '',
+        isCentral: true,
+      });
+
+      expect(extractTenant('127.0.0.1')).toEqual({
+        subdomain: '',
+        isCentral: true,
+      });
+    });
+
+    it('should handle invalid hostnames', () => {
       expect(extractTenant('localhost')).toEqual({
         subdomain: '',
         isCentral: true,

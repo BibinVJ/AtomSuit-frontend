@@ -6,6 +6,7 @@ export interface TenantInfo {
   subdomain: string;
   isCentral: boolean;
   isValid?: boolean;
+  isCustomDomain?: boolean;
 }
 
 /**
@@ -17,19 +18,21 @@ export function extractTenant(hostname: string): TenantInfo {
   // Remove port if present
   const cleanHostname = hostname.split(':')[0];
 
-  // Get base domain from environment or default
+  // Get base domain from environment or default, strip port for comparison
   const baseDomain = process.env.NEXT_PUBLIC_BASE_DOMAIN || 'atomsuit.test';
+  const cleanBaseDomain = baseDomain.split(':')[0];
 
   // Check if it's the main domain (central login)
-  if (cleanHostname === baseDomain || cleanHostname === `www.${baseDomain}`) {
+  if (cleanHostname === cleanBaseDomain || cleanHostname === `www.${cleanBaseDomain}`) {
     return {
       subdomain: '',
       isCentral: true,
     };
   }
 
-  // Check if it's a subdomain
-  const subdomainPattern = new RegExp(`^([^.]+)\\.${baseDomain.replace('.', '\\.')}$`);
+  // Check if it's a subdomain of the base domain
+  const escapedBase = cleanBaseDomain.replace(/\./g, '\\.');
+  const subdomainPattern = new RegExp(`^([^.]+)\\.${escapedBase}$`);
   const subdomainMatch = cleanHostname.match(subdomainPattern);
 
   if (subdomainMatch) {
@@ -51,7 +54,18 @@ export function extractTenant(hostname: string): TenantInfo {
     };
   }
 
-  // If hostname doesn't match expected pattern, treat as central
+  // If hostname doesn't match base domain pattern, it might be a custom domain.
+  // Send the full hostname as subdomain for the backend to resolve directly.
+  // Exclude common non-tenant hostnames.
+  const nonTenantHosts = ['localhost', '127.0.0.1'];
+  if (!nonTenantHosts.includes(cleanHostname)) {
+    return {
+      subdomain: cleanHostname,
+      isCentral: false,
+      isCustomDomain: true,
+    };
+  }
+
   return {
     subdomain: '',
     isCentral: true,
