@@ -121,7 +121,11 @@ export default function CreateGoodsReceivedNote() {
     }
   };
 
-  const handleItemChange = (index: number, field: keyof GoodsReceivedNoteItemInput, value: any) => {
+  const handleItemChange = (
+    index: number,
+    field: keyof GoodsReceivedNoteItemInput,
+    value: string | number
+  ) => {
     const newItems = [...items];
     newItems[index] = { ...newItems[index], [field]: value };
 
@@ -232,11 +236,13 @@ export default function CreateGoodsReceivedNote() {
       await GoodsReceivedNoteService.create(payload);
       toast.success('Goods Received Note created successfully');
       router.push('/goods-received-notes');
-    } catch (error: any) {
+    } catch (error: unknown) {
+      let message = 'Failed to create Goods Received Note';
       if (isApiError(error)) {
         setErrors(error.response?.data?.errors || {});
+        message = error.response?.data?.message || message;
       }
-      toast.error(error.response?.data?.message || 'Failed to create Goods Received Note');
+      toast.error(message);
     } finally {
       setIsSubmitting(false);
     }

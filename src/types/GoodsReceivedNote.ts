@@ -37,7 +37,7 @@ export interface GoodsReceivedNote {
   purchase_order_id?: number;
   vendor_id: number;
   vendor: Vendor;
-  vendor_meta?: Record<string, any>;
+  vendor_meta?: Record<string, unknown>;
   grn_number: string;
   reference_number?: string;
   received_date: string;

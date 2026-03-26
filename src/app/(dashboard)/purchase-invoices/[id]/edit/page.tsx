@@ -12,7 +12,15 @@ import { getCostCenters } from '@/services/CostCenterService';
 import { getWarehouses } from '@/services/WarehouseService';
 import { getTaxGroups } from '@/services/TaxService';
 import { isApiError } from '@/utils/errors';
-import { Item, Vendor, DiscountType, CostCenter, Warehouse, TaxGroup } from '@/types';
+import {
+  Item,
+  Vendor,
+  DiscountType,
+  CostCenter,
+  Warehouse,
+  TaxGroup,
+  PaginatedResponse,
+} from '@/types';
 import { usePermissions } from '@/hooks/usePermissions';
 import { useSettings } from '@/hooks/useSettings';
 import Button from '@/components/ui/button/Button';
@@ -67,12 +75,12 @@ export default function EditPurchaseInvoice() {
     setIsLoading(true);
     try {
       const [vData, iData, ccData, wData, tgData, piData] = await Promise.all([
-        getVendors({ unpaginated: true }),
-        getItems({ unpaginated: true }),
-        getCostCenters({ unpaginated: true }),
-        getWarehouses({ unpaginated: true }),
-        getTaxGroups({ unpaginated: true }),
-        PurchaseInvoiceService.get(id as string),
+        getVendors({ unpaginated: true }) as Promise<PaginatedResponse<Vendor>>,
+        getItems({ unpaginated: true }) as Promise<PaginatedResponse<Item>>,
+        getCostCenters({ unpaginated: true }) as Promise<PaginatedResponse<CostCenter>>,
+        getWarehouses({ unpaginated: true }) as Promise<PaginatedResponse<Warehouse>>,
+        getTaxGroups({ unpaginated: true }) as Promise<PaginatedResponse<TaxGroup>>,
+        PurchaseInvoiceService.get(id as string) as Promise<any>,
       ]);
 
       setVendors(vData.data || []);
@@ -95,8 +103,8 @@ export default function EditPurchaseInvoice() {
           id: item.id,
           item_id: String(item.item_id),
           description: item.description || '',
-          quantity: Number(item.quantity),
-          unit_price: Number(item.unit_price),
+          quantity: Number(item.quantity || 0),
+          unit_price: Number(item.unit_price || 0),
           discount_type: (item.discount_type as DiscountType) || 'percentage',
           discount_value: Number(item.discount_value || 0),
           tax_group_id: item.tax_group_id ? String(item.tax_group_id) : '',
@@ -175,8 +183,8 @@ export default function EditPurchaseInvoice() {
     let taxAmount = 0;
     const taxBreakdown: { name: string; rate: number; amount: number }[] = [];
 
-    if (taxGroup?.tax_rates) {
-      taxGroup.tax_rates.forEach((rate) => {
+    if (taxGroup && (taxGroup as any).tax_rates) {
+      (taxGroup as any).tax_rates.forEach((rate: any) => {
         const amount = taxableAmount * (Number(rate.rate) / 100);
         taxAmount += amount;
         taxBreakdown.push({ name: rate.name, rate: Number(rate.rate), amount });
@@ -656,8 +664,8 @@ export default function EditPurchaseInvoice() {
                   -{formatCurrency(orderTotals.discountTotal)}
                 </span>
               </div>
-              {orderTotals.taxBreakdown.map((tb, idx) => (
-                <div key={idx} className="flex justify-between items-center px-4">
+              {orderTotals.taxBreakdown.map((tb) => (
+                <div key={tb.name} className="flex justify-between items-center px-4">
                   <span className="text-gray-500 font-bold uppercase text-theme-xs">{tb.name}</span>
                   <span className="font-bold text-gray-900 dark:text-white">
                     +{formatCurrency(tb.amount)}

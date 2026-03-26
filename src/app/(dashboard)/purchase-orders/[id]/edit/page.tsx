@@ -17,8 +17,8 @@ import { getItems } from '@/services/ItemService';
 import { getCostCenters } from '@/services/CostCenterService';
 import { CostCenter } from '@/types/CostCenter';
 import { getWarehouses } from '@/services/WarehouseService';
-import { Item, Vendor } from '@/types';
-import { PurchaseOrderItem, DiscountType } from '@/types/PurchaseOrder';
+import { Item, Vendor, DiscountType, PaginatedResponse } from '@/types';
+import { PurchaseOrderItem } from '@/types/PurchaseOrder';
 import { getPurchaseOrder, updatePurchaseOrder } from '@/services/PurchaseOrderService';
 import { isApiError } from '@/utils/errors';
 import { useSettings } from '@/hooks/useSettings';
@@ -38,7 +38,7 @@ interface ApiError {
 }
 
 export default function EditPurchaseOrder() {
-  const { getSetting, formatCurrency, formatQuantity, formatNumber } = useSettings();
+  const { getSetting, formatCurrency, formatNumber } = useSettings();
   const params = useParams<{ id: string }>();
   const id = params?.id;
   const router = useRouter();
@@ -70,7 +70,7 @@ export default function EditPurchaseOrder() {
           sortDir: 'desc',
           unpaginated: true,
           include: 'currency',
-        }),
+        }) as Promise<PaginatedResponse<Vendor>>,
         getItems({
           page: 1,
           limit: 10,
@@ -78,9 +78,13 @@ export default function EditPurchaseOrder() {
           sortDir: 'desc',
           unpaginated: true,
           include: 'unit,tax_group,item_prices',
-        }),
-        getCostCenters({ page: 1, limit: 100, unpaginated: true }),
-        getWarehouses({ page: 1, limit: 100, unpaginated: true }),
+        }) as Promise<PaginatedResponse<Item>>,
+        getCostCenters({ page: 1, limit: 100, unpaginated: true }) as Promise<
+          PaginatedResponse<CostCenter>
+        >,
+        getWarehouses({ page: 1, limit: 100, unpaginated: true }) as Promise<
+          PaginatedResponse<{ id: number; name: string }>
+        >,
         getPurchaseOrder(Number(id)),
       ]);
       setVendors(vendorResponse.data);
@@ -740,8 +744,8 @@ export default function EditPurchaseOrder() {
                   -{formatCurrency(orderTotals.totalDiscount)}
                 </span>
               </div>
-              {orderTotals.taxBreakdown.map((tb, idx) => (
-                <div key={idx} className="flex justify-between items-center px-4">
+              {orderTotals.taxBreakdown.map((tb) => (
+                <div key={tb.name} className="flex justify-between items-center px-4">
                   <span className="text-gray-500 font-bold uppercase text-theme-xs">{tb.name}</span>
                   <span className="font-bold text-gray-900 dark:text-white">
                     +{formatCurrency(tb.amount)}

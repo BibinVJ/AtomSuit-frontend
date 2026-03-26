@@ -12,7 +12,15 @@ import { getCostCenters } from '@/services/CostCenterService';
 import { getWarehouses } from '@/services/WarehouseService';
 import { getTaxGroups } from '@/services/TaxService';
 import { isApiError } from '@/utils/errors';
-import { Item, Vendor, DiscountType, CostCenter, Warehouse, TaxGroup } from '@/types';
+import {
+  Item,
+  Vendor,
+  DiscountType,
+  CostCenter,
+  Warehouse,
+  TaxGroup,
+  PaginatedResponse,
+} from '@/types';
 import { usePermissions } from '@/hooks/usePermissions';
 import { useSettings } from '@/hooks/useSettings';
 import Button from '@/components/ui/button/Button';
@@ -67,12 +75,12 @@ export default function EditGoodsReceivedNote() {
     setIsLoading(true);
     try {
       const [vData, iData, ccData, wData, tgData, grnData] = await Promise.all([
-        getVendors({ unpaginated: true }),
-        getItems({ unpaginated: true }),
-        getCostCenters({ unpaginated: true }),
-        getWarehouses({ unpaginated: true }),
-        getTaxGroups({ unpaginated: true }),
-        GoodsReceivedNoteService.get(id as string),
+        getVendors({ unpaginated: true }) as Promise<PaginatedResponse<Vendor>>,
+        getItems({ unpaginated: true }) as Promise<PaginatedResponse<Item>>,
+        getCostCenters({ unpaginated: true }) as Promise<PaginatedResponse<CostCenter>>,
+        getWarehouses({ unpaginated: true }) as Promise<PaginatedResponse<Warehouse>>,
+        getTaxGroups({ unpaginated: true }) as Promise<PaginatedResponse<TaxGroup>>,
+        GoodsReceivedNoteService.get(id as string) as Promise<any>,
       ]);
 
       setVendors(vData.data || []);
@@ -94,9 +102,9 @@ export default function EditGoodsReceivedNote() {
           id: item.id,
           item_id: String(item.item_id),
           description: item.description || '',
-          quantity_received: Number(item.quantity_received),
-          accepted_quantity: Number(item.accepted_quantity),
-          unit_price: Number(item.unit_price),
+          quantity_received: Number(item.quantity_received || 0),
+          accepted_quantity: Number(item.accepted_quantity || 0),
+          unit_price: Number(item.unit_price || 0),
           discount_type: (item.discount_type as DiscountType) || 'percentage',
           discount_value: Number(item.discount_value || 0),
           tax_group_id: item.tax_group_id ? String(item.tax_group_id) : '',
@@ -176,8 +184,8 @@ export default function EditGoodsReceivedNote() {
     let taxAmount = 0;
     const taxBreakdown: { name: string; rate: number; amount: number }[] = [];
 
-    if (taxGroup?.tax_rates) {
-      taxGroup.tax_rates.forEach((rate) => {
+    if (taxGroup && (taxGroup as any).tax_rates) {
+      (taxGroup as any).tax_rates.forEach((rate: any) => {
         const amount = taxableAmount * (Number(rate.rate) / 100);
         taxAmount += amount;
         taxBreakdown.push({ name: rate.name, rate: Number(rate.rate), amount });

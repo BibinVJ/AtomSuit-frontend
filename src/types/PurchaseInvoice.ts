@@ -14,7 +14,7 @@ export interface PurchaseInvoiceItem {
   purchase_invoice_id: number;
   item_id: number;
   item: Item;
-  item_meta?: Record<string, any>;
+  item_meta?: Record<string, unknown>;
   description?: string;
   quantity: number;
   unit_price: number;
@@ -38,7 +38,7 @@ export interface PurchaseInvoice {
   purchase_order_id?: number;
   vendor_id: number;
   vendor: Vendor;
-  vendor_meta?: Record<string, any>;
+  vendor_meta?: Record<string, unknown>;
   invoice_number: string;
   reference_number?: string;
   posting_date: string;

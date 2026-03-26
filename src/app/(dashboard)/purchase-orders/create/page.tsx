@@ -36,7 +36,7 @@ interface ApiError {
 }
 
 export default function AddPurchaseOrder() {
-  const { getSetting, formatCurrency, formatQuantity, formatNumber } = useSettings();
+  const { getSetting, formatCurrency, formatNumber } = useSettings();
   const router = useRouter();
   const [vendors, setVendors] = useState<Vendor[]>([]);
   const [items, setItems] = useState<Item[]>([]);

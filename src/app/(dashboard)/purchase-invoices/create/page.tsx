@@ -119,7 +119,11 @@ export default function CreatePurchaseInvoice() {
     }
   };
 
-  const handleItemChange = (index: number, field: keyof PurchaseInvoiceItemInput, value: any) => {
+  const handleItemChange = (
+    index: number,
+    field: keyof PurchaseInvoiceItemInput,
+    value: string | number
+  ) => {
     const newItems = [...items];
     newItems[index] = { ...newItems[index], [field]: value };
 
@@ -230,11 +234,13 @@ export default function CreatePurchaseInvoice() {
       await PurchaseInvoiceService.create(payload);
       toast.success('Purchase Invoice created successfully');
       router.push('/purchase-invoices');
-    } catch (error: any) {
+    } catch (error: unknown) {
+      let message = 'Failed to create Purchase Invoice';
       if (isApiError(error)) {
         setErrors(error.response?.data?.errors || {});
+        message = error.response?.data?.message || message;
       }
-      toast.error(error.response?.data?.message || 'Failed to create Purchase Invoice');
+      toast.error(message);
     } finally {
       setIsSubmitting(false);
     }
