@@ -16,7 +16,7 @@ interface CostCenterTableProps {
   sortBy: string;
   sortDirection: 'asc' | 'desc';
   currentPage: number;
-  perPage: number;
+  _perPage: number;
   startIndex?: number;
   viewMode: 'active' | 'trashed';
 }
@@ -27,7 +27,6 @@ export default function CostCenterTable({
   onSort,
   sortBy,
   sortDirection,
-  perPage,
   startIndex = 0,
   viewMode,
 }: CostCenterTableProps) {

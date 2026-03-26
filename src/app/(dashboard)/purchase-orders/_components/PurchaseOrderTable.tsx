@@ -7,6 +7,7 @@ import { TableActions } from '@/components/common/TableActions';
 import { useRouter } from 'next/navigation';
 
 import { PurchaseOrder } from '@/types/PurchaseOrder';
+import { isApiError } from '@/utils/errors';
 
 interface Props {
   data: PurchaseOrder[];
@@ -63,9 +64,13 @@ export default function PurchaseOrderTable({
       try {
         await deletePurchaseOrder(purchase.id, isTrashed);
         onAction(); // Refresh
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error(error);
-        alert(error.response?.data?.message || 'Failed to delete');
+        let message = 'Failed to delete';
+        if (isApiError(error)) {
+          message = error.response?.data?.message || message;
+        }
+        alert(message);
       }
     }
   };

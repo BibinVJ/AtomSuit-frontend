@@ -6,6 +6,7 @@ import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide } from 'lucide-r
 import { TableActions } from '@/components/common/TableActions';
 import { useRouter } from 'next/navigation';
 
+import { isApiError } from '@/utils/errors';
 import { GoodsReceivedNote } from '@/types/GoodsReceivedNote';
 import { usePermissions } from '@/hooks/usePermissions';
 import { useSettings } from '@/hooks/useSettings';
@@ -61,9 +62,13 @@ export default function GoodsReceivedNoteTable({
       try {
         await GoodsReceivedNoteService.delete(grn.id, isTrashed);
         onAction(); // Refresh
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error(error);
-        alert(error.response?.data?.message || 'Failed to delete');
+        let message = 'Failed to delete';
+        if (isApiError(error)) {
+          message = error.response?.data?.message || message;
+        }
+        alert(message);
       }
     }
   };

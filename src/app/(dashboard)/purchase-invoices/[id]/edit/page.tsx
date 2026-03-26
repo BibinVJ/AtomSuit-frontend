@@ -20,6 +20,8 @@ import {
   Warehouse,
   TaxGroup,
   PaginatedResponse,
+  PurchaseInvoice,
+  PurchaseInvoiceItem,
 } from '@/types';
 import { usePermissions } from '@/hooks/usePermissions';
 import { useSettings } from '@/hooks/useSettings';
@@ -80,7 +82,7 @@ export default function EditPurchaseInvoice() {
         getCostCenters({ unpaginated: true }) as Promise<PaginatedResponse<CostCenter>>,
         getWarehouses({ unpaginated: true }) as Promise<PaginatedResponse<Warehouse>>,
         getTaxGroups({ unpaginated: true }) as Promise<PaginatedResponse<TaxGroup>>,
-        PurchaseInvoiceService.get(id as string) as Promise<any>,
+        PurchaseInvoiceService.get(id as string) as Promise<PurchaseInvoice>,
       ]);
 
       setVendors(vData.data || []);
@@ -99,7 +101,7 @@ export default function EditPurchaseInvoice() {
       setWarehouseId(String(pi.warehouse_id || ''));
       setNotes(pi.notes || '');
       setItems(
-        pi.items.map((item: any) => ({
+        pi.items.map((item: PurchaseInvoiceItem) => ({
           id: item.id,
           item_id: String(item.item_id),
           description: item.description || '',
@@ -149,7 +151,11 @@ export default function EditPurchaseInvoice() {
     }
   };
 
-  const handleItemChange = (index: number, field: keyof PurchaseInvoiceItemInput, value: any) => {
+  const handleItemChange = (
+    index: number,
+    field: keyof PurchaseInvoiceItemInput,
+    value: string | number
+  ) => {
     const newItems = [...items];
     newItems[index] = { ...newItems[index], [field]: value };
 
@@ -165,41 +171,44 @@ export default function EditPurchaseInvoice() {
     setItems(newItems);
   };
 
-  const calculateItemTotals = (item: PurchaseInvoiceItemInput) => {
-    const quantity = Number(item.quantity) || 0;
-    const price = Number(item.unit_price) || 0;
-    const subtotal = quantity * price;
+  const calculateItemTotals = useCallback(
+    (item: PurchaseInvoiceItemInput) => {
+      const quantity = Number(item.quantity) || 0;
+      const price = Number(item.unit_price) || 0;
+      const subtotal = quantity * price;
 
-    let discountAmount = 0;
-    if (item.discount_type === 'percentage') {
-      discountAmount = subtotal * (Number(item.discount_value) / 100);
-    } else {
-      discountAmount = Number(item.discount_value);
-    }
+      let discountAmount = 0;
+      if (item.discount_type === 'percentage') {
+        discountAmount = subtotal * (Number(item.discount_value) / 100);
+      } else {
+        discountAmount = Number(item.discount_value);
+      }
 
-    const taxableAmount = subtotal - discountAmount;
-    const taxGroup = taxGroups.find((tg) => String(tg.id) === item.tax_group_id);
+      const taxableAmount = subtotal - discountAmount;
+      const taxGroup = taxGroups.find((tg) => String(tg.id) === item.tax_group_id);
 
-    let taxAmount = 0;
-    const taxBreakdown: { name: string; rate: number; amount: number }[] = [];
+      let taxAmount = 0;
+      const taxBreakdown: { name: string; rate: number; amount: number }[] = [];
 
-    if (taxGroup && (taxGroup as any).tax_rates) {
-      (taxGroup as any).tax_rates.forEach((rate: any) => {
-        const amount = taxableAmount * (Number(rate.rate) / 100);
-        taxAmount += amount;
-        taxBreakdown.push({ name: rate.name, rate: Number(rate.rate), amount });
-      });
-    }
+      if (taxGroup?.tax_rates) {
+        taxGroup.tax_rates.forEach((rate) => {
+          const amount = taxableAmount * (Number(rate.rate) / 100);
+          taxAmount += amount;
+          taxBreakdown.push({ name: rate.name, rate: Number(rate.rate), amount });
+        });
+      }
 
-    return {
-      subtotal,
-      discountAmount,
-      taxableAmount,
-      taxAmount,
-      taxBreakdown,
-      total: taxableAmount + taxAmount,
-    };
-  };
+      return {
+        subtotal,
+        discountAmount,
+        taxableAmount,
+        taxAmount,
+        taxBreakdown,
+        total: taxableAmount + taxAmount,
+      };
+    },
+    [taxGroups]
+  );
 
   const orderTotals = useMemo(() => {
     return items.reduce(
@@ -229,7 +238,7 @@ export default function EditPurchaseInvoice() {
         taxBreakdown: [] as { name: string; rate: number; amount: number }[],
       }
     );
-  }, [items, taxGroups]);
+  }, [items, calculateItemTotals]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -262,11 +271,13 @@ export default function EditPurchaseInvoice() {
       await PurchaseInvoiceService.update(id as string, payload);
       toast.success('Purchase Invoice updated successfully');
       router.push('/purchase-invoices');
-    } catch (error: any) {
+    } catch (error: unknown) {
+      let message = 'Failed to update Purchase Invoice';
       if (isApiError(error)) {
         setErrors(error.response?.data?.errors || {});
+        message = error.response?.data?.message || message;
       }
-      toast.error(error.response?.data?.message || 'Failed to update Purchase Invoice');
+      toast.error(message);
     } finally {
       setIsSubmitting(false);
     }

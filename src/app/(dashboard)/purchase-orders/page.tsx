@@ -16,6 +16,7 @@ import TableToolbar from '@/components/common/TableToolbar';
 import ViewModeTabs from '@/components/common/ViewModeTabs';
 import { Plus } from 'lucide-react';
 import { toast } from 'sonner';
+import { isApiError } from '@/utils/errors';
 
 export default function PurchaseOrders() {
   const { hasPermission } = usePermissions();
@@ -54,8 +55,12 @@ export default function PurchaseOrders() {
       await restorePurchaseOrder(id);
       toast.success('Purchase Order restored successfully');
       refresh();
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Failed to restore purchase order');
+    } catch (error: unknown) {
+      let message = 'Failed to restore purchase order';
+      if (isApiError(error)) {
+        message = error.response?.data?.message || message;
+      }
+      toast.error(message);
     }
   };
 

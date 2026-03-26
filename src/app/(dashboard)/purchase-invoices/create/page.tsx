@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import PageBreadcrumb from '@/components/common/PageBreadCrumb';
 import PageMeta from '@/components/common/PageMeta';
@@ -139,41 +139,44 @@ export default function CreatePurchaseInvoice() {
     setItems(newItems);
   };
 
-  const calculateItemTotals = (item: PurchaseInvoiceItemInput) => {
-    const quantity = Number(item.quantity) || 0;
-    const price = Number(item.unit_price) || 0;
-    const subtotal = quantity * price;
+  const calculateItemTotals = useCallback(
+    (item: PurchaseInvoiceItemInput) => {
+      const quantity = Number(item.quantity) || 0;
+      const price = Number(item.unit_price) || 0;
+      const subtotal = quantity * price;
 
-    let discountAmount = 0;
-    if (item.discount_type === 'percentage') {
-      discountAmount = subtotal * (Number(item.discount_value) / 100);
-    } else {
-      discountAmount = Number(item.discount_value);
-    }
+      let discountAmount = 0;
+      if (item.discount_type === 'percentage') {
+        discountAmount = subtotal * (Number(item.discount_value) / 100);
+      } else {
+        discountAmount = Number(item.discount_value);
+      }
 
-    const taxableAmount = subtotal - discountAmount;
-    const taxGroup = taxGroups.find((tg) => String(tg.id) === item.tax_group_id);
+      const taxableAmount = subtotal - discountAmount;
+      const taxGroup = taxGroups.find((tg) => String(tg.id) === item.tax_group_id);
 
-    let taxAmount = 0;
-    const taxBreakdown: { name: string; rate: number; amount: number }[] = [];
+      let taxAmount = 0;
+      const taxBreakdown: { name: string; rate: number; amount: number }[] = [];
 
-    if (taxGroup?.tax_rates) {
-      taxGroup.tax_rates.forEach((rate) => {
-        const amount = taxableAmount * (Number(rate.rate) / 100);
-        taxAmount += amount;
-        taxBreakdown.push({ name: rate.name, rate: Number(rate.rate), amount });
-      });
-    }
+      if (taxGroup?.tax_rates) {
+        taxGroup.tax_rates.forEach((rate) => {
+          const amount = taxableAmount * (Number(rate.rate) / 100);
+          taxAmount += amount;
+          taxBreakdown.push({ name: rate.name, rate: Number(rate.rate), amount });
+        });
+      }
 
-    return {
-      subtotal,
-      discountAmount,
-      taxableAmount,
-      taxAmount,
-      taxBreakdown,
-      total: taxableAmount + taxAmount,
-    };
-  };
+      return {
+        subtotal,
+        discountAmount,
+        taxableAmount,
+        taxAmount,
+        taxBreakdown,
+        total: taxableAmount + taxAmount,
+      };
+    },
+    [taxGroups]
+  );
 
   const orderTotals = useMemo(() => {
     return items.reduce(
@@ -184,7 +187,7 @@ export default function CreatePurchaseInvoice() {
         acc.taxTotal += totals.taxAmount;
         acc.total += totals.total;
 
-        totals.taxBreakdown.forEach((tb) => {
+        totals.taxBreakdown.forEach((tb: { name: string; rate: number; amount: number }) => {
           const existing = acc.taxBreakdown.find((etc) => etc.name === tb.name);
           if (existing) {
             existing.amount += tb.amount;
@@ -203,7 +206,7 @@ export default function CreatePurchaseInvoice() {
         taxBreakdown: [] as { name: string; rate: number; amount: number }[],
       }
     );
-  }, [items, taxGroups]);
+  }, [items, calculateItemTotals]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
