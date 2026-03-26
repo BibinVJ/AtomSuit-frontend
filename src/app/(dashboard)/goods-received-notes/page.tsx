@@ -4,12 +4,12 @@ import { useRouter } from 'next/navigation';
 import PageBreadcrumb from '@/components/common/PageBreadCrumb';
 import ComponentCard from '@/components/common/ComponentCard';
 import PageMeta from '@/components/common/PageMeta';
-import PurchaseOrderTable from '@/app/(dashboard)/purchase-orders/_components/PurchaseOrderTable';
+import GoodsReceivedNoteTable from '@/app/(dashboard)/goods-received-notes/_components/GoodsReceivedNoteTable';
 import Pagination from '@/components/common/Pagination';
 import Button from '@/components/ui/button/Button';
 import Tooltip from '@/components/ui/tooltip/Tooltip';
-import { getPurchaseOrders, restorePurchaseOrder } from '@/services/PurchaseOrderService';
-import { PurchaseOrder } from '@/types/PurchaseOrder';
+import { GoodsReceivedNoteService } from '@/services/GoodsReceivedNoteService';
+import { GoodsReceivedNote } from '@/types/GoodsReceivedNote';
 import { usePermissions } from '@/hooks/usePermissions';
 import { useDataTable } from '@/hooks/useDataTable';
 import TableToolbar from '@/components/common/TableToolbar';
@@ -17,12 +17,12 @@ import ViewModeTabs from '@/components/common/ViewModeTabs';
 import { Plus } from 'lucide-react';
 import { toast } from 'sonner';
 
-export default function PurchaseOrders() {
+export default function GoodsReceivedNotes() {
   const { hasPermission } = usePermissions();
   const router = useRouter();
 
   const {
-    data: purchaseOrders,
+    data: grns,
     loading,
     currentPage,
     perPage,
@@ -45,24 +45,24 @@ export default function PurchaseOrders() {
     setViewMode,
     refresh,
     resetFilters,
-  } = useDataTable<PurchaseOrder>({
-    fetchData: getPurchaseOrders,
+  } = useDataTable<GoodsReceivedNote>({
+    fetchData: GoodsReceivedNoteService.list,
   });
 
   const handleRestore = async (id: number) => {
     try {
-      await restorePurchaseOrder(id);
-      toast.success('Purchase Order restored successfully');
+      await GoodsReceivedNoteService.restore(id);
+      toast.success('GRN restored successfully');
       refresh();
     } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Failed to restore purchase order');
+      toast.error(error.response?.data?.message || 'Failed to restore GRN');
     }
   };
 
   return (
     <>
-      <PageMeta title="Purchase Orders" description="List of purchase orders" />
-      <PageBreadcrumb pageTitle="Purchase Orders" />
+      <PageMeta title="Goods Received Notes" description="List of goods received notes" />
+      <PageBreadcrumb pageTitle="Goods Received Notes" />
 
       <div className="space-y-6">
         <div className="p-5 border border-gray-200 rounded-2xl bg-gray-50 dark:bg-white/[0.03] dark:border-gray-800 shadow-sm">
@@ -70,7 +70,7 @@ export default function PurchaseOrders() {
             className="mb-0"
             searchTerm={searchTerm}
             onSearchChange={setSearchTerm}
-            searchPlaceholder="Search purchase orders..."
+            searchPlaceholder="Search GRNs..."
             rangeFrom={rangeFrom}
             onRangeFromChange={(val) => setRangeFrom(val as number | '')}
             rangeTo={rangeTo}
@@ -82,19 +82,19 @@ export default function PurchaseOrders() {
         </div>
 
         <ComponentCard
-          title={`Purchase Orders (${viewMode})`}
+          title={`Goods Received Notes (${viewMode})`}
           action={
             <div className="flex flex-wrap items-center gap-4">
               <ViewModeTabs viewMode={viewMode} setViewMode={setViewMode} />
               <div className="flex flex-wrap items-center gap-2">
-                {hasPermission('create-purchase-order') && (
-                  <Tooltip text="Add New Purchase Order">
+                {hasPermission('create-grn') && (
+                  <Tooltip text="Add New GRN">
                     <Button
-                      onClick={() => router.push('/purchase-orders/create')}
+                      onClick={() => router.push('/goods-received-notes/create')}
                       size="sm"
                       startIcon={<Plus className="w-4 h-4" />}
                     >
-                      Add Purchase Order
+                      Add GRN
                     </Button>
                   </Tooltip>
                 )}
@@ -102,8 +102,8 @@ export default function PurchaseOrders() {
             </div>
           }
         >
-          <PurchaseOrderTable
-            data={purchaseOrders}
+          <GoodsReceivedNoteTable
+            data={grns}
             loading={loading}
             onAction={refresh}
             onSort={handleSort}

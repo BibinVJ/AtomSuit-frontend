@@ -152,17 +152,67 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     [getSetting, formatDate]
   );
 
+  const formatQuantity = useCallback(
+    (amount: number | string) => {
+      const num = typeof amount === 'string' ? parseFloat(amount) : amount;
+      const decimalSeparator = getSetting('quantity_decimal_separator', '.');
+      const thousandSeparator = getSetting('quantity_thousand_separator', ',');
+      const decimalPlaces = parseInt(getSetting('quantity_decimal_places', '3'));
+
+      let formatted =
+        num !== null && num !== undefined ? num.toFixed(decimalPlaces) : (0).toFixed(decimalPlaces);
+
+      const parts = formatted.split('.');
+      parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, thousandSeparator);
+      formatted = parts.join(decimalSeparator);
+
+      return formatted;
+    },
+    [getSetting]
+  );
+
+  const formatNumber = useCallback(
+    (amount: number | string) => {
+      const num = typeof amount === 'string' ? parseFloat(amount) : amount;
+      const decimalSeparator = getSetting('decimal_separator', '.');
+      const thousandSeparator = getSetting('thousand_separator', ',');
+      const decimalPlaces = parseInt(getSetting('general_number_decimal_places', '2'));
+
+      let formatted =
+        num !== null && num !== undefined ? num.toFixed(decimalPlaces) : (0).toFixed(decimalPlaces);
+
+      const parts = formatted.split('.');
+      parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, thousandSeparator);
+      formatted = parts.join(decimalSeparator);
+
+      return formatted;
+    },
+    [getSetting]
+  );
+
   const contextValue = useMemo<SettingsContextType>(
     () => ({
       settings,
       isLoading,
       getSetting,
       formatCurrency,
+      formatQuantity,
+      formatNumber,
       formatDate,
       formatDateTime,
       refreshSettings: fetchSettings,
     }),
-    [settings, isLoading, getSetting, formatCurrency, formatDate, formatDateTime, fetchSettings]
+    [
+      settings,
+      isLoading,
+      getSetting,
+      formatCurrency,
+      formatQuantity,
+      formatNumber,
+      formatDate,
+      formatDateTime,
+      fetchSettings,
+    ]
   );
 
   return <SettingsContext.Provider value={contextValue}>{children}</SettingsContext.Provider>;

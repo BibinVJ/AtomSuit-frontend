@@ -22,7 +22,21 @@ export default function AppProviders({ children }: AppProvidersProps) {
         <TenantProvider>
           <AuthProvider>
             <SettingsProvider>
-              <Toaster richColors position="top-center" closeButton={true} />
+              <Toaster
+                richColors
+                position="top-center"
+                closeButton={true}
+                duration={4000}
+                toastOptions={{
+                  style: {
+                    boxShadow:
+                      '0 10px 40px -5px rgba(0, 0, 0, 0.25), 0 8px 20px -8px rgba(0, 0, 0, 0.2)',
+                    border: '1px solid rgba(0, 0, 0, 0.08)',
+                    fontSize: '14px',
+                    padding: '14px 18px',
+                  },
+                }}
+              />
               {children}
             </SettingsProvider>
           </AuthProvider>

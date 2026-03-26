@@ -5,6 +5,8 @@ export interface SettingsContextType {
   isLoading: boolean;
   getSetting: <T>(key: string, defaultValue?: T) => T;
   formatCurrency: (amount: number | string) => string;
+  formatQuantity: (amount: number | string) => string;
+  formatNumber: (amount: number | string) => string;
   formatDate: (date: string | Date) => string;
   formatDateTime: (date: string | Date) => string;
   refreshSettings: () => Promise<void>;

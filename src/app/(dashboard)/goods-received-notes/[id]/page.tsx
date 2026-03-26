@@ -8,74 +8,68 @@ import ComponentCard from '@/components/common/ComponentCard';
 import Button from '@/components/ui/button/Button';
 import Badge from '@/components/ui/badge/Badge';
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '@/components/ui/table';
-import { getPurchaseOrder } from '@/services/PurchaseOrderService';
+import { GoodsReceivedNoteService } from '@/services/GoodsReceivedNoteService';
 import { useSettings } from '@/hooks/useSettings';
-import { PurchaseOrder, PurchaseOrderStatus } from '@/types/PurchaseOrder';
+import { GoodsReceivedNote, GoodsReceivedNoteStatus } from '@/types/GoodsReceivedNote';
 import { toast } from 'sonner';
 
-export default function ViewPurchaseOrder() {
+export default function ViewGoodsReceivedNote() {
   const params = useParams<{ id: string }>();
   const id = params?.id;
   const router = useRouter();
   const { formatCurrency, formatQuantity, formatDate } = useSettings();
-  const [purchaseOrder, setPurchaseOrder] = useState<PurchaseOrder | null>(null);
+  const [grn, setGrn] = useState<GoodsReceivedNote | null>(null);
 
-  const fetchPurchaseDetails = useCallback(async () => {
+  const fetchGrnDetails = useCallback(async () => {
     try {
       if (id) {
-        const response = await getPurchaseOrder(Number(id));
-        setPurchaseOrder(response);
+        const response = await GoodsReceivedNoteService.get(id as string);
+        setGrn(response);
       }
     } catch (error) {
-      console.error('Error fetching purchase order details:', error);
-      toast.error('Failed to load purchase order details');
-      router.push('/purchase-orders');
+      console.error('Error fetching GRN details:', error);
+      toast.error('Failed to load goods received note details');
+      router.push('/goods-received-notes');
     }
   }, [id, router]);
 
   useEffect(() => {
-    fetchPurchaseDetails();
-  }, [fetchPurchaseDetails]);
+    fetchGrnDetails();
+  }, [fetchGrnDetails]);
 
   const handlePrint = () => {
     window.print();
   };
 
-  const getStatusColor = (status: PurchaseOrderStatus) => {
+  const getStatusColor = (status: GoodsReceivedNoteStatus) => {
     switch (status) {
-      case PurchaseOrderStatus.DRAFT:
-        return 'warning';
-      case PurchaseOrderStatus.SENT:
-        return 'info';
-      case PurchaseOrderStatus.CONFIRMED:
+      case GoodsReceivedNoteStatus.RECEIVED:
         return 'success';
-      case PurchaseOrderStatus.COMPLETED:
-        return 'success';
-      case PurchaseOrderStatus.CANCELLED:
+      case GoodsReceivedNoteStatus.VOIDED:
         return 'error';
       default:
         return 'secondary';
     }
   };
 
-  if (!purchaseOrder) {
-    return <div>Loading...</div>;
+  if (!grn) {
+    return <div className="p-6 text-center">Loading...</div>;
   }
 
   return (
     <>
       <PageMeta
-        title={`Purchase Order #${purchaseOrder.order_number}`}
-        description="View purchase order details"
+        title={`Goods Received Note #${grn.grn_number}`}
+        description="View goods received note details"
       />
       <PageBreadcrumb
-        pageTitle="Purchase Order Details"
-        breadcrumbs={[{ label: 'Purchase Orders', path: '/purchase-orders' }]}
+        pageTitle="Goods Received Note Details"
+        breadcrumbs={[{ label: 'Goods Received Notes', path: '/goods-received-notes' }]}
         backButton={true}
       />
 
       <div className="flex justify-end gap-2 mb-4">
-        <Button variant="outline" onClick={() => router.push(`/purchase-orders/${id}/edit`)}>
+        <Button variant="outline" onClick={() => router.push(`/goods-received-notes/${id}/edit`)}>
           Edit
         </Button>
         <Button variant="outline" onClick={handlePrint}>
@@ -83,79 +77,70 @@ export default function ViewPurchaseOrder() {
         </Button>
       </div>
 
-      <ComponentCard title={`Purchase Order #${purchaseOrder.order_number}`}>
+      <ComponentCard title={`Goods Received Note #${grn.grn_number}`}>
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
               <h3 className="text-lg font-semibold mb-2 dark:text-gray-400">Vendor Details</h3>
               <p className="dark:text-gray-400">
-                <strong>Name:</strong> {purchaseOrder.vendor.name}
+                <strong>Name:</strong> {grn.vendor?.name}
               </p>
               <p className="dark:text-gray-400">
-                <strong>Email:</strong> {purchaseOrder.vendor.email}
+                <strong>Email:</strong> {grn.vendor?.email}
               </p>
               <p className="dark:text-gray-400">
-                <strong>Phone:</strong> {purchaseOrder.vendor.phone}
+                <strong>Phone:</strong> {grn.vendor?.phone}
               </p>
-              {purchaseOrder.vendor.billing_address_line_1 && (
+              {grn.vendor?.billing_address_line_1 && (
                 <p className="dark:text-gray-400">
                   <strong>Address:</strong>
                   <span className="block">
-                    {purchaseOrder.vendor.billing_address_line_1}
-                    {purchaseOrder.vendor.billing_city && `, ${purchaseOrder.vendor.billing_city}`}
-                    {purchaseOrder.vendor.billing_state &&
-                      `, ${purchaseOrder.vendor.billing_state}`}
-                    {purchaseOrder.vendor.billing_country &&
-                      `, ${purchaseOrder.vendor.billing_country}`}
-                    {purchaseOrder.vendor.billing_zip_code &&
-                      ` - ${purchaseOrder.vendor.billing_zip_code}`}
+                    {grn.vendor.billing_address_line_1}
+                    {grn.vendor.billing_city && `, ${grn.vendor.billing_city}`}
+                    {grn.vendor.billing_state && `, ${grn.vendor.billing_state}`}
+                    {grn.vendor.billing_country && `, ${grn.vendor.billing_country}`}
+                    {grn.vendor.billing_zip_code && ` - ${grn.vendor.billing_zip_code}`}
                   </span>
                 </p>
               )}
             </div>
             <div>
-              <h3 className="text-lg font-semibold mb-2 dark:text-gray-400">Order Details</h3>
+              <h3 className="text-lg font-semibold mb-2 dark:text-gray-400">GRN Details</h3>
               <p className="dark:text-gray-400">
-                <strong>Order #:</strong> {purchaseOrder.order_number}
+                <strong>GRN #:</strong> {grn.grn_number}
               </p>
-              {purchaseOrder.reference_number && (
+              {grn.reference_number && (
                 <p className="dark:text-gray-400">
-                  <strong>Reference #:</strong> {purchaseOrder.reference_number}
+                  <strong>Reference #:</strong> {grn.reference_number}
                 </p>
               )}
               <p className="dark:text-gray-400">
-                <strong>Order Date:</strong> {formatDate(purchaseOrder.order_date)}
+                <strong>Received Date:</strong> {formatDate(grn.received_date)}
               </p>
-              {purchaseOrder.expected_delivery_date && (
-                <p className="dark:text-gray-400">
-                  <strong>Expected Delivery:</strong>{' '}
-                  {formatDate(purchaseOrder.expected_delivery_date)}
-                </p>
-              )}
               <p className="dark:text-gray-400">
                 <strong>Status:</strong>
-                <Badge size="sm" color={getStatusColor(purchaseOrder.status)}>
-                  {purchaseOrder.status}
+                <Badge size="sm" color={getStatusColor(grn.status)}>
+                  {grn.status}
                 </Badge>
               </p>
             </div>
             <div>
               <h3 className="text-lg font-semibold mb-2 dark:text-gray-400">Additional Info</h3>
-              {purchaseOrder.cost_center && (
+              {grn.cost_center && (
                 <p className="dark:text-gray-400">
-                  <strong>Cost Center:</strong> {purchaseOrder.cost_center.name}
+                  <strong>Cost Center:</strong> {grn.cost_center.name}
                 </p>
               )}
-              {purchaseOrder.warehouse && (
+              {grn.warehouse && (
                 <p className="dark:text-gray-400">
-                  <strong>Warehouse:</strong> {purchaseOrder.warehouse.name}
+                  <strong>Warehouse:</strong> {grn.warehouse.name}
                 </p>
               )}
-              {purchaseOrder.notes && (
+              {grn.notes && (
                 <div className="mt-2">
                   <strong>Notes:</strong>
                   <p className="text-sm dark:text-gray-400 mt-1 whitespace-pre-wrap border p-2 rounded bg-gray-50 dark:bg-gray-800">
-                    {purchaseOrder.notes}
+                    {grn.notes}
                   </p>
                 </div>
               )}
@@ -183,7 +168,13 @@ export default function ViewPurchaseOrder() {
                       isHeader
                       className="px-5 py-3 font-medium text-gray-500 text-end text-theme-xs dark:text-gray-400"
                     >
-                      Quantity
+                      Qty Rcvd
+                    </TableCell>
+                    <TableCell
+                      isHeader
+                      className="px-5 py-3 font-medium text-gray-500 text-end text-theme-xs dark:text-gray-400"
+                    >
+                      Qty Accpt
                     </TableCell>
                     <TableCell
                       isHeader
@@ -200,36 +191,39 @@ export default function ViewPurchaseOrder() {
                   </TableRow>
                 </TableHeader>
                 <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-                  {purchaseOrder.items.map((item, index) => (
+                  {grn.items.map((item, index) => (
                     <TableRow key={index}>
                       <TableCell className="px-5 py-4 text-gray-800 text-start text-theme-sm dark:text-gray-400">
-                        {item.item.name}
+                        {item.item?.name}
                       </TableCell>
                       <TableCell className="px-5 py-4 text-gray-800 text-start text-theme-sm dark:text-gray-400">
                         {item.description || '-'}
                       </TableCell>
                       <TableCell className="px-5 py-4 text-gray-800 text-end text-theme-sm dark:text-gray-400">
-                        {formatQuantity(item.quantity)} {item.item.unit?.code}
+                        {formatQuantity(item.quantity_received ?? 0)} {item.item?.unit?.code}
                       </TableCell>
                       <TableCell className="px-5 py-4 text-gray-800 text-end text-theme-sm dark:text-gray-400">
-                        {formatCurrency(item.unit_price)}
+                        {formatQuantity(item.accepted_quantity ?? 0)} {item.item?.unit?.code}
                       </TableCell>
                       <TableCell className="px-5 py-4 text-gray-800 text-end text-theme-sm dark:text-gray-400">
-                        {formatCurrency(item.quantity * item.unit_price)}
+                        {formatCurrency(item.unit_price ?? 0)}
+                      </TableCell>
+                      <TableCell className="px-5 py-4 text-gray-800 text-end text-theme-sm dark:text-gray-400">
+                        {formatCurrency((item.accepted_quantity ?? 0) * (item.unit_price ?? 0))}
                       </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
                 <tfoot className="border-t border-gray-100 dark:border-white/[0.05]">
-                  <TableRow className="font-semibold">
+                  <TableRow className="font-semibold text-lg">
                     <TableCell
-                      colSpan={4}
-                      className="px-5 py-4 text-end text-gray-800 dark:text-white/90"
+                      colSpan={5}
+                      className="px-5 py-4 text-end text-gray-900 dark:text-white"
                     >
                       Total Amount:
                     </TableCell>
-                    <TableCell className="px-5 py-4 text-end text-gray-800 dark:text-white/90">
-                      {formatCurrency(purchaseOrder.total_amount)}
+                    <TableCell className="px-5 py-4 text-end text-brand-600 dark:text-brand-400">
+                      {formatCurrency(grn.total_amount)}
                     </TableCell>
                   </TableRow>
                 </tfoot>

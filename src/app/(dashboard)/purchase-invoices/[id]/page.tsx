@@ -8,74 +8,71 @@ import ComponentCard from '@/components/common/ComponentCard';
 import Button from '@/components/ui/button/Button';
 import Badge from '@/components/ui/badge/Badge';
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '@/components/ui/table';
-import { getPurchaseOrder } from '@/services/PurchaseOrderService';
+import { PurchaseInvoiceService } from '@/services/PurchaseInvoiceService';
 import { useSettings } from '@/hooks/useSettings';
-import { PurchaseOrder, PurchaseOrderStatus } from '@/types/PurchaseOrder';
+import { PurchaseInvoice, PurchaseInvoiceStatus } from '@/types/PurchaseInvoice';
 import { toast } from 'sonner';
 
-export default function ViewPurchaseOrder() {
+export default function ViewPurchaseInvoice() {
   const params = useParams<{ id: string }>();
   const id = params?.id;
   const router = useRouter();
   const { formatCurrency, formatQuantity, formatDate } = useSettings();
-  const [purchaseOrder, setPurchaseOrder] = useState<PurchaseOrder | null>(null);
+  const [invoice, setInvoice] = useState<PurchaseInvoice | null>(null);
 
-  const fetchPurchaseDetails = useCallback(async () => {
+  const fetchInvoiceDetails = useCallback(async () => {
     try {
       if (id) {
-        const response = await getPurchaseOrder(Number(id));
-        setPurchaseOrder(response);
+        const response = await PurchaseInvoiceService.get(id as string);
+        setInvoice(response);
       }
     } catch (error) {
-      console.error('Error fetching purchase order details:', error);
-      toast.error('Failed to load purchase order details');
-      router.push('/purchase-orders');
+      console.error('Error fetching purchase invoice details:', error);
+      toast.error('Failed to load purchase invoice details');
+      router.push('/purchase-invoices');
     }
   }, [id, router]);
 
   useEffect(() => {
-    fetchPurchaseDetails();
-  }, [fetchPurchaseDetails]);
+    fetchInvoiceDetails();
+  }, [fetchInvoiceDetails]);
 
   const handlePrint = () => {
     window.print();
   };
 
-  const getStatusColor = (status: PurchaseOrderStatus) => {
+  const getStatusColor = (status: PurchaseInvoiceStatus) => {
     switch (status) {
-      case PurchaseOrderStatus.DRAFT:
+      case PurchaseInvoiceStatus.PAID:
+        return 'success';
+      case PurchaseInvoiceStatus.POSTED:
+      case PurchaseInvoiceStatus.PARTIALLY_PAID:
         return 'warning';
-      case PurchaseOrderStatus.SENT:
-        return 'info';
-      case PurchaseOrderStatus.CONFIRMED:
-        return 'success';
-      case PurchaseOrderStatus.COMPLETED:
-        return 'success';
-      case PurchaseOrderStatus.CANCELLED:
+      case PurchaseInvoiceStatus.VOIDED:
         return 'error';
       default:
         return 'secondary';
     }
   };
 
-  if (!purchaseOrder) {
-    return <div>Loading...</div>;
+  if (!invoice) {
+    return <div className="p-6 text-center">Loading...</div>;
   }
 
   return (
     <>
       <PageMeta
-        title={`Purchase Order #${purchaseOrder.order_number}`}
-        description="View purchase order details"
+        title={`Purchase Invoice #${invoice.invoice_number}`}
+        description="View purchase invoice details"
       />
       <PageBreadcrumb
-        pageTitle="Purchase Order Details"
-        breadcrumbs={[{ label: 'Purchase Orders', path: '/purchase-orders' }]}
+        pageTitle="Purchase Invoice Details"
+        breadcrumbs={[{ label: 'Purchase Invoices', path: '/purchase-invoices' }]}
         backButton={true}
       />
 
       <div className="flex justify-end gap-2 mb-4">
-        <Button variant="outline" onClick={() => router.push(`/purchase-orders/${id}/edit`)}>
+        <Button variant="outline" onClick={() => router.push(`/purchase-invoices/${id}/edit`)}>
           Edit
         </Button>
         <Button variant="outline" onClick={handlePrint}>
@@ -83,79 +80,73 @@ export default function ViewPurchaseOrder() {
         </Button>
       </div>
 
-      <ComponentCard title={`Purchase Order #${purchaseOrder.order_number}`}>
+      <ComponentCard title={`Purchase Invoice #${invoice.invoice_number}`}>
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
               <h3 className="text-lg font-semibold mb-2 dark:text-gray-400">Vendor Details</h3>
               <p className="dark:text-gray-400">
-                <strong>Name:</strong> {purchaseOrder.vendor.name}
+                <strong>Name:</strong> {invoice.vendor?.name}
               </p>
               <p className="dark:text-gray-400">
-                <strong>Email:</strong> {purchaseOrder.vendor.email}
+                <strong>Email:</strong> {invoice.vendor?.email}
               </p>
               <p className="dark:text-gray-400">
-                <strong>Phone:</strong> {purchaseOrder.vendor.phone}
+                <strong>Phone:</strong> {invoice.vendor?.phone}
               </p>
-              {purchaseOrder.vendor.billing_address_line_1 && (
+              {invoice.vendor?.billing_address_line_1 && (
                 <p className="dark:text-gray-400">
                   <strong>Address:</strong>
                   <span className="block">
-                    {purchaseOrder.vendor.billing_address_line_1}
-                    {purchaseOrder.vendor.billing_city && `, ${purchaseOrder.vendor.billing_city}`}
-                    {purchaseOrder.vendor.billing_state &&
-                      `, ${purchaseOrder.vendor.billing_state}`}
-                    {purchaseOrder.vendor.billing_country &&
-                      `, ${purchaseOrder.vendor.billing_country}`}
-                    {purchaseOrder.vendor.billing_zip_code &&
-                      ` - ${purchaseOrder.vendor.billing_zip_code}`}
+                    {invoice.vendor.billing_address_line_1}
+                    {invoice.vendor.billing_city && `, ${invoice.vendor.billing_city}`}
+                    {invoice.vendor.billing_state && `, ${invoice.vendor.billing_state}`}
+                    {invoice.vendor.billing_country && `, ${invoice.vendor.billing_country}`}
+                    {invoice.vendor.billing_zip_code && ` - ${invoice.vendor.billing_zip_code}`}
                   </span>
                 </p>
               )}
             </div>
             <div>
-              <h3 className="text-lg font-semibold mb-2 dark:text-gray-400">Order Details</h3>
+              <h3 className="text-lg font-semibold mb-2 dark:text-gray-400">Invoice Details</h3>
               <p className="dark:text-gray-400">
-                <strong>Order #:</strong> {purchaseOrder.order_number}
+                <strong>Invoice #:</strong> {invoice.invoice_number}
               </p>
-              {purchaseOrder.reference_number && (
+              {invoice.reference_number && (
                 <p className="dark:text-gray-400">
-                  <strong>Reference #:</strong> {purchaseOrder.reference_number}
+                  <strong>Reference #:</strong> {invoice.reference_number}
                 </p>
               )}
               <p className="dark:text-gray-400">
-                <strong>Order Date:</strong> {formatDate(purchaseOrder.order_date)}
+                <strong>Posting Date:</strong> {formatDate(invoice.posting_date)}
               </p>
-              {purchaseOrder.expected_delivery_date && (
-                <p className="dark:text-gray-400">
-                  <strong>Expected Delivery:</strong>{' '}
-                  {formatDate(purchaseOrder.expected_delivery_date)}
-                </p>
-              )}
+              <p className="dark:text-gray-400">
+                <strong>Due Date:</strong> {formatDate(invoice.due_date)}
+              </p>
               <p className="dark:text-gray-400">
                 <strong>Status:</strong>
-                <Badge size="sm" color={getStatusColor(purchaseOrder.status)}>
-                  {purchaseOrder.status}
+                <Badge size="sm" color={getStatusColor(invoice.status)}>
+                  {invoice.status}
                 </Badge>
               </p>
             </div>
             <div>
               <h3 className="text-lg font-semibold mb-2 dark:text-gray-400">Additional Info</h3>
-              {purchaseOrder.cost_center && (
+              {invoice.cost_center && (
                 <p className="dark:text-gray-400">
-                  <strong>Cost Center:</strong> {purchaseOrder.cost_center.name}
+                  <strong>Cost Center:</strong> {invoice.cost_center.name}
                 </p>
               )}
-              {purchaseOrder.warehouse && (
+              {invoice.warehouse && (
                 <p className="dark:text-gray-400">
-                  <strong>Warehouse:</strong> {purchaseOrder.warehouse.name}
+                  <strong>Warehouse:</strong> {invoice.warehouse.name}
                 </p>
               )}
-              {purchaseOrder.notes && (
+              {invoice.notes && (
                 <div className="mt-2">
                   <strong>Notes:</strong>
                   <p className="text-sm dark:text-gray-400 mt-1 whitespace-pre-wrap border p-2 rounded bg-gray-50 dark:bg-gray-800">
-                    {purchaseOrder.notes}
+                    {invoice.notes}
                   </p>
                 </div>
               )}
@@ -200,22 +191,22 @@ export default function ViewPurchaseOrder() {
                   </TableRow>
                 </TableHeader>
                 <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-                  {purchaseOrder.items.map((item, index) => (
+                  {invoice.items.map((item, index) => (
                     <TableRow key={index}>
                       <TableCell className="px-5 py-4 text-gray-800 text-start text-theme-sm dark:text-gray-400">
-                        {item.item.name}
+                        {item.item?.name}
                       </TableCell>
                       <TableCell className="px-5 py-4 text-gray-800 text-start text-theme-sm dark:text-gray-400">
                         {item.description || '-'}
                       </TableCell>
                       <TableCell className="px-5 py-4 text-gray-800 text-end text-theme-sm dark:text-gray-400">
-                        {formatQuantity(item.quantity)} {item.item.unit?.code}
+                        {formatQuantity(item.quantity ?? 0)} {item.item?.unit?.code}
                       </TableCell>
                       <TableCell className="px-5 py-4 text-gray-800 text-end text-theme-sm dark:text-gray-400">
-                        {formatCurrency(item.unit_price)}
+                        {formatCurrency(item.unit_price ?? 0)}
                       </TableCell>
                       <TableCell className="px-5 py-4 text-gray-800 text-end text-theme-sm dark:text-gray-400">
-                        {formatCurrency(item.quantity * item.unit_price)}
+                        {formatCurrency((item.quantity ?? 0) * (item.unit_price ?? 0))}
                       </TableCell>
                     </TableRow>
                   ))}
@@ -226,10 +217,40 @@ export default function ViewPurchaseOrder() {
                       colSpan={4}
                       className="px-5 py-4 text-end text-gray-800 dark:text-white/90"
                     >
-                      Total Amount:
+                      Sub Total:
                     </TableCell>
                     <TableCell className="px-5 py-4 text-end text-gray-800 dark:text-white/90">
-                      {formatCurrency(purchaseOrder.total_amount)}
+                      {formatCurrency(invoice.sub_total)}
+                    </TableCell>
+                  </TableRow>
+                  <TableRow className="font-semibold text-red-500">
+                    <TableCell colSpan={4} className="px-5 py-4 text-end">
+                      Discount Total:
+                    </TableCell>
+                    <TableCell className="px-5 py-4 text-end">
+                      -{formatCurrency(invoice.discount_total)}
+                    </TableCell>
+                  </TableRow>
+                  <TableRow className="font-semibold">
+                    <TableCell
+                      colSpan={4}
+                      className="px-5 py-4 text-end text-gray-800 dark:text-white/90"
+                    >
+                      Tax Total:
+                    </TableCell>
+                    <TableCell className="px-5 py-4 text-end text-gray-800 dark:text-white/90">
+                      +{formatCurrency(invoice.tax_total)}
+                    </TableCell>
+                  </TableRow>
+                  <TableRow className="font-black text-lg border-t-2 border-brand-500/20">
+                    <TableCell
+                      colSpan={4}
+                      className="px-5 py-4 text-end text-gray-900 dark:text-white"
+                    >
+                      Net Total:
+                    </TableCell>
+                    <TableCell className="px-5 py-4 text-end text-brand-600 dark:text-brand-400">
+                      {formatCurrency(invoice.total_amount)}
                     </TableCell>
                   </TableRow>
                 </tfoot>

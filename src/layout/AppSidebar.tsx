@@ -94,6 +94,12 @@ const navItems: NavItem[] = [
     subItems: [
       { name: 'Vendors', path: '/vendors', permission: 'view-vendor' },
       { name: 'Purchase Orders', path: '/purchase-orders', permission: 'view-purchase-order' },
+      { name: 'Goods Received Notes', path: '/goods-received-notes', permission: 'view-grn' },
+      {
+        name: 'Purchase Invoices',
+        path: '/purchase-invoices',
+        permission: 'view-purchase-invoice',
+      },
     ],
   },
 ];

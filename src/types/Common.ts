@@ -31,3 +31,5 @@ export interface PaginatedResponse<T> extends BaseApiResponse {
   meta: PaginationMeta;
   links: PaginationLinks;
 }
+
+export type DiscountType = 'percentage' | 'fixed';

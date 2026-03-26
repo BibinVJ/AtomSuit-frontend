@@ -18,6 +18,7 @@ type PropsType = {
   placeholder?: string;
   error?: boolean;
   hint?: string;
+  required?: boolean;
 };
 
 export default function DatePicker({
@@ -29,6 +30,7 @@ export default function DatePicker({
   placeholder,
   error = false,
   hint,
+  required = false,
 }: PropsType) {
   const { getSetting } = useSettings();
   const phpFormat = getSetting('date_format', 'Y-m-d');
@@ -74,7 +76,11 @@ export default function DatePicker({
 
   return (
     <div>
-      {label && <Label htmlFor={id}>{label}</Label>}
+      {label && (
+        <Label htmlFor={id} required={required}>
+          {label}
+        </Label>
+      )}
 
       <div className="relative">
         <input id={id} placeholder={placeholder} className={inputClasses} />

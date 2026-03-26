@@ -6,10 +6,12 @@ import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide } from 'lucide-r
 import { TableActions } from '@/components/common/TableActions';
 import { useRouter } from 'next/navigation';
 
-import { PurchaseOrder } from '@/types/PurchaseOrder';
+import { GoodsReceivedNote } from '@/types/GoodsReceivedNote';
+import { usePermissions } from '@/hooks/usePermissions';
+import { useSettings } from '@/hooks/useSettings';
 
 interface Props {
-  data: PurchaseOrder[];
+  data: GoodsReceivedNote[];
   onAction: () => void;
   onSort: (column: string) => void;
   sortBy: string;
@@ -22,10 +24,7 @@ interface Props {
   onRestore?: (id: number) => void;
 }
 
-import { usePermissions } from '@/hooks/usePermissions';
-import { useSettings } from '@/hooks/useSettings';
-
-export default function PurchaseOrderTable({
+export default function GoodsReceivedNoteTable({
   data,
   onAction,
   onSort,
@@ -41,27 +40,26 @@ export default function PurchaseOrderTable({
   const { hasPermission } = usePermissions();
   const { formatCurrency, formatDate } = useSettings();
   const router = useRouter();
-  // const [isVoidModalOpen, setIsVoidModalOpen] = useState(false); // Using standard delete for now
-  // const [selectedPurchase, setSelectedPurchase] = useState<PurchaseOrder | null>(null);
 
   const handleView = (id: number) => {
-    router.push(`/purchase-orders/${id}`);
+    router.push(`/goods-received-notes/${id}`);
   };
 
   const handleEdit = (id: number) => {
-    router.push(`/purchase-orders/${id}/edit`);
+    router.push(`/goods-received-notes/${id}/edit`);
   };
 
-  const handleDelete = async (purchase: PurchaseOrder) => {
+  const handleDelete = async (grn: GoodsReceivedNote) => {
     const isTrashed = viewMode === 'trashed';
     const message = isTrashed
-      ? 'Are you sure you want to permanently delete this Purchase Order? This action cannot be undone.'
-      : 'Are you sure you want to delete this Purchase Order?';
+      ? 'Are you sure you want to permanently delete this GRN? This action cannot be undone.'
+      : 'Are you sure you want to void this GRN?';
 
     if (confirm(message)) {
-      const { deletePurchaseOrder } = await import('@/services/PurchaseOrderService');
+      const { default: GoodsReceivedNoteService } =
+        await import('@/services/GoodsReceivedNoteService');
       try {
-        await deletePurchaseOrder(purchase.id, isTrashed);
+        await GoodsReceivedNoteService.delete(grn.id, isTrashed);
         onAction(); // Refresh
       } catch (error: any) {
         console.error(error);
@@ -96,16 +94,16 @@ export default function PurchaseOrderTable({
               <TableCell
                 isHeader
                 className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400"
-                onClick={() => onSort('order_number')}
+                onClick={() => onSort('grn_number')}
               >
-                Order # {renderSortIcon('order_number')}
+                GRN # {renderSortIcon('grn_number')}
               </TableCell>
               <TableCell
                 isHeader
                 className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400"
-                onClick={() => onSort('order_date')}
+                onClick={() => onSort('received_date')}
               >
-                Order Date {renderSortIcon('order_date')}
+                Received Date {renderSortIcon('received_date')}
               </TableCell>
               <TableCell
                 isHeader
@@ -142,19 +140,19 @@ export default function PurchaseOrderTable({
                 <TableCell colSpan={7} className="px-5 py-10 text-center">
                   <div className="flex flex-col items-center justify-center space-y-2">
                     <div className="w-10 h-10 border-4 border-brand-500 border-t-transparent rounded-full animate-spin"></div>
-                    <p className="text-gray-500">Loading purchase orders...</p>
+                    <p className="text-gray-500">Loading GRNs...</p>
                   </div>
                 </TableCell>
               </TableRow>
             ) : data.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={7} className="px-5 py-10 text-center text-gray-500">
-                  No purchase orders found.
+                  No Goods Received Notes found.
                 </TableCell>
               </TableRow>
             ) : (
-              data.map((purchase, index) => (
-                <TableRow key={purchase.id}>
+              data.map((grn, index) => (
+                <TableRow key={grn.id}>
                   <TableCell className="px-5 py-4 sm:px-6 text-start">
                     <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
                       {startIndex !== undefined
@@ -163,54 +161,35 @@ export default function PurchaseOrderTable({
                     </p>
                   </TableCell>
                   <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
-                    {purchase.order_number}
+                    {grn.grn_number}
                   </TableCell>
                   <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
-                    {formatDate(purchase.order_date)}
+                    {formatDate(grn.received_date)}
                   </TableCell>
                   <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
-                    {purchase.vendor?.name}
+                    {grn.vendor?.name}
                   </TableCell>
                   <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
-                    {formatCurrency(purchase.total_amount || 0)}
+                    {formatCurrency(grn.total_amount || 0)}
                   </TableCell>
                   <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                    <Badge
-                      size="sm"
-                      color={
-                        purchase.status === 'CONFIRMED' || purchase.status === 'COMPLETED'
-                          ? 'success'
-                          : purchase.status === 'DRAFT'
-                            ? 'warning'
-                            : 'error'
-                      }
-                    >
-                      {purchase.status}
+                    <Badge size="sm" color={grn.status === 'RECEIVED' ? 'success' : 'error'}>
+                      {grn.status}
                     </Badge>
                   </TableCell>
                   <TableCell className="px-4 py-3 text-gray-500 text-end text-theme-sm dark:text-gray-400">
                     <TableActions
                       isTrashed={viewMode === 'trashed'}
-                      onView={
-                        hasPermission('view-purchase-order')
-                          ? () => handleView(purchase.id)
-                          : undefined
-                      }
+                      onView={hasPermission('view-grn') ? () => handleView(grn.id) : undefined}
                       onEdit={
-                        viewMode === 'active' && hasPermission('update-purchase-order')
-                          ? () => handleEdit(purchase.id)
+                        viewMode === 'active' && hasPermission('update-grn')
+                          ? () => handleEdit(grn.id)
                           : undefined
                       }
-                      onDelete={
-                        hasPermission('delete-purchase-order')
-                          ? () => handleDelete(purchase)
-                          : undefined
-                      }
+                      onDelete={hasPermission('delete-grn') ? () => handleDelete(grn) : undefined}
                       onRestore={
-                        viewMode === 'trashed' &&
-                        hasPermission('update-purchase-order') &&
-                        onRestore
-                          ? () => onRestore(purchase.id)
+                        viewMode === 'trashed' && hasPermission('update-grn') && onRestore
+                          ? () => onRestore(grn.id)
                           : undefined
                       }
                     />

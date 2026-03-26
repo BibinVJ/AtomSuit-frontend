@@ -6,10 +6,12 @@ import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide } from 'lucide-r
 import { TableActions } from '@/components/common/TableActions';
 import { useRouter } from 'next/navigation';
 
-import { PurchaseOrder } from '@/types/PurchaseOrder';
+import { PurchaseInvoice } from '@/types/PurchaseInvoice';
+import { usePermissions } from '@/hooks/usePermissions';
+import { useSettings } from '@/hooks/useSettings';
 
 interface Props {
-  data: PurchaseOrder[];
+  data: PurchaseInvoice[];
   onAction: () => void;
   onSort: (column: string) => void;
   sortBy: string;
@@ -22,10 +24,7 @@ interface Props {
   onRestore?: (id: number) => void;
 }
 
-import { usePermissions } from '@/hooks/usePermissions';
-import { useSettings } from '@/hooks/useSettings';
-
-export default function PurchaseOrderTable({
+export default function PurchaseInvoiceTable({
   data,
   onAction,
   onSort,
@@ -41,27 +40,25 @@ export default function PurchaseOrderTable({
   const { hasPermission } = usePermissions();
   const { formatCurrency, formatDate } = useSettings();
   const router = useRouter();
-  // const [isVoidModalOpen, setIsVoidModalOpen] = useState(false); // Using standard delete for now
-  // const [selectedPurchase, setSelectedPurchase] = useState<PurchaseOrder | null>(null);
 
   const handleView = (id: number) => {
-    router.push(`/purchase-orders/${id}`);
+    router.push(`/purchase-invoices/${id}`);
   };
 
   const handleEdit = (id: number) => {
-    router.push(`/purchase-orders/${id}/edit`);
+    router.push(`/purchase-invoices/${id}/edit`);
   };
 
-  const handleDelete = async (purchase: PurchaseOrder) => {
+  const handleDelete = async (invoice: PurchaseInvoice) => {
     const isTrashed = viewMode === 'trashed';
     const message = isTrashed
-      ? 'Are you sure you want to permanently delete this Purchase Order? This action cannot be undone.'
-      : 'Are you sure you want to delete this Purchase Order?';
+      ? 'Are you sure you want to permanently delete this Purchase Invoice? This action cannot be undone.'
+      : 'Are you sure you want to void this Purchase Invoice?';
 
     if (confirm(message)) {
-      const { deletePurchaseOrder } = await import('@/services/PurchaseOrderService');
+      const { default: PurchaseInvoiceService } = await import('@/services/PurchaseInvoiceService');
       try {
-        await deletePurchaseOrder(purchase.id, isTrashed);
+        await PurchaseInvoiceService.delete(invoice.id, isTrashed);
         onAction(); // Refresh
       } catch (error: any) {
         console.error(error);
@@ -96,16 +93,16 @@ export default function PurchaseOrderTable({
               <TableCell
                 isHeader
                 className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400"
-                onClick={() => onSort('order_number')}
+                onClick={() => onSort('invoice_number')}
               >
-                Order # {renderSortIcon('order_number')}
+                Invoice # {renderSortIcon('invoice_number')}
               </TableCell>
               <TableCell
                 isHeader
                 className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400"
-                onClick={() => onSort('order_date')}
+                onClick={() => onSort('posting_date')}
               >
-                Order Date {renderSortIcon('order_date')}
+                Posting Date {renderSortIcon('posting_date')}
               </TableCell>
               <TableCell
                 isHeader
@@ -142,19 +139,19 @@ export default function PurchaseOrderTable({
                 <TableCell colSpan={7} className="px-5 py-10 text-center">
                   <div className="flex flex-col items-center justify-center space-y-2">
                     <div className="w-10 h-10 border-4 border-brand-500 border-t-transparent rounded-full animate-spin"></div>
-                    <p className="text-gray-500">Loading purchase orders...</p>
+                    <p className="text-gray-500">Loading purchase invoices...</p>
                   </div>
                 </TableCell>
               </TableRow>
             ) : data.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={7} className="px-5 py-10 text-center text-gray-500">
-                  No purchase orders found.
+                  No purchase invoices found.
                 </TableCell>
               </TableRow>
             ) : (
-              data.map((purchase, index) => (
-                <TableRow key={purchase.id}>
+              data.map((invoice, index) => (
+                <TableRow key={invoice.id}>
                   <TableCell className="px-5 py-4 sm:px-6 text-start">
                     <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
                       {startIndex !== undefined
@@ -163,54 +160,54 @@ export default function PurchaseOrderTable({
                     </p>
                   </TableCell>
                   <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
-                    {purchase.order_number}
+                    {invoice.invoice_number}
                   </TableCell>
                   <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
-                    {formatDate(purchase.order_date)}
+                    {formatDate(invoice.posting_date)}
                   </TableCell>
                   <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
-                    {purchase.vendor?.name}
+                    {invoice.vendor?.name}
                   </TableCell>
                   <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
-                    {formatCurrency(purchase.total_amount || 0)}
+                    {formatCurrency(invoice.total_amount || 0)}
                   </TableCell>
                   <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
                     <Badge
                       size="sm"
                       color={
-                        purchase.status === 'CONFIRMED' || purchase.status === 'COMPLETED'
+                        invoice.status === 'PAID'
                           ? 'success'
-                          : purchase.status === 'DRAFT'
+                          : invoice.status === 'POSTED' || invoice.status === 'PARTIALLY_PAID'
                             ? 'warning'
                             : 'error'
                       }
                     >
-                      {purchase.status}
+                      {invoice.status}
                     </Badge>
                   </TableCell>
                   <TableCell className="px-4 py-3 text-gray-500 text-end text-theme-sm dark:text-gray-400">
                     <TableActions
                       isTrashed={viewMode === 'trashed'}
                       onView={
-                        hasPermission('view-purchase-order')
-                          ? () => handleView(purchase.id)
+                        hasPermission('view-purchase-invoice')
+                          ? () => handleView(invoice.id)
                           : undefined
                       }
                       onEdit={
-                        viewMode === 'active' && hasPermission('update-purchase-order')
-                          ? () => handleEdit(purchase.id)
+                        viewMode === 'active' && hasPermission('update-purchase-invoice')
+                          ? () => handleEdit(invoice.id)
                           : undefined
                       }
                       onDelete={
-                        hasPermission('delete-purchase-order')
-                          ? () => handleDelete(purchase)
+                        hasPermission('delete-purchase-invoice')
+                          ? () => handleDelete(invoice)
                           : undefined
                       }
                       onRestore={
                         viewMode === 'trashed' &&
-                        hasPermission('update-purchase-order') &&
+                        hasPermission('update-purchase-invoice') &&
                         onRestore
-                          ? () => onRestore(purchase.id)
+                          ? () => onRestore(invoice.id)
                           : undefined
                       }
                     />

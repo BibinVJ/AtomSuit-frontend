@@ -9,6 +9,7 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   onRightIconClick?: () => void;
   prefix?: string;
   suffix?: string;
+  decimalPlaces?: number;
 }
 
 const Input: FC<InputProps> = ({
@@ -22,8 +23,14 @@ const Input: FC<InputProps> = ({
   onRightIconClick,
   prefix,
   suffix,
+  decimalPlaces,
   ...props
 }) => {
+  const step =
+    props.type === 'number' && decimalPlaces !== undefined
+      ? (1 / Math.pow(10, decimalPlaces)).toString()
+      : props.step;
+
   let containerClasses = `relative flex items-center h-11 w-full rounded-lg border shadow-theme-xs focus-within:ring-3`;
 
   if (disabled) {
@@ -50,7 +57,7 @@ const Input: FC<InputProps> = ({
           <div className="pl-3 pr-1 text-gray-500 text-sm whitespace-nowrap">{prefix}</div>
         )}
 
-        <input disabled={disabled} className={inputClasses} {...props} />
+        <input disabled={disabled} step={step} className={inputClasses} {...props} />
 
         {suffix && (
           <div className="pl-1 pr-3 text-gray-500 text-sm whitespace-nowrap">{suffix}</div>
