@@ -95,7 +95,7 @@ export default function PurchaseOrders() {
                 {hasPermission('create-purchase-order') && (
                   <Tooltip text="Add New Purchase Order">
                     <Button
-                      onClick={() => router.push('/purchase-orders/create')}
+                      href="/purchase-orders/create"
                       size="sm"
                       startIcon={<Plus className="w-4 h-4" />}
                     >

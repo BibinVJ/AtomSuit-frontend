@@ -5,13 +5,15 @@ import { useState } from 'react';
 import Badge from '@/components/ui/badge/Badge';
 import ViewUserModal from './ViewUserModal';
 import EditUserModal from './EditUserModal';
-import DeleteUserModal from './DeleteUserModal';
+import ConfirmModal from '@/components/common/ConfirmModal';
 import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide } from 'lucide-react';
-import { restoreUser } from '@/services/UserService';
+import { restoreUser, deleteUser } from '@/services/UserService';
 import { toast } from 'sonner';
+import { isApiError } from '@/utils/errors';
 import { TableActions } from '@/components/common/TableActions';
 import { formatKebabCase } from '@/utils/string';
 import { User } from '@/types';
+import SkeletonTable from '@/components/common/SkeletonTable';
 
 interface Props {
   data: User[];
@@ -39,18 +41,16 @@ export default function UserTable({
   loading,
 }: Props) {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [confirmTarget, setConfirmTarget] = useState<User | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const isTrashed = viewMode === 'trashed';
 
   const handleEdit = (user: User) => {
     setSelectedUser(user);
     setIsEditModalOpen(true);
-  };
-
-  const handleDelete = (user: User) => {
-    setSelectedUser(user);
-    setIsDeleteModalOpen(true);
   };
 
   const handleView = (user: User) => {
@@ -58,9 +58,27 @@ export default function UserTable({
     setIsViewModalOpen(true);
   };
 
+  const handleDeleteConfirm = async () => {
+    if (!confirmTarget) return;
+    setIsDeleting(true);
+    try {
+      await deleteUser(confirmTarget.id, isTrashed);
+      toast.success(isTrashed ? 'User permanently deleted' : 'User deleted successfully');
+      onAction();
+    } catch (error: unknown) {
+      let message = 'Failed to delete user';
+      if (isApiError(error)) {
+        message = error.response?.data?.message || message;
+      }
+      toast.error(message);
+    } finally {
+      setIsDeleting(false);
+      setConfirmTarget(null);
+    }
+  };
+
   const handleCloseModals = () => {
     setIsEditModalOpen(false);
-    setIsDeleteModalOpen(false);
     setIsViewModalOpen(false);
     setSelectedUser(null);
   };
@@ -145,11 +163,8 @@ export default function UserTable({
           <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
             {loading ? (
               <TableRow>
-                <TableCell colSpan={7} className="px-5 py-10 text-center">
-                  <div className="flex flex-col items-center justify-center space-y-2">
-                    <div className="w-10 h-10 border-4 border-brand-500 border-t-transparent rounded-full animate-spin"></div>
-                    <p className="text-gray-500">Loading users...</p>
-                  </div>
+                <TableCell colSpan={7} className="p-0">
+                  <SkeletonTable rows={perPage} columns={7} />
                 </TableCell>
               </TableRow>
             ) : data.length === 0 ? (
@@ -203,7 +218,7 @@ export default function UserTable({
                       isTrashed={viewMode === 'trashed'}
                       onView={() => handleView(user)}
                       onEdit={() => handleEdit(user)}
-                      onDelete={() => handleDelete(user)}
+                      onDelete={() => setConfirmTarget(user)}
                       onRestore={() => handleRestore(user.id)}
                     />
                   </TableCell>
@@ -222,15 +237,23 @@ export default function UserTable({
             onUserUpdated={onAction}
             user={selectedUser}
           />
-          <DeleteUserModal
-            isOpen={isDeleteModalOpen}
-            onClose={handleCloseModals}
-            onUserDeleted={onAction}
-            user={selectedUser}
-            force={viewMode === 'trashed'}
-          />
         </>
       )}
+
+      <ConfirmModal
+        isOpen={!!confirmTarget}
+        onClose={() => setConfirmTarget(null)}
+        onConfirm={handleDeleteConfirm}
+        isLoading={isDeleting}
+        title={isTrashed ? 'Permanently Delete User' : 'Delete User'}
+        message={
+          isTrashed
+            ? `Are you sure you want to permanently delete "${confirmTarget?.name}"? This action cannot be undone.`
+            : `Are you sure you want to delete "${confirmTarget?.name}"? You can restore it later from the trash.`
+        }
+        confirmLabel={isTrashed ? 'Delete Permanently' : 'Delete'}
+        variant="danger"
+      />
     </div>
   );
 }

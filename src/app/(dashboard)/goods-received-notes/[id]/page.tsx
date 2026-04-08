@@ -5,6 +5,7 @@ import { useRouter, useParams } from 'next/navigation';
 import PageMeta from '@/components/common/PageMeta';
 import PageBreadcrumb from '@/components/common/PageBreadCrumb';
 import ComponentCard from '@/components/common/ComponentCard';
+import SkeletonDetail from '@/components/common/SkeletonDetail';
 import Button from '@/components/ui/button/Button';
 import Badge from '@/components/ui/badge/Badge';
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '@/components/ui/table';
@@ -53,7 +54,16 @@ export default function ViewGoodsReceivedNote() {
   };
 
   if (!grn) {
-    return <div className="p-6 text-center">Loading...</div>;
+    return (
+      <>
+        <PageBreadcrumb
+          pageTitle="Goods Received Note Details"
+          breadcrumbs={[{ label: 'Goods Received Notes', path: '/goods-received-notes' }]}
+          backButton={true}
+        />
+        <SkeletonDetail columns={3} />
+      </>
+    );
   }
 
   return (
@@ -69,9 +79,6 @@ export default function ViewGoodsReceivedNote() {
       />
 
       <div className="flex justify-end gap-2 mb-4">
-        <Button variant="outline" onClick={() => router.push(`/goods-received-notes/${id}/edit`)}>
-          Edit
-        </Button>
         <Button variant="outline" onClick={handlePrint}>
           Print
         </Button>

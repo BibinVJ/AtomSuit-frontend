@@ -2,6 +2,7 @@
 
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '@/components/ui/table';
 import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide } from 'lucide-react';
+import SkeletonTable from '@/components/common/SkeletonTable';
 
 import { Domain } from '@/types';
 
@@ -12,6 +13,7 @@ interface Props {
   sortDirection: string;
   currentPage: number;
   perPage: number;
+  loading?: boolean;
 }
 
 export default function DomainTable({
@@ -21,6 +23,7 @@ export default function DomainTable({
   sortDirection,
   currentPage,
   perPage,
+  loading,
 }: Props) {
   const renderSortIcon = (column: string) => {
     if (sortBy !== column) {
@@ -62,23 +65,37 @@ export default function DomainTable({
           </TableHeader>
 
           <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-            {data.map((domain, index) => (
-              <TableRow key={domain.id}>
-                <TableCell className="px-5 py-4 sm:px-6 text-start">
-                  <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                    {(currentPage - 1) * perPage + index + 1}
-                  </p>
-                </TableCell>
-                <TableCell className="px-4 py-3 text-start">
-                  <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                    {domain.domain}
-                  </p>
-                </TableCell>
-                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
-                  {domain.tenant?.name || 'N/A'}
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={3} className="p-0">
+                  <SkeletonTable rows={perPage} columns={3} />
                 </TableCell>
               </TableRow>
-            ))}
+            ) : data.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={3} className="px-5 py-10 text-center text-gray-500">
+                  No domains found.
+                </TableCell>
+              </TableRow>
+            ) : (
+              data.map((domain, index) => (
+                <TableRow key={domain.id}>
+                  <TableCell className="px-5 py-4 sm:px-6 text-start">
+                    <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
+                      {(currentPage - 1) * perPage + index + 1}
+                    </p>
+                  </TableCell>
+                  <TableCell className="px-4 py-3 text-start">
+                    <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
+                      {domain.domain}
+                    </p>
+                  </TableCell>
+                  <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
+                    {domain.tenant?.name || 'N/A'}
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>

@@ -5,9 +5,16 @@ import Tooltip from '@/components/ui/tooltip/Tooltip';
 interface ViewModeTabsProps {
   viewMode: 'active' | 'trashed';
   setViewMode: (mode: 'active' | 'trashed') => void;
+  trashedLabel?: string;
+  trashedTooltip?: string;
 }
 
-const ViewModeTabs: React.FC<ViewModeTabsProps> = ({ viewMode, setViewMode }) => {
+const ViewModeTabs: React.FC<ViewModeTabsProps> = ({
+  viewMode,
+  setViewMode,
+  trashedLabel = 'Trashed',
+  trashedTooltip = 'Show Trashed Items',
+}) => {
   return (
     <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-lg mr-2">
       <Tooltip text="Show Active Items">
@@ -23,7 +30,7 @@ const ViewModeTabs: React.FC<ViewModeTabsProps> = ({ viewMode, setViewMode }) =>
           Active
         </button>
       </Tooltip>
-      <Tooltip text="Show Trashed Items">
+      <Tooltip text={trashedTooltip}>
         <button
           type="button"
           onClick={() => setViewMode('trashed')}
@@ -33,7 +40,7 @@ const ViewModeTabs: React.FC<ViewModeTabsProps> = ({ viewMode, setViewMode }) =>
               : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
           }`}
         >
-          Trashed
+          {trashedLabel}
         </button>
       </Tooltip>
     </div>

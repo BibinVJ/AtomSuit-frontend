@@ -30,6 +30,7 @@ export default function Audits() {
 
   const {
     data: activities,
+    loading,
     currentPage,
     perPage,
     totalPages,
@@ -117,6 +118,7 @@ export default function Audits() {
         <ComponentCard title="Activity Log">
           <AuditTable
             data={activities}
+            loading={loading}
             currentPage={currentPage}
             perPage={perPage}
             onViewDetails={handleViewDetails}

@@ -36,6 +36,7 @@ export default function Customers() {
 
   const {
     data: customers,
+    loading,
     currentPage,
     perPage,
     totalPages,
@@ -132,6 +133,7 @@ export default function Customers() {
         >
           <CustomerTable
             data={customers}
+            loading={loading}
             onAction={refresh}
             onSort={handleSort}
             sortBy={sortBy}

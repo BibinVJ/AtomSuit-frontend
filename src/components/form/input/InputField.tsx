@@ -1,4 +1,4 @@
-import type { FC, ReactNode, InputHTMLAttributes } from 'react';
+import { FC, ReactNode, InputHTMLAttributes, useState, useEffect } from 'react';
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   success?: boolean;
@@ -26,6 +26,33 @@ const Input: FC<InputProps> = ({
   decimalPlaces,
   ...props
 }) => {
+  const [localValue, setLocalValue] = useState(props.value ?? '');
+
+  useEffect(() => {
+    if (props.type === 'number') {
+      const externalStr = String(props.value ?? '');
+      const localStr = String(localValue ?? '');
+
+      if (externalStr !== localStr) {
+        // If they parse to the same number (e.g., "0" vs "", "0" vs "0."),
+        // we keep the local string to prevent stripping user input.
+        // Otherwise, sync from external props.
+        if (Number(externalStr) !== Number(localStr)) {
+          setLocalValue(props.value ?? '');
+        }
+      }
+    } else {
+      setLocalValue(props.value ?? '');
+    }
+  }, [props.value, props.type]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setLocalValue(e.target.value);
+    if (props.onChange) {
+      props.onChange(e);
+    }
+  };
+
   const step =
     props.type === 'number' && decimalPlaces !== undefined
       ? (1 / Math.pow(10, decimalPlaces)).toString()
@@ -40,7 +67,7 @@ const Input: FC<InputProps> = ({
   } else if (success) {
     containerClasses += ` border-success-500 focus-within:border-success-300 focus-within:ring-success-500/20 dark:text-success-400 dark:border-success-500 dark:focus-within:border-success-800`;
   } else {
-    containerClasses += ` bg-transparent text-gray-800 border-gray-300 focus-within:border-brand-300 focus-within:ring-brand-500/20 dark:border-gray-700 dark:text-white/90 dark:focus-within:border-brand-800`;
+    containerClasses += ` bg-white text-gray-800 border-gray-300 focus-within:border-brand-300 focus-within:ring-brand-500/20 dark:bg-gray-900 dark:border-gray-700 dark:text-white/90 dark:focus-within:border-brand-800`;
   }
 
   // Add overflow-hidden to ensure border-radius clips children and we don't bleed out
@@ -57,7 +84,14 @@ const Input: FC<InputProps> = ({
           <div className="pl-3 pr-1 text-gray-500 text-sm whitespace-nowrap">{prefix}</div>
         )}
 
-        <input disabled={disabled} step={step} className={inputClasses} {...props} />
+        <input
+          disabled={disabled}
+          step={step}
+          className={inputClasses}
+          {...props}
+          value={props.type === 'number' ? (localValue ?? '') : props.value}
+          onChange={props.type === 'number' ? handleChange : props.onChange}
+        />
 
         {suffix && (
           <div className="pl-1 pr-3 text-gray-500 text-sm whitespace-nowrap">{suffix}</div>

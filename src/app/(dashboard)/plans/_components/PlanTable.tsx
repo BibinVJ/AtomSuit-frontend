@@ -3,24 +3,27 @@
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '@/components/ui/table';
 import { useState } from 'react';
 import EditPlanModal from './EditPlanModal';
-import DeletePlanModal from './DeletePlanModal';
+import ConfirmModal from '@/components/common/ConfirmModal';
 import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide } from 'lucide-react';
 import { TableActions } from '@/components/common/TableActions';
+import SkeletonTable from '@/components/common/SkeletonTable';
 
 import { Plan } from '@/types';
 import { usePermissions } from '@/hooks/usePermissions';
 import { useSettings } from '@/hooks/useSettings';
-import { getPlan } from '@/services/PlanService';
+import { getPlan, deletePlan } from '@/services/PlanService';
 import { toast } from 'sonner';
+import { isApiError } from '@/utils/errors';
 
 interface Props {
   data: Plan[];
-  onAction: () => void;
+  onAction: () => void | Promise<any>;
   onSort: (column: string) => void;
   sortBy: string;
   sortDirection: string;
   currentPage: number;
   perPage: number;
+  loading?: boolean;
 }
 
 export default function PlanTable({
@@ -31,12 +34,14 @@ export default function PlanTable({
   sortDirection,
   currentPage,
   perPage,
+  loading,
 }: Props) {
   const { hasPermission } = usePermissions();
   const { formatCurrency } = useSettings();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
+  const [confirmTarget, setConfirmTarget] = useState<Plan | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleEdit = async (plan: Plan) => {
     try {
@@ -51,13 +56,30 @@ export default function PlanTable({
   };
 
   const handleDelete = (plan: Plan) => {
-    setSelectedPlan(plan);
-    setIsDeleteModalOpen(true);
+    setConfirmTarget(plan);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!confirmTarget) return;
+    setIsDeleting(true);
+    try {
+      await deletePlan(confirmTarget.id);
+      toast.success('Plan deleted successfully');
+      onAction();
+    } catch (error: unknown) {
+      let message = 'Failed to delete plan';
+      if (isApiError(error)) {
+        message = error.response?.data?.message || message;
+      }
+      toast.error(message);
+    } finally {
+      setIsDeleting(false);
+      setConfirmTarget(null);
+    }
   };
 
   const handleCloseModals = () => {
     setIsEditModalOpen(false);
-    setIsDeleteModalOpen(false);
     setSelectedPlan(null);
   };
 
@@ -126,41 +148,55 @@ export default function PlanTable({
           </TableHeader>
 
           <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-            {data.map((plan, index) => (
-              <TableRow key={plan.id}>
-                <TableCell className="px-5 py-4 sm:px-6 text-start">
-                  <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                    {(currentPage - 1) * perPage + index + 1}
-                  </p>
-                </TableCell>
-                <TableCell className="px-4 py-3 text-start">
-                  <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                    {plan.name}
-                  </p>
-                </TableCell>
-                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
-                  {formatCurrency(plan.price)}
-                </TableCell>
-                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
-                  <span className="capitalize">
-                    {plan.interval_count} {plan.interval}
-                    {plan.interval_count > 1 ? 's' : ''}
-                  </span>
-                </TableCell>
-                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
-                  {plan.is_trial_plan ? `${plan.trial_duration_in_days} days` : 'No'}
-                </TableCell>
-                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
-                  {plan.subscribed_tenants?.length || 0}
-                </TableCell>
-                <TableCell className="px-4 py-3 text-gray-500 text-end text-theme-sm dark:text-gray-400">
-                  <TableActions
-                    onEdit={hasPermission('update-plan') ? () => handleEdit(plan) : undefined}
-                    onDelete={hasPermission('delete-plan') ? () => handleDelete(plan) : undefined}
-                  />
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={7} className="p-0">
+                  <SkeletonTable rows={perPage} columns={7} />
                 </TableCell>
               </TableRow>
-            ))}
+            ) : data.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={7} className="px-5 py-10 text-center text-gray-500">
+                  No plans found.
+                </TableCell>
+              </TableRow>
+            ) : (
+              data.map((plan, index) => (
+                <TableRow key={plan.id}>
+                  <TableCell className="px-5 py-4 sm:px-6 text-start">
+                    <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
+                      {(currentPage - 1) * perPage + index + 1}
+                    </p>
+                  </TableCell>
+                  <TableCell className="px-4 py-3 text-start">
+                    <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
+                      {plan.name}
+                    </p>
+                  </TableCell>
+                  <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
+                    {formatCurrency(plan.price)}
+                  </TableCell>
+                  <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
+                    <span className="capitalize">
+                      {plan.interval_count} {plan.interval}
+                      {plan.interval_count > 1 ? 's' : ''}
+                    </span>
+                  </TableCell>
+                  <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
+                    {plan.is_trial_plan ? `${plan.trial_duration_in_days} days` : 'No'}
+                  </TableCell>
+                  <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
+                    {plan.subscribed_tenants?.length || 0}
+                  </TableCell>
+                  <TableCell className="px-4 py-3 text-gray-500 text-end text-theme-sm dark:text-gray-400">
+                    <TableActions
+                      onEdit={hasPermission('update-plan') ? () => handleEdit(plan) : undefined}
+                      onDelete={hasPermission('delete-plan') ? () => handleDelete(plan) : undefined}
+                    />
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>
@@ -172,14 +208,19 @@ export default function PlanTable({
             onPlanUpdated={onAction}
             plan={selectedPlan}
           />
-          <DeletePlanModal
-            isOpen={isDeleteModalOpen}
-            onClose={handleCloseModals}
-            onPlanDeleted={onAction}
-            plan={selectedPlan}
-          />
         </>
       )}
+
+      <ConfirmModal
+        isOpen={!!confirmTarget}
+        onClose={() => setConfirmTarget(null)}
+        onConfirm={handleDeleteConfirm}
+        isLoading={isDeleting}
+        title="Delete Plan"
+        message={`Are you sure you want to delete "${confirmTarget?.name}"?`}
+        confirmLabel="Delete Plan"
+        variant="danger"
+      />
     </div>
   );
 }

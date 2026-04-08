@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { useSidebar } from '@/hooks/useSidebar';
 import { usePermissions } from '@/hooks/usePermissions';
+import { useSettings } from '@/hooks/useSettings';
 
 type NavItem = {
   name: string;
@@ -182,6 +183,25 @@ const AppSidebar: React.FC = () => {
   const [subMenuHeight, setSubMenuHeight] = useState<Record<string, number>>({});
   const subMenuRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
+  const { settings } = useSettings();
+  const dynamicAdministrationItems = useMemo(() => {
+    const hasDefaultAccounts =
+      settings['default_sales_account'] !== undefined ||
+      settings['default_payable_account'] !== undefined;
+
+    return administrationItems.map((item) => {
+      if (item.name === 'Settings') {
+        return {
+          ...item,
+          subItems: item.subItems?.filter(
+            (sub) => sub.name !== 'Default Accounts' || hasDefaultAccounts
+          ),
+        };
+      }
+      return item;
+    });
+  }, [settings]);
+
   const isActive = useCallback(
     (path: string) => {
       if (!pathname) return false;
@@ -197,7 +217,11 @@ const AppSidebar: React.FC = () => {
     let submenuMatched = false;
     ['main', 'others', 'administration'].forEach((menuType) => {
       const items =
-        menuType === 'main' ? navItems : menuType === 'others' ? othersItems : administrationItems;
+        menuType === 'main'
+          ? navItems
+          : menuType === 'others'
+            ? othersItems
+            : dynamicAdministrationItems;
       items.forEach((nav, index) => {
         if (nav.subItems) {
           nav.subItems.forEach((subItem) => {
@@ -476,7 +500,7 @@ const AppSidebar: React.FC = () => {
                   {renderMenuItems(othersItems, 'others')}
                 </div>
               )}
-              {hasAnyPermission(administrationItems) && (
+              {hasAnyPermission(dynamicAdministrationItems) && (
                 <div className="">
                   <h2
                     className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${
@@ -489,7 +513,7 @@ const AppSidebar: React.FC = () => {
                       <MoreHorizontal />
                     )}
                   </h2>
-                  {renderMenuItems(administrationItems, 'administration')}
+                  {renderMenuItems(dynamicAdministrationItems, 'administration')}
                 </div>
               )}
             </div>

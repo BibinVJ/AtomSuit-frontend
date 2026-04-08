@@ -18,9 +18,13 @@ import { Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import { isApiError } from '@/utils/errors';
 
+import { useState } from 'react';
+
 export default function GoodsReceivedNotes() {
   const { hasPermission } = usePermissions();
   const router = useRouter();
+
+  const [activeTab, setActiveTab] = useState<'active' | 'trashed'>('active');
 
   const {
     data: grns,
@@ -42,12 +46,14 @@ export default function GoodsReceivedNotes() {
     handlePageChange,
     handlePerPageChange,
     handleSort,
-    viewMode,
-    setViewMode,
     refresh,
     resetFilters,
   } = useDataTable<GoodsReceivedNote>({
     fetchData: GoodsReceivedNoteService.list,
+    extraParams: {
+      exclude_status: activeTab === 'active' ? 'voided' : undefined,
+      status: activeTab === 'trashed' ? 'voided' : undefined,
+    },
   });
 
   const handleRestore = async (id: number) => {
@@ -87,15 +93,20 @@ export default function GoodsReceivedNotes() {
         </div>
 
         <ComponentCard
-          title={`Goods Received Notes (${viewMode})`}
+          title={`Goods Received Notes (${activeTab === 'trashed' ? 'Voided' : 'Active'})`}
           action={
             <div className="flex flex-wrap items-center gap-4">
-              <ViewModeTabs viewMode={viewMode} setViewMode={setViewMode} />
+              <ViewModeTabs
+                viewMode={activeTab}
+                setViewMode={setActiveTab}
+                trashedLabel="Voided"
+                trashedTooltip="Show Voided GRNs"
+              />
               <div className="flex flex-wrap items-center gap-2">
                 {hasPermission('create-grn') && (
                   <Tooltip text="Add New GRN">
                     <Button
-                      onClick={() => router.push('/goods-received-notes/create')}
+                      href="/goods-received-notes/create"
                       size="sm"
                       startIcon={<Plus className="w-4 h-4" />}
                     >
@@ -117,7 +128,7 @@ export default function GoodsReceivedNotes() {
             currentPage={currentPage}
             perPage={perPage}
             startIndex={rangeFrom !== '' ? Number(rangeFrom) : undefined}
-            viewMode={viewMode}
+            viewMode={activeTab === 'trashed' ? 'voided' : 'active'}
             onRestore={handleRestore}
           />
           <Pagination

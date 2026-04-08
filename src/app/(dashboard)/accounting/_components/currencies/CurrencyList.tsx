@@ -20,6 +20,7 @@ export default function CurrencyList() {
 
   const {
     data: currencies,
+    loading,
     currentPage,
     perPage,
     totalPages,
@@ -102,6 +103,7 @@ export default function CurrencyList() {
         >
           <CurrencyTable
             data={currencies}
+            loading={loading}
             onAction={refresh}
             onSort={handleSort}
             sortBy={sortBy}

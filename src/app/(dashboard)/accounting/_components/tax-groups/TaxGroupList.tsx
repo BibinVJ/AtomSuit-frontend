@@ -21,6 +21,7 @@ export default function TaxGroupList() {
 
   const {
     data: taxGroups,
+    loading,
     currentPage,
     perPage,
     totalPages,
@@ -86,6 +87,7 @@ export default function TaxGroupList() {
         >
           <TaxGroupTable
             data={taxGroups}
+            loading={loading}
             onAction={refresh}
             onSort={handleSort}
             sortBy={sortBy}

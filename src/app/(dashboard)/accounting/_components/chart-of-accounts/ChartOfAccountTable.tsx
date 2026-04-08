@@ -3,13 +3,15 @@
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '@/components/ui/table';
 import { useState } from 'react';
 import EditChartOfAccountModal from './EditChartOfAccountModal';
-import DeleteChartOfAccountModal from './DeleteChartOfAccountModal';
+import ConfirmModal from '@/components/common/ConfirmModal';
 import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide } from 'lucide-react';
-import { restoreChartOfAccount } from '@/services/ChartOfAccountService';
+import { restoreChartOfAccount, deleteChartOfAccount } from '@/services/ChartOfAccountService';
 import { toast } from 'sonner';
+import { isApiError } from '@/utils/errors';
 import { TableActions } from '@/components/common/TableActions';
 import { ChartOfAccount } from '@/types';
 import { usePermissions } from '@/hooks/usePermissions';
+import SkeletonTable from '@/components/common/SkeletonTable';
 
 interface Props {
   data: ChartOfAccount[];
@@ -21,6 +23,7 @@ interface Props {
   perPage: number;
   startIndex?: number;
   viewMode?: 'active' | 'trashed';
+  loading?: boolean;
 }
 
 export default function ChartOfAccountTable({
@@ -33,11 +36,15 @@ export default function ChartOfAccountTable({
   perPage,
   startIndex,
   viewMode = 'active',
+  loading,
 }: Props) {
   const { hasPermission } = usePermissions();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedAccount, setSelectedAccount] = useState<ChartOfAccount | null>(null);
+  const [confirmTarget, setConfirmTarget] = useState<ChartOfAccount | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const isTrashed = viewMode === 'trashed';
 
   const handleEdit = (account: ChartOfAccount) => {
     setSelectedAccount(account);
@@ -45,13 +52,30 @@ export default function ChartOfAccountTable({
   };
 
   const handleDelete = (account: ChartOfAccount) => {
-    setSelectedAccount(account);
-    setIsDeleteModalOpen(true);
+    setConfirmTarget(account);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!confirmTarget) return;
+    setIsDeleting(true);
+    try {
+      await deleteChartOfAccount(confirmTarget.id, isTrashed);
+      toast.success(isTrashed ? 'Account permanently deleted' : 'Account deleted successfully');
+      onAction();
+    } catch (error: unknown) {
+      let message = 'Failed to delete account';
+      if (isApiError(error)) {
+        message = error.response?.data?.message || message;
+      }
+      toast.error(message);
+    } finally {
+      setIsDeleting(false);
+      setConfirmTarget(null);
+    }
   };
 
   const handleCloseModals = () => {
     setIsEditModalOpen(false);
-    setIsDeleteModalOpen(false);
     setSelectedAccount(null);
   };
 
@@ -125,66 +149,81 @@ export default function ChartOfAccountTable({
           </TableHeader>
 
           <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-            {data.map((account, index) => (
-              <TableRow key={account.id}>
-                <TableCell className="px-5 py-4 sm:px-6 text-start">
-                  <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                    {startIndex !== undefined
-                      ? startIndex + index
-                      : (currentPage - 1) * perPage + index + 1}
-                  </p>
-                </TableCell>
-                <TableCell className="px-5 py-4 sm:px-6 text-start">
-                  <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                    {account.code}
-                  </p>
-                </TableCell>
-                <TableCell className="px-5 py-4 sm:px-6 text-start">
-                  <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                    {account.name}
-                  </p>
-                </TableCell>
-                <TableCell className="px-5 py-4 sm:px-6 text-start">
-                  <span
-                    className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-                      account.account_group?.deleted_at
-                        ? 'bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-500'
-                        : 'bg-gray-100 text-gray-800 dark:bg-white/10 dark:text-white'
-                    }`}
-                  >
-                    {account.account_group?.name}
-                    {account.account_group?.deleted_at ? ' (Deleted)' : ''}
-                  </span>
-                </TableCell>
-                <TableCell className="px-5 py-4 sm:px-6 text-start">
-                  <p className="text-gray-500 text-theme-sm dark:text-gray-400">
-                    {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(
-                      account.opening_balance
-                    )}
-                  </p>
-                </TableCell>
-                <TableCell className="px-4 py-3 text-gray-500 text-end text-theme-sm dark:text-gray-400">
-                  <TableActions
-                    isTrashed={viewMode === 'trashed'}
-                    onEdit={
-                      hasPermission('update-chart-of-account')
-                        ? () => handleEdit(account)
-                        : undefined
-                    }
-                    onDelete={
-                      hasPermission('delete-chart-of-account')
-                        ? () => handleDelete(account)
-                        : undefined
-                    }
-                    onRestore={
-                      hasPermission('update-chart-of-account')
-                        ? () => handleRestore(account.id)
-                        : undefined
-                    }
-                  />
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={6} className="p-0">
+                  <SkeletonTable rows={perPage} columns={6} />
                 </TableCell>
               </TableRow>
-            ))}
+            ) : data.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={6} className="px-5 py-10 text-center text-gray-500">
+                  No accounts found.
+                </TableCell>
+              </TableRow>
+            ) : (
+              data.map((account, index) => (
+                <TableRow key={account.id}>
+                  <TableCell className="px-5 py-4 sm:px-6 text-start">
+                    <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
+                      {startIndex !== undefined
+                        ? startIndex + index
+                        : (currentPage - 1) * perPage + index + 1}
+                    </p>
+                  </TableCell>
+                  <TableCell className="px-5 py-4 sm:px-6 text-start">
+                    <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
+                      {account.code}
+                    </p>
+                  </TableCell>
+                  <TableCell className="px-5 py-4 sm:px-6 text-start">
+                    <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
+                      {account.name}
+                    </p>
+                  </TableCell>
+                  <TableCell className="px-5 py-4 sm:px-6 text-start">
+                    <span
+                      className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+                        account.account_group?.deleted_at
+                          ? 'bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-500'
+                          : 'bg-gray-100 text-gray-800 dark:bg-white/10 dark:text-white'
+                      }`}
+                    >
+                      {account.account_group?.name}
+                      {account.account_group?.deleted_at ? ' (Deleted)' : ''}
+                    </span>
+                  </TableCell>
+                  <TableCell className="px-5 py-4 sm:px-6 text-start">
+                    <p className="text-gray-500 text-theme-sm dark:text-gray-400">
+                      {new Intl.NumberFormat('en-US', {
+                        style: 'currency',
+                        currency: 'USD',
+                      }).format(account.opening_balance)}
+                    </p>
+                  </TableCell>
+                  <TableCell className="px-4 py-3 text-gray-500 text-end text-theme-sm dark:text-gray-400">
+                    <TableActions
+                      isTrashed={viewMode === 'trashed'}
+                      onEdit={
+                        hasPermission('update-chart-of-account')
+                          ? () => handleEdit(account)
+                          : undefined
+                      }
+                      onDelete={
+                        hasPermission('delete-chart-of-account')
+                          ? () => handleDelete(account)
+                          : undefined
+                      }
+                      onRestore={
+                        hasPermission('update-chart-of-account')
+                          ? () => handleRestore(account.id)
+                          : undefined
+                      }
+                    />
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>
@@ -196,15 +235,23 @@ export default function ChartOfAccountTable({
             onSuccess={onAction}
             chartOfAccount={selectedAccount}
           />
-          <DeleteChartOfAccountModal
-            isOpen={isDeleteModalOpen}
-            onClose={handleCloseModals}
-            onSuccess={onAction}
-            chartOfAccount={selectedAccount}
-            force={viewMode === 'trashed'}
-          />
         </>
       )}
+
+      <ConfirmModal
+        isOpen={!!confirmTarget}
+        onClose={() => setConfirmTarget(null)}
+        onConfirm={handleDeleteConfirm}
+        isLoading={isDeleting}
+        title={isTrashed ? 'Permanently Delete Account' : 'Delete Account'}
+        message={
+          isTrashed
+            ? `Are you sure you want to permanently delete "${confirmTarget?.name}"? This action cannot be undone.`
+            : `Are you sure you want to delete "${confirmTarget?.name}"? You can restore it later from the trash.`
+        }
+        confirmLabel={isTrashed ? 'Delete Permanently' : 'Delete'}
+        variant="danger"
+      />
     </div>
   );
 }

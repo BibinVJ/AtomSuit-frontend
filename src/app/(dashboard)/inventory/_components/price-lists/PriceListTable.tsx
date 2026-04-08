@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import { TableActions } from '@/components/common/TableActions';
 import { PriceList } from '@/types/PriceList';
 import { restorePriceList } from '@/services/PriceListService';
+import SkeletonTable from '@/components/common/SkeletonTable';
 
 interface Props {
   data: PriceList[];
@@ -120,11 +121,8 @@ export default function PriceListTable({
           <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
             {loading ? (
               <TableRow>
-                <TableCell colSpan={7} className="px-5 py-10 text-center">
-                  <div className="flex flex-col items-center justify-center space-y-2">
-                    <div className="w-10 h-10 border-4 border-brand-500 border-t-transparent rounded-full animate-spin"></div>
-                    <p className="text-gray-500">Loading price lists...</p>
-                  </div>
+                <TableCell colSpan={7} className="p-0">
+                  <SkeletonTable rows={perPage} columns={7} />
                 </TableCell>
               </TableRow>
             ) : data.length === 0 ? (

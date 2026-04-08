@@ -7,8 +7,10 @@ import PageMeta from '@/components/common/PageMeta';
 import PriceListTable from '@/app/(dashboard)/inventory/_components/price-lists/PriceListTable';
 import AddPriceListModal from '@/app/(dashboard)/inventory/_components/price-lists/AddPriceListModal';
 import EditPriceListModal from '@/app/(dashboard)/inventory/_components/price-lists/EditPriceListModal';
-import DeletePriceListModal from '@/app/(dashboard)/inventory/_components/price-lists/DeletePriceListModal';
 import ViewPriceListModal from '@/app/(dashboard)/inventory/_components/price-lists/ViewPriceListModal';
+import ConfirmModal from '@/components/common/ConfirmModal';
+import { deletePriceList } from '@/services/PriceListService';
+import { isApiError } from '@/utils/errors';
 import { useModal } from '@/hooks/useModal';
 import Pagination from '@/components/common/Pagination';
 import Button from '@/components/ui/button/Button';
@@ -31,7 +33,8 @@ export default function PriceLists() {
 
   // Edit/Delete/Manage State
   const [selectedPriceList, setSelectedPriceList] = useState<PriceList | null>(null);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [confirmTarget, setConfirmTarget] = useState<PriceList | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const extraParams = useMemo(
     () => ({
@@ -81,8 +84,30 @@ export default function PriceLists() {
   };
 
   const handleDelete = (pl: PriceList) => {
-    setSelectedPriceList(pl);
-    setIsDeleteModalOpen(true);
+    setConfirmTarget(pl);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!confirmTarget) return;
+    setIsDeleting(true);
+    try {
+      await deletePriceList(confirmTarget.id, viewMode === 'trashed');
+      toast.success(
+        viewMode === 'trashed'
+          ? 'Price list permanently deleted'
+          : 'Price list deleted successfully'
+      );
+      refresh();
+    } catch (error: unknown) {
+      let message = 'Failed to delete price list';
+      if (isApiError(error)) {
+        message = error.response?.data?.message || message;
+      }
+      toast.error(message);
+    } finally {
+      setIsDeleting(false);
+      setConfirmTarget(null);
+    }
   };
 
   const handleModalClose = () => {
@@ -97,11 +122,6 @@ export default function PriceLists() {
 
   const handleViewModalClose = () => {
     closeViewModal();
-    setSelectedPriceList(null);
-  };
-
-  const handleDeleteModalClose = () => {
-    setIsDeleteModalOpen(false);
     setSelectedPriceList(null);
   };
 
@@ -232,12 +252,19 @@ export default function PriceLists() {
           />
         )}
 
-        <DeletePriceListModal
-          isOpen={isDeleteModalOpen}
-          onClose={handleDeleteModalClose}
-          onSuccess={refresh}
-          priceList={selectedPriceList}
-          force={viewMode === 'trashed'}
+        <ConfirmModal
+          isOpen={!!confirmTarget}
+          onClose={() => setConfirmTarget(null)}
+          onConfirm={handleDeleteConfirm}
+          isLoading={isDeleting}
+          title={viewMode === 'trashed' ? 'Permanently Delete Price List' : 'Delete Price List'}
+          message={
+            viewMode === 'trashed'
+              ? `Are you sure you want to permanently delete "${confirmTarget?.name}"? This action cannot be undone.`
+              : `Are you sure you want to delete "${confirmTarget?.name}"? You can restore it later from the trash.`
+          }
+          confirmLabel={viewMode === 'trashed' ? 'Delete Permanently' : 'Delete'}
+          variant="danger"
         />
       </div>
     </>

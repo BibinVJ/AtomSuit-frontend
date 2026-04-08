@@ -12,6 +12,7 @@ import { Plan, Subscription } from '@/types';
 import SubscriptionCard from './SubscriptionCard';
 import Button from '@/components/ui/button/Button';
 import { Modal } from '@/components/ui/modal';
+import ConfirmModal from '@/components/common/ConfirmModal';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
 
 export default function SubscriptionManagement() {
@@ -190,45 +191,17 @@ export default function SubscriptionManagement() {
       </Modal>
 
       {/* Cancel Confirmation Modal */}
-      <Modal
+      <ConfirmModal
         isOpen={showCancelModal}
         onClose={() => setShowCancelModal(false)}
-        className="max-w-md mx-4 p-6"
-      >
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
-          Cancel Subscription
-        </h2>
-        <div className="space-y-4">
-          <div className="flex items-start gap-3">
-            <AlertTriangle className="w-6 h-6 text-orange-500 mt-1" />
-            <div>
-              <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
-                Are you sure you want to cancel?
-              </h3>
-              <p className="text-gray-600 dark:text-gray-300 text-sm">
-                Your subscription will remain active until the end of your current billing period.
-                You can resume your subscription at any time before it expires.
-              </p>
-            </div>
-          </div>
-
-          <div className="flex gap-3 pt-4">
-            <Button
-              onClick={() => setShowCancelModal(false)}
-              className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700"
-            >
-              Keep Subscription
-            </Button>
-            <Button
-              onClick={handleCancelSubscription}
-              disabled={actionLoading}
-              className="flex-1 bg-red-600 hover:bg-red-700 text-white"
-            >
-              {actionLoading ? 'Cancelling...' : 'Cancel Subscription'}
-            </Button>
-          </div>
-        </div>
-      </Modal>
+        onConfirm={handleCancelSubscription}
+        isLoading={actionLoading}
+        title="Cancel Subscription"
+        message="Are you sure you want to cancel? Your subscription will remain active until the end of your current billing period. You can resume your subscription at any time before it expires."
+        confirmLabel="Cancel Subscription"
+        cancelLabel="Keep Subscription"
+        variant="warning"
+      />
     </div>
   );
 }

@@ -13,6 +13,7 @@ import TableToolbar from '@/components/common/TableToolbar';
 export default function Domains() {
   const {
     data: domains,
+    loading,
     currentPage,
     perPage,
     totalPages,
@@ -50,6 +51,7 @@ export default function Domains() {
         <ComponentCard title="Domains">
           <DomainTable
             data={domains}
+            loading={loading}
             onSort={handleSort}
             sortBy={sortBy}
             sortDirection={sortDirection}

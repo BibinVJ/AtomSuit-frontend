@@ -5,6 +5,7 @@ import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide, Eye } from 'luc
 import Badge from '@/components/ui/badge/Badge';
 import { formatKebabCase } from '@/utils/string';
 import ViewLogModal from './ViewLogModal';
+import SkeletonTable from '@/components/common/SkeletonTable';
 
 interface Props {
   data: UserLoginDetail[];
@@ -116,11 +117,8 @@ export default function UserLogsTable({
           <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
             {loading ? (
               <TableRow>
-                <TableCell colSpan={showUserColumn ? 8 : 6} className="px-5 py-10 text-center">
-                  <div className="flex flex-col items-center justify-center space-y-2">
-                    <div className="w-10 h-10 border-4 border-brand-500 border-t-transparent rounded-full animate-spin"></div>
-                    <p className="text-gray-500">Loading logs...</p>
-                  </div>
+                <TableCell colSpan={showUserColumn ? 8 : 6} className="p-0">
+                  <SkeletonTable rows={10} columns={showUserColumn ? 8 : 6} />
                 </TableCell>
               </TableRow>
             ) : data.length === 0 ? (

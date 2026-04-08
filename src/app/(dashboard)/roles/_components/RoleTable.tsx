@@ -2,13 +2,15 @@
 
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '@/components/ui/table';
 import { useState } from 'react';
-import DeleteRoleModal from './DeleteRoleModal';
+import ConfirmModal from '@/components/common/ConfirmModal';
 import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide } from 'lucide-react';
-import { restoreRole } from '@/services/RoleService';
+import { restoreRole, deleteRole } from '@/services/RoleService';
 import { toast } from 'sonner';
+import { isApiError } from '@/utils/errors';
 import { TableActions } from '@/components/common/TableActions';
 import { Role } from '@/types';
 import { useRouter } from 'next/navigation';
+import SkeletonTable from '@/components/common/SkeletonTable';
 
 import { formatKebabCase } from '@/utils/string';
 
@@ -37,22 +39,34 @@ export default function RoleTable({
   viewMode = 'active',
   loading,
 }: Props) {
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [selectedRole, setSelectedRole] = useState<Role | null>(null);
+  const selectedRole = null; // Removed selectedRole entirely, keeping just for syntax, wait, no, confirmTarget is needed
+  const [confirmTarget, setConfirmTarget] = useState<Role | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const router = useRouter();
+
+  const isTrashed = viewMode === 'trashed';
 
   const handleEdit = (role: Role) => {
     router.push(`/roles/${role.id}/edit`);
   };
 
-  const handleDelete = (role: Role) => {
-    setSelectedRole(role);
-    setIsDeleteModalOpen(true);
-  };
-
-  const handleCloseModals = () => {
-    setIsDeleteModalOpen(false);
-    setSelectedRole(null);
+  const handleDeleteConfirm = async () => {
+    if (!confirmTarget) return;
+    setIsDeleting(true);
+    try {
+      await deleteRole(confirmTarget.id, isTrashed);
+      toast.success(isTrashed ? 'Role permanently deleted' : 'Role deleted successfully');
+      onAction();
+    } catch (error: unknown) {
+      let message = 'Failed to delete role';
+      if (isApiError(error)) {
+        message = error.response?.data?.message || message;
+      }
+      toast.error(message);
+    } finally {
+      setIsDeleting(false);
+      setConfirmTarget(null);
+    }
   };
 
   const handleRestore = async (id: number) => {
@@ -108,11 +122,8 @@ export default function RoleTable({
           <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
             {loading ? (
               <TableRow>
-                <TableCell colSpan={3} className="px-5 py-10 text-center">
-                  <div className="flex flex-col items-center justify-center space-y-2">
-                    <div className="w-10 h-10 border-4 border-brand-500 border-t-transparent rounded-full animate-spin"></div>
-                    <p className="text-gray-500">Loading roles...</p>
-                  </div>
+                <TableCell colSpan={3} className="p-0">
+                  <SkeletonTable rows={perPage} columns={3} />
                 </TableCell>
               </TableRow>
             ) : data.length === 0 ? (
@@ -139,7 +150,7 @@ export default function RoleTable({
                       <TableActions
                         isTrashed={viewMode === 'trashed'}
                         onEdit={() => handleEdit(role)}
-                        onDelete={() => handleDelete(role)}
+                        onDelete={() => setConfirmTarget(role)}
                         onRestore={() => handleRestore(role.id)}
                       />
                     )}
@@ -150,15 +161,20 @@ export default function RoleTable({
           </TableBody>
         </Table>
       </div>
-      {selectedRole && (
-        <DeleteRoleModal
-          isOpen={isDeleteModalOpen}
-          onClose={handleCloseModals}
-          onRoleDeleted={onAction}
-          role={selectedRole}
-          force={viewMode === 'trashed'}
-        />
-      )}
+      <ConfirmModal
+        isOpen={!!confirmTarget}
+        onClose={() => setConfirmTarget(null)}
+        onConfirm={handleDeleteConfirm}
+        isLoading={isDeleting}
+        title={isTrashed ? 'Permanently Delete Role' : 'Delete Role'}
+        message={
+          isTrashed
+            ? `Are you sure you want to permanently delete "${confirmTarget?.name}"? This action cannot be undone.`
+            : `Are you sure you want to delete "${confirmTarget?.name}"? You can restore it later from the trash.`
+        }
+        confirmLabel={isTrashed ? 'Delete Permanently' : 'Delete'}
+        variant="danger"
+      />
     </div>
   );
 }

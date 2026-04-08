@@ -12,8 +12,11 @@ import {
 import WarehouseTable from '@/app/(dashboard)/inventory/_components/warehouses/WarehouseTable';
 import CreateWarehouseModal from '@/app/(dashboard)/inventory/_components/warehouses/CreateWarehouseModal';
 import EditWarehouseModal from '@/app/(dashboard)/inventory/_components/warehouses/EditWarehouseModal';
-import DeleteWarehouseModal from '@/app/(dashboard)/inventory/_components/warehouses/DeleteWarehouseModal';
+import ConfirmModal from '@/components/common/ConfirmModal';
 import { Warehouse } from '@/types/Warehouse';
+import { deleteWarehouse } from '@/services/WarehouseService';
+import { isApiError } from '@/utils/errors';
+import { toast } from 'sonner';
 import Pagination from '@/components/common/Pagination';
 import TableToolbar from '@/components/common/TableToolbar';
 import PageMeta from '@/components/common/PageMeta';
@@ -29,10 +32,12 @@ export default function Warehouses() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [editingWarehouse, setEditingWarehouse] = useState<Warehouse | null>(null);
-  const [deletingWarehouse, setDeletingWarehouse] = useState<Warehouse | null>(null);
+  const [confirmTarget, setConfirmTarget] = useState<Warehouse | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const {
     data: warehouses,
+    loading,
     currentPage,
     perPage,
     totalPages,
@@ -70,7 +75,28 @@ export default function Warehouses() {
   };
 
   const handleDelete = (warehouse: Warehouse) => {
-    setDeletingWarehouse(warehouse);
+    setConfirmTarget(warehouse);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!confirmTarget) return;
+    setIsDeleting(true);
+    try {
+      await deleteWarehouse(confirmTarget.id);
+      toast.success('Warehouse deleted successfully');
+      refresh();
+    } catch (error: boolean | unknown) {
+      let message = 'Failed to delete warehouse';
+      if (isApiError(error)) {
+        message =
+          (error as { response?: { data?: { message?: string } } }).response?.data?.message ||
+          message;
+      }
+      toast.error(message);
+    } finally {
+      setIsDeleting(false);
+      setConfirmTarget(null);
+    }
   };
 
   const onImport = async (file: File) => {
@@ -141,9 +167,11 @@ export default function Warehouses() {
         >
           <WarehouseTable
             warehouses={warehouses}
+            loading={loading}
+            perPage={perPage}
             onEdit={handleEdit}
             onDelete={handleDelete}
-            onRestore={viewMode === 'trashed' ? (u) => setDeletingWarehouse(u) : undefined}
+            onRestore={viewMode === 'trashed' ? (u) => handleEdit(u) : undefined}
             viewMode={viewMode}
             onSort={handleSort}
             sortBy={sortBy}
@@ -185,14 +213,16 @@ export default function Warehouses() {
         />
       )}
 
-      {deletingWarehouse && (
-        <DeleteWarehouseModal
-          isOpen={!!deletingWarehouse}
-          onClose={() => setDeletingWarehouse(null)}
-          onWarehouseDeleted={refresh}
-          warehouse={deletingWarehouse}
-        />
-      )}
+      <ConfirmModal
+        isOpen={!!confirmTarget}
+        onClose={() => setConfirmTarget(null)}
+        onConfirm={handleDeleteConfirm}
+        isLoading={isDeleting}
+        title="Delete Warehouse"
+        message={`Are you sure you want to delete "${confirmTarget?.name}"? You can restore it later.`}
+        confirmLabel="Delete Warehouse"
+        variant="danger"
+      />
     </>
   );
 }

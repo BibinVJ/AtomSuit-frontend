@@ -57,6 +57,7 @@ export default function Items() {
 
   const {
     data: items,
+    loading,
     currentPage,
     perPage,
     totalPages,
@@ -238,6 +239,7 @@ export default function Items() {
         >
           <ItemTable
             data={items}
+            loading={loading}
             onAction={refresh}
             onSort={handleSort}
             sortBy={sortBy}

@@ -6,6 +6,8 @@ export enum PurchaseOrderStatus {
   DRAFT = 'DRAFT',
   SENT = 'SENT',
   CONFIRMED = 'CONFIRMED',
+  PARTIALLY_RECEIVED = 'PARTIALLY_RECEIVED',
+  RECEIVED = 'RECEIVED',
   COMPLETED = 'COMPLETED',
   CANCELLED = 'CANCELLED',
 }
@@ -64,6 +66,7 @@ export interface PurchaseOrderPayload {
   order_date: string;
   expected_delivery_date?: string;
   reference_number?: string;
+  status?: PurchaseOrderStatus;
   notes?: string;
   cost_center_id: number;
   warehouse_id: number;

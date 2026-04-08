@@ -3,13 +3,15 @@
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '@/components/ui/table';
 import { useState } from 'react';
 import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide } from 'lucide-react';
-import { restoreTaxGroup } from '@/services/TaxService';
+import { restoreTaxGroup, deleteTaxGroup } from '@/services/TaxService';
 import { toast } from 'sonner';
+import { isApiError } from '@/utils/errors';
 import { TaxGroup } from '@/types';
 import EditTaxGroupModal from './EditTaxGroupModal';
-import DeleteTaxGroupModal from './DeleteTaxGroupModal';
+import ConfirmModal from '@/components/common/ConfirmModal';
 import { TableActions } from '@/components/common/TableActions';
 import { usePermissions } from '@/hooks/usePermissions';
+import SkeletonTable from '@/components/common/SkeletonTable';
 
 interface Props {
   data: TaxGroup[];
@@ -21,6 +23,7 @@ interface Props {
   perPage: number;
   startIndex?: number;
   viewMode?: 'active' | 'trashed';
+  loading?: boolean;
 }
 
 export default function TaxGroupTable({
@@ -33,11 +36,15 @@ export default function TaxGroupTable({
   perPage,
   startIndex,
   viewMode = 'active',
+  loading,
 }: Props) {
   const { hasPermission } = usePermissions();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedTaxGroup, setSelectedTaxGroup] = useState<TaxGroup | null>(null);
+  const [confirmTarget, setConfirmTarget] = useState<TaxGroup | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const isTrashed = viewMode === 'trashed';
 
   const handleEdit = (taxGroup: TaxGroup) => {
     setSelectedTaxGroup(taxGroup);
@@ -45,13 +52,30 @@ export default function TaxGroupTable({
   };
 
   const handleDelete = (taxGroup: TaxGroup) => {
-    setSelectedTaxGroup(taxGroup);
-    setIsDeleteModalOpen(true);
+    setConfirmTarget(taxGroup);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!confirmTarget) return;
+    setIsDeleting(true);
+    try {
+      await deleteTaxGroup(confirmTarget.id, isTrashed);
+      toast.success(isTrashed ? 'Tax group permanently deleted' : 'Tax group deleted successfully');
+      onAction();
+    } catch (error: unknown) {
+      let message = 'Failed to delete tax group';
+      if (isApiError(error)) {
+        message = error.response?.data?.message || message;
+      }
+      toast.error(message);
+    } finally {
+      setIsDeleting(false);
+      setConfirmTarget(null);
+    }
   };
 
   const handleCloseModals = () => {
     setIsEditModalOpen(false);
-    setIsDeleteModalOpen(false);
     setSelectedTaxGroup(null);
   };
 
@@ -118,7 +142,13 @@ export default function TaxGroupTable({
           </TableHeader>
 
           <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-            {data.length === 0 ? (
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={5} className="p-0">
+                  <SkeletonTable rows={perPage} columns={5} />
+                </TableCell>
+              </TableRow>
+            ) : data.length === 0 ? (
               <TableRow>
                 <TableCell
                   colSpan={5}
@@ -189,15 +219,23 @@ export default function TaxGroupTable({
             onSuccess={onAction}
             taxGroup={selectedTaxGroup}
           />
-          <DeleteTaxGroupModal
-            isOpen={isDeleteModalOpen}
-            onClose={handleCloseModals}
-            onTaxGroupDeleted={onAction}
-            taxGroup={selectedTaxGroup}
-            force={viewMode === 'trashed'}
-          />
         </>
       )}
+
+      <ConfirmModal
+        isOpen={!!confirmTarget}
+        onClose={() => setConfirmTarget(null)}
+        onConfirm={handleDeleteConfirm}
+        isLoading={isDeleting}
+        title={isTrashed ? 'Permanently Delete Tax Group' : 'Delete Tax Group'}
+        message={
+          isTrashed
+            ? `Are you sure you want to permanently delete "${confirmTarget?.name}"? This action cannot be undone.`
+            : `Are you sure you want to delete "${confirmTarget?.name}"? You can restore it later from the trash.`
+        }
+        confirmLabel={isTrashed ? 'Delete Permanently' : 'Delete'}
+        variant="danger"
+      />
     </div>
   );
 }

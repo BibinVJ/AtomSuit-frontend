@@ -9,11 +9,12 @@ import SettingsGroup from '@/app/(dashboard)/settings/_components/SettingsGroup'
 import { getSettings } from '@/services/SettingsService';
 import { Setting } from '@/types';
 import { formatLabel } from '@/utils/string';
+import SkeletonCard from '@/components/common/SkeletonCard';
 
 // Define the mapping of URL paths to settings groups
 const ROUTE_GROUP_MAPPING: Record<string, string[]> = {
   general: ['company', 'general', 'appearance', 'notifications', 'business', 'social'],
-  configurations: ['financial', 'invoicing', 'inventory', 'accounting'],
+  configurations: ['financial', 'invoicing', 'inventory', 'accounting', 'payment'],
   'default-accounts': [
     'default_accounts_customer',
     'default_accounts_vendor',
@@ -97,6 +98,11 @@ export default function Settings({ params }: { params: Promise<{ category: strin
         const remainingSettings: Setting[] = [];
 
         groupSettings.forEach((setting: Setting) => {
+          // Skip virtual settings injected by the backend for formatting
+          if (['currency_symbol', 'currency_code'].includes(setting.key)) {
+            return;
+          }
+
           if (DEFAULT_ACCOUNT_KEYS.includes(setting.key)) {
             // Find which group this key belongs to
             const targetGroupKey = Object.keys(DEFAULT_ACCOUNTS_MAPPING).find((key) =>
@@ -166,8 +172,22 @@ export default function Settings({ params }: { params: Promise<{ category: strin
       <>
         <PageMeta title="Settings" description="Application settings" />
         <PageBreadcrumb pageTitle="Settings" />
-        <div className="flex justify-center items-center h-64">
-          <div className="text-gray-500">Loading settings...</div>
+        <div className="flex flex-col lg:flex-row gap-8">
+          <aside className="lg:w-64 flex-shrink-0">
+            <div className="space-y-2">
+              {[1, 2, 3, 4].map((i) => (
+                <div
+                  key={i}
+                  className="h-10 bg-gray-100 dark:bg-gray-800 rounded-xl animate-pulse"
+                ></div>
+              ))}
+            </div>
+          </aside>
+          <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-6">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <SkeletonCard key={i} />
+            ))}
+          </div>
         </div>
       </>
     );

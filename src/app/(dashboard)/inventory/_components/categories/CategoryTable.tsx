@@ -3,14 +3,16 @@
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '@/components/ui/table';
 import { useState } from 'react';
 import EditCategoryModal from './EditCategoryModal';
-import DeleteCategoryModal from './DeleteCategoryModal';
 import ViewCategoryModal from './ViewCategoryModal';
+import ConfirmModal from '@/components/common/ConfirmModal';
 import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide } from 'lucide-react';
-import { restoreCategory } from '@/services/CategoryService';
+import { restoreCategory, deleteCategory } from '@/services/CategoryService';
 import { toast } from 'sonner';
+import { isApiError } from '@/utils/errors';
 import { TableActions } from '@/components/common/TableActions';
 import { Category } from '@/types';
 import { usePermissions } from '@/hooks/usePermissions';
+import SkeletonTable from '@/components/common/SkeletonTable';
 
 interface Props {
   data: Category[];
@@ -22,6 +24,7 @@ interface Props {
   perPage: number;
   startIndex?: number;
   viewMode?: 'active' | 'trashed';
+  loading?: boolean;
 }
 
 export default function CategoryTable({
@@ -34,33 +37,50 @@ export default function CategoryTable({
   perPage,
   startIndex,
   viewMode = 'active',
+  loading,
 }: Props) {
   const { hasPermission } = usePermissions();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+  const [confirmTarget, setConfirmTarget] = useState<Category | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const isTrashed = viewMode === 'trashed';
 
   const handleEdit = (category: Category) => {
     setSelectedCategory(category);
     setIsEditModalOpen(true);
   };
 
-  const handleDelete = (category: Category) => {
-    setSelectedCategory(category);
-    setIsDeleteModalOpen(true);
+  const handleCloseModals = () => {
+    setIsEditModalOpen(false);
+    setIsViewModalOpen(false);
+    setSelectedCategory(null);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!confirmTarget) return;
+    setIsDeleting(true);
+    try {
+      await deleteCategory(confirmTarget.id, isTrashed);
+      toast.success(isTrashed ? 'Category permanently deleted' : 'Category deleted successfully');
+      onAction();
+    } catch (error: unknown) {
+      let message = 'Failed to delete category';
+      if (isApiError(error)) {
+        message = error.response?.data?.message || message;
+      }
+      toast.error(message);
+    } finally {
+      setIsDeleting(false);
+      setConfirmTarget(null);
+    }
   };
 
   const handleView = (category: Category) => {
     setSelectedCategory(category);
     setIsViewModalOpen(true);
-  };
-
-  const handleCloseModals = () => {
-    setIsEditModalOpen(false);
-    setIsDeleteModalOpen(false);
-    setIsViewModalOpen(false);
-    setSelectedCategory(null);
   };
 
   const handleRestore = async (id: number) => {
@@ -121,42 +141,58 @@ export default function CategoryTable({
           </TableHeader>
 
           <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-            {data.map((category, index) => (
-              <TableRow key={category.id}>
-                <TableCell className="px-5 py-4 sm:px-6 text-start">
-                  <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                    {startIndex !== undefined
-                      ? startIndex + index
-                      : (currentPage - 1) * perPage + index + 1}
-                  </p>
-                </TableCell>
-                <TableCell className="px-5 py-4 sm:px-6 text-start">
-                  <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                    {category.name}
-                  </p>
-                </TableCell>
-                <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                  {category.description}
-                </TableCell>
-                <TableCell className="px-4 py-3 text-gray-500 text-end text-theme-sm dark:text-gray-400">
-                  <TableActions
-                    isTrashed={viewMode === 'trashed'}
-                    onView={() => handleView(category)}
-                    onEdit={
-                      hasPermission('update-category') ? () => handleEdit(category) : undefined
-                    }
-                    onDelete={
-                      hasPermission('delete-category') ? () => handleDelete(category) : undefined
-                    }
-                    onRestore={
-                      hasPermission('update-category')
-                        ? () => handleRestore(category.id)
-                        : undefined
-                    }
-                  />
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={4} className="p-0">
+                  <SkeletonTable rows={perPage} columns={4} />
                 </TableCell>
               </TableRow>
-            ))}
+            ) : data.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={4} className="px-5 py-10 text-center text-gray-500">
+                  No categories found.
+                </TableCell>
+              </TableRow>
+            ) : (
+              data.map((category, index) => (
+                <TableRow key={category.id}>
+                  <TableCell className="px-5 py-4 sm:px-6 text-start">
+                    <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
+                      {startIndex !== undefined
+                        ? startIndex + index
+                        : (currentPage - 1) * perPage + index + 1}
+                    </p>
+                  </TableCell>
+                  <TableCell className="px-5 py-4 sm:px-6 text-start">
+                    <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
+                      {category.name}
+                    </p>
+                  </TableCell>
+                  <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
+                    {category.description}
+                  </TableCell>
+                  <TableCell className="px-4 py-3 text-gray-500 text-end text-theme-sm dark:text-gray-400">
+                    <TableActions
+                      isTrashed={viewMode === 'trashed'}
+                      onView={() => handleView(category)}
+                      onEdit={
+                        hasPermission('update-category') ? () => handleEdit(category) : undefined
+                      }
+                      onDelete={
+                        hasPermission('delete-category')
+                          ? () => setConfirmTarget(category)
+                          : undefined
+                      }
+                      onRestore={
+                        hasPermission('update-category')
+                          ? () => handleRestore(category.id)
+                          : undefined
+                      }
+                    />
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>
@@ -173,15 +209,23 @@ export default function CategoryTable({
             onSuccess={onAction}
             category={selectedCategory}
           />
-          <DeleteCategoryModal
-            isOpen={isDeleteModalOpen}
-            onClose={handleCloseModals}
-            onCategoryDeleted={onAction}
-            category={selectedCategory}
-            force={viewMode === 'trashed'}
-          />
         </>
       )}
+
+      <ConfirmModal
+        isOpen={!!confirmTarget}
+        onClose={() => setConfirmTarget(null)}
+        onConfirm={handleDeleteConfirm}
+        isLoading={isDeleting}
+        title={isTrashed ? 'Permanently Delete Category' : 'Delete Category'}
+        message={
+          isTrashed
+            ? `Are you sure you want to permanently delete "${confirmTarget?.name}"? This action cannot be undone.`
+            : `Are you sure you want to delete "${confirmTarget?.name}"? You can restore it later from the trash.`
+        }
+        confirmLabel={isTrashed ? 'Delete Permanently' : 'Delete'}
+        variant="danger"
+      />
     </div>
   );
 }

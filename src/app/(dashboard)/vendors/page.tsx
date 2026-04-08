@@ -35,6 +35,7 @@ export default function Vendors() {
 
   const {
     data: vendors,
+    loading,
     currentPage,
     perPage,
     totalPages,
@@ -131,6 +132,7 @@ export default function Vendors() {
         >
           <VendorTable
             data={vendors}
+            loading={loading}
             onAction={refresh}
             onSort={handleSort}
             sortBy={sortBy}

@@ -6,9 +6,13 @@ import Badge from '@/components/ui/badge/Badge';
 import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide } from 'lucide-react';
 import { TableActions } from '@/components/common/TableActions';
 import { useRouter } from 'next/navigation';
-import VoidSaleModal from './VoidSaleModal';
-
+import ConfirmModal from '@/components/common/ConfirmModal';
+import { toast } from 'sonner';
+import { voidSale } from '@/services/SaleService';
+import { isApiError } from '@/utils/errors';
 import { Sale } from '@/types';
+
+import SkeletonTable from '@/components/common/SkeletonTable';
 
 interface Props {
   data: Sale[];
@@ -39,8 +43,8 @@ export default function SaleTable({
   const { hasPermission } = usePermissions();
   const { formatCurrency, formatDate } = useSettings();
   const router = useRouter();
-  const [isVoidModalOpen, setIsVoidModalOpen] = useState(false);
-  const [selectedSale, setSelectedSale] = useState<Sale | null>(null);
+  const [confirmTarget, setConfirmTarget] = useState<Sale | null>(null);
+  const [isVoiding, setIsVoiding] = useState(false);
 
   const handleView = (id: number) => {
     router.push(`/sales/${id}`);
@@ -51,13 +55,26 @@ export default function SaleTable({
   };
 
   const handleDelete = (sale: Sale) => {
-    setSelectedSale(sale);
-    setIsVoidModalOpen(true);
+    setConfirmTarget(sale);
   };
 
-  const handleCloseModal = () => {
-    setIsVoidModalOpen(false);
-    setSelectedSale(null);
+  const handleVoidConfirm = async () => {
+    if (!confirmTarget) return;
+    setIsVoiding(true);
+    try {
+      await voidSale(confirmTarget.id);
+      toast.success('Sale voided successfully');
+      onAction();
+    } catch (error: unknown) {
+      if (isApiError(error) && error.response?.status === 409) {
+        toast.error(error.response?.data?.message);
+      } else {
+        toast.error('Failed to void sale');
+      }
+    } finally {
+      setIsVoiding(false);
+      setConfirmTarget(null);
+    }
   };
 
   const renderSortIcon = (column: string) => {
@@ -130,11 +147,8 @@ export default function SaleTable({
           <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
             {loading ? (
               <TableRow>
-                <TableCell colSpan={7} className="px-5 py-10 text-center">
-                  <div className="flex flex-col items-center justify-center space-y-2">
-                    <div className="w-10 h-10 border-4 border-brand-500 border-t-transparent rounded-full animate-spin"></div>
-                    <p className="text-gray-500">Loading sales...</p>
-                  </div>
+                <TableCell colSpan={7} className="p-0">
+                  <SkeletonTable rows={perPage} columns={7} />
                 </TableCell>
               </TableRow>
             ) : data.length === 0 ? (
@@ -193,14 +207,16 @@ export default function SaleTable({
           </TableBody>
         </Table>
       </div>
-      {selectedSale && (
-        <VoidSaleModal
-          isOpen={isVoidModalOpen}
-          onClose={handleCloseModal}
-          onSaleVoided={onAction}
-          sale={selectedSale}
-        />
-      )}
+      <ConfirmModal
+        isOpen={!!confirmTarget}
+        onClose={() => setConfirmTarget(null)}
+        onConfirm={handleVoidConfirm}
+        isLoading={isVoiding}
+        title="Void Sale"
+        message={`Are you sure you want to void the sale "${confirmTarget?.invoice_number}"? This action cannot be undone.`}
+        confirmLabel="Void Sale"
+        variant="danger"
+      />
     </div>
   );
 }

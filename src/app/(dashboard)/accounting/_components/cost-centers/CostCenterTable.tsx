@@ -8,6 +8,7 @@ import { useState } from 'react';
 import Badge from '@/components/ui/badge/Badge';
 import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide } from 'lucide-react';
 import { usePermissions } from '@/hooks/usePermissions';
+import SkeletonTable from '@/components/common/SkeletonTable';
 
 interface CostCenterTableProps {
   data: CostCenter[];
@@ -16,9 +17,10 @@ interface CostCenterTableProps {
   sortBy: string;
   sortDirection: 'asc' | 'desc';
   currentPage: number;
-  _perPage: number;
+  perPage: number;
   startIndex?: number;
   viewMode: 'active' | 'trashed';
+  loading?: boolean;
 }
 
 export default function CostCenterTable({
@@ -29,6 +31,8 @@ export default function CostCenterTable({
   sortDirection,
   startIndex = 0,
   viewMode,
+  loading,
+  perPage,
 }: CostCenterTableProps) {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [selectedCostCenter, setSelectedCostCenter] = useState<CostCenter | null>(null);
@@ -111,62 +115,79 @@ export default function CostCenterTable({
               </TableRow>
             </TableHeader>
             <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-              {data.map((row, index) => (
-                <TableRow key={row.id}>
-                  <TableCell className="px-5 py-4 sm:px-6 text-start">
-                    <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                      {startIndex + index + 1}
-                    </p>
-                  </TableCell>
-                  <TableCell className="px-5 py-4 sm:px-6 text-start">
-                    <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                      {row.code}
-                    </p>
-                  </TableCell>
-                  <TableCell className="px-5 py-4 sm:px-6 text-start">
-                    <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                      {row.name}
-                    </p>
-                  </TableCell>
-                  <TableCell className="px-5 py-4 sm:px-6 text-start">
-                    <Badge variant="light" color="primary">
-                      {row.type}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="px-5 py-4 sm:px-6 text-start">
-                    <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                      {row.parent?.name || '-'}
-                    </p>
-                  </TableCell>
-                  <TableCell className="px-5 py-4 sm:px-6 text-start">
-                    <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                      {row.warehouse?.name || '-'}
-                    </p>
-                  </TableCell>
-                  <TableCell className="px-4 py-3 text-gray-500 text-end text-theme-sm dark:text-gray-400">
-                    <TableActions
-                      onEdit={
-                        hasPermission('update-cost-center')
-                          ? () => {
-                              openEditModal(row);
-                            }
-                          : undefined
-                      }
-                      onDelete={
-                        hasPermission('delete-cost-center')
-                          ? () => deleteCostCenter(row.id)
-                          : undefined
-                      }
-                      onRestore={
-                        hasPermission('update-cost-center')
-                          ? () => restoreCostCenter(row.id)
-                          : undefined
-                      }
-                      isTrashed={viewMode === 'trashed'}
-                    />
+              {loading ? (
+                <TableRow>
+                  <TableCell colSpan={7} className="p-0">
+                    <SkeletonTable rows={perPage} columns={7} />
                   </TableCell>
                 </TableRow>
-              ))}
+              ) : data.length === 0 ? (
+                <TableRow>
+                  <TableCell
+                    colSpan={7}
+                    className="px-6 py-8 text-center text-gray-500 text-theme-sm"
+                  >
+                    No cost centers found.
+                  </TableCell>
+                </TableRow>
+              ) : (
+                data.map((row, index) => (
+                  <TableRow key={row.id}>
+                    <TableCell className="px-5 py-4 sm:px-6 text-start">
+                      <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
+                        {startIndex + index + 1}
+                      </p>
+                    </TableCell>
+                    <TableCell className="px-5 py-4 sm:px-6 text-start">
+                      <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
+                        {row.code}
+                      </p>
+                    </TableCell>
+                    <TableCell className="px-5 py-4 sm:px-6 text-start">
+                      <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
+                        {row.name}
+                      </p>
+                    </TableCell>
+                    <TableCell className="px-5 py-4 sm:px-6 text-start">
+                      <Badge variant="light" color="primary">
+                        {row.type}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="px-5 py-4 sm:px-6 text-start">
+                      <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
+                        {row.parent?.name || '-'}
+                      </p>
+                    </TableCell>
+                    <TableCell className="px-5 py-4 sm:px-6 text-start">
+                      <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
+                        {row.warehouse?.name || '-'}
+                      </p>
+                    </TableCell>
+                    <TableCell className="px-4 py-3 text-gray-500 text-end text-theme-sm dark:text-gray-400">
+                      <TableActions
+                        onEdit={
+                          hasPermission('update-cost-center')
+                            ? () => {
+                                openEditModal(row);
+                              }
+                            : undefined
+                        }
+                        onDelete={
+                          hasPermission('delete-cost-center')
+                            ? () => deleteCostCenter(row.id)
+                            : undefined
+                        }
+                        onRestore={
+                          hasPermission('update-cost-center')
+                            ? () => restoreCostCenter(row.id)
+                            : undefined
+                        }
+                        isTrashed={viewMode === 'trashed'}
+                      />
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </div>

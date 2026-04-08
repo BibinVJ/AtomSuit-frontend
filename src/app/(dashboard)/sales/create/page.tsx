@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import PageBreadcrumb from '@/components/common/PageBreadCrumb';
 import ComponentCard from '@/components/common/ComponentCard';
+import SkeletonForm from '@/components/common/SkeletonForm';
 import PageMeta from '@/components/common/PageMeta';
 import Button from '@/components/ui/button/Button';
 import Select from '@/components/form/Select';
@@ -52,8 +53,10 @@ export default function AddSale() {
     { item_id: '', quantity: 1, unit_price: 0, description: '', stock_on_hand: 0 },
   ]);
   const [errors, setErrors] = useState<ApiError>({});
+  const [isLoading, setIsLoading] = useState(true);
 
   const fetchInitialData = useCallback(async () => {
+    setIsLoading(true);
     try {
       const [customerResponse, itemResponse, invoiceResponse] = await Promise.all([
         getCustomers({
@@ -73,6 +76,8 @@ export default function AddSale() {
       }
     } catch (error) {
       console.error('Error fetching initial data:', error);
+    } finally {
+      setIsLoading(false);
     }
   }, []);
 
@@ -185,191 +190,195 @@ export default function AddSale() {
         backButton={true}
       />
       <ComponentCard>
-        <form onSubmit={handleSubmit}>
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-            <div>
-              <Label>Customer</Label>
-              <div className="flex items-center gap-2">
-                <Select
-                  options={customers.map((c) => ({ value: String(c.id), label: c.name }))}
-                  onChange={(value) => {
-                    setCustomerId(value);
-                    clearError('customer_id');
-                  }}
-                  defaultValue={customerId}
-                  placeholder="Select a customer"
-                  error={!!getErrorMessage('customer_id')}
-                  hint={getErrorMessage('customer_id')}
-                  className="flex-grow"
-                />
-                <Button type="button" onClick={openCustomerModal} className="p-1" size="xs">
-                  <Plus></Plus>
-                </Button>
-              </div>
-            </div>
-            <div>
-              <Label>Invoice Number</Label>
-              <Input
-                type="text"
-                value={invoiceNumber}
-                onChange={(e) => {
-                  setInvoiceNumber(e.target.value);
-                  clearError('invoice_number');
-                }}
-                error={!!getErrorMessage('invoice_number')}
-                hint={getErrorMessage('invoice_number')}
-              />
-            </div>
-            <div>
-              <DatePicker
-                id="sale_date"
-                label="Sale Date"
-                onChange={(_, dateStr: string) => {
-                  setSaleDate(dateStr);
-                  clearError('sale_date');
-                }}
-                defaultDate={saleDate}
-                error={!!getErrorMessage('sale_date')}
-                hint={getErrorMessage('sale_date')}
-              />
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between mt-6 mb-4">
-            <h3 className="text-lg font-semibold dark:text-gray-400">Items</h3>
-
-            <Button type="button" variant="outline" onClick={handleAddItem}>
-              Add Item
-            </Button>
-          </div>
-          {getErrorMessage('items') && (
-            <p className="text-sm text-red-500 mb-4">{getErrorMessage('items')}</p>
-          )}
-
-          {saleItems.map((item, index) => (
-            <div key={index} className="relative p-4 mb-4 border rounded-lg">
-              <button
-                type="button"
-                onClick={() => handleRemoveItem(index)}
-                className="absolute p-1 text-red-500 bg-red-100 rounded-full -top-2 -right-2 hover:bg-red-300"
-              >
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M6 18L18 6M6 6l12 12"
-                  ></path>
-                </svg>
-              </button>
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-5">
-                <div className="md:col-span-2">
-                  <Label>Item</Label>
+        {isLoading ? (
+          <SkeletonForm rows={2} columns={2} />
+        ) : (
+          <form onSubmit={handleSubmit}>
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              <div>
+                <Label>Customer</Label>
+                <div className="flex items-center gap-2">
                   <Select
-                    options={items.map((i) => ({ value: String(i.id), label: i.name }))}
+                    options={customers.map((c) => ({ value: String(c.id), label: c.name }))}
                     onChange={(value) => {
-                      handleItemChange(index, 'item_id', value);
-                      clearError(`items.${index}.item_id`);
+                      setCustomerId(value);
+                      clearError('customer_id');
                     }}
-                    defaultValue={item.item_id}
-                    placeholder="Select an item"
-                    error={!!getErrorMessage(`items.${index}.item_id`)}
-                    hint={getErrorMessage(`items.${index}.item_id`)}
+                    defaultValue={customerId}
+                    placeholder="Select a customer"
+                    error={!!getErrorMessage('customer_id')}
+                    hint={getErrorMessage('customer_id')}
+                    className="flex-grow"
                   />
-                </div>
-                <div>
-                  <Label>Quantity</Label>
-                  <Input
-                    type="number"
-                    value={item.quantity}
-                    onChange={(e) => {
-                      handleItemChange(index, 'quantity', Number(e.target.value));
-                      clearError(`items.${index}.quantity`);
-                    }}
-                    error={!!getErrorMessage(`items.${index}.quantity`)}
-                    hint={getErrorMessage(`items.${index}.quantity`)}
-                    suffix={
-                      item.item_id
-                        ? items.find((i) => i.id === Number(item.item_id))?.unit.code
-                        : undefined
-                    }
-                  />
-                  {item.item_id && (
-                    <p
-                      className={`text-sm mt-1 ${
-                        item.stock_on_hand === 0
-                          ? 'text-red-500'
-                          : item.stock_on_hand < 10
-                            ? 'text-orange-500'
-                            : 'text-gray-500'
-                      }`}
-                    >
-                      Available: {item.stock_on_hand}
-                    </p>
-                  )}
-                </div>
-                <div>
-                  <Label>Unit Price</Label>
-                  <Input
-                    type="number"
-                    value={item.unit_price}
-                    onChange={(e) => {
-                      handleItemChange(index, 'unit_price', Number(e.target.value));
-                      clearError(`items.${index}.unit_price`);
-                    }}
-                    error={!!getErrorMessage(`items.${index}.unit_price`)}
-                    hint={getErrorMessage(`items.${index}.unit_price`)}
-                    prefix={
-                      getSetting<string>('currency_position') === 'before'
-                        ? getSetting<string>('currency_symbol')
-                        : undefined
-                    }
-                    suffix={
-                      getSetting<string>('currency_position') === 'after'
-                        ? getSetting<string>('currency_symbol')
-                        : undefined
-                    }
-                  />
+                  <Button type="button" onClick={openCustomerModal} className="p-1" size="xs">
+                    <Plus></Plus>
+                  </Button>
                 </div>
               </div>
-              <div className="grid grid-cols-1 gap-4 mt-4">
-                <div>
-                  <Label>Description</Label>
-                  <TextArea value={item.description} className="bg-gray-100 dark:bg-gray-800" />
-                </div>
+              <div>
+                <Label>Invoice Number</Label>
+                <Input
+                  type="text"
+                  value={invoiceNumber}
+                  onChange={(e) => {
+                    setInvoiceNumber(e.target.value);
+                    clearError('invoice_number');
+                  }}
+                  error={!!getErrorMessage('invoice_number')}
+                  hint={getErrorMessage('invoice_number')}
+                />
               </div>
-              <div className="flex justify-end mt-4">
-                <div className="flex items-center space-x-4">
-                  <span className="font-semibold dark:text-gray-400">Total:</span>
-                  <span className="font-bold dark:text-white">
-                    {(item.quantity * item.unit_price).toFixed(2)}
-                  </span>
-                </div>
+              <div>
+                <DatePicker
+                  id="sale_date"
+                  label="Sale Date"
+                  onChange={(_, dateStr: string) => {
+                    setSaleDate(dateStr);
+                    clearError('sale_date');
+                  }}
+                  defaultDate={saleDate}
+                  error={!!getErrorMessage('sale_date')}
+                  hint={getErrorMessage('sale_date')}
+                />
               </div>
             </div>
-          ))}
 
-          <div className="flex justify-end mt-6">
-            <div className="flex items-center space-x-4">
-              <span className="text-lg font-semibold dark:text-gray-400">Net Total:</span>
-              <span className="text-lg font-bold dark:text-white">
-                {saleItems
-                  .reduce((acc, item) => acc + item.quantity * item.unit_price, 0)
-                  .toFixed(2)}
-              </span>
+            <div className="flex items-center justify-between mt-6 mb-4">
+              <h3 className="text-lg font-semibold dark:text-gray-400">Items</h3>
+
+              <Button type="button" variant="outline" onClick={handleAddItem}>
+                Add Item
+              </Button>
             </div>
-          </div>
+            {getErrorMessage('items') && (
+              <p className="text-sm text-red-500 mb-4">{getErrorMessage('items')}</p>
+            )}
 
-          <div className="flex justify-end mt-6">
-            <Button type="submit">Save Sale</Button>
-          </div>
-        </form>
+            {saleItems.map((item, index) => (
+              <div key={index} className="relative p-4 mb-4 border rounded-lg">
+                <button
+                  type="button"
+                  onClick={() => handleRemoveItem(index)}
+                  className="absolute p-1 text-red-500 bg-red-100 rounded-full -top-2 -right-2 hover:bg-red-300"
+                >
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M6 18L18 6M6 6l12 12"
+                    ></path>
+                  </svg>
+                </button>
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-5">
+                  <div className="md:col-span-2">
+                    <Label>Item</Label>
+                    <Select
+                      options={items.map((i) => ({ value: String(i.id), label: i.name }))}
+                      onChange={(value) => {
+                        handleItemChange(index, 'item_id', value);
+                        clearError(`items.${index}.item_id`);
+                      }}
+                      defaultValue={item.item_id}
+                      placeholder="Select an item"
+                      error={!!getErrorMessage(`items.${index}.item_id`)}
+                      hint={getErrorMessage(`items.${index}.item_id`)}
+                    />
+                  </div>
+                  <div>
+                    <Label>Quantity</Label>
+                    <Input
+                      type="number"
+                      value={item.quantity}
+                      onChange={(e) => {
+                        handleItemChange(index, 'quantity', Number(e.target.value));
+                        clearError(`items.${index}.quantity`);
+                      }}
+                      error={!!getErrorMessage(`items.${index}.quantity`)}
+                      hint={getErrorMessage(`items.${index}.quantity`)}
+                      suffix={
+                        item.item_id
+                          ? items.find((i) => i.id === Number(item.item_id))?.unit.code
+                          : undefined
+                      }
+                    />
+                    {item.item_id && (
+                      <p
+                        className={`text-sm mt-1 ${
+                          item.stock_on_hand === 0
+                            ? 'text-red-500'
+                            : item.stock_on_hand < 10
+                              ? 'text-orange-500'
+                              : 'text-gray-500'
+                        }`}
+                      >
+                        Available: {item.stock_on_hand}
+                      </p>
+                    )}
+                  </div>
+                  <div>
+                    <Label>Unit Price</Label>
+                    <Input
+                      type="number"
+                      value={item.unit_price}
+                      onChange={(e) => {
+                        handleItemChange(index, 'unit_price', Number(e.target.value));
+                        clearError(`items.${index}.unit_price`);
+                      }}
+                      error={!!getErrorMessage(`items.${index}.unit_price`)}
+                      hint={getErrorMessage(`items.${index}.unit_price`)}
+                      prefix={
+                        getSetting<string>('currency_position') === 'before'
+                          ? getSetting<string>('currency_symbol')
+                          : undefined
+                      }
+                      suffix={
+                        getSetting<string>('currency_position') === 'after'
+                          ? getSetting<string>('currency_symbol')
+                          : undefined
+                      }
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 gap-4 mt-4">
+                  <div>
+                    <Label>Description</Label>
+                    <TextArea value={item.description} className="bg-gray-100 dark:bg-gray-800" />
+                  </div>
+                </div>
+                <div className="flex justify-end mt-4">
+                  <div className="flex items-center space-x-4">
+                    <span className="font-semibold dark:text-gray-400">Total:</span>
+                    <span className="font-bold dark:text-white">
+                      {(item.quantity * item.unit_price).toFixed(2)}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+
+            <div className="flex justify-end mt-6">
+              <div className="flex items-center space-x-4">
+                <span className="text-lg font-semibold dark:text-gray-400">Net Total:</span>
+                <span className="text-lg font-bold dark:text-white">
+                  {saleItems
+                    .reduce((acc, item) => acc + item.quantity * item.unit_price, 0)
+                    .toFixed(2)}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex justify-end mt-6">
+              <Button type="submit">Save Sale</Button>
+            </div>
+          </form>
+        )}
       </ComponentCard>
       <AddCustomerModal
         isOpen={isCustomerModalOpen}

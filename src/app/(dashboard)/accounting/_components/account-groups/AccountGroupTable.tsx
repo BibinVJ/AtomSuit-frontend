@@ -3,13 +3,15 @@
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '@/components/ui/table';
 import { useState } from 'react';
 import EditAccountGroupModal from './EditAccountGroupModal';
-import DeleteAccountGroupModal from './DeleteAccountGroupModal';
+import ConfirmModal from '@/components/common/ConfirmModal';
 import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide } from 'lucide-react';
-import { restoreAccountGroup } from '@/services/AccountGroupService';
+import { restoreAccountGroup, deleteAccountGroup } from '@/services/AccountGroupService';
 import { toast } from 'sonner';
+import { isApiError } from '@/utils/errors';
 import { TableActions } from '@/components/common/TableActions';
 import { AccountGroup } from '@/types';
 import { usePermissions } from '@/hooks/usePermissions';
+import SkeletonTable from '@/components/common/SkeletonTable';
 
 interface Props {
   data: AccountGroup[];
@@ -21,6 +23,7 @@ interface Props {
   perPage: number;
   startIndex?: number;
   viewMode?: 'active' | 'trashed';
+  loading?: boolean;
 }
 
 export default function AccountGroupTable({
@@ -33,11 +36,15 @@ export default function AccountGroupTable({
   perPage,
   startIndex,
   viewMode = 'active',
+  loading,
 }: Props) {
   const { hasPermission } = usePermissions();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedGroup, setSelectedGroup] = useState<AccountGroup | null>(null);
+  const [confirmTarget, setConfirmTarget] = useState<AccountGroup | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const isTrashed = viewMode === 'trashed';
 
   const handleEdit = (group: AccountGroup) => {
     setSelectedGroup(group);
@@ -45,13 +52,32 @@ export default function AccountGroupTable({
   };
 
   const handleDelete = (group: AccountGroup) => {
-    setSelectedGroup(group);
-    setIsDeleteModalOpen(true);
+    setConfirmTarget(group);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!confirmTarget) return;
+    setIsDeleting(true);
+    try {
+      await deleteAccountGroup(confirmTarget.id, isTrashed);
+      toast.success(
+        isTrashed ? 'Account group permanently deleted' : 'Account group deleted successfully'
+      );
+      onAction();
+    } catch (error: unknown) {
+      let message = 'Failed to delete account group';
+      if (isApiError(error)) {
+        message = error.response?.data?.message || message;
+      }
+      toast.error(message);
+    } finally {
+      setIsDeleting(false);
+      setConfirmTarget(null);
+    }
   };
 
   const handleCloseModals = () => {
     setIsEditModalOpen(false);
-    setIsDeleteModalOpen(false);
     setSelectedGroup(null);
   };
 
@@ -125,64 +151,80 @@ export default function AccountGroupTable({
           </TableHeader>
 
           <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-            {data.map((group, index) => (
-              <TableRow key={group.id}>
-                <TableCell className="px-5 py-4 sm:px-6 text-start">
-                  <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                    {startIndex !== undefined
-                      ? startIndex + index
-                      : (currentPage - 1) * perPage + index + 1}
-                  </p>
-                </TableCell>
-                <TableCell className="px-5 py-4 sm:px-6 text-start">
-                  <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                    {group.name}
-                  </p>
-                </TableCell>
-                <TableCell className="px-5 py-4 sm:px-6 text-start">
-                  <p className="text-gray-500 text-theme-sm dark:text-gray-400">
-                    {group.code || '-'}
-                  </p>
-                </TableCell>
-                <TableCell className="px-5 py-4 sm:px-6 text-start">
-                  <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800 dark:bg-white/10 dark:text-white">
-                    {group.account_type?.name}
-                  </span>
-                </TableCell>
-                <TableCell className="px-5 py-4 sm:px-6 text-start">
-                  {group.parent ? (
-                    <span
-                      className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-                        group.parent.deleted_at
-                          ? 'bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-500'
-                          : 'bg-gray-100 text-gray-800 dark:bg-white/10 dark:text-white'
-                      }`}
-                    >
-                      {group.parent.name}
-                      {group.parent.deleted_at ? ' (Deleted)' : ''}
-                    </span>
-                  ) : (
-                    <span className="text-gray-500 text-theme-sm dark:text-gray-400">-</span>
-                  )}
-                </TableCell>
-                <TableCell className="px-4 py-3 text-gray-500 text-end text-theme-sm dark:text-gray-400">
-                  <TableActions
-                    isTrashed={viewMode === 'trashed'}
-                    onEdit={
-                      hasPermission('update-account-group') ? () => handleEdit(group) : undefined
-                    }
-                    onDelete={
-                      hasPermission('delete-account-group') ? () => handleDelete(group) : undefined
-                    }
-                    onRestore={
-                      hasPermission('update-account-group')
-                        ? () => handleRestore(group.id)
-                        : undefined
-                    }
-                  />
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={6} className="p-0">
+                  <SkeletonTable rows={perPage} columns={6} />
                 </TableCell>
               </TableRow>
-            ))}
+            ) : data.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={6} className="px-5 py-10 text-center text-gray-500">
+                  No account groups found.
+                </TableCell>
+              </TableRow>
+            ) : (
+              data.map((group, index) => (
+                <TableRow key={group.id}>
+                  <TableCell className="px-5 py-4 sm:px-6 text-start">
+                    <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
+                      {startIndex !== undefined
+                        ? startIndex + index
+                        : (currentPage - 1) * perPage + index + 1}
+                    </p>
+                  </TableCell>
+                  <TableCell className="px-5 py-4 sm:px-6 text-start">
+                    <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
+                      {group.name}
+                    </p>
+                  </TableCell>
+                  <TableCell className="px-5 py-4 sm:px-6 text-start">
+                    <p className="text-gray-500 text-theme-sm dark:text-gray-400">
+                      {group.code || '-'}
+                    </p>
+                  </TableCell>
+                  <TableCell className="px-5 py-4 sm:px-6 text-start">
+                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800 dark:bg-white/10 dark:text-white">
+                      {group.account_type?.name}
+                    </span>
+                  </TableCell>
+                  <TableCell className="px-5 py-4 sm:px-6 text-start">
+                    {group.parent ? (
+                      <span
+                        className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+                          group.parent.deleted_at
+                            ? 'bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-500'
+                            : 'bg-gray-100 text-gray-800 dark:bg-white/10 dark:text-white'
+                        }`}
+                      >
+                        {group.parent.name}
+                        {group.parent.deleted_at ? ' (Deleted)' : ''}
+                      </span>
+                    ) : (
+                      <span className="text-gray-500 text-theme-sm dark:text-gray-400">-</span>
+                    )}
+                  </TableCell>
+                  <TableCell className="px-4 py-3 text-gray-500 text-end text-theme-sm dark:text-gray-400">
+                    <TableActions
+                      isTrashed={viewMode === 'trashed'}
+                      onEdit={
+                        hasPermission('update-account-group') ? () => handleEdit(group) : undefined
+                      }
+                      onDelete={
+                        hasPermission('delete-account-group')
+                          ? () => handleDelete(group)
+                          : undefined
+                      }
+                      onRestore={
+                        hasPermission('update-account-group')
+                          ? () => handleRestore(group.id)
+                          : undefined
+                      }
+                    />
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>
@@ -194,15 +236,23 @@ export default function AccountGroupTable({
             onSuccess={onAction}
             accountGroup={selectedGroup}
           />
-          <DeleteAccountGroupModal
-            isOpen={isDeleteModalOpen}
-            onClose={handleCloseModals}
-            onSuccess={onAction}
-            accountGroup={selectedGroup}
-            force={viewMode === 'trashed'}
-          />
         </>
       )}
+
+      <ConfirmModal
+        isOpen={!!confirmTarget}
+        onClose={() => setConfirmTarget(null)}
+        onConfirm={handleDeleteConfirm}
+        isLoading={isDeleting}
+        title={isTrashed ? 'Permanently Delete Account Group' : 'Delete Account Group'}
+        message={
+          isTrashed
+            ? `Are you sure you want to permanently delete "${confirmTarget?.name}"? This action cannot be undone.`
+            : `Are you sure you want to delete "${confirmTarget?.name}"? You can restore it later from the trash.`
+        }
+        confirmLabel={isTrashed ? 'Delete Permanently' : 'Delete'}
+        variant="danger"
+      />
     </div>
   );
 }

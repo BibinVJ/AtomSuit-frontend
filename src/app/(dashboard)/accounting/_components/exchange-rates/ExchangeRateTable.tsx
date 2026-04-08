@@ -3,13 +3,15 @@
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '@/components/ui/table';
 import { useState } from 'react';
 import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide } from 'lucide-react';
-import { restoreExchangeRate } from '@/services/ExchangeRateService';
+import { restoreExchangeRate, deleteExchangeRate } from '@/services/ExchangeRateService';
 import { toast } from 'sonner';
+import { isApiError } from '@/utils/errors';
 import { ExchangeRate } from '@/types';
 import EditExchangeRateModal from './EditExchangeRateModal';
-import DeleteExchangeRateModal from './DeleteExchangeRateModal';
+import ConfirmModal from '@/components/common/ConfirmModal';
 import { TableActions } from '@/components/common/TableActions';
 import { usePermissions } from '@/hooks/usePermissions';
+import SkeletonTable from '@/components/common/SkeletonTable';
 
 interface Props {
   data: ExchangeRate[];
@@ -21,6 +23,7 @@ interface Props {
   perPage: number;
   startIndex?: number;
   viewMode?: 'active' | 'trashed';
+  loading?: boolean;
 }
 
 export default function ExchangeRateTable({
@@ -33,11 +36,15 @@ export default function ExchangeRateTable({
   perPage,
   startIndex,
   viewMode = 'active',
+  loading,
 }: Props) {
   const { hasPermission } = usePermissions();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedExchangeRate, setSelectedExchangeRate] = useState<ExchangeRate | null>(null);
+  const [confirmTarget, setConfirmTarget] = useState<ExchangeRate | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const isTrashed = viewMode === 'trashed';
 
   const handleEdit = (rate: ExchangeRate) => {
     setSelectedExchangeRate(rate);
@@ -45,13 +52,32 @@ export default function ExchangeRateTable({
   };
 
   const handleDelete = (rate: ExchangeRate) => {
-    setSelectedExchangeRate(rate);
-    setIsDeleteModalOpen(true);
+    setConfirmTarget(rate);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!confirmTarget) return;
+    setIsDeleting(true);
+    try {
+      await deleteExchangeRate(confirmTarget.id, isTrashed);
+      toast.success(
+        isTrashed ? 'Exchange rate permanently deleted' : 'Exchange rate deleted successfully'
+      );
+      onAction();
+    } catch (error: unknown) {
+      let message = 'Failed to delete exchange rate';
+      if (isApiError(error)) {
+        message = error.response?.data?.message || message;
+      }
+      toast.error(message);
+    } finally {
+      setIsDeleting(false);
+      setConfirmTarget(null);
+    }
   };
 
   const handleCloseModals = () => {
     setIsEditModalOpen(false);
-    setIsDeleteModalOpen(false);
     setSelectedExchangeRate(null);
   };
 
@@ -125,7 +151,13 @@ export default function ExchangeRateTable({
           </TableHeader>
 
           <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-            {data.length === 0 ? (
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={6} className="p-0">
+                  <SkeletonTable rows={perPage} columns={6} />
+                </TableCell>
+              </TableRow>
+            ) : data.length === 0 ? (
               <TableRow>
                 <TableCell
                   colSpan={6}
@@ -212,15 +244,23 @@ export default function ExchangeRateTable({
             onSuccess={onAction}
             exchangeRate={selectedExchangeRate}
           />
-          <DeleteExchangeRateModal
-            isOpen={isDeleteModalOpen}
-            onClose={handleCloseModals}
-            onExchangeRateDeleted={onAction}
-            exchangeRate={selectedExchangeRate}
-            force={viewMode === 'trashed'}
-          />
         </>
       )}
+
+      <ConfirmModal
+        isOpen={!!confirmTarget}
+        onClose={() => setConfirmTarget(null)}
+        onConfirm={handleDeleteConfirm}
+        isLoading={isDeleting}
+        title={isTrashed ? 'Permanently Delete Exchange Rate' : 'Delete Exchange Rate'}
+        message={
+          isTrashed
+            ? `Are you sure you want to permanently delete the exchange rate for ${confirmTarget?.base_currency?.code} to ${confirmTarget?.target_currency?.code}? This action cannot be undone.`
+            : `Are you sure you want to delete the exchange rate for ${confirmTarget?.base_currency?.code} to ${confirmTarget?.target_currency?.code}? You can restore it later from the trash.`
+        }
+        confirmLabel={isTrashed ? 'Delete Permanently' : 'Delete'}
+        variant="danger"
+      />
     </div>
   );
 }

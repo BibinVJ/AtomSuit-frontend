@@ -12,6 +12,7 @@ import Pagination from '@/components/common/Pagination';
 export default function AccountTypes() {
   const {
     data: typesData,
+    loading,
     currentPage: typesCurrentPage,
     perPage: typesPerPage,
     totalPages: typesTotalPages,
@@ -57,6 +58,7 @@ export default function AccountTypes() {
 
             <AccountTypeTable
               data={typesData}
+              loading={loading}
               onSort={handleTypesSort}
               sortBy={typesSortBy}
               sortDirection={typesSortDirection}

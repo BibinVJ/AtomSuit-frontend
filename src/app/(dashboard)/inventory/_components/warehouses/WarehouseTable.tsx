@@ -4,6 +4,7 @@ import { Warehouse } from '@/types/Warehouse';
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '@/components/ui/table';
 import { TableActions } from '@/components/common/TableActions';
 import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide } from 'lucide-react';
+import SkeletonTable from '@/components/common/SkeletonTable';
 
 interface WarehouseTableProps {
   warehouses: Warehouse[];
@@ -14,6 +15,8 @@ interface WarehouseTableProps {
   onSort: (column: string) => void;
   sortBy: string;
   sortDirection: string;
+  loading?: boolean;
+  perPage?: number;
 }
 
 export default function WarehouseTable({
@@ -25,6 +28,8 @@ export default function WarehouseTable({
   onSort,
   sortBy,
   sortDirection,
+  loading,
+  perPage = 10,
 }: WarehouseTableProps) {
   const renderSortIcon = (column: string) => {
     if (sortBy !== column) {
@@ -38,82 +43,79 @@ export default function WarehouseTable({
   };
 
   return (
-    <div className="overflow-hidden bg-white border border-gray-200 rounded-xl shadow-sm dark:border-gray-800 dark:bg-gray-900">
-      <div className="overflow-x-auto relative">
+    <div className="overflow-hidden rounded-xl border border-gray-200 custom-card-bg dark:border-white/[0.05]">
+      <div className="max-w-full overflow-x-auto">
         <Table>
-          <TableHeader>
+          <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
             <TableRow>
               <TableCell
                 isHeader
-                className="px-5 py-4 sm:px-6 text-start text-xs font-medium text-gray-500 uppercase dark:text-gray-400 cursor-pointer"
+                className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400"
                 onClick={() => onSort('name')}
               >
                 Name {renderSortIcon('name')}
               </TableCell>
               <TableCell
                 isHeader
-                className="px-5 py-4 sm:px-6 text-start text-xs font-medium text-gray-500 uppercase dark:text-gray-400 cursor-pointer"
+                className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400"
                 onClick={() => onSort('code')}
               >
                 Code {renderSortIcon('code')}
               </TableCell>
               <TableCell
                 isHeader
-                className="px-5 py-4 sm:px-6 text-start text-xs font-medium text-gray-500 uppercase dark:text-gray-400"
+                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
               >
                 Address
               </TableCell>
               <TableCell
                 isHeader
-                className="px-5 py-4 sm:px-6 text-start text-xs font-medium text-gray-500 uppercase dark:text-gray-400"
+                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
               >
                 Contact Info
               </TableCell>
               <TableCell
                 isHeader
-                className="px-5 py-4 sm:px-6 text-end text-xs font-medium text-gray-500 uppercase dark:text-gray-400"
+                className="px-5 py-3 font-medium text-gray-500 text-end text-theme-xs dark:text-gray-400"
               >
                 Actions
               </TableCell>
             </TableRow>
           </TableHeader>
-          <TableBody>
-            {warehouses.length > 0 ? (
+          <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={5} className="p-0">
+                  <SkeletonTable rows={perPage} columns={5} />
+                </TableCell>
+              </TableRow>
+            ) : warehouses.length > 0 ? (
               warehouses.map((warehouse) => (
-                <TableRow
-                  key={warehouse.id}
-                  className="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
-                >
-                  <TableCell className="px-5 py-4 sm:px-6 text-start text-gray-800 dark:text-white/90 text-sm font-medium">
-                    <span
-                      className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-                        warehouse.deleted_at
-                          ? 'bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-500'
-                          : ''
-                      }`}
-                    >
+                <TableRow key={warehouse.id}>
+                  <TableCell className="px-5 py-4 sm:px-6 text-start">
+                    <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
                       {warehouse.name}
                       {warehouse.deleted_at ? ' (Deleted)' : ''}
-                    </span>
+                    </p>
                   </TableCell>
-                  <TableCell className="px-5 py-4 sm:px-6 text-start text-gray-500 dark:text-gray-400 text-sm">
+                  <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
                     {warehouse.code || 'N/A'}
                   </TableCell>
-                  <TableCell className="px-5 py-4 sm:px-6 text-start text-gray-500 dark:text-gray-400 text-sm">
+                  <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
                     <div className="flex flex-col">
                       <span>
                         {warehouse.city}, {warehouse.state}
                       </span>
-                      <span className="text-xs">{warehouse.country}</span>
+                      <span className="text-xs text-gray-500">{warehouse.country}</span>
                     </div>
                   </TableCell>
-                  <TableCell className="px-5 py-4 sm:px-6 text-start text-gray-500 dark:text-gray-400 text-sm">
+                  <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
                     <div className="flex flex-col">
                       <span>{warehouse.phone}</span>
-                      <span className="text-xs">{warehouse.email}</span>
+                      <span className="text-xs text-gray-500">{warehouse.email}</span>
                     </div>
                   </TableCell>
-                  <TableCell className="px-5 py-4 sm:px-6 text-end">
+                  <TableCell className="px-4 py-3 text-end">
                     <TableActions
                       isTrashed={viewMode === 'trashed'}
                       onEdit={() => onEdit(warehouse)}
@@ -125,10 +127,7 @@ export default function WarehouseTable({
               ))
             ) : (
               <TableRow>
-                <TableCell
-                  colSpan={5}
-                  className="px-5 py-8 text-center text-gray-500 dark:text-gray-400"
-                >
+                <TableCell colSpan={5} className="px-5 py-10 text-center text-gray-500 font-medium">
                   No warehouses found
                 </TableCell>
               </TableRow>

@@ -3,13 +3,15 @@
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '@/components/ui/table';
 import { useState } from 'react';
 import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide } from 'lucide-react';
-import { restoreCurrency } from '@/services/CurrencyService';
+import { restoreCurrency, deleteCurrency } from '@/services/CurrencyService';
 import { toast } from 'sonner';
+import { isApiError } from '@/utils/errors';
 import { Currency } from '@/types';
 import EditCurrencyModal from './EditCurrencyModal';
-import DeleteCurrencyModal from './DeleteCurrencyModal';
+import ConfirmModal from '@/components/common/ConfirmModal';
 import { TableActions } from '@/components/common/TableActions';
 import { usePermissions } from '@/hooks/usePermissions';
+import SkeletonTable from '@/components/common/SkeletonTable';
 
 interface Props {
   data: Currency[];
@@ -21,6 +23,7 @@ interface Props {
   perPage: number;
   startIndex?: number;
   viewMode?: 'active' | 'trashed';
+  loading?: boolean;
 }
 
 export default function CurrencyTable({
@@ -33,11 +36,15 @@ export default function CurrencyTable({
   perPage,
   startIndex,
   viewMode = 'active',
+  loading,
 }: Props) {
   const { hasPermission } = usePermissions();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedCurrency, setSelectedCurrency] = useState<Currency | null>(null);
+  const [confirmTarget, setConfirmTarget] = useState<Currency | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const isTrashed = viewMode === 'trashed';
 
   const handleEdit = (currency: Currency) => {
     setSelectedCurrency(currency);
@@ -45,13 +52,30 @@ export default function CurrencyTable({
   };
 
   const handleDelete = (currency: Currency) => {
-    setSelectedCurrency(currency);
-    setIsDeleteModalOpen(true);
+    setConfirmTarget(currency);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!confirmTarget) return;
+    setIsDeleting(true);
+    try {
+      await deleteCurrency(confirmTarget.id, isTrashed);
+      toast.success(isTrashed ? 'Currency permanently deleted' : 'Currency deleted successfully');
+      onAction();
+    } catch (error: unknown) {
+      let message = 'Failed to delete currency';
+      if (isApiError(error)) {
+        message = error.response?.data?.message || message;
+      }
+      toast.error(message);
+    } finally {
+      setIsDeleting(false);
+      setConfirmTarget(null);
+    }
   };
 
   const handleCloseModals = () => {
     setIsEditModalOpen(false);
-    setIsDeleteModalOpen(false);
     setSelectedCurrency(null);
   };
 
@@ -120,7 +144,13 @@ export default function CurrencyTable({
           </TableHeader>
 
           <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-            {data.length === 0 ? (
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={5} className="p-0">
+                  <SkeletonTable rows={perPage} columns={5} />
+                </TableCell>
+              </TableRow>
+            ) : data.length === 0 ? (
               <TableRow>
                 <TableCell
                   colSpan={5}
@@ -182,15 +212,23 @@ export default function CurrencyTable({
             onSuccess={onAction}
             currency={selectedCurrency}
           />
-          <DeleteCurrencyModal
-            isOpen={isDeleteModalOpen}
-            onClose={handleCloseModals}
-            onCurrencyDeleted={onAction}
-            currency={selectedCurrency}
-            force={viewMode === 'trashed'}
-          />
         </>
       )}
+
+      <ConfirmModal
+        isOpen={!!confirmTarget}
+        onClose={() => setConfirmTarget(null)}
+        onConfirm={handleDeleteConfirm}
+        isLoading={isDeleting}
+        title={isTrashed ? 'Permanently Delete Currency' : 'Delete Currency'}
+        message={
+          isTrashed
+            ? `Are you sure you want to permanently delete "${confirmTarget?.name}"? This action cannot be undone.`
+            : `Are you sure you want to delete "${confirmTarget?.name}"? You can restore it later from the trash.`
+        }
+        confirmLabel={isTrashed ? 'Delete Permanently' : 'Delete'}
+        variant="danger"
+      />
     </div>
   );
 }

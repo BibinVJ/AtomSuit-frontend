@@ -21,6 +21,7 @@ export default function TaxRateList() {
 
   const {
     data: taxRates,
+    loading,
     currentPage,
     perPage,
     totalPages,
@@ -86,6 +87,7 @@ export default function TaxRateList() {
         >
           <TaxRateTable
             data={taxRates}
+            loading={loading}
             onAction={refresh}
             onSort={handleSort}
             sortBy={sortBy}

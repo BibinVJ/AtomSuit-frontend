@@ -22,6 +22,7 @@ export default function Categories() {
 
   const {
     data: categories,
+    loading,
     currentPage,
     perPage,
     totalPages,
@@ -107,6 +108,7 @@ export default function Categories() {
         >
           <CategoryTable
             data={categories}
+            loading={loading}
             onAction={refresh}
             onSort={handleSort}
             sortBy={sortBy}

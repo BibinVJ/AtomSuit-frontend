@@ -35,6 +35,7 @@ export default function AccountGroups() {
 
   const {
     data: groupsData,
+    loading,
     currentPage,
     perPage,
     totalPages,
@@ -166,6 +167,7 @@ export default function AccountGroups() {
         >
           <AccountGroupTable
             data={groupsData}
+            loading={loading}
             onAction={refresh}
             onSort={handleSort}
             sortBy={sortBy}

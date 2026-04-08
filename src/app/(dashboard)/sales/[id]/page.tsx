@@ -5,6 +5,7 @@ import { useRouter, useParams } from 'next/navigation';
 import PageMeta from '@/components/common/PageMeta';
 import PageBreadcrumb from '@/components/common/PageBreadCrumb';
 import ComponentCard from '@/components/common/ComponentCard';
+import SkeletonDetail from '@/components/common/SkeletonDetail';
 import Button from '@/components/ui/button/Button';
 import Badge from '@/components/ui/badge/Badge';
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '@/components/ui/table';
@@ -46,7 +47,16 @@ export default function ViewSale() {
   };
 
   if (!sale) {
-    return <div>Loading...</div>;
+    return (
+      <div className="p-6">
+        <PageBreadcrumb
+          pageTitle="Sale Details"
+          breadcrumbs={[{ label: 'Sales', path: '/sales' }]}
+          backButton={true}
+        />
+        <SkeletonDetail columns={3} />
+      </div>
+    );
   }
 
   return (

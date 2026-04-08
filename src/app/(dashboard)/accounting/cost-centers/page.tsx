@@ -30,6 +30,7 @@ export default function CostCenters() {
 
   const {
     data: costCenters,
+    loading,
     currentPage,
     perPage,
     totalPages,
@@ -158,6 +159,7 @@ export default function CostCenters() {
         >
           <CostCenterTable
             data={costCenters}
+            loading={loading}
             onAction={refresh}
             onSort={handleSort}
             sortBy={sortBy}

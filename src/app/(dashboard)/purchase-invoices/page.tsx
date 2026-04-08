@@ -18,9 +18,13 @@ import { Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import { isApiError } from '@/utils/errors';
 
+import { useState } from 'react';
+
 export default function PurchaseInvoices() {
   const { hasPermission } = usePermissions();
   const router = useRouter();
+
+  const [activeTab, setActiveTab] = useState<'active' | 'trashed'>('active');
 
   const {
     data: purchaseInvoices,
@@ -42,12 +46,14 @@ export default function PurchaseInvoices() {
     handlePageChange,
     handlePerPageChange,
     handleSort,
-    viewMode,
-    setViewMode,
     refresh,
     resetFilters,
   } = useDataTable<PurchaseInvoice>({
     fetchData: PurchaseInvoiceService.list,
+    extraParams: {
+      exclude_status: activeTab === 'active' ? 'voided' : undefined,
+      status: activeTab === 'trashed' ? 'voided' : undefined,
+    },
   });
 
   const handleRestore = async (id: number) => {
@@ -87,15 +93,20 @@ export default function PurchaseInvoices() {
         </div>
 
         <ComponentCard
-          title={`Purchase Invoices (${viewMode})`}
+          title={`Purchase Invoices (${activeTab === 'trashed' ? 'Voided' : 'Active'})`}
           action={
             <div className="flex flex-wrap items-center gap-4">
-              <ViewModeTabs viewMode={viewMode} setViewMode={setViewMode} />
+              <ViewModeTabs
+                viewMode={activeTab}
+                setViewMode={setActiveTab}
+                trashedLabel="Voided"
+                trashedTooltip="Show Voided Invoices"
+              />
               <div className="flex flex-wrap items-center gap-2">
                 {hasPermission('create-purchase-invoice') && (
                   <Tooltip text="Add New Purchase Invoice">
                     <Button
-                      onClick={() => router.push('/purchase-invoices/create')}
+                      href="/purchase-invoices/create"
                       size="sm"
                       startIcon={<Plus className="w-4 h-4" />}
                     >
@@ -117,7 +128,7 @@ export default function PurchaseInvoices() {
             currentPage={currentPage}
             perPage={perPage}
             startIndex={rangeFrom !== '' ? Number(rangeFrom) : undefined}
-            viewMode={viewMode}
+            viewMode={activeTab === 'trashed' ? 'voided' : 'active'}
             onRestore={handleRestore}
           />
           <Pagination

@@ -3,22 +3,24 @@
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '@/components/ui/table';
 import { useState } from 'react';
 import EditItemModal from './EditItemModal';
-import DeleteItemModal from './DeleteItemModal';
 import ViewItemModal from './ViewItemModal';
+import ConfirmModal from '@/components/common/ConfirmModal';
 import {
   ChevronsUpDown,
   ArrowUpWideNarrow,
   ArrowDownNarrowWide,
   BadgeDollarSign,
 } from 'lucide-react';
-import { restoreItem } from '@/services/ItemService';
+import { restoreItem, deleteItem } from '@/services/ItemService';
 import { toast } from 'sonner';
+import { isApiError } from '@/utils/errors';
 import { Item } from '@/types';
 import { usePermissions } from '@/hooks/usePermissions';
 
 import { TableActions } from '@/components/common/TableActions';
 import Button from '@/components/ui/button/Button';
 import Tooltip from '@/components/ui/tooltip/Tooltip';
+import SkeletonTable from '@/components/common/SkeletonTable';
 
 interface Props {
   data: Item[];
@@ -31,6 +33,7 @@ interface Props {
   startIndex?: number;
   viewMode?: 'active' | 'trashed';
   onManagePricing?: (item: Item) => void;
+  loading?: boolean;
 }
 
 export default function ItemTable({
@@ -44,22 +47,21 @@ export default function ItemTable({
   startIndex,
   viewMode = 'active',
   onManagePricing,
+  loading,
 }: Props) {
   const { hasPermission } = usePermissions();
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
+  const [confirmTarget, setConfirmTarget] = useState<Item | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const isTrashed = viewMode === 'trashed';
 
   const handleEdit = (item: Item) => {
     setSelectedItem(item);
     setIsEditModalOpen(true);
-  };
-
-  const handleDelete = (item: Item) => {
-    setSelectedItem(item);
-    setIsDeleteModalOpen(true);
   };
 
   const handleView = (item: Item) => {
@@ -69,9 +71,27 @@ export default function ItemTable({
 
   const handleCloseModals = () => {
     setIsEditModalOpen(false);
-    setIsDeleteModalOpen(false);
     setIsViewModalOpen(false);
     setSelectedItem(null);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!confirmTarget) return;
+    setIsDeleting(true);
+    try {
+      await deleteItem(confirmTarget.id, isTrashed);
+      toast.success(isTrashed ? 'Item permanently deleted' : 'Item deleted successfully');
+      onAction();
+    } catch (error: unknown) {
+      let message = 'Failed to delete item';
+      if (isApiError(error)) {
+        message = error.response?.data?.message || message;
+      }
+      toast.error(message);
+    } finally {
+      setIsDeleting(false);
+      setConfirmTarget(null);
+    }
   };
 
   const handleRestore = async (id: number) => {
@@ -153,105 +173,130 @@ export default function ItemTable({
           </TableHeader>
 
           <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-            {data.map((item, index) => (
-              <TableRow key={item.id}>
-                <TableCell className="px-5 py-4 sm:px-6 text-start">
-                  <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                    {startIndex !== undefined
-                      ? startIndex + index
-                      : (currentPage - 1) * perPage + index + 1}
-                  </p>
-                </TableCell>
-                <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                  {item.sku}
-                </TableCell>
-                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
-                  {item.name}
-                </TableCell>
-                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
-                  {item.category ? (
-                    <span
-                      className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-                        item.category.deleted_at
-                          ? 'bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-500'
-                          : 'bg-gray-100 text-gray-800 dark:bg-white/10 dark:text-white'
-                      }`}
-                    >
-                      {item.category.name}
-                      {item.category.deleted_at ? ' (Deleted)' : ''}
-                    </span>
-                  ) : (
-                    '-'
-                  )}
-                </TableCell>
-                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
-                  {item.unit ? (
-                    <span
-                      className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-                        item.unit.deleted_at
-                          ? 'bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-500'
-                          : 'bg-gray-100 text-gray-800 dark:bg-white/10 dark:text-white'
-                      }`}
-                    >
-                      {item.unit.name} ({item.unit.code}){item.unit.deleted_at ? ' (Deleted)' : ''}
-                    </span>
-                  ) : (
-                    '-'
-                  )}
-                </TableCell>
-                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
-                  {item.type}
-                </TableCell>
-
-                <TableCell className="px-4 py-3 text-end">
-                  <div className="flex justify-end gap-2">
-                    {onManagePricing && (
-                      <Tooltip text="Manage Pricing">
-                        <Button
-                          variant="ghost"
-                          size="xs"
-                          onClick={() => onManagePricing(item)}
-                          className="text-gray-500 hover:text-emerald-600"
-                        >
-                          <BadgeDollarSign size={18} />
-                        </Button>
-                      </Tooltip>
-                    )}
-                    <TableActions
-                      isTrashed={viewMode === 'trashed'}
-                      onView={() => handleView(item)}
-                      onEdit={hasPermission('update-item') ? () => handleEdit(item) : undefined}
-                      onDelete={hasPermission('delete-item') ? () => handleDelete(item) : undefined}
-                      onRestore={
-                        hasPermission('update-item') ? () => handleRestore(item.id) : undefined
-                      }
-                    />
-                  </div>
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={7} className="p-0">
+                  <SkeletonTable rows={perPage} columns={7} />
                 </TableCell>
               </TableRow>
-            ))}
+            ) : data.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={7} className="px-5 py-10 text-center text-gray-500">
+                  No items found.
+                </TableCell>
+              </TableRow>
+            ) : (
+              data.map((item, index) => (
+                <TableRow key={item.id}>
+                  <TableCell className="px-5 py-4 sm:px-6 text-start">
+                    <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
+                      {startIndex !== undefined
+                        ? startIndex + index
+                        : (currentPage - 1) * perPage + index + 1}
+                    </p>
+                  </TableCell>
+                  <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
+                    {item.sku}
+                  </TableCell>
+                  <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
+                    {item.name}
+                  </TableCell>
+                  <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
+                    {item.category ? (
+                      <span
+                        className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+                          item.category.deleted_at
+                            ? 'bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-500'
+                            : 'bg-gray-100 text-gray-800 dark:bg-white/10 dark:text-white'
+                        }`}
+                      >
+                        {item.category.name}
+                        {item.category.deleted_at ? ' (Deleted)' : ''}
+                      </span>
+                    ) : (
+                      '-'
+                    )}
+                  </TableCell>
+                  <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
+                    {item.unit ? (
+                      <span
+                        className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+                          item.unit.deleted_at
+                            ? 'bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-500'
+                            : 'bg-gray-100 text-gray-800 dark:bg-white/10 dark:text-white'
+                        }`}
+                      >
+                        {item.unit.name} ({item.unit.code})
+                        {item.unit.deleted_at ? ' (Deleted)' : ''}
+                      </span>
+                    ) : (
+                      '-'
+                    )}
+                  </TableCell>
+                  <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
+                    {item.type}
+                  </TableCell>
+
+                  <TableCell className="px-4 py-3 text-end">
+                    <div className="flex justify-end gap-2">
+                      {onManagePricing && (
+                        <Tooltip text="Manage Pricing">
+                          <Button
+                            variant="ghost"
+                            size="xs"
+                            onClick={() => onManagePricing(item)}
+                            className="text-gray-500 hover:text-emerald-600"
+                          >
+                            <BadgeDollarSign size={18} />
+                          </Button>
+                        </Tooltip>
+                      )}
+                      <TableActions
+                        isTrashed={viewMode === 'trashed'}
+                        onView={() => handleView(item)}
+                        onEdit={hasPermission('update-item') ? () => handleEdit(item) : undefined}
+                        onDelete={
+                          hasPermission('delete-item') ? () => setConfirmTarget(item) : undefined
+                        }
+                        onRestore={
+                          hasPermission('update-item') ? () => handleRestore(item.id) : undefined
+                        }
+                      />
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>
       {selectedItem && (
-        <>
-          <ViewItemModal isOpen={isViewModalOpen} onClose={handleCloseModals} item={selectedItem} />
-          <EditItemModal
-            isOpen={isEditModalOpen}
-            onClose={handleCloseModals}
-            onSuccess={onAction}
-            item={selectedItem}
-            onManagePricing={onManagePricing}
-          />
-          <DeleteItemModal
-            isOpen={isDeleteModalOpen}
-            onClose={handleCloseModals}
-            onSuccess={onAction}
-            item={selectedItem}
-            isForceDelete={viewMode === 'trashed'}
-          />
-        </>
+        <ViewItemModal isOpen={isViewModalOpen} onClose={handleCloseModals} item={selectedItem} />
       )}
+      {selectedItem && (
+        <EditItemModal
+          isOpen={isEditModalOpen}
+          onClose={handleCloseModals}
+          onSuccess={onAction}
+          item={selectedItem}
+          onManagePricing={onManagePricing}
+        />
+      )}
+
+      <ConfirmModal
+        isOpen={!!confirmTarget}
+        onClose={() => setConfirmTarget(null)}
+        onConfirm={handleDeleteConfirm}
+        isLoading={isDeleting}
+        title={isTrashed ? 'Permanently Delete Item' : 'Delete Item'}
+        message={
+          isTrashed
+            ? `Are you sure you want to PERMANENTLY delete "${confirmTarget?.name}"? This will check for any related records and fail if any are found. This action cannot be undone.`
+            : `Are you sure you want to delete "${confirmTarget?.name}"? You can restore it later from the Trashed items view.`
+        }
+        confirmLabel={isTrashed ? 'Delete Permanently' : 'Delete'}
+        variant="danger"
+      />
     </div>
   );
 }

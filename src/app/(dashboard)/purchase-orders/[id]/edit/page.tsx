@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import PageBreadcrumb from '@/components/common/PageBreadCrumb';
 import ComponentCard from '@/components/common/ComponentCard';
+import SkeletonForm from '@/components/common/SkeletonForm';
 import PageMeta from '@/components/common/PageMeta';
 import Button from '@/components/ui/button/Button';
 import Select from '@/components/form/Select';
@@ -18,7 +19,7 @@ import { getCostCenters } from '@/services/CostCenterService';
 import { CostCenter } from '@/types/CostCenter';
 import { getWarehouses } from '@/services/WarehouseService';
 import { Item, Vendor, DiscountType, PaginatedResponse } from '@/types';
-import { PurchaseOrderItem } from '@/types/PurchaseOrder';
+import { PurchaseOrderItem, PurchaseOrderStatus } from '@/types/PurchaseOrder';
 import { getPurchaseOrder, updatePurchaseOrder } from '@/services/PurchaseOrderService';
 import { isApiError } from '@/utils/errors';
 import { useSettings } from '@/hooks/useSettings';
@@ -54,12 +55,15 @@ export default function EditPurchaseOrder() {
   const [warehouseId, setWarehouseId] = useState('');
   const [orderDate, setOrderDate] = useState('');
   const [expectedDeliveryDate, setExpectedDeliveryDate] = useState('');
+  const [status, setStatus] = useState<PurchaseOrderStatus>(PurchaseOrderStatus.DRAFT);
   const [notes, setNotes] = useState('');
 
   const [purchaseItems, setPurchaseItems] = useState<PurchaseOrderItemInput[]>([]);
   const [errors, setErrors] = useState<ApiError>({});
+  const [isLoading, setIsLoading] = useState(true);
 
   const fetchInitialData = useCallback(async () => {
+    setIsLoading(true);
     try {
       if (!id) return;
       const [vendorResponse, itemResponse, ccResponse, whResponse, poResponse] = await Promise.all([
@@ -98,6 +102,7 @@ export default function EditPurchaseOrder() {
       setReferenceNumber(po.reference_number || '');
       setOrderDate(po.order_date);
       setExpectedDeliveryDate(po.expected_delivery_date || '');
+      setStatus(po.status);
       setNotes(po.notes || '');
       setCostCenterId(String(po.cost_center_id || ''));
       setWarehouseId(String(po.warehouse_id || ''));
@@ -117,6 +122,8 @@ export default function EditPurchaseOrder() {
       console.error('Error fetching initial data:', error);
       toast.error('Failed to load purchase order data');
       router.push('/purchase-orders');
+    } finally {
+      setIsLoading(false);
     }
   }, [id, router]);
 
@@ -245,6 +252,7 @@ export default function EditPurchaseOrder() {
         reference_number: referenceNumber,
         order_date: orderDate,
         expected_delivery_date: expectedDeliveryDate || undefined,
+        status: status,
         cost_center_id: Number(costCenterId),
         warehouse_id: Number(warehouseId),
         notes: notes,
@@ -370,409 +378,435 @@ export default function EditPurchaseOrder() {
       />
 
       <ComponentCard>
-        <form onSubmit={handleSubmit}>
-          <div className="grid grid-cols-1 gap-x-6 gap-y-4 md:grid-cols-2 lg:grid-cols-4">
-            <div>
-              <Label required>Vendor</Label>
-              <Select
-                options={vendors.map((v) => ({ value: String(v.id), label: v.name }))}
-                onChange={(value) => {
-                  setVendorId(value);
-                  clearError('vendor_id');
-                }}
-                defaultValue={vendorId}
-                placeholder="Select a vendor"
-                error={!!getErrorMessage('vendor_id')}
-                hint={getErrorMessage('vendor_id')}
-              />
-            </div>
-            <div>
-              <Label>Order Number</Label>
-              <Input
-                type="text"
-                value={orderNumber}
-                onChange={(e) => {
-                  setOrderNumber(e.target.value);
-                  clearError('order_number');
-                }}
-                error={!!getErrorMessage('order_number')}
-                hint={getErrorMessage('order_number')}
-                readOnly
-              />
-            </div>
-            <div>
-              <Label>Reference Number</Label>
-              <Input
-                type="text"
-                value={referenceNumber}
-                onChange={(e) => {
-                  setReferenceNumber(e.target.value);
-                  clearError('reference_number');
-                }}
-                error={!!getErrorMessage('reference_number')}
-                hint={getErrorMessage('reference_number')}
-                placeholder="e.g. Vendor Quote #"
-              />
-            </div>
-            <div className="lg:col-span-1">
-              <Label>Order Date</Label>
-              <DatePicker
-                id="order_date"
-                required
-                onChange={(_, dateStr) => {
-                  setOrderDate(dateStr);
-                  clearError('order_date');
-                }}
-                defaultDate={orderDate}
-                error={!!getErrorMessage('order_date')}
-                hint={getErrorMessage('order_date')}
-              />
-            </div>
+        {isLoading ? (
+          <SkeletonForm rows={3} columns={4} />
+        ) : (
+          <form onSubmit={handleSubmit}>
+            <div className="grid grid-cols-1 gap-x-6 gap-y-4 md:grid-cols-2 lg:grid-cols-4">
+              <div>
+                <Label required>Vendor</Label>
+                <Select
+                  options={vendors.map((v) => ({ value: String(v.id), label: v.name }))}
+                  onChange={(value) => {
+                    setVendorId(value);
+                    clearError('vendor_id');
+                  }}
+                  defaultValue={vendorId}
+                  placeholder="Select a vendor"
+                  error={!!getErrorMessage('vendor_id')}
+                  hint={getErrorMessage('vendor_id')}
+                />
+              </div>
+              <div>
+                <Label>Order Number</Label>
+                <Input
+                  type="text"
+                  value={orderNumber}
+                  onChange={(e) => {
+                    setOrderNumber(e.target.value);
+                    clearError('order_number');
+                  }}
+                  error={!!getErrorMessage('order_number')}
+                  hint={getErrorMessage('order_number')}
+                  readOnly
+                />
+              </div>
+              <div>
+                <Label>Reference Number</Label>
+                <Input
+                  type="text"
+                  value={referenceNumber}
+                  onChange={(e) => {
+                    setReferenceNumber(e.target.value);
+                    clearError('reference_number');
+                  }}
+                  error={!!getErrorMessage('reference_number')}
+                  hint={getErrorMessage('reference_number')}
+                  placeholder="e.g. Vendor Quote #"
+                />
+              </div>
+              <div className="lg:col-span-1">
+                <Label>Order Date</Label>
+                <DatePicker
+                  id="order_date"
+                  required
+                  onChange={(_, dateStr) => {
+                    setOrderDate(dateStr);
+                    clearError('order_date');
+                  }}
+                  defaultDate={orderDate}
+                  error={!!getErrorMessage('order_date')}
+                  hint={getErrorMessage('order_date')}
+                />
+              </div>
 
-            {/* Row 2 & 3, Column 1: Vendor Details */}
-            <div className="lg:col-span-1 lg:row-span-2 min-h-[100px]">
-              {selectedVendor && (
-                <div className="p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700 text-xs animate-in fade-in duration-300 h-full">
-                  <h4 className="font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wider text-[10px]">
-                    Vendor Info
-                  </h4>
-                  <div className="space-y-1 text-gray-600 dark:text-gray-400">
-                    <p className="flex items-center gap-2">
-                      <span className="font-semibold w-10 underline decoration-gray-300 dark:decoration-gray-600">
-                        Email:
-                      </span>{' '}
-                      {selectedVendor.email || 'N/A'}
-                    </p>
-                    <p className="flex items-center gap-2">
-                      <span className="font-semibold w-10 underline decoration-gray-300 dark:decoration-gray-600">
-                        Phone:
-                      </span>{' '}
-                      {selectedVendor.phone || 'N/A'}
-                    </p>
-                    <div className="flex gap-2 mt-2 pt-2 border-t border-gray-200 dark:border-gray-700 text-[11px]">
-                      <span className="font-semibold w-10 flex-shrink-0 underline decoration-gray-300 dark:decoration-gray-600">
-                        Addr:
-                      </span>
-                      <p className="italic leading-tight">
-                        {[
-                          selectedVendor.billing_address_line_1,
-                          selectedVendor.billing_address_line_2,
-                          selectedVendor.billing_city,
-                          selectedVendor.billing_state,
-                          selectedVendor.billing_zip_code,
-                          selectedVendor.billing_country,
-                        ]
-                          .filter(Boolean)
-                          .join(', ') || 'No address provided'}
+              {/* Row 2 & 3, Column 1: Vendor Details */}
+              <div className="lg:col-span-1 lg:row-span-2 min-h-[100px]">
+                {selectedVendor && (
+                  <div className="p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700 text-xs animate-in fade-in duration-300 h-full">
+                    <h4 className="font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wider text-[10px]">
+                      Vendor Info
+                    </h4>
+                    <div className="space-y-1 text-gray-600 dark:text-gray-400">
+                      <p className="flex items-center gap-2">
+                        <span className="font-semibold w-10 underline decoration-gray-300 dark:decoration-gray-600">
+                          Email:
+                        </span>{' '}
+                        {selectedVendor.email || 'N/A'}
                       </p>
+                      <p className="flex items-center gap-2">
+                        <span className="font-semibold w-10 underline decoration-gray-300 dark:decoration-gray-600">
+                          Phone:
+                        </span>{' '}
+                        {selectedVendor.phone || 'N/A'}
+                      </p>
+                      <div className="flex gap-2 mt-2 pt-2 border-t border-gray-200 dark:border-gray-700 text-[11px]">
+                        <span className="font-semibold w-10 flex-shrink-0 underline decoration-gray-300 dark:decoration-gray-600">
+                          Addr:
+                        </span>
+                        <p className="italic leading-tight">
+                          {[
+                            selectedVendor.billing_address_line_1,
+                            selectedVendor.billing_address_line_2,
+                            selectedVendor.billing_city,
+                            selectedVendor.billing_state,
+                            selectedVendor.billing_zip_code,
+                            selectedVendor.billing_country,
+                          ]
+                            .filter(Boolean)
+                            .join(', ') || 'No address provided'}
+                        </p>
+                      </div>
                     </div>
                   </div>
+                )}
+              </div>
+
+              <div className="lg:col-span-1">
+                <Label>Status</Label>
+                <Select
+                  options={[
+                    { value: PurchaseOrderStatus.DRAFT, label: 'Draft' },
+                    { value: PurchaseOrderStatus.SENT, label: 'Sent' },
+                    { value: PurchaseOrderStatus.CONFIRMED, label: 'Confirmed' },
+                  ]}
+                  onChange={(value) => setStatus(value as PurchaseOrderStatus)}
+                  defaultValue={status}
+                />
+              </div>
+
+              <div className="lg:col-span-1">
+                <DatePicker
+                  id="expected_delivery_date"
+                  label="Expected Delivery Date"
+                  required
+                  onChange={(_, dateStr) => {
+                    setExpectedDeliveryDate(dateStr);
+                    clearError('expected_delivery_date');
+                  }}
+                  defaultDate={expectedDeliveryDate}
+                  error={!!getErrorMessage('expected_delivery_date')}
+                  hint={getErrorMessage('expected_delivery_date')}
+                />
+              </div>
+
+              <div className="lg:col-span-1">
+                <Label>Cost Center</Label>
+                <Select
+                  options={costCenters.map((c) => ({ value: String(c.id), label: c.name }))}
+                  onChange={(value) => {
+                    setCostCenterId(value);
+                    clearError('cost_center_id');
+                  }}
+                  defaultValue={costCenterId}
+                  placeholder="Select Cost Center"
+                  error={!!getErrorMessage('cost_center_id')}
+                  hint={getErrorMessage('cost_center_id')}
+                />
+              </div>
+
+              <div className="lg:col-span-1">
+                <Label required>Warehouse</Label>
+                <Select
+                  options={warehouses.map((w) => ({ value: String(w.id), label: w.name }))}
+                  onChange={(value) => {
+                    setWarehouseId(value);
+                    clearError('warehouse_id');
+                  }}
+                  defaultValue={warehouseId}
+                  placeholder="Select Warehouse"
+                  error={!!getErrorMessage('warehouse_id')}
+                  hint={getErrorMessage('warehouse_id')}
+                />
+              </div>
+
+              {/* Row 3, Columns 3 & 4: Notes (Last Row) */}
+              <div className="lg:col-span-2">
+                <Label>Notes</Label>
+                <TextArea
+                  value={notes}
+                  onChange={(value) => setNotes(value)}
+                  placeholder="Internal notes..."
+                  className="min-h-[100px]"
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between mt-8 mb-4">
+              <h3 className="text-xl font-bold dark:text-white">Items</h3>
+              <Button type="button" variant="outline" onClick={handleAddItem} className="gap-2">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M12 4v16m8-8H4"
+                  ></path>
+                </svg>
+                Add Item
+              </Button>
+            </div>
+
+            <div className="space-y-4">
+              {/* Table Headers */}
+              <div className="grid grid-cols-[2.5fr_1.5fr_1.5fr_1.5fr_0.8fr_1.2fr] gap-x-4 px-4 py-3 mb-2 bg-gray-50 dark:bg-gray-800/50 rounded-lg items-end">
+                <div className="min-w-0 uppercase text-theme-xs font-bold tracking-wider text-gray-500">
+                  Items <span className="text-red-500">*</span>
                 </div>
-              )}
-            </div>
-
-            <div className="lg:col-span-1">
-              <DatePicker
-                id="expected_delivery_date"
-                label="Expected Delivery Date"
-                required
-                onChange={(_, dateStr) => {
-                  setExpectedDeliveryDate(dateStr);
-                  clearError('expected_delivery_date');
-                }}
-                defaultDate={expectedDeliveryDate}
-                error={!!getErrorMessage('expected_delivery_date')}
-                hint={getErrorMessage('expected_delivery_date')}
-              />
-            </div>
-
-            <div className="lg:col-span-1">
-              <Label>Cost Center</Label>
-              <Select
-                options={costCenters.map((c) => ({ value: String(c.id), label: c.name }))}
-                onChange={(value) => {
-                  setCostCenterId(value);
-                  clearError('cost_center_id');
-                }}
-                defaultValue={costCenterId}
-                placeholder="Select Cost Center"
-                error={!!getErrorMessage('cost_center_id')}
-                hint={getErrorMessage('cost_center_id')}
-              />
-            </div>
-
-            <div className="lg:col-span-1">
-              <Label required>Warehouse</Label>
-              <Select
-                options={warehouses.map((w) => ({ value: String(w.id), label: w.name }))}
-                onChange={(value) => {
-                  setWarehouseId(value);
-                  clearError('warehouse_id');
-                }}
-                defaultValue={warehouseId}
-                placeholder="Select Warehouse"
-                error={!!getErrorMessage('warehouse_id')}
-                hint={getErrorMessage('warehouse_id')}
-              />
-            </div>
-
-            {/* Row 3, Columns 2 & 3: Notes (Last Row) */}
-            <div className="lg:col-span-2 lg:col-start-2">
-              <Label>Notes</Label>
-              <TextArea
-                value={notes}
-                onChange={(value) => setNotes(value)}
-                placeholder="Internal notes..."
-                className="min-h-[100px]"
-              />
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between mt-8 mb-4">
-            <h3 className="text-xl font-bold dark:text-white">Items</h3>
-            <Button type="button" variant="outline" onClick={handleAddItem} className="gap-2">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M12 4v16m8-8H4"
-                ></path>
-              </svg>
-              Add Item
-            </Button>
-          </div>
-
-          <div className="space-y-4">
-            {/* Table Headers */}
-            <div className="grid grid-cols-[2.5fr_1.5fr_1.5fr_1.5fr_0.8fr_1.2fr] gap-x-4 px-4 py-3 mb-2 bg-gray-50 dark:bg-gray-800/50 rounded-lg items-end">
-              <div className="min-w-0 uppercase text-theme-xs font-bold tracking-wider text-gray-500">
-                Items <span className="text-red-500">*</span>
-              </div>
-              <div className="min-w-0 text-center uppercase text-theme-xs font-bold tracking-wider text-gray-500">
-                Quantity <span className="text-red-500">*</span>
-              </div>
-              <div className="min-w-0 text-center uppercase text-theme-xs font-bold tracking-wider text-gray-500">
-                Price <span className="text-red-500">*</span>
-              </div>
-              <div className="min-w-0 text-center uppercase text-theme-xs font-bold tracking-wider text-gray-500">
-                Discount (% / Fixed)
-              </div>
-              <div className="min-w-0 text-center uppercase text-theme-xs font-bold tracking-wider text-gray-500">
-                Tax (%)
-              </div>
-              <div className="min-w-0 text-end">
-                <div className="uppercase text-theme-xs font-bold tracking-wider text-gray-500">
-                  Amount
+                <div className="min-w-0 text-center uppercase text-theme-xs font-bold tracking-wider text-gray-500">
+                  Quantity <span className="text-red-500">*</span>
                 </div>
-                <div className="text-[10px] font-bold text-red-500 uppercase tracking-tight leading-none mt-1">
-                  After Tax & Discount
+                <div className="min-w-0 text-center uppercase text-theme-xs font-bold tracking-wider text-gray-500">
+                  Price <span className="text-red-500">*</span>
+                </div>
+                <div className="min-w-0 text-center uppercase text-theme-xs font-bold tracking-wider text-gray-500">
+                  Discount (% / Fixed)
+                </div>
+                <div className="min-w-0 text-center uppercase text-theme-xs font-bold tracking-wider text-gray-500">
+                  Tax (%)
+                </div>
+                <div className="min-w-0 text-end">
+                  <div className="uppercase text-theme-xs font-bold tracking-wider text-gray-500">
+                    Amount
+                  </div>
+                  <div className="text-[10px] font-bold text-red-500 uppercase tracking-tight leading-none mt-1">
+                    After Tax & Discount
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {purchaseItems.map((item, index) => {
-              const selectedItem = getSelectedItem(item.item_id);
-              const itemTotals = calculateItemTotals(item, selectedItem);
-              const currencySymbol = getSetting<string>('currency_symbol');
-              return (
-                <div
-                  key={index}
-                  className="group relative rounded-xl border border-gray-100 p-4 transition-all hover:border-brand-200 dark:border-gray-800 dark:hover:border-brand-500/30"
-                >
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveItem(index)}
-                    className="absolute p-1 text-red-500 bg-red-50 dark:bg-red-500/10 rounded-full -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-100 dark:hover:bg-red-500/20"
+              {purchaseItems.map((item, index) => {
+                const selectedItem = getSelectedItem(item.item_id);
+                const itemTotals = calculateItemTotals(item, selectedItem);
+                const currencySymbol = getSetting<string>('currency_symbol');
+                return (
+                  <div
+                    key={index}
+                    className="group relative rounded-xl border border-gray-100 p-4 transition-all hover:border-brand-200 dark:border-gray-800 dark:hover:border-brand-500/30"
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M6 18L18 6M6 6l12 12"
-                      ></path>
-                    </svg>
-                  </button>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveItem(index)}
+                      className="absolute p-1 text-red-500 bg-red-50 dark:bg-red-500/10 rounded-full -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-100 dark:hover:bg-red-500/20"
+                    >
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M6 18L18 6M6 6l12 12"
+                        ></path>
+                      </svg>
+                    </button>
 
-                  {/* Row 1: Main Inputs */}
-                  <div className="grid grid-cols-[2.5fr_1.5fr_1.5fr_1.5fr_0.8fr_1.2fr] gap-x-4 items-center">
-                    <div className="min-w-0 overflow-hidden">
-                      <Select
-                        options={items.map((i) => ({ value: String(i.id), label: i.name }))}
-                        onChange={(value) => {
-                          handleItemChange(index, 'item_id', value);
-                          clearError(`items.${index}.item_id`);
-                        }}
-                        defaultValue={item.item_id}
-                        placeholder="Select an Item"
-                        error={!!getErrorMessage(`items.${index}.item_id`)}
-                      />
-                      {getErrorMessage(`items.${index}.item_id`) && (
-                        <p className="mt-1 text-xs text-red-500">
-                          {getErrorMessage(`items.${index}.item_id`)}
-                        </p>
-                      )}
-                    </div>
+                    {/* Row 1: Main Inputs */}
+                    <div className="grid grid-cols-[2.5fr_1.5fr_1.5fr_1.5fr_0.8fr_1.2fr] gap-x-4 items-center">
+                      <div className="min-w-0 overflow-hidden">
+                        <Select
+                          options={items.map((i) => ({ value: String(i.id), label: i.name }))}
+                          onChange={(value) => {
+                            handleItemChange(index, 'item_id', value);
+                            clearError(`items.${index}.item_id`);
+                          }}
+                          defaultValue={item.item_id}
+                          placeholder="Select an Item"
+                          error={!!getErrorMessage(`items.${index}.item_id`)}
+                        />
+                        {getErrorMessage(`items.${index}.item_id`) && (
+                          <p className="mt-1 text-xs text-red-500">
+                            {getErrorMessage(`items.${index}.item_id`)}
+                          </p>
+                        )}
+                      </div>
 
-                    <div className="min-w-0 overflow-hidden">
-                      <Input
-                        type="number"
-                        value={item.quantity}
-                        onChange={(e) => {
-                          handleItemChange(index, 'quantity', Number(e.target.value));
-                          clearError(`items.${index}.quantity`);
-                        }}
-                        className="text-center px-1"
-                        placeholder="Qty"
-                        suffix={selectedItem?.unit?.code || '-'}
-                        decimalPlaces={parseInt(getSetting('quantity_decimal_places', '3'))}
-                      />
-                    </div>
-
-                    <div className="min-w-0 overflow-hidden">
-                      <Input
-                        type="number"
-                        value={item.unit_price}
-                        onChange={(e) => {
-                          handleItemChange(index, 'unit_price', Number(e.target.value));
-                          clearError(`items.${index}.unit_price`);
-                        }}
-                        className="px-1"
-                        placeholder="Price"
-                        suffix={currencySymbol}
-                        decimalPlaces={parseInt(getSetting('decimal_places', '2'))}
-                      />
-                    </div>
-
-                    <div className="min-w-0 overflow-hidden">
-                      <div className="flex min-w-0 [&>div]:min-w-0 [&>div]:flex-1">
+                      <div className="min-w-0 overflow-hidden">
                         <Input
                           type="number"
-                          value={item.discount_value}
-                          onChange={(e) =>
-                            handleItemChange(index, 'discount_value', Number(e.target.value))
-                          }
-                          className="rounded-r-none border-r-0 px-1"
-                          placeholder="0"
-                          decimalPlaces={parseInt(getSetting('general_number_decimal_places', '2'))}
+                          value={item.quantity}
+                          onChange={(e) => {
+                            handleItemChange(index, 'quantity', Number(e.target.value));
+                            clearError(`items.${index}.quantity`);
+                          }}
+                          className="text-center px-1"
+                          placeholder="Qty"
+                          suffix={selectedItem?.unit?.code || '-'}
+                          decimalPlaces={parseInt(getSetting('quantity_decimal_places', '3'))}
                         />
-                        <button
-                          type="button"
-                          onClick={() =>
-                            handleItemChange(
-                              index,
-                              'discount_type',
-                              item.discount_type === 'percentage' ? 'fixed' : 'percentage'
-                            )
-                          }
-                          className="flex-shrink-0 flex items-center gap-1.5 px-2.5 border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 rounded-r-lg text-theme-xs font-bold text-blue-600 dark:text-blue-400 justify-center hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all cursor-pointer h-11 min-w-[45px] shadow-sm active:scale-95 group"
-                          title={`Switch to ${item.discount_type === 'percentage' ? 'fixed' : 'percentage'} discount`}
-                        >
-                          <span className="group-hover:scale-110 transition-transform">
-                            {item.discount_type === 'percentage' ? '%' : currencySymbol}
-                          </span>
-                          <svg
-                            className="w-3 h-3 text-gray-400 group-hover:text-blue-500 transition-colors"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
+                      </div>
+
+                      <div className="min-w-0 overflow-hidden">
+                        <Input
+                          type="number"
+                          value={item.unit_price}
+                          onChange={(e) => {
+                            handleItemChange(index, 'unit_price', Number(e.target.value));
+                            clearError(`items.${index}.unit_price`);
+                          }}
+                          className="px-1"
+                          placeholder="Price"
+                          suffix={currencySymbol}
+                          decimalPlaces={parseInt(getSetting('decimal_places', '2'))}
+                        />
+                      </div>
+
+                      <div className="min-w-0 overflow-hidden">
+                        <div className="flex min-w-0 [&>div]:min-w-0 [&>div]:flex-1">
+                          <Input
+                            type="number"
+                            value={item.discount_value}
+                            onChange={(e) =>
+                              handleItemChange(index, 'discount_value', Number(e.target.value))
+                            }
+                            className="rounded-r-none border-r-0 px-1"
+                            placeholder="0"
+                            decimalPlaces={parseInt(
+                              getSetting('general_number_decimal_places', '2')
+                            )}
+                          />
+                          <button
+                            type="button"
+                            onClick={() =>
+                              handleItemChange(
+                                index,
+                                'discount_type',
+                                item.discount_type === 'percentage' ? 'fixed' : 'percentage'
+                              )
+                            }
+                            className="flex-shrink-0 flex items-center gap-1.5 px-2.5 border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 rounded-r-lg text-theme-xs font-bold text-blue-600 dark:text-blue-400 justify-center hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all cursor-pointer h-11 min-w-[45px] shadow-sm active:scale-95 group"
+                            title={`Switch to ${item.discount_type === 'percentage' ? 'fixed' : 'percentage'} discount`}
                           >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="2.5"
-                              d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"
-                            />
-                          </svg>
-                        </button>
+                            <span className="group-hover:scale-110 transition-transform">
+                              {item.discount_type === 'percentage' ? '%' : currencySymbol}
+                            </span>
+                            <svg
+                              className="w-3 h-3 text-gray-400 group-hover:text-blue-500 transition-colors"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2.5"
+                                d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"
+                              />
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-center">
+                        {itemTotals.taxBreakdown.length > 0 ? (
+                          <div className="text-center space-y-0.5">
+                            {itemTotals.taxBreakdown.map((tb, ti) => (
+                              <div
+                                key={ti}
+                                className="text-xs font-medium text-gray-600 dark:text-gray-400 whitespace-nowrap"
+                              >
+                                {tb.name}{' '}
+                                <span className="font-bold text-gray-700 dark:text-gray-300">
+                                  {formatNumber(tb.rate)}%
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <span className="text-xs text-gray-400">—</span>
+                        )}
+                      </div>
+
+                      <div className="text-end">
+                        <p className="text-lg font-bold text-gray-800 dark:text-white">
+                          {formatCurrency(itemTotals.netTotal)}
+                        </p>
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-center">
-                      {itemTotals.taxBreakdown.length > 0 ? (
-                        <div className="text-center space-y-0.5">
-                          {itemTotals.taxBreakdown.map((tb, ti) => (
-                            <div
-                              key={ti}
-                              className="text-xs font-medium text-gray-600 dark:text-gray-400 whitespace-nowrap"
-                            >
-                              {tb.name}{' '}
-                              <span className="font-bold text-gray-700 dark:text-gray-300">
-                                {formatNumber(tb.rate)}%
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <span className="text-xs text-gray-400">—</span>
-                      )}
-                    </div>
-
-                    <div className="text-end">
-                      <p className="text-lg font-bold text-gray-800 dark:text-white">
-                        {formatCurrency(itemTotals.netTotal)}
-                      </p>
+                    {/* Row 2: Description */}
+                    <div className="mt-4 max-w-[40%]">
+                      <TextArea
+                        value={item.description}
+                        onChange={(value) => handleItemChange(index, 'description', value)}
+                        placeholder="Description"
+                        className="min-h-[40px] py-2"
+                      />
                     </div>
                   </div>
+                );
+              })}
+            </div>
 
-                  {/* Row 2: Description */}
-                  <div className="mt-4 max-w-[40%]">
-                    <TextArea
-                      value={item.description}
-                      onChange={(value) => handleItemChange(index, 'description', value)}
-                      placeholder="Description"
-                      className="min-h-[40px] py-2"
-                    />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          <div className="flex justify-end mt-8">
-            <div className="w-full max-w-sm space-y-3">
-              <div className="flex justify-between items-center px-4">
-                <span className="text-gray-500 font-bold uppercase text-theme-xs">Sub Total</span>
-                <span className="font-bold text-gray-900 dark:text-white">
-                  {formatCurrency(orderTotals.subTotal)}
-                </span>
-              </div>
-              <div className="flex justify-between items-center px-4">
-                <span className="text-gray-500 font-bold uppercase text-theme-xs">Discount</span>
-                <span className="font-bold text-gray-900 dark:text-white">
-                  -{formatCurrency(orderTotals.totalDiscount)}
-                </span>
-              </div>
-              {orderTotals.taxBreakdown.map((tb) => (
-                <div key={tb.name} className="flex justify-between items-center px-4">
-                  <span className="text-gray-500 font-bold uppercase text-theme-xs">{tb.name}</span>
+            <div className="flex justify-end mt-8">
+              <div className="w-full max-w-sm space-y-3">
+                <div className="flex justify-between items-center px-4">
+                  <span className="text-gray-500 font-bold uppercase text-theme-xs">Sub Total</span>
                   <span className="font-bold text-gray-900 dark:text-white">
-                    +{formatCurrency(tb.amount)}
+                    {formatCurrency(orderTotals.subTotal)}
                   </span>
                 </div>
-              ))}
-              <div className="flex justify-between items-center px-4">
-                <span className="text-gray-500 font-bold uppercase text-theme-xs">Total Tax</span>
-                <span className="font-bold text-gray-900 dark:text-white">
-                  +{formatCurrency(orderTotals.totalTax)}
-                </span>
-              </div>
-              <div className="flex justify-between items-center p-4 bg-brand-50 dark:bg-brand-500/10 rounded-xl">
-                <span className="text-brand-600 dark:text-brand-400 font-bold uppercase text-theme-sm">
-                  Total Amount
-                </span>
-                <span className="text-xl font-black text-brand-700 dark:text-brand-400">
-                  {formatCurrency(orderTotals.grandTotal)}
-                </span>
+                <div className="flex justify-between items-center px-4">
+                  <span className="text-gray-500 font-bold uppercase text-theme-xs">Discount</span>
+                  <span className="font-bold text-gray-900 dark:text-white">
+                    -{formatCurrency(orderTotals.totalDiscount)}
+                  </span>
+                </div>
+                {orderTotals.taxBreakdown.map((tb) => (
+                  <div key={tb.name} className="flex justify-between items-center px-4">
+                    <span className="text-gray-500 font-bold uppercase text-theme-xs">
+                      {tb.name}
+                    </span>
+                    <span className="font-bold text-gray-900 dark:text-white">
+                      +{formatCurrency(tb.amount)}
+                    </span>
+                  </div>
+                ))}
+                <div className="flex justify-between items-center px-4">
+                  <span className="text-gray-500 font-bold uppercase text-theme-xs">Total Tax</span>
+                  <span className="font-bold text-gray-900 dark:text-white">
+                    +{formatCurrency(orderTotals.totalTax)}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center p-4 bg-brand-50 dark:bg-brand-500/10 rounded-xl">
+                  <span className="text-brand-600 dark:text-brand-400 font-bold uppercase text-theme-sm">
+                    Total Amount
+                  </span>
+                  <span className="text-xl font-black text-brand-700 dark:text-brand-400">
+                    {formatCurrency(orderTotals.grandTotal)}
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div className="flex justify-end mt-6">
-            <Button type="submit">Update Purchase Order</Button>
-          </div>
-        </form>
+            <div className="flex justify-end mt-6">
+              <Button type="submit">Update Purchase Order</Button>
+            </div>
+          </form>
+        )}
       </ComponentCard>
     </>
   );

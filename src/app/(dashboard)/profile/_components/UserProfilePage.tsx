@@ -11,6 +11,8 @@ import EditProfileModal from './EditProfileModal';
 import EditAddressModal from './EditAddressModal';
 import EditSocialLinksModal from './EditSocialLinksModal';
 import EditProfileImageModal from './EditProfileImageModal';
+import SkeletonDetail from '@/components/common/SkeletonDetail';
+import ComponentCard from '@/components/common/ComponentCard';
 
 export default function UserProfilePage() {
   const { fetchProfile, user, loading } = useAuth();
@@ -32,13 +34,31 @@ export default function UserProfilePage() {
   // Show loading state while user data is being fetched
   if (loading) {
     return (
-      <>
+      <div className="p-6">
         <PageMeta title="User Profile" description="This is the user profile page" />
         <PageBreadcrumb pageTitle="Profile" />
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-500"></div>
+        <div className="space-y-6">
+          <ComponentCard>
+            <div className="flex flex-col gap-5 xl:flex-row xl:items-center">
+              <div className="flex flex-col items-center w-full gap-6 xl:flex-row">
+                <div className="w-20 h-20 bg-gray-200 dark:bg-gray-800 rounded-full animate-pulse"></div>
+                <div className="space-y-3 flex-grow">
+                  <div className="h-6 w-48 bg-gray-200 dark:bg-gray-800 rounded animate-pulse"></div>
+                  <div className="h-4 w-32 bg-gray-100 dark:bg-gray-800/50 rounded animate-pulse"></div>
+                </div>
+                <div className="flex gap-2">
+                  <div className="h-10 w-10 bg-gray-200 dark:bg-gray-800 rounded-full animate-pulse"></div>
+                  <div className="h-10 w-10 bg-gray-200 dark:bg-gray-800 rounded-full animate-pulse"></div>
+                  <div className="h-10 w-10 bg-gray-200 dark:bg-gray-800 rounded-full animate-pulse"></div>
+                </div>
+              </div>
+              <div className="h-10 w-32 bg-brand-500/20 rounded-full animate-pulse ml-auto"></div>
+            </div>
+          </ComponentCard>
+          <SkeletonDetail columns={1} hasTable={false} />
+          <SkeletonDetail columns={1} hasTable={false} />
         </div>
-      </>
+      </div>
     );
   }
 

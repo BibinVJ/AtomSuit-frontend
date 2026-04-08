@@ -22,6 +22,7 @@ export default function Units() {
 
   const {
     data: units,
+    loading,
     currentPage,
     perPage,
     totalPages,
@@ -107,6 +108,7 @@ export default function Units() {
         >
           <UnitTable
             data={units}
+            loading={loading}
             onAction={refresh}
             onSort={handleSort}
             sortBy={sortBy}

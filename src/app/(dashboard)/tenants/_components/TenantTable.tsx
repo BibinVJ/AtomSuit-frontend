@@ -3,12 +3,16 @@
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '@/components/ui/table';
 import { useState } from 'react';
 import Badge from '@/components/ui/badge/Badge';
-import DeleteTenantModal from './DeleteTenantModal';
+import ConfirmModal from '@/components/common/ConfirmModal';
 import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide } from 'lucide-react';
 import { TableActions } from '@/components/common/TableActions';
+import SkeletonTable from '@/components/common/SkeletonTable';
 
 import { Tenant } from '@/types';
 import { usePermissions } from '@/hooks/usePermissions';
+import { deleteTenant } from '@/services/TenantService';
+import { toast } from 'sonner';
+import { isApiError } from '@/utils/errors';
 
 interface Props {
   data: Tenant[];
@@ -34,17 +38,30 @@ export default function TenantTable({
   loading,
 }: Props) {
   const { hasPermission } = usePermissions();
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [selectedTenant, setSelectedTenant] = useState<Tenant | null>(null);
+  const [confirmTarget, setConfirmTarget] = useState<Tenant | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = (tenant: Tenant) => {
-    setSelectedTenant(tenant);
-    setIsDeleteModalOpen(true);
+    setConfirmTarget(tenant);
   };
 
-  const handleCloseModals = () => {
-    setIsDeleteModalOpen(false);
-    setSelectedTenant(null);
+  const handleDeleteConfirm = async () => {
+    if (!confirmTarget) return;
+    setIsDeleting(true);
+    try {
+      await deleteTenant(confirmTarget.id);
+      toast.success('Tenant deleted successfully');
+      onAction();
+    } catch (error: unknown) {
+      let message = 'Failed to delete tenant';
+      if (isApiError(error)) {
+        message = error.response?.data?.message || message;
+      }
+      toast.error(message);
+    } finally {
+      setIsDeleting(false);
+      setConfirmTarget(null);
+    }
   };
 
   const renderSortIcon = (column: string) => {
@@ -148,11 +165,8 @@ export default function TenantTable({
           <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
             {loading ? (
               <TableRow>
-                <TableCell colSpan={8} className="px-5 py-10 text-center">
-                  <div className="flex flex-col items-center justify-center space-y-2">
-                    <div className="w-10 h-10 border-4 border-brand-500 border-t-transparent rounded-full animate-spin"></div>
-                    <p className="text-gray-500">Loading tenants...</p>
-                  </div>
+                <TableCell colSpan={8} className="p-0">
+                  <SkeletonTable rows={perPage} columns={8} />
                 </TableCell>
               </TableRow>
             ) : data.length === 0 ? (
@@ -208,14 +222,16 @@ export default function TenantTable({
           </TableBody>
         </Table>
       </div>
-      {selectedTenant && (
-        <DeleteTenantModal
-          isOpen={isDeleteModalOpen}
-          onClose={handleCloseModals}
-          onTenantDeleted={onAction}
-          tenant={selectedTenant}
-        />
-      )}
+      <ConfirmModal
+        isOpen={!!confirmTarget}
+        onClose={() => setConfirmTarget(null)}
+        onConfirm={handleDeleteConfirm}
+        isLoading={isDeleting}
+        title="Delete Tenant"
+        message={`Are you sure you want to delete "${confirmTarget?.name}"?`}
+        confirmLabel="Delete Tenant"
+        variant="danger"
+      />
     </div>
   );
 }

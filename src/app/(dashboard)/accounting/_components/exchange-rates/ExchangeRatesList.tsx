@@ -14,12 +14,15 @@ import ViewModeTabs from '@/components/common/ViewModeTabs';
 import TableToolbar from '@/components/common/TableToolbar';
 import { useDataTable } from '@/hooks/useDataTable';
 import { useExport } from '@/hooks/useExport';
+import { usePermissions } from '@/hooks/usePermissions';
 
 export default function ExchangeRatesList() {
+  const { hasPermission } = usePermissions();
   const { isOpen, openModal, closeModal } = useModal();
 
   const {
     data: rates,
+    loading,
     currentPage,
     perPage,
     totalPages,
@@ -80,28 +83,33 @@ export default function ExchangeRatesList() {
           action={
             <div className="flex flex-wrap items-center gap-3">
               <ViewModeTabs viewMode={viewMode} setViewMode={setViewMode} />
-              <Tooltip text="Export Exchange Rates">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleExport}
-                  className="flex items-center gap-2"
-                >
-                  <Download size={16} />
-                  Export
-                </Button>
-              </Tooltip>
-              <Tooltip text="Add New Exchange Rate">
-                <Button onClick={openModal} size="sm" className="flex items-center gap-2">
-                  <Plus size={16} />
-                  Add Rate
-                </Button>
-              </Tooltip>
+              {hasPermission('view-exchange-rate') && (
+                <Tooltip text="Export Exchange Rates">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleExport}
+                    className="flex items-center gap-2"
+                  >
+                    <Download size={16} />
+                    Export
+                  </Button>
+                </Tooltip>
+              )}
+              {hasPermission('create-exchange-rate') && (
+                <Tooltip text="Add New Exchange Rate">
+                  <Button onClick={openModal} size="sm" className="flex items-center gap-2">
+                    <Plus size={16} />
+                    Add Rate
+                  </Button>
+                </Tooltip>
+              )}
             </div>
           }
         >
           <ExchangeRateTable
             data={rates}
+            loading={loading}
             onAction={refresh}
             onSort={handleSort}
             sortBy={sortBy}

@@ -5,12 +5,14 @@ import { useRouter, useParams } from 'next/navigation';
 import PageMeta from '@/components/common/PageMeta';
 import PageBreadcrumb from '@/components/common/PageBreadCrumb';
 import ComponentCard from '@/components/common/ComponentCard';
+import SkeletonDetail from '@/components/common/SkeletonDetail';
 import Button from '@/components/ui/button/Button';
 import Badge from '@/components/ui/badge/Badge';
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '@/components/ui/table';
-import { getPurchaseOrder } from '@/services/PurchaseOrderService';
+import { getPurchaseOrder, updatePurchaseOrderStatus } from '@/services/PurchaseOrderService';
 import { useSettings } from '@/hooks/useSettings';
 import { PurchaseOrder, PurchaseOrderStatus } from '@/types/PurchaseOrder';
+import ConfirmModal from '@/components/common/ConfirmModal';
 import { toast } from 'sonner';
 
 export default function ViewPurchaseOrder() {
@@ -19,6 +21,9 @@ export default function ViewPurchaseOrder() {
   const router = useRouter();
   const { formatCurrency, formatQuantity, formatDate } = useSettings();
   const [purchaseOrder, setPurchaseOrder] = useState<PurchaseOrder | null>(null);
+
+  const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
+  const [confirmCancelOpen, setConfirmCancelOpen] = useState(false);
 
   const fetchPurchaseDetails = useCallback(async () => {
     try {
@@ -41,6 +46,24 @@ export default function ViewPurchaseOrder() {
     window.print();
   };
 
+  const handleUpdateStatus = async (newStatus: PurchaseOrderStatus) => {
+    if (!purchaseOrder) return;
+
+    try {
+      setIsUpdatingStatus(true);
+      await updatePurchaseOrderStatus(purchaseOrder.id, newStatus);
+      toast.success(`Purchase Order marked as ${newStatus}`);
+      fetchPurchaseDetails(); // refresh data
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Failed to update status');
+    } finally {
+      setIsUpdatingStatus(false);
+      if (newStatus === PurchaseOrderStatus.CANCELLED) {
+        setConfirmCancelOpen(false);
+      }
+    }
+  };
+
   const getStatusColor = (status: PurchaseOrderStatus) => {
     switch (status) {
       case PurchaseOrderStatus.DRAFT:
@@ -59,7 +82,16 @@ export default function ViewPurchaseOrder() {
   };
 
   if (!purchaseOrder) {
-    return <div>Loading...</div>;
+    return (
+      <>
+        <PageBreadcrumb
+          pageTitle="Purchase Order Details"
+          breadcrumbs={[{ label: 'Purchase Orders', path: '/purchase-orders' }]}
+          backButton={true}
+        />
+        <SkeletonDetail columns={3} />
+      </>
+    );
   }
 
   return (
@@ -74,11 +106,105 @@ export default function ViewPurchaseOrder() {
         backButton={true}
       />
 
-      <div className="flex justify-end gap-2 mb-4">
-        <Button variant="outline" onClick={() => router.push(`/purchase-orders/${id}/edit`)}>
-          Edit
-        </Button>
-        <Button variant="outline" onClick={handlePrint}>
+      <div className="flex flex-wrap justify-end gap-2 mb-4">
+        {/* Manual Status Transitions */}
+        {purchaseOrder.status === PurchaseOrderStatus.DRAFT && (
+          <>
+            <Button variant="outline" size="sm" href={`/purchase-orders/${id}/edit`}>
+              Edit
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={isUpdatingStatus}
+              onClick={() => handleUpdateStatus(PurchaseOrderStatus.SENT)}
+            >
+              Mark as Sent
+            </Button>
+            <Button
+              variant="primary"
+              size="sm"
+              disabled={isUpdatingStatus}
+              onClick={() => handleUpdateStatus(PurchaseOrderStatus.CONFIRMED)}
+            >
+              Confirm Order
+            </Button>
+            <Button
+              variant="danger"
+              size="sm"
+              disabled={isUpdatingStatus}
+              onClick={() => setConfirmCancelOpen(true)}
+            >
+              Cancel Order
+            </Button>
+          </>
+        )}
+
+        {purchaseOrder.status === PurchaseOrderStatus.SENT && (
+          <>
+            <Button variant="outline" size="sm" href={`/purchase-orders/${id}/edit`}>
+              Edit
+            </Button>
+            <Button
+              variant="primary"
+              size="sm"
+              disabled={isUpdatingStatus}
+              onClick={() => handleUpdateStatus(PurchaseOrderStatus.CONFIRMED)}
+            >
+              Confirm Order
+            </Button>
+            <Button
+              variant="danger"
+              size="sm"
+              disabled={isUpdatingStatus}
+              onClick={() => setConfirmCancelOpen(true)}
+            >
+              Cancel Order
+            </Button>
+          </>
+        )}
+
+        {purchaseOrder.status === PurchaseOrderStatus.CONFIRMED && (
+          <>
+            <Button
+              variant="danger"
+              size="sm"
+              disabled={isUpdatingStatus}
+              onClick={() => setConfirmCancelOpen(true)}
+            >
+              Cancel Order
+            </Button>
+          </>
+        )}
+
+        {/* Downstream Converts */}
+        {[PurchaseOrderStatus.CONFIRMED, PurchaseOrderStatus.PARTIALLY_RECEIVED].includes(
+          purchaseOrder.status
+        ) && (
+          <Button
+            variant="primary"
+            size="sm"
+            href={`/goods-received-notes/create?purchase_order_id=${id}`}
+          >
+            Convert to GRN
+          </Button>
+        )}
+
+        {[
+          PurchaseOrderStatus.CONFIRMED,
+          PurchaseOrderStatus.PARTIALLY_RECEIVED,
+          PurchaseOrderStatus.RECEIVED,
+        ].includes(purchaseOrder.status) && (
+          <Button
+            variant="primary"
+            size="sm"
+            href={`/purchase-invoices/create?purchase_order_id=${id}`}
+          >
+            Convert to PI
+          </Button>
+        )}
+
+        <Button variant="outline" size="sm" onClick={handlePrint}>
           Print
         </Button>
       </div>
@@ -238,6 +364,17 @@ export default function ViewPurchaseOrder() {
           </div>
         </div>
       </ComponentCard>
+
+      <ConfirmModal
+        isOpen={confirmCancelOpen}
+        onClose={() => setConfirmCancelOpen(false)}
+        onConfirm={() => handleUpdateStatus(PurchaseOrderStatus.CANCELLED)}
+        isLoading={isUpdatingStatus}
+        title="Cancel Purchase Order"
+        message="Are you sure you want to cancel this purchase order? This action cannot be undone."
+        confirmLabel="Cancel Order"
+        variant="danger"
+      />
     </>
   );
 }

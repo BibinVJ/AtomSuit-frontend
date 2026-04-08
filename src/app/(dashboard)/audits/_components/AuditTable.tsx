@@ -5,6 +5,7 @@ import Badge from '@/components/ui/badge/Badge';
 import { TableActions } from '@/components/common/TableActions';
 import { useContext } from 'react';
 import { SettingsContext } from '@/context/SettingsContext';
+import SkeletonTable from '@/components/common/SkeletonTable';
 
 interface AuditEntry {
   id: number;
@@ -36,6 +37,7 @@ interface Props {
   perPage: number;
   onViewDetails: (entry: AuditEntry) => void;
   startIndex?: number;
+  loading?: boolean;
 }
 
 export default function AuditTable({
@@ -44,6 +46,7 @@ export default function AuditTable({
   perPage,
   onViewDetails,
   startIndex,
+  loading,
 }: Props) {
   const settingsContext = useContext(SettingsContext);
   const formatDateTime =
@@ -122,40 +125,54 @@ export default function AuditTable({
           </TableHeader>
 
           <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-            {data.map((entry, index) => (
-              <TableRow key={entry.id}>
-                <TableCell className="px-5 py-4 sm:px-6 text-start">
-                  <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                    {startIndex !== undefined
-                      ? startIndex + index
-                      : (currentPage - 1) * perPage + index + 1}
-                  </p>
-                </TableCell>
-                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
-                  {entry.causer?.name || 'System'}
-                </TableCell>
-                <TableCell className="px-4 py-3 text-start text-theme-sm">
-                  <Badge size="sm" color={getEventColor(entry.event)}>
-                    {entry.event}
-                  </Badge>
-                </TableCell>
-                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
-                  <span className="font-medium">{formatSubject(entry.subject_type)}</span>
-                  {entry.subject?.name && (
-                    <span className="block text-xs text-gray-500">{entry.subject.name}</span>
-                  )}
-                </TableCell>
-                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400 max-w-[200px] truncate">
-                  {entry.description}
-                </TableCell>
-                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
-                  {formatDateTime(entry.created_at)}
-                </TableCell>
-                <TableCell className="px-4 py-3 text-gray-500 text-end text-theme-sm dark:text-gray-400">
-                  <TableActions onView={() => onViewDetails(entry)} viewTooltip="View Details" />
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={7} className="p-0">
+                  <SkeletonTable rows={perPage} columns={7} />
                 </TableCell>
               </TableRow>
-            ))}
+            ) : data.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={7} className="px-5 py-10 text-center text-gray-500 font-medium">
+                  No audit logs found
+                </TableCell>
+              </TableRow>
+            ) : (
+              data.map((entry, index) => (
+                <TableRow key={entry.id}>
+                  <TableCell className="px-5 py-4 sm:px-6 text-start">
+                    <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
+                      {startIndex !== undefined
+                        ? startIndex + index
+                        : (currentPage - 1) * perPage + index + 1}
+                    </p>
+                  </TableCell>
+                  <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
+                    {entry.causer?.name || 'System'}
+                  </TableCell>
+                  <TableCell className="px-4 py-3 text-start text-theme-sm">
+                    <Badge size="sm" color={getEventColor(entry.event)}>
+                      {entry.event}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
+                    <span className="font-medium">{formatSubject(entry.subject_type)}</span>
+                    {entry.subject?.name && (
+                      <span className="block text-xs text-gray-500">{entry.subject.name}</span>
+                    )}
+                  </TableCell>
+                  <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400 max-w-[200px] truncate">
+                    {entry.description}
+                  </TableCell>
+                  <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
+                    {formatDateTime(entry.created_at)}
+                  </TableCell>
+                  <TableCell className="px-4 py-3 text-gray-500 text-end text-theme-sm dark:text-gray-400">
+                    <TableActions onView={() => onViewDetails(entry)} viewTooltip="View Details" />
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>

@@ -4,12 +4,13 @@ import { useState, useMemo } from 'react';
 import { Modal } from '@/components/ui/modal';
 import ItemPriceTable from './ItemPriceTable';
 import AddItemPriceModal from './AddItemPriceModal';
-import DeleteItemPriceModal from './DeleteItemPriceModal';
+import ConfirmModal from '@/components/common/ConfirmModal';
 import { useModal } from '@/hooks/useModal';
 import Pagination from '@/components/common/Pagination';
 import Button from '@/components/ui/button/Button';
 import Tooltip from '@/components/ui/tooltip/Tooltip';
-import { getItemPrices, exportItemPrices } from '@/services/ItemPriceService';
+import { getItemPrices, exportItemPrices, deleteItemPrice } from '@/services/ItemPriceService';
+import { isApiError } from '@/utils/errors';
 import { ItemPrice } from '@/types/ItemPrice';
 import { PriceList } from '@/types/PriceList';
 import { useDataTable } from '@/hooks/useDataTable';
@@ -30,7 +31,8 @@ export default function ManageItemPricesModal({ isOpen, onClose, priceList }: Pr
 
   // Edit/Delete State
   const [selectedItemPrice, setSelectedItemPrice] = useState<ItemPrice | null>(null);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [confirmTarget, setConfirmTarget] = useState<ItemPrice | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const extraParams = useMemo(
     () => ({
@@ -76,17 +78,34 @@ export default function ManageItemPricesModal({ isOpen, onClose, priceList }: Pr
   };
 
   const handleDelete = (ip: ItemPrice) => {
-    setSelectedItemPrice(ip);
-    setIsDeleteModalOpen(true);
+    setConfirmTarget(ip);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!confirmTarget) return;
+    setIsDeleting(true);
+    try {
+      await deleteItemPrice(confirmTarget.id, viewMode === 'trashed');
+      toast.success(
+        viewMode === 'trashed'
+          ? 'Item price permanently deleted'
+          : 'Item price deleted successfully'
+      );
+      refresh();
+    } catch (error: unknown) {
+      let message = 'Failed to delete item price';
+      if (isApiError(error)) {
+        message = error.response?.data?.message || message;
+      }
+      toast.error(message);
+    } finally {
+      setIsDeleting(false);
+      setConfirmTarget(null);
+    }
   };
 
   const handleAddModalClose = () => {
     closeAddModal();
-    setSelectedItemPrice(null);
-  };
-
-  const handleDeleteModalClose = () => {
-    setIsDeleteModalOpen(false);
     setSelectedItemPrice(null);
   };
 
@@ -204,12 +223,19 @@ export default function ManageItemPricesModal({ isOpen, onClose, priceList }: Pr
           itemPrice={selectedItemPrice}
         />
 
-        <DeleteItemPriceModal
-          isOpen={isDeleteModalOpen}
-          onClose={handleDeleteModalClose}
-          onSuccess={refresh}
-          itemPrice={selectedItemPrice}
-          force={viewMode === 'trashed'}
+        <ConfirmModal
+          isOpen={!!confirmTarget}
+          onClose={() => setConfirmTarget(null)}
+          onConfirm={handleDeleteConfirm}
+          isLoading={isDeleting}
+          title={viewMode === 'trashed' ? 'Permanently Delete Item Price' : 'Delete Item Price'}
+          message={
+            viewMode === 'trashed'
+              ? `Are you sure you want to permanently delete the price for "${confirmTarget?.item?.name}"? This action cannot be undone.`
+              : `Are you sure you want to delete the price for "${confirmTarget?.item?.name}"? You can restore it later from the trash.`
+          }
+          confirmLabel={viewMode === 'trashed' ? 'Delete Permanently' : 'Delete'}
+          variant="danger"
         />
       </div>
     </Modal>

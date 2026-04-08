@@ -5,9 +5,11 @@ import PageBreadcrumb from '@/components/common/PageBreadCrumb';
 import PageMeta from '@/components/common/PageMeta';
 import ExchangeRatesList from '@/app/(dashboard)/accounting/_components/exchange-rates/ExchangeRatesList';
 import CurrencyList from '@/app/(dashboard)/accounting/_components/currencies/CurrencyList';
+import { usePermissions } from '@/hooks/usePermissions';
 
 export default function Currencies() {
   const [activeTab, setActiveTab] = useState<'currencies' | 'rates'>('currencies');
+  const { hasPermission } = usePermissions();
 
   return (
     <>
@@ -29,20 +31,28 @@ export default function Currencies() {
           >
             Currencies
           </button>
-          <button
-            onClick={() => setActiveTab('rates')}
-            className={`px-4 py-2 text-sm font-medium rounded-md transition-all duration-200 ${
-              activeTab === 'rates'
-                ? 'bg-brand-600 text-white shadow-sm'
-                : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'
-            }`}
-          >
-            Exchange Rates
-          </button>
+          {hasPermission('view-exchange-rate') && (
+            <button
+              onClick={() => setActiveTab('rates')}
+              className={`px-4 py-2 text-sm font-medium rounded-md transition-all duration-200 ${
+                activeTab === 'rates'
+                  ? 'bg-brand-600 text-white shadow-sm'
+                  : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'
+              }`}
+            >
+              Exchange Rates
+            </button>
+          )}
         </div>
       </div>
 
-      {activeTab === 'currencies' ? <CurrencyList /> : <ExchangeRatesList />}
+      {activeTab === 'currencies' ? (
+        <CurrencyList />
+      ) : hasPermission('view-exchange-rate') ? (
+        <ExchangeRatesList />
+      ) : (
+        <CurrencyList />
+      )}
     </>
   );
 }

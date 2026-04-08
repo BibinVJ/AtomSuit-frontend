@@ -34,6 +34,7 @@ export default function ChartOfAccounts() {
 
   const {
     data: chartsData,
+    loading,
     currentPage,
     perPage,
     totalPages,
@@ -162,6 +163,7 @@ export default function ChartOfAccounts() {
         >
           <ChartOfAccountTable
             data={chartsData}
+            loading={loading}
             onAction={refresh}
             onSort={handleSort}
             sortBy={sortBy}

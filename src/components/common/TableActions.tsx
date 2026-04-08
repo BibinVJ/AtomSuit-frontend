@@ -6,48 +6,57 @@ import Button from '@/components/ui/button/Button';
 interface TableActionsProps {
   isTrashed?: boolean;
   onView?: () => void;
+  viewHref?: string;
   onEdit?: () => void;
+  editHref?: string;
   onDelete?: () => void;
   onRestore?: () => void;
   viewTooltip?: string;
   editTooltip?: string;
   deleteTooltip?: string;
   restoreTooltip?: string;
+  customActions?: React.ReactNode;
 }
 
 export const TableActions: React.FC<TableActionsProps> = ({
   isTrashed = false,
   onView,
+  viewHref,
   onEdit,
+  editHref,
   onDelete,
   onRestore,
   viewTooltip = 'View',
   editTooltip = 'Edit',
   deleteTooltip = 'Delete',
   restoreTooltip = 'Restore',
+  customActions,
 }) => {
   return (
     <div className="flex items-center justify-end gap-1">
+      {customActions}
       {!isTrashed ? (
         <>
-          {onView && (
+          {(onView || viewHref) && (
             <Tooltip text={viewTooltip}>
               <Button
                 variant="ghost"
                 size="xs"
                 onClick={onView}
+                href={viewHref}
                 className="text-gray-500 hover:text-brand-500"
               >
                 <Eye size={18} />
               </Button>
             </Tooltip>
           )}
-          {onEdit && (
+          {(onEdit || editHref) && (
             <Tooltip text={editTooltip}>
               <Button
                 variant="ghost"
                 size="xs"
                 onClick={onEdit}
+                href={editHref}
                 className="text-gray-500 hover:text-blue-600"
               >
                 <Edit size={18} />
