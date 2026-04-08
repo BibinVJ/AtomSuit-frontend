@@ -153,23 +153,31 @@ export default function CreateGoodsReceivedNote() {
 
         // 1. Check if selected vendor has a specific price list
         if (selectedVendor?.price_list?.id) {
-          const specificPrice = item.item_prices?.find((ip: any) => {
+          const prices = (item.item_prices || []) as Array<{
+            price_list?: { id: number | string };
+            price: number | string;
+          }>;
+          const specificPrice = prices.find((ip) => {
             return String(ip.price_list?.id) === String(selectedVendor.price_list?.id);
           });
           if (specificPrice) {
-            newItems[index].unit_price = Number((specificPrice as any).price) || 0;
+            newItems[index].unit_price = Number(specificPrice.price) || 0;
             priceFound = true;
           }
         }
 
         // 2. Fallback: Use purchase price list
         if (!priceFound) {
-          const fallbackPrice = item.item_prices?.find((ip: any) => {
+          const prices = (item.item_prices || []) as Array<{
+            price_list?: { type: string };
+            price: number | string;
+          }>;
+          const fallbackPrice = prices.find((ip) => {
             return ip.price_list?.type === 'purchase';
           });
 
           if (fallbackPrice) {
-            newItems[index].unit_price = Number((fallbackPrice as any).price) || 0;
+            newItems[index].unit_price = Number(fallbackPrice.price) || 0;
             priceFound = true;
           }
         }

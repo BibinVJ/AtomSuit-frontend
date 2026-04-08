@@ -240,7 +240,7 @@ const AppSidebar: React.FC = () => {
     if (!submenuMatched) {
       setOpenSubmenu(null);
     }
-  }, [pathname, isActive]);
+  }, [pathname, isActive, dynamicAdministrationItems]);
 
   useEffect(() => {
     if (openSubmenu !== null) {

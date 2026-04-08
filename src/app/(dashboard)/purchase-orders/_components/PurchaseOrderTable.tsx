@@ -12,7 +12,6 @@ import {
 } from 'lucide-react';
 import { TableActions } from '@/components/common/TableActions';
 import ConfirmModal from '@/components/common/ConfirmModal';
-import { useRouter } from 'next/navigation';
 import SkeletonTable from '@/components/common/SkeletonTable';
 import Tooltip from '@/components/ui/tooltip/Tooltip';
 import Button from '@/components/ui/button/Button';
@@ -54,7 +53,6 @@ export default function PurchaseOrderTable({
 }: Props) {
   const { hasPermission } = usePermissions();
   const { formatCurrency, formatDate } = useSettings();
-  const router = useRouter();
   const [confirmTarget, setConfirmTarget] = useState<PurchaseOrder | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -66,8 +64,12 @@ export default function PurchaseOrderTable({
       await updatePurchaseOrderStatus(id, newStatus);
       toast.success(`Purchase Order marked as ${newStatus}`);
       onAction();
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Failed to update status');
+    } catch (error: unknown) {
+      let message = 'Failed to update status';
+      if (isApiError(error)) {
+        message = error.response?.data?.message || message;
+      }
+      toast.error(message);
     } finally {
       setIsUpdating(null);
     }

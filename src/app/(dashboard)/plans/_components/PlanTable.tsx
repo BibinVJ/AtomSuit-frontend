@@ -17,7 +17,7 @@ import { isApiError } from '@/utils/errors';
 
 interface Props {
   data: Plan[];
-  onAction: () => void | Promise<any>;
+  onAction: () => void | Promise<unknown>;
   onSort: (column: string) => void;
   sortBy: string;
   sortDirection: string;

@@ -1,6 +1,5 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import PageBreadcrumb from '@/components/common/PageBreadCrumb';
 import ComponentCard from '@/components/common/ComponentCard';
 import PageMeta from '@/components/common/PageMeta';
@@ -22,7 +21,6 @@ import { useState } from 'react';
 
 export default function PurchaseInvoices() {
   const { hasPermission } = usePermissions();
-  const router = useRouter();
 
   const [activeTab, setActiveTab] = useState<'active' | 'trashed'>('active');
 

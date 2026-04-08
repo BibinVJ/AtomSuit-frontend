@@ -94,7 +94,7 @@ export default function Plans() {
           />
         </ComponentCard>
       </div>
-      <AddPlanModal isOpen={isOpen} onClose={closeModal} onPlanAdded={(plan) => refresh()} />
+      <AddPlanModal isOpen={isOpen} onClose={closeModal} onPlanAdded={() => refresh()} />
     </>
   );
 }

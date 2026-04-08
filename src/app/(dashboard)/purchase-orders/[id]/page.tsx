@@ -14,6 +14,7 @@ import { useSettings } from '@/hooks/useSettings';
 import { PurchaseOrder, PurchaseOrderStatus } from '@/types/PurchaseOrder';
 import ConfirmModal from '@/components/common/ConfirmModal';
 import { toast } from 'sonner';
+import { isApiError } from '@/utils/errors';
 
 export default function ViewPurchaseOrder() {
   const params = useParams<{ id: string }>();
@@ -54,8 +55,12 @@ export default function ViewPurchaseOrder() {
       await updatePurchaseOrderStatus(purchaseOrder.id, newStatus);
       toast.success(`Purchase Order marked as ${newStatus}`);
       fetchPurchaseDetails(); // refresh data
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Failed to update status');
+    } catch (error: unknown) {
+      let message = 'Failed to update status';
+      if (isApiError(error)) {
+        message = error.response?.data?.message || message;
+      }
+      toast.error(message);
     } finally {
       setIsUpdatingStatus(false);
       if (newStatus === PurchaseOrderStatus.CANCELLED) {

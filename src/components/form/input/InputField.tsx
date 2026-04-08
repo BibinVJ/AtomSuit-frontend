@@ -44,6 +44,7 @@ const Input: FC<InputProps> = ({
     } else {
       setLocalValue(props.value ?? '');
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.value, props.type]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

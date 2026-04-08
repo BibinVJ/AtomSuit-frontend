@@ -39,7 +39,6 @@ export default function RoleTable({
   viewMode = 'active',
   loading,
 }: Props) {
-  const selectedRole = null; // Removed selectedRole entirely, keeping just for syntax, wait, no, confirmTarget is needed
   const [confirmTarget, setConfirmTarget] = useState<Role | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const router = useRouter();
