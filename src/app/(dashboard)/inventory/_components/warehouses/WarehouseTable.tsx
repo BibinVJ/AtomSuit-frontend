@@ -10,6 +10,7 @@ interface WarehouseTableProps {
   warehouses: Warehouse[];
   onEdit: (warehouse: Warehouse) => void;
   onDelete: (warehouse: Warehouse) => void;
+  onView?: (warehouse: Warehouse) => void;
   onRestore?: (warehouse: Warehouse) => void;
   viewMode?: 'active' | 'trashed';
   onSort: (column: string) => void;
@@ -23,6 +24,7 @@ export default function WarehouseTable({
   warehouses,
   onEdit,
   onDelete,
+  onView,
   onRestore,
   viewMode = 'active',
   onSort,
@@ -118,6 +120,7 @@ export default function WarehouseTable({
                   <TableCell className="px-4 py-3 text-end">
                     <TableActions
                       isTrashed={viewMode === 'trashed'}
+                      onView={onView ? () => onView(warehouse) : undefined}
                       onEdit={() => onEdit(warehouse)}
                       onDelete={() => onDelete(warehouse)}
                       onRestore={onRestore ? () => onRestore(warehouse) : undefined}

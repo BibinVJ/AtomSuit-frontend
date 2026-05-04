@@ -3,9 +3,11 @@
 import { useState } from 'react';
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '@/components/ui/table';
 import Badge from '@/components/ui/badge/Badge';
-import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide } from 'lucide-react';
+import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide, ReceiptText } from 'lucide-react';
 import { TableActions } from '@/components/common/TableActions';
 import ConfirmModal from '@/components/common/ConfirmModal';
+import Tooltip from '@/components/ui/tooltip/Tooltip';
+import Button from '@/components/ui/button/Button';
 
 import { isApiError } from '@/utils/errors';
 import { GoodsReceivedNote } from '@/types/GoodsReceivedNote';
@@ -181,6 +183,22 @@ export default function GoodsReceivedNoteTable({
                     <TableCell className="px-4 py-3 text-gray-500 text-end text-theme-sm dark:text-gray-400">
                       <TableActions
                         isTrashed={isVoided}
+                        customActions={
+                          !isVoided &&
+                          !grn.is_fully_invoiced &&
+                          hasPermission('create-purchase-invoice') && (
+                            <Tooltip text="Convert to Invoice">
+                              <Button
+                                variant="ghost"
+                                size="xs"
+                                href={`/purchase-invoices/create?grn_id=${grn.id}`}
+                                className="text-gray-500 hover:text-green-600"
+                              >
+                                <ReceiptText size={18} />
+                              </Button>
+                            </Tooltip>
+                          )
+                        }
                         viewHref={
                           hasPermission('view-grn') ? `/goods-received-notes/${grn.id}` : undefined
                         }

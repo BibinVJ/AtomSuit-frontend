@@ -70,6 +70,7 @@ export default function AddPurchaseOrder() {
   ]);
   const [errors, setErrors] = useState<ApiError>({});
   const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const fetchInitialData = useCallback(async () => {
     setIsLoading(true);
@@ -246,6 +247,7 @@ export default function AddPurchaseOrder() {
       return;
     }
 
+    setIsSubmitting(true);
     try {
       await addPurchaseOrder({
         vendor_id: Number(vendorId),
@@ -276,6 +278,8 @@ export default function AddPurchaseOrder() {
         console.error('Error creating purchase order:', error);
         toast.error('Failed to create purchase order');
       }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -801,7 +805,9 @@ export default function AddPurchaseOrder() {
             </div>
 
             <div className="flex justify-end mt-6">
-              <Button type="submit">Create Purchase Order</Button>
+              <Button type="submit" isLoading={isSubmitting}>
+                {isSubmitting ? 'Creating...' : 'Create Purchase Order'}
+              </Button>
             </div>
           </form>
         )}

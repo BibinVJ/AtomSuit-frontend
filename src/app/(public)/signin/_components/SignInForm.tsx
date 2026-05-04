@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Input from '@/components/form/input/InputField';
 import Label from '@/components/form/Label';
 import Checkbox from '@/components/form/input/Checkbox';
@@ -24,6 +24,7 @@ export default function SignInForm() {
   const [signUpUrl, setSignUpUrl] = useState('/signup');
 
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { login } = useAuth();
 
   useEffect(() => {
@@ -66,7 +67,13 @@ export default function SignInForm() {
     try {
       // your backend should accept `identifier` (either email or phone)
       await login(form.identifier, form.password, stayLoggedIn);
-      router.push('/dashboard');
+
+      const redirect = searchParams.get('redirect');
+      const safeRedirect =
+        redirect && redirect.startsWith('/') && !redirect.startsWith('//')
+          ? redirect
+          : '/dashboard';
+      router.push(safeRedirect);
     } catch (err: unknown) {
       if (isApiError(err)) {
         const message = err.response?.data?.message || 'An error occurred';

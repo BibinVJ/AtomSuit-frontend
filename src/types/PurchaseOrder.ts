@@ -32,6 +32,8 @@ export interface PurchaseOrderItem {
   };
   tax_amount: number;
   total_amount: number;
+  received_quantity: number;
+  invoiced_quantity: number;
 }
 
 export interface PurchaseOrder {
@@ -53,6 +55,8 @@ export interface PurchaseOrder {
   warehouse_id?: number;
   cost_center?: { id: number; name: string; code: string };
   warehouse?: { id: number; name: string };
+  is_fully_received: boolean;
+  is_fully_invoiced: boolean;
   items: PurchaseOrderItem[];
   created_at: string;
   updated_at: string;

@@ -9,6 +9,8 @@ import {
   ArrowDownNarrowWide,
   Send,
   CheckCircle,
+  PackageCheck,
+  ReceiptText,
 } from 'lucide-react';
 import { TableActions } from '@/components/common/TableActions';
 import ConfirmModal from '@/components/common/ConfirmModal';
@@ -220,40 +222,81 @@ export default function PurchaseOrderTable({
                       <TableActions
                         isTrashed={viewMode === 'trashed'}
                         customActions={
-                          viewMode === 'active' &&
-                          hasPermission('update-purchase-order') && (
+                          viewMode === 'active' && (
                             <>
-                              {purchase.status === PurchaseOrderStatus.DRAFT && (
-                                <Tooltip text="Mark as Sent">
-                                  <Button
-                                    variant="ghost"
-                                    size="xs"
-                                    disabled={isUpdating === purchase.id}
-                                    onClick={() =>
-                                      handleQuickStatus(purchase.id, PurchaseOrderStatus.SENT)
-                                    }
-                                    className="text-gray-500 hover:text-blue-600"
-                                  >
-                                    <Send size={18} />
-                                  </Button>
-                                </Tooltip>
+                              {hasPermission('update-purchase-order') && (
+                                <>
+                                  {purchase.status === PurchaseOrderStatus.DRAFT && (
+                                    <Tooltip text="Mark as Sent">
+                                      <Button
+                                        variant="ghost"
+                                        size="xs"
+                                        disabled={isUpdating === purchase.id}
+                                        onClick={() =>
+                                          handleQuickStatus(purchase.id, PurchaseOrderStatus.SENT)
+                                        }
+                                        className="text-gray-500 hover:text-blue-600"
+                                      >
+                                        <Send size={18} />
+                                      </Button>
+                                    </Tooltip>
+                                  )}
+                                  {(purchase.status === PurchaseOrderStatus.DRAFT ||
+                                    purchase.status === PurchaseOrderStatus.SENT) && (
+                                    <Tooltip text="Confirm Order">
+                                      <Button
+                                        variant="ghost"
+                                        size="xs"
+                                        disabled={isUpdating === purchase.id}
+                                        onClick={() =>
+                                          handleQuickStatus(
+                                            purchase.id,
+                                            PurchaseOrderStatus.CONFIRMED
+                                          )
+                                        }
+                                        className="text-gray-500 hover:text-green-600"
+                                      >
+                                        <CheckCircle size={18} />
+                                      </Button>
+                                    </Tooltip>
+                                  )}
+                                </>
                               )}
-                              {(purchase.status === PurchaseOrderStatus.DRAFT ||
-                                purchase.status === PurchaseOrderStatus.SENT) && (
-                                <Tooltip text="Confirm Order">
-                                  <Button
-                                    variant="ghost"
-                                    size="xs"
-                                    disabled={isUpdating === purchase.id}
-                                    onClick={() =>
-                                      handleQuickStatus(purchase.id, PurchaseOrderStatus.CONFIRMED)
-                                    }
-                                    className="text-gray-500 hover:text-green-600"
-                                  >
-                                    <CheckCircle size={18} />
-                                  </Button>
-                                </Tooltip>
-                              )}
+                              {!purchase.is_fully_received &&
+                                hasPermission('create-grn') &&
+                                [
+                                  PurchaseOrderStatus.CONFIRMED,
+                                  PurchaseOrderStatus.PARTIALLY_RECEIVED,
+                                ].includes(purchase.status) && (
+                                  <Tooltip text="Convert to GRN">
+                                    <Button
+                                      variant="ghost"
+                                      size="xs"
+                                      href={`/goods-received-notes/create?purchase_order_id=${purchase.id}`}
+                                      className="text-gray-500 hover:text-blue-600"
+                                    >
+                                      <PackageCheck size={18} />
+                                    </Button>
+                                  </Tooltip>
+                                )}
+                              {!purchase.is_fully_invoiced &&
+                                hasPermission('create-purchase-invoice') &&
+                                [
+                                  PurchaseOrderStatus.CONFIRMED,
+                                  PurchaseOrderStatus.PARTIALLY_RECEIVED,
+                                  PurchaseOrderStatus.RECEIVED,
+                                ].includes(purchase.status) && (
+                                  <Tooltip text="Convert to Invoice">
+                                    <Button
+                                      variant="ghost"
+                                      size="xs"
+                                      href={`/purchase-invoices/create?purchase_order_id=${purchase.id}`}
+                                      className="text-gray-500 hover:text-green-600"
+                                    >
+                                      <ReceiptText size={18} />
+                                    </Button>
+                                  </Tooltip>
+                                )}
                             </>
                           )
                         }
@@ -263,7 +306,10 @@ export default function PurchaseOrderTable({
                             : undefined
                         }
                         editHref={
-                          viewMode === 'active' && hasPermission('update-purchase-order')
+                          viewMode === 'active' &&
+                          hasPermission('update-purchase-order') &&
+                          (purchase.status === PurchaseOrderStatus.DRAFT ||
+                            purchase.status === PurchaseOrderStatus.SENT)
                             ? `/purchase-orders/${purchase.id}/edit`
                             : undefined
                         }

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import PageBreadcrumb from '@/components/common/PageBreadCrumb';
 import PageMeta from '@/components/common/PageMeta';
 import SkeletonForm from '@/components/common/SkeletonForm';
@@ -9,6 +9,8 @@ import { toast } from 'sonner';
 import { getVendors } from '@/services/VendorService';
 import { getItems } from '@/services/ItemService';
 import { PurchaseInvoiceService } from '@/services/PurchaseInvoiceService';
+import { GoodsReceivedNoteService } from '@/services/GoodsReceivedNoteService';
+import { getPurchaseOrder } from '@/services/PurchaseOrderService';
 import { getCostCenters } from '@/services/CostCenterService';
 import { getWarehouses } from '@/services/WarehouseService';
 import { getTaxGroups } from '@/services/TaxService';
@@ -32,11 +34,19 @@ interface PurchaseInvoiceItemInput {
   discount_type: DiscountType;
   discount_value: number;
   tax_group_id: string;
+  purchase_order_item_id?: number;
+  goods_received_note_item_id?: number;
+  ordered_quantity?: number;
+  already_invoiced?: number;
 }
 
 export default function CreatePurchaseInvoice() {
   const { hasPermission } = usePermissions();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const purchaseOrderId = searchParams.get('purchase_order_id');
+  const grnId = searchParams.get('grn_id');
+  const isConverting = !!purchaseOrderId || !!grnId;
   const { getSetting, formatCurrency, formatNumber } = useSettings();
 
   // Form State
@@ -69,25 +79,164 @@ export default function CreatePurchaseInvoice() {
   const [errors, setErrors] = useState<Record<string, string[]>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [purchaseOrderNumber, setPurchaseOrderNumber] = useState<string | null>(null);
+  const [grnNumber, setGrnNumber] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        const [vData, iData, ccData, wData, nextNumData, tgData] = await Promise.all([
+        const promises: Promise<unknown>[] = [
           getVendors({ unpaginated: true }),
           getItems({ unpaginated: true }),
           getCostCenters({ unpaginated: true }),
           getWarehouses({ unpaginated: true }),
           PurchaseInvoiceService.getNextInvoiceNumber(),
           getTaxGroups({ unpaginated: true }),
-        ]);
+        ];
+
+        // Fetch PO data if converting from a PO
+        if (grnId) {
+          promises.push(GoodsReceivedNoteService.get(grnId));
+        } else if (purchaseOrderId) {
+          promises.push(getPurchaseOrder(Number(purchaseOrderId)));
+        }
+
+        const results = await Promise.all(promises);
+        const [vData, iData, ccData, wData, nextNumData, tgData] = results as [
+          { data: Vendor[] },
+          { data: Item[] },
+          { data: CostCenter[] },
+          { data: Warehouse[] },
+          Record<string, unknown>,
+          { data: TaxGroup[] },
+          ...unknown[],
+        ];
+
         setVendors(vData.data || []);
         setAvailableItems(iData.data || []);
         setCostCenters(ccData.data || []);
         setWarehouses(wData.data || []);
-        setInvoiceNumber(nextNumData?.invoice_number || nextNumData?.data?.invoice_number || '');
+        setInvoiceNumber(
+          (nextNumData as Record<string, string>)?.invoice_number ||
+            (nextNumData as { data?: { invoice_number?: string } })?.data?.invoice_number ||
+            ''
+        );
         setTaxGroups(tgData.data || []);
+
+        // Auto-fill from GRN data
+        if (grnId && results[6]) {
+          const grn = results[6] as {
+            grn_number: string;
+            vendor_id: number;
+            warehouse_id?: number;
+            cost_center_id?: number;
+            notes?: string;
+            reference_number?: string;
+            purchase_order_id?: number;
+            items: Array<{
+              id: number;
+              item_id: number;
+              description: string;
+              accepted_quantity: number;
+              unit_price: number;
+              discount_type: DiscountType;
+              discount_value: number;
+              tax_group_id?: number;
+              purchase_order_item_id?: number;
+            }>;
+          };
+
+          setGrnNumber(grn.grn_number);
+          setVendorId(String(grn.vendor_id));
+          if (grn.warehouse_id) setWarehouseId(String(grn.warehouse_id));
+          if (grn.cost_center_id) setCostCenterId(String(grn.cost_center_id));
+          if (grn.notes) setNotes(grn.notes);
+          if (grn.reference_number) setReferenceNumber(grn.reference_number);
+
+          if (grn.items && grn.items.length > 0) {
+            const grnItems = grn.items
+              .filter((grnItem) => grnItem.accepted_quantity > 0)
+              .map((grnItem) => {
+                return {
+                  item_id: String(grnItem.item_id),
+                  description: grnItem.description || '',
+                  quantity: grnItem.accepted_quantity,
+                  unit_price: grnItem.unit_price || 0,
+                  discount_type: grnItem.discount_type || ('percentage' as DiscountType),
+                  discount_value: grnItem.discount_value || 0,
+                  tax_group_id: grnItem.tax_group_id ? String(grnItem.tax_group_id) : '',
+                  purchase_order_item_id: grnItem.purchase_order_item_id,
+                  goods_received_note_item_id: grnItem.id,
+                  ordered_quantity: grnItem.accepted_quantity,
+                  already_invoiced: 0,
+                };
+              });
+            if (grnItems.length > 0) {
+              setItems(grnItems);
+            }
+          }
+        }
+        // Auto-fill from PO data
+        else if (purchaseOrderId && results[6]) {
+          const po = results[6] as {
+            order_number: string;
+            vendor_id: number;
+            warehouse_id?: number;
+            cost_center_id?: number;
+            notes?: string;
+            reference_number?: string;
+            items: Array<{
+              id: number;
+              item_id: number;
+              description: string;
+              quantity: number;
+              unit_price: number;
+              discount_type: DiscountType;
+              discount_value: number;
+              tax_group_id?: number;
+              invoiced_quantity: number;
+            }>;
+          };
+
+          setPurchaseOrderNumber(po.order_number);
+          setVendorId(String(po.vendor_id));
+          if (po.warehouse_id) setWarehouseId(String(po.warehouse_id));
+          if (po.cost_center_id) setCostCenterId(String(po.cost_center_id));
+          if (po.notes) setNotes(po.notes);
+          if (po.reference_number) setReferenceNumber(po.reference_number);
+
+          if (po.items && po.items.length > 0) {
+            const poItems = po.items
+              .filter((poItem) => poItem.quantity - poItem.invoiced_quantity > 0)
+              .map((poItem) => {
+                const remaining = poItem.quantity - poItem.invoiced_quantity;
+                const ratio = poItem.quantity > 0 ? remaining / poItem.quantity : 1;
+                const scaledDiscount =
+                  poItem.discount_type === 'fixed'
+                    ? poItem.discount_value * ratio
+                    : poItem.discount_value;
+
+                return {
+                  item_id: String(poItem.item_id),
+                  description: poItem.description || '',
+                  quantity: remaining,
+                  unit_price: poItem.unit_price,
+                  discount_type: poItem.discount_type || ('percentage' as DiscountType),
+                  discount_value: scaledDiscount || 0,
+                  tax_group_id: poItem.tax_group_id ? String(poItem.tax_group_id) : '',
+                  purchase_order_item_id: poItem.id,
+                  ordered_quantity: poItem.quantity,
+                  already_invoiced: poItem.invoiced_quantity,
+                };
+              });
+            if (poItems.length > 0) {
+              setItems(poItems);
+            } else {
+              toast.warning('All items on this PO have already been fully invoiced.');
+            }
+          }
+        }
       } catch (error) {
         console.error('Failed to fetch data:', error);
         toast.error('Failed to load form data');
@@ -96,7 +245,7 @@ export default function CreatePurchaseInvoice() {
       }
     };
     fetchData();
-  }, []);
+  }, [purchaseOrderId, grnId]);
 
   const selectedVendor = useMemo(
     () => vendors.find((v) => String(v.id) === vendorId),
@@ -273,6 +422,8 @@ export default function CreatePurchaseInvoice() {
       cost_center_id: Number(costCenterId),
       warehouse_id: Number(warehouseId),
       notes: notes,
+      ...(purchaseOrderId ? { purchase_order_id: Number(purchaseOrderId) } : {}),
+      ...(grnId ? { grn_id: Number(grnId) } : {}),
       items: items.map((item) => ({
         item_id: Number(item.item_id),
         description: item.description,
@@ -281,6 +432,12 @@ export default function CreatePurchaseInvoice() {
         discount_type: item.discount_type,
         discount_value: Number(item.discount_value),
         tax_group_id: item.tax_group_id ? Number(item.tax_group_id) : undefined,
+        ...(item.purchase_order_item_id
+          ? { purchase_order_item_id: item.purchase_order_item_id }
+          : {}),
+        ...(item.goods_received_note_item_id
+          ? { goods_received_note_item_id: item.goods_received_note_item_id }
+          : {}),
       })),
     };
 
@@ -291,8 +448,16 @@ export default function CreatePurchaseInvoice() {
     } catch (error: unknown) {
       let message = 'Failed to create Purchase Invoice';
       if (isApiError(error)) {
-        setErrors(error.response?.data?.errors || {});
-        message = error.response?.data?.message || message;
+        const data = error.response?.data;
+        const formErrors = data?.errors || {};
+        setErrors(formErrors);
+
+        const firstErrorKey = Object.keys(formErrors)[0];
+        if (firstErrorKey && formErrors[firstErrorKey]?.[0]) {
+          message = formErrors[firstErrorKey][0];
+        } else {
+          message = data?.message || message;
+        }
       }
       toast.error(message);
     } finally {
@@ -311,6 +476,38 @@ export default function CreatePurchaseInvoice() {
     <>
       <PageMeta title="Create Purchase Invoice" description="Create a new purchase invoice" />
       <PageBreadcrumb pageTitle="Create Purchase Invoice" />
+
+      {purchaseOrderNumber && !grnId && (
+        <div className="mb-4 flex items-center gap-3 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-700 dark:border-blue-500/30 dark:bg-blue-500/10 dark:text-blue-300">
+          <svg className="h-5 w-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <path
+              fillRule="evenodd"
+              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+              clipRule="evenodd"
+            />
+          </svg>
+          <span>
+            Converting from Purchase Order <strong>#{purchaseOrderNumber}</strong> — details have
+            been auto-filled. You can adjust quantities before saving.
+          </span>
+        </div>
+      )}
+
+      {grnNumber && (
+        <div className="mb-4 flex items-center gap-3 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700 dark:border-green-500/30 dark:bg-green-500/10 dark:text-green-300">
+          <svg className="h-5 w-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <path
+              fillRule="evenodd"
+              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+              clipRule="evenodd"
+            />
+          </svg>
+          <span>
+            Converting from Goods Received Note <strong>#{grnNumber}</strong> — details have been
+            auto-filled. You can adjust quantities before saving.
+          </span>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {isLoading ? (
@@ -336,6 +533,7 @@ export default function CreatePurchaseInvoice() {
                     placeholder="Select Vendor"
                     error={!!getErrorMessage('vendor_id')}
                     hint={getErrorMessage('vendor_id')}
+                    disabled={!!purchaseOrderId}
                   />
                 </div>
 
@@ -457,6 +655,7 @@ export default function CreatePurchaseInvoice() {
                     placeholder="Select Warehouse"
                     error={!!getErrorMessage('warehouse_id')}
                     hint={getErrorMessage('warehouse_id')}
+                    disabled={!!purchaseOrderId}
                   />
                 </div>
 
@@ -477,6 +676,7 @@ export default function CreatePurchaseInvoice() {
                     placeholder="Select Cost Center"
                     error={!!getErrorMessage('cost_center_id')}
                     hint={getErrorMessage('cost_center_id')}
+                    disabled={!!purchaseOrderId}
                   />
                 </div>
 
@@ -508,177 +708,349 @@ export default function CreatePurchaseInvoice() {
 
               <div className="flex items-center justify-between mt-8 mb-4">
                 <h3 className="text-xl font-bold dark:text-white">Items</h3>
-                <Button type="button" variant="outline" onClick={handleAddItem} className="gap-2">
-                  <Plus className="w-4 h-4" />
-                  Add Item
-                </Button>
+                {!isConverting && (
+                  <Button type="button" variant="outline" onClick={handleAddItem} className="gap-2">
+                    <Plus className="w-4 h-4" />
+                    Add Item
+                  </Button>
+                )}
               </div>
 
               <div className="space-y-4">
                 {/* Table Headers */}
-                <div className="grid grid-cols-[2.5fr_1.5fr_1.5fr_1.5fr_0.8fr_1.2fr] gap-x-4 px-4 py-3 mb-2 bg-gray-50 dark:bg-gray-800/50 rounded-lg items-end">
-                  <div className="uppercase text-theme-xs font-bold tracking-wider text-gray-500">
-                    Items *
-                  </div>
-                  <div className="text-center uppercase text-theme-xs font-bold tracking-wider text-gray-500">
-                    Quantity *
-                  </div>
-                  <div className="text-center uppercase text-theme-xs font-bold tracking-wider text-gray-500">
-                    Price *
-                  </div>
-                  <div className="text-center uppercase text-theme-xs font-bold tracking-wider text-gray-500">
-                    Discount (% / Fixed)
-                  </div>
-                  <div className="text-center uppercase text-theme-xs font-bold tracking-wider text-gray-500">
-                    Tax (%)
-                  </div>
-                  <div className="text-end">
+                {isConverting ? (
+                  <div className="grid grid-cols-[2fr_0.7fr_0.7fr_0.8fr_1.2fr_1.2fr_0.7fr_1.2fr] gap-x-3 px-4 py-3 mb-2 bg-gray-50 dark:bg-gray-800/50 rounded-lg items-end">
                     <div className="uppercase text-theme-xs font-bold tracking-wider text-gray-500">
+                      Item
+                    </div>
+                    <div className="text-center uppercase text-theme-xs font-bold tracking-wider text-gray-500">
+                      {grnId ? 'Received' : 'Ordered'}
+                    </div>
+                    <div className="text-center uppercase text-theme-xs font-bold tracking-wider text-gray-500">
+                      Invoiced
+                    </div>
+                    <div className="text-center uppercase text-theme-xs font-bold tracking-wider text-gray-500">
+                      Qty to Invoice *
+                    </div>
+                    <div className="text-center uppercase text-theme-xs font-bold tracking-wider text-gray-500">
+                      Price *
+                    </div>
+                    <div className="text-center uppercase text-theme-xs font-bold tracking-wider text-gray-500">
+                      Discount
+                    </div>
+                    <div className="text-center uppercase text-theme-xs font-bold tracking-wider text-gray-500">
+                      Tax
+                    </div>
+                    <div className="text-end uppercase text-theme-xs font-bold tracking-wider text-gray-500">
                       Amount
                     </div>
-                    <div className="text-[10px] font-bold text-red-500 uppercase tracking-tight leading-none mt-1">
-                      After Tax & Discount
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-[2.5fr_1.5fr_1.5fr_1.5fr_0.8fr_1.2fr] gap-x-4 px-4 py-3 mb-2 bg-gray-50 dark:bg-gray-800/50 rounded-lg items-end">
+                    <div className="uppercase text-theme-xs font-bold tracking-wider text-gray-500">
+                      Items *
+                    </div>
+                    <div className="text-center uppercase text-theme-xs font-bold tracking-wider text-gray-500">
+                      Quantity *
+                    </div>
+                    <div className="text-center uppercase text-theme-xs font-bold tracking-wider text-gray-500">
+                      Price *
+                    </div>
+                    <div className="text-center uppercase text-theme-xs font-bold tracking-wider text-gray-500">
+                      Discount (% / Fixed)
+                    </div>
+                    <div className="text-center uppercase text-theme-xs font-bold tracking-wider text-gray-500">
+                      Tax (%)
+                    </div>
+                    <div className="text-end">
+                      <div className="uppercase text-theme-xs font-bold tracking-wider text-gray-500">
+                        Amount
+                      </div>
+                      <div className="text-[10px] font-bold text-red-500 uppercase tracking-tight leading-none mt-1">
+                        After Tax & Discount
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
 
                 {items.map((item, index) => {
                   const selectedItem = availableItems.find(
                     (i) => String(i.id) === String(item.item_id)
                   );
                   const totals = calculateItemTotals(item);
+                  const isConvertedItem =
+                    !!item.purchase_order_item_id || !!item.goods_received_note_item_id;
+
                   return (
                     <div
                       key={index}
                       className="group relative rounded-xl border border-gray-100 p-4 transition-all hover:border-brand-200 dark:border-gray-800 dark:hover:border-brand-500/30"
                     >
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveItem(index)}
-                        className="absolute p-1 text-red-500 bg-red-50 dark:bg-red-500/10 rounded-full -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-100 dark:hover:bg-red-500/20"
-                      >
-                        <svg
-                          className="w-4 h-4"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
+                      {!isConverting && (
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveItem(index)}
+                          className="absolute p-1 text-red-500 bg-red-50 dark:bg-red-500/10 rounded-full -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-100 dark:hover:bg-red-500/20"
                         >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M6 18L18 6M6 6l12 12"
-                          ></path>
-                        </svg>
-                      </button>
+                          <svg
+                            className="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M6 18L18 6M6 6l12 12"
+                            ></path>
+                          </svg>
+                        </button>
+                      )}
 
-                      <div className="grid grid-cols-[2.5fr_1.5fr_1.5fr_1.5fr_0.8fr_1.2fr] gap-x-4 items-center">
-                        {/* Item Select */}
-                        <div>
-                          <Select
-                            options={availableItems.map((i) => ({
-                              value: String(i.id),
-                              label: i.name,
-                            }))}
-                            onChange={(val) => handleItemChange(index, 'item_id', val)}
-                            defaultValue={item.item_id}
-                            placeholder="Search item..."
-                            error={!!getErrorMessage(`items.${index}.item_id`)}
-                          />
-                        </div>
+                      {/* PO Conversion Mode Grid */}
+                      {isConverting ? (
+                        <div className="grid grid-cols-[2fr_0.7fr_0.7fr_0.8fr_1.2fr_1.2fr_0.7fr_1.2fr] gap-x-3 items-center">
+                          {/* Item Name (read-only) */}
+                          <div>
+                            <Select
+                              options={availableItems.map((i) => ({
+                                value: String(i.id),
+                                label: i.name,
+                              }))}
+                              onChange={() => {}}
+                              defaultValue={item.item_id}
+                              placeholder="Item"
+                              disabled={isConvertedItem}
+                            />
+                          </div>
 
-                        {/* Quantity */}
-                        <div className="min-w-0 overflow-hidden">
-                          <Input
-                            type="number"
-                            value={item.quantity}
-                            onChange={(e) =>
-                              handleItemChange(index, 'quantity', Number(e.target.value))
-                            }
-                            className="text-center px-1"
-                            placeholder="Qty"
-                            suffix={selectedItem?.unit?.code || '-'}
-                            decimalPlaces={parseInt(getSetting('quantity_decimal_places', '3'))}
-                          />
-                        </div>
+                          {/* Ordered Qty (read-only) */}
+                          <div className="text-center">
+                            <div className="h-11 flex items-center justify-center rounded-lg bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700">
+                              <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">
+                                {formatNumber(item.ordered_quantity || 0)}
+                              </span>
+                            </div>
+                          </div>
 
-                        {/* Price */}
-                        <div className="min-w-0 overflow-hidden">
-                          <Input
-                            type="number"
-                            value={item.unit_price}
-                            onChange={(e) =>
-                              handleItemChange(index, 'unit_price', Number(e.target.value))
-                            }
-                            className="px-1"
-                            placeholder="Price"
-                            suffix={currencySymbol}
-                            decimalPlaces={parseInt(getSetting('decimal_places', '2'))}
-                          />
-                        </div>
+                          {/* Already Invoiced (read-only) */}
+                          <div className="text-center">
+                            <div className="h-11 flex items-center justify-center rounded-lg bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700">
+                              <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">
+                                {formatNumber(item.already_invoiced || 0)}
+                              </span>
+                            </div>
+                          </div>
 
-                        {/* Discount */}
-                        <div className="min-w-0 overflow-hidden">
-                          <div className="flex min-w-0 [&>div]:min-w-0 [&>div]:flex-1">
+                          {/* Qty to Invoice (editable) */}
+                          <div className="min-w-0 overflow-hidden">
                             <Input
                               type="number"
-                              value={item.discount_value}
+                              value={item.quantity}
                               onChange={(e) =>
-                                handleItemChange(index, 'discount_value', Number(e.target.value))
+                                handleItemChange(index, 'quantity', Number(e.target.value))
                               }
-                              className="rounded-r-none border-r-0 px-1"
-                              placeholder="0"
-                              decimalPlaces={parseInt(
-                                getSetting('general_number_decimal_places', '2')
-                              )}
+                              className="text-center px-1"
+                              placeholder="Qty"
+                              decimalPlaces={parseInt(getSetting('quantity_decimal_places', '3'))}
+                              error={!!getErrorMessage(`items.${index}.quantity`)}
+                              hint={getErrorMessage(`items.${index}.quantity`)}
                             />
-                            <button
-                              type="button"
-                              onClick={() =>
-                                handleItemChange(
-                                  index,
-                                  'discount_type',
-                                  item.discount_type === 'percentage' ? 'fixed' : 'percentage'
-                                )
+                          </div>
+
+                          {/* Price (editable) */}
+                          <div className="min-w-0 overflow-hidden">
+                            <Input
+                              type="number"
+                              value={item.unit_price}
+                              onChange={(e) =>
+                                handleItemChange(index, 'unit_price', Number(e.target.value))
                               }
-                              className="flex-shrink-0 flex items-center gap-1.5 px-2.5 border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 rounded-r-lg text-theme-xs font-bold text-blue-600 dark:text-blue-400 justify-center hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all cursor-pointer h-11 min-w-[45px] shadow-sm active:scale-95 group"
-                              title={`Switch to ${item.discount_type === 'percentage' ? 'fixed' : 'percentage'} discount`}
-                            >
-                              <span className="group-hover:scale-110 transition-transform">
+                              className="px-1"
+                              placeholder="Price"
+                              suffix={currencySymbol}
+                              decimalPlaces={parseInt(getSetting('decimal_places', '2'))}
+                              error={!!getErrorMessage(`items.${index}.unit_price`)}
+                              hint={getErrorMessage(`items.${index}.unit_price`)}
+                            />
+                          </div>
+
+                          {/* Discount (editable) */}
+                          <div className="min-w-0 overflow-hidden">
+                            <div className="flex min-w-0 [&>div]:min-w-0 [&>div]:flex-1">
+                              <Input
+                                type="number"
+                                value={item.discount_value}
+                                onChange={(e) =>
+                                  handleItemChange(index, 'discount_value', Number(e.target.value))
+                                }
+                                className="rounded-r-none border-r-0 px-1"
+                                placeholder="0"
+                                decimalPlaces={parseInt(
+                                  getSetting('general_number_decimal_places', '2')
+                                )}
+                                error={!!getErrorMessage(`items.${index}.discount_value`)}
+                                hint={getErrorMessage(`items.${index}.discount_value`)}
+                              />
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  handleItemChange(
+                                    index,
+                                    'discount_type',
+                                    item.discount_type === 'percentage' ? 'fixed' : 'percentage'
+                                  )
+                                }
+                                className="flex-shrink-0 flex items-center gap-1.5 px-2.5 border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 rounded-r-lg text-theme-xs font-bold text-blue-600 dark:text-blue-400 justify-center hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all cursor-pointer h-11 min-w-[40px] shadow-sm active:scale-95"
+                                title={`Switch to ${item.discount_type === 'percentage' ? 'fixed' : 'percentage'} discount`}
+                              >
                                 {item.discount_type === 'percentage' ? '%' : currencySymbol}
-                              </span>
-                            </button>
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* Tax (read-only) */}
+                          <div className="flex items-center justify-center">
+                            {totals.taxBreakdown.length > 0 ? (
+                              <div className="text-center space-y-0.5">
+                                {totals.taxBreakdown.map((tb, ti) => (
+                                  <div
+                                    key={ti}
+                                    className="text-xs font-medium text-gray-600 dark:text-gray-400 whitespace-nowrap"
+                                  >
+                                    {formatNumber(tb.rate)}%
+                                  </div>
+                                ))}
+                              </div>
+                            ) : (
+                              <span className="text-xs text-gray-400">—</span>
+                            )}
+                          </div>
+
+                          {/* Amount */}
+                          <div className="text-end">
+                            <p className="text-lg font-bold text-gray-800 dark:text-white">
+                              {formatCurrency(totals.total)}
+                            </p>
                           </div>
                         </div>
+                      ) : (
+                        /* Direct Invoice Mode Grid */
+                        <div className="grid grid-cols-[2.5fr_1.5fr_1.5fr_1.5fr_0.8fr_1.2fr] gap-x-4 items-center">
+                          {/* Item Select */}
+                          <div>
+                            <Select
+                              options={availableItems.map((i) => ({
+                                value: String(i.id),
+                                label: i.name,
+                              }))}
+                              onChange={(val) => handleItemChange(index, 'item_id', val)}
+                              defaultValue={item.item_id}
+                              placeholder="Search item..."
+                              error={!!getErrorMessage(`items.${index}.item_id`)}
+                            />
+                          </div>
 
-                        {/* Tax Group */}
-                        <div className="flex items-center justify-center">
-                          {totals.taxBreakdown.length > 0 ? (
-                            <div className="text-center space-y-0.5">
-                              {totals.taxBreakdown.map((tb, ti) => (
-                                <div
-                                  key={ti}
-                                  className="text-xs font-medium text-gray-600 dark:text-gray-400 whitespace-nowrap"
-                                >
-                                  {tb.name}{' '}
-                                  <span className="font-bold text-gray-700 dark:text-gray-300">
-                                    {formatNumber(tb.rate)}%
-                                  </span>
-                                </div>
-                              ))}
+                          {/* Quantity */}
+                          <div className="min-w-0 overflow-hidden">
+                            <Input
+                              type="number"
+                              value={item.quantity}
+                              onChange={(e) =>
+                                handleItemChange(index, 'quantity', Number(e.target.value))
+                              }
+                              className="text-center px-1"
+                              placeholder="Qty"
+                              suffix={selectedItem?.unit?.code || '-'}
+                              decimalPlaces={parseInt(getSetting('quantity_decimal_places', '3'))}
+                              error={!!getErrorMessage(`items.${index}.quantity`)}
+                              hint={getErrorMessage(`items.${index}.quantity`)}
+                            />
+                          </div>
+
+                          {/* Price */}
+                          <div className="min-w-0 overflow-hidden">
+                            <Input
+                              type="number"
+                              value={item.unit_price}
+                              onChange={(e) =>
+                                handleItemChange(index, 'unit_price', Number(e.target.value))
+                              }
+                              className="px-1"
+                              placeholder="Price"
+                              suffix={currencySymbol}
+                              decimalPlaces={parseInt(getSetting('decimal_places', '2'))}
+                              error={!!getErrorMessage(`items.${index}.unit_price`)}
+                              hint={getErrorMessage(`items.${index}.unit_price`)}
+                            />
+                          </div>
+
+                          {/* Discount */}
+                          <div className="min-w-0 overflow-hidden">
+                            <div className="flex min-w-0 [&>div]:min-w-0 [&>div]:flex-1">
+                              <Input
+                                type="number"
+                                value={item.discount_value}
+                                onChange={(e) =>
+                                  handleItemChange(index, 'discount_value', Number(e.target.value))
+                                }
+                                className="rounded-r-none border-r-0 px-1"
+                                placeholder="0"
+                                decimalPlaces={parseInt(
+                                  getSetting('general_number_decimal_places', '2')
+                                )}
+                                error={!!getErrorMessage(`items.${index}.discount_value`)}
+                                hint={getErrorMessage(`items.${index}.discount_value`)}
+                              />
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  handleItemChange(
+                                    index,
+                                    'discount_type',
+                                    item.discount_type === 'percentage' ? 'fixed' : 'percentage'
+                                  )
+                                }
+                                className="flex-shrink-0 flex items-center gap-1.5 px-2.5 border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 rounded-r-lg text-theme-xs font-bold text-blue-600 dark:text-blue-400 justify-center hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all cursor-pointer h-11 min-w-[45px] shadow-sm active:scale-95 group"
+                                title={`Switch to ${item.discount_type === 'percentage' ? 'fixed' : 'percentage'} discount`}
+                              >
+                                <span className="group-hover:scale-110 transition-transform">
+                                  {item.discount_type === 'percentage' ? '%' : currencySymbol}
+                                </span>
+                              </button>
                             </div>
-                          ) : (
-                            <span className="text-xs text-gray-400">—</span>
-                          )}
-                        </div>
+                          </div>
 
-                        {/* Result Amount */}
-                        <div className="text-end">
-                          <p className="text-lg font-bold text-gray-800 dark:text-white">
-                            {formatCurrency(totals.total)}
-                          </p>
+                          {/* Tax Group */}
+                          <div className="flex items-center justify-center">
+                            {totals.taxBreakdown.length > 0 ? (
+                              <div className="text-center space-y-0.5">
+                                {totals.taxBreakdown.map((tb, ti) => (
+                                  <div
+                                    key={ti}
+                                    className="text-xs font-medium text-gray-600 dark:text-gray-400 whitespace-nowrap"
+                                  >
+                                    {tb.name}{' '}
+                                    <span className="font-bold text-gray-700 dark:text-gray-300">
+                                      {formatNumber(tb.rate)}%
+                                    </span>
+                                  </div>
+                                ))}
+                              </div>
+                            ) : (
+                              <span className="text-xs text-gray-400">—</span>
+                            )}
+                          </div>
+
+                          {/* Result Amount */}
+                          <div className="text-end">
+                            <p className="text-lg font-bold text-gray-800 dark:text-white">
+                              {formatCurrency(totals.total)}
+                            </p>
+                          </div>
                         </div>
-                      </div>
+                      )}
 
                       {/* Description Row */}
                       <div className="mt-4 max-w-[40%]">
@@ -738,7 +1110,7 @@ export default function CreatePurchaseInvoice() {
               <Button variant="outline" type="button" onClick={() => router.back()}>
                 Cancel
               </Button>
-              <Button type="submit" disabled={isSubmitting}>
+              <Button type="submit" isLoading={isSubmitting}>
                 {isSubmitting ? 'Creating...' : 'Create Purchase Invoice'}
               </Button>
             </div>

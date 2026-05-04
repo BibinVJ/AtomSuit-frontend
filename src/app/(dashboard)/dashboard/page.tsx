@@ -384,7 +384,7 @@ function Home() {
 
   return (
     <>
-      <PageMeta title="Ecommerce Dashboard" description="Ecommerce dashboard page" />
+      <PageMeta title="Dashboard" description="Dashboard page" />
       <div>
         <div className="flex justify-end gap-2 mb-4">
           {!editMode ? (

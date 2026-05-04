@@ -12,6 +12,7 @@ import {
 import WarehouseTable from '@/app/(dashboard)/inventory/_components/warehouses/WarehouseTable';
 import CreateWarehouseModal from '@/app/(dashboard)/inventory/_components/warehouses/CreateWarehouseModal';
 import EditWarehouseModal from '@/app/(dashboard)/inventory/_components/warehouses/EditWarehouseModal';
+import ViewWarehouseModal from '@/app/(dashboard)/inventory/_components/warehouses/ViewWarehouseModal';
 import ConfirmModal from '@/components/common/ConfirmModal';
 import { Warehouse } from '@/types/Warehouse';
 import { deleteWarehouse } from '@/services/WarehouseService';
@@ -32,6 +33,7 @@ export default function Warehouses() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [editingWarehouse, setEditingWarehouse] = useState<Warehouse | null>(null);
+  const [viewingWarehouse, setViewingWarehouse] = useState<Warehouse | null>(null);
   const [confirmTarget, setConfirmTarget] = useState<Warehouse | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -72,6 +74,10 @@ export default function Warehouses() {
 
   const handleEdit = (warehouse: Warehouse) => {
     setEditingWarehouse(warehouse);
+  };
+
+  const handleView = (warehouse: Warehouse) => {
+    setViewingWarehouse(warehouse);
   };
 
   const handleDelete = (warehouse: Warehouse) => {
@@ -170,6 +176,7 @@ export default function Warehouses() {
             loading={loading}
             perPage={perPage}
             onEdit={handleEdit}
+            onView={handleView}
             onDelete={handleDelete}
             onRestore={viewMode === 'trashed' ? (u) => handleEdit(u) : undefined}
             viewMode={viewMode}
@@ -210,6 +217,14 @@ export default function Warehouses() {
           onClose={() => setEditingWarehouse(null)}
           onWarehouseUpdated={refresh}
           warehouse={editingWarehouse}
+        />
+      )}
+
+      {viewingWarehouse && (
+        <ViewWarehouseModal
+          isOpen={!!viewingWarehouse}
+          onClose={() => setViewingWarehouse(null)}
+          warehouse={viewingWarehouse}
         />
       )}
 

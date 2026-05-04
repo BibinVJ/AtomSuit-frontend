@@ -13,6 +13,11 @@ export interface Warehouse {
   zip_code?: string;
   phone?: string;
   email?: string;
+  stock_by_item?: {
+    id: number;
+    name: string;
+    quantity: number;
+  }[];
   created_at?: string;
   updated_at?: string;
   deleted_at?: string;

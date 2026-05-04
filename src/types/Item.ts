@@ -14,6 +14,11 @@ export interface Item {
   type: string;
   tax_group?: TaxGroup;
   stock_on_hand?: number;
+  stock_by_warehouse?: {
+    id: number;
+    name: string;
+    quantity: number;
+  }[];
   non_expired_stock?: number;
   expired_stock?: number;
   sales_account?: ChartOfAccount;

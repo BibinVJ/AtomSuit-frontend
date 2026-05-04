@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import PageMeta from '@/components/common/PageMeta';
 import PageBreadcrumb from '@/components/common/PageBreadCrumb';
@@ -37,6 +37,26 @@ export default function ViewPurchaseInvoice() {
   useEffect(() => {
     fetchInvoiceDetails();
   }, [fetchInvoiceDetails]);
+
+  const taxBreakdown = useMemo(() => {
+    if (!invoice?.items) return [];
+    const taxMap: Record<string, number> = {};
+    invoice.items.forEach((item) => {
+      if (item.tax_meta?.rates) {
+        const taxableAmount = (item.sub_total || 0) - (item.discount_amount || 0);
+        item.tax_meta.rates.forEach((rate) => {
+          let amount = 0;
+          if (rate.type === 'percentage') {
+            amount = taxableAmount * (Number(rate.rate) / 100);
+          } else {
+            amount = Number(rate.rate) * (item.quantity || 0);
+          }
+          taxMap[rate.name] = (taxMap[rate.name] || 0) + amount;
+        });
+      }
+    });
+    return Object.entries(taxMap).map(([name, amount]) => ({ name, amount }));
+  }, [invoice?.items]);
 
   const handlePrint = () => {
     window.print();
@@ -82,7 +102,7 @@ export default function ViewPurchaseInvoice() {
       />
 
       <div className="flex justify-end gap-2 mb-4">
-        <Button variant="outline" onClick={handlePrint}>
+        <Button variant="outline" size="sm" onClick={handlePrint}>
           Print
         </Button>
       </div>
@@ -193,6 +213,12 @@ export default function ViewPurchaseInvoice() {
                       isHeader
                       className="px-5 py-3 font-medium text-gray-500 text-end text-theme-xs dark:text-gray-400"
                     >
+                      Tax
+                    </TableCell>
+                    <TableCell
+                      isHeader
+                      className="px-5 py-3 font-medium text-gray-500 text-end text-theme-xs dark:text-gray-400"
+                    >
                       Total Amount
                     </TableCell>
                   </TableRow>
@@ -213,55 +239,68 @@ export default function ViewPurchaseInvoice() {
                         {formatCurrency(item.unit_price ?? 0)}
                       </TableCell>
                       <TableCell className="px-5 py-4 text-gray-800 text-end text-theme-sm dark:text-gray-400">
-                        {formatCurrency((item.quantity ?? 0) * (item.unit_price ?? 0))}
+                        {item.tax_meta?.rates?.length ? (
+                          <div className="flex flex-col items-end space-y-0.5">
+                            {item.tax_meta.rates.map((rate, i) => (
+                              <div key={i} className="text-xs whitespace-nowrap">
+                                {rate.name}{' '}
+                                <span className="font-medium text-gray-500">
+                                  ({rate.rate}
+                                  {rate.type === 'percentage' ? '%' : ''})
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <span className="text-gray-400">—</span>
+                        )}
+                      </TableCell>
+                      <TableCell className="px-5 py-4 text-gray-800 text-end text-theme-sm dark:text-gray-400">
+                        {formatCurrency(item.total_amount ?? 0)}
                       </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
-                <tfoot className="border-t border-gray-100 dark:border-white/[0.05]">
-                  <TableRow className="font-semibold">
-                    <TableCell
-                      colSpan={4}
-                      className="px-5 py-4 text-end text-gray-800 dark:text-white/90"
-                    >
-                      Sub Total:
-                    </TableCell>
-                    <TableCell className="px-5 py-4 text-end text-gray-800 dark:text-white/90">
-                      {formatCurrency(invoice.sub_total)}
-                    </TableCell>
-                  </TableRow>
-                  <TableRow className="font-semibold text-red-500">
-                    <TableCell colSpan={4} className="px-5 py-4 text-end">
-                      Discount Total:
-                    </TableCell>
-                    <TableCell className="px-5 py-4 text-end">
-                      -{formatCurrency(invoice.discount_total)}
-                    </TableCell>
-                  </TableRow>
-                  <TableRow className="font-semibold">
-                    <TableCell
-                      colSpan={4}
-                      className="px-5 py-4 text-end text-gray-800 dark:text-white/90"
-                    >
-                      Tax Total:
-                    </TableCell>
-                    <TableCell className="px-5 py-4 text-end text-gray-800 dark:text-white/90">
-                      +{formatCurrency(invoice.tax_total)}
-                    </TableCell>
-                  </TableRow>
-                  <TableRow className="font-black text-lg border-t-2 border-brand-500/20">
-                    <TableCell
-                      colSpan={4}
-                      className="px-5 py-4 text-end text-gray-900 dark:text-white"
-                    >
-                      Net Total:
-                    </TableCell>
-                    <TableCell className="px-5 py-4 text-end text-brand-600 dark:text-brand-400">
-                      {formatCurrency(invoice.total_amount)}
-                    </TableCell>
-                  </TableRow>
-                </tfoot>
               </Table>
+            </div>
+          </div>
+
+          <div className="flex justify-end mt-8">
+            <div className="w-full max-w-sm space-y-3">
+              <div className="flex justify-between items-center px-4">
+                <span className="text-gray-500 font-bold uppercase text-theme-xs">Sub Total</span>
+                <span className="font-bold text-gray-900 dark:text-white">
+                  {formatCurrency(invoice.sub_total)}
+                </span>
+              </div>
+              <div className="flex justify-between items-center px-4">
+                <span className="text-gray-500 font-bold uppercase text-theme-xs">Discount</span>
+                <span className="font-bold text-gray-900 dark:text-white">
+                  -{formatCurrency(invoice.discount_total)}
+                </span>
+              </div>
+              {taxBreakdown.map((tb, idx) => (
+                <div key={idx} className="flex justify-between items-center px-4">
+                  <span className="text-gray-500 font-bold uppercase text-theme-xs">{tb.name}</span>
+                  <span className="font-bold text-gray-900 dark:text-white">
+                    +{formatCurrency(tb.amount)}
+                  </span>
+                </div>
+              ))}
+              <div className="flex justify-between items-center px-4">
+                <span className="text-gray-500 font-bold uppercase text-theme-xs">Total Tax</span>
+                <span className="font-bold text-gray-900 dark:text-white">
+                  +{formatCurrency(invoice.tax_total)}
+                </span>
+              </div>
+              <div className="flex justify-between items-center p-4 bg-brand-50 dark:bg-brand-500/10 rounded-xl">
+                <span className="text-brand-600 dark:text-brand-400 font-bold uppercase text-theme-sm">
+                  Total Amount
+                </span>
+                <span className="text-xl font-black text-brand-700 dark:text-brand-400">
+                  {formatCurrency(invoice.total_amount)}
+                </span>
+              </div>
             </div>
           </div>
         </div>

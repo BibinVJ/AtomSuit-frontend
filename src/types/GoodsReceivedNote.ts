@@ -48,6 +48,7 @@ export interface GoodsReceivedNote {
   total_amount: number;
   cost_center_id: number;
   warehouse_id: number;
+  is_fully_invoiced?: boolean;
   notes?: string;
   created_by?: number;
   updated_by?: number;
@@ -74,6 +75,7 @@ export interface GoodsReceivedNotePayload {
   items: {
     item_id: number;
     purchase_order_item_id?: number;
+    purchase_invoice_item_id?: number;
     description?: string;
     quantity_received: number;
     accepted_quantity: number;

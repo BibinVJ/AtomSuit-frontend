@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import {
   getUser,
   storeUser,
@@ -19,6 +19,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isInitialized, setIsInitialized] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const { tenant } = useTenant();
 
   const fetchProfile = useCallback(async () => {
@@ -34,19 +35,28 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, []);
 
-  const handleLogout = useCallback(async () => {
-    try {
-      await logoutService();
-    } catch {
-      // Silently handle logout errors
-    }
-    setUser(null);
+  const handleLogout = useCallback(
+    async (preserveRedirect = false) => {
+      try {
+        await logoutService();
+      } catch {
+        // Silently handle logout errors
+      }
+      setUser(null);
 
-    // Always redirect to signin after logout
-    if (pathname !== '/signin' && pathname !== '/signup') {
-      router.push('/signin');
-    }
-  }, [pathname, router]);
+      // Always redirect to signin after logout
+      if (pathname !== '/signin' && pathname !== '/signup') {
+        // If this is a session expiry (401), preserve the current path so the user
+        // can return to it after re-authenticating
+        const redirectParam =
+          preserveRedirect && pathname && pathname !== '/'
+            ? `?redirect=${encodeURIComponent(pathname)}`
+            : '';
+        router.push(`/signin${redirectParam}`);
+      }
+    },
+    [pathname, router]
+  );
 
   useEffect(() => {
     const initializeAuth = async () => {
@@ -102,12 +112,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     if (user) {
       // User is authenticated - redirect away from auth pages
       if (pathname === '/signin' || pathname === '/signup') {
-        router.push('/dashboard');
+        const redirect = searchParams.get('redirect');
+        const safeRedirect =
+          redirect && redirect.startsWith('/') && !redirect.startsWith('//')
+            ? redirect
+            : '/dashboard';
+        router.push(safeRedirect);
       }
     } else {
       // User is not authenticated - redirect to signin if on protected route
       if (!isPublicRoute) {
-        router.push('/signin');
+        const redirectParam =
+          pathname && pathname !== '/' ? `?redirect=${encodeURIComponent(pathname)}` : '';
+        router.push(`/signin${redirectParam}`);
       } else if (!tenant.isCentral && pathname === '/') {
         // If on tenant domain home page, redirect to signin
         router.push('/signin');
@@ -118,7 +135,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   // Listen for logout events from API interceptor (401 responses)
   useEffect(() => {
     const handleLogoutEvent = () => {
-      handleLogout();
+      // 401-triggered logout: preserve the current path for redirect after re-login
+      handleLogout(true);
     };
 
     window.addEventListener('logout', handleLogoutEvent);

@@ -62,6 +62,39 @@ export default function ViewItemModal({ isOpen, onClose, item }: Props) {
             <p className="text-base text-gray-900 dark:text-gray-100">{item.description || '-'}</p>
           </div>
 
+          {/* Stock Info */}
+          <div className="md:col-span-2 mt-2">
+            <h3 className="text-lg font-medium text-gray-800 dark:text-white mb-4 border-b pb-2 border-gray-100 dark:border-gray-800 flex justify-between items-end">
+              <span>Stock Information</span>
+              <span className="text-sm text-gray-500 font-normal">
+                Total Stock:{' '}
+                <span className="font-semibold text-gray-900 dark:text-white">
+                  {item.stock_on_hand ?? 0}
+                </span>
+              </span>
+            </h3>
+
+            {item.stock_by_warehouse && item.stock_by_warehouse.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                {item.stock_by_warehouse.map((warehouseStock) => (
+                  <div
+                    key={warehouseStock.id}
+                    className="bg-gray-50 dark:bg-gray-800/50 p-3 rounded-lg border border-gray-100 dark:border-gray-700"
+                  >
+                    <h4 className="text-sm font-medium text-gray-500 mb-1">
+                      {warehouseStock.name}
+                    </h4>
+                    <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                      {warehouseStock.quantity}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-gray-500">No stock information available.</p>
+            )}
+          </div>
+
           {/* Accounting Info */}
           <div className="md:col-span-2 mt-2">
             <h3 className="text-lg font-medium text-gray-800 dark:text-white mb-4 border-b pb-2 border-gray-100 dark:border-gray-800">

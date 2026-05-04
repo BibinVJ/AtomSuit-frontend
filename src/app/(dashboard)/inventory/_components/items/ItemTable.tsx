@@ -162,6 +162,13 @@ export default function ItemTable({
               >
                 Type {renderSortIcon('type')}
               </TableCell>
+              <TableCell
+                isHeader
+                className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400"
+                onClick={() => onSort('stock_on_hand')}
+              >
+                Total Stock {renderSortIcon('stock_on_hand')}
+              </TableCell>
 
               <TableCell
                 isHeader
@@ -175,13 +182,13 @@ export default function ItemTable({
           <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
             {loading ? (
               <TableRow>
-                <TableCell colSpan={7} className="p-0">
-                  <SkeletonTable rows={perPage} columns={7} />
+                <TableCell colSpan={8} className="p-0">
+                  <SkeletonTable rows={perPage} columns={8} />
                 </TableCell>
               </TableRow>
             ) : data.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="px-5 py-10 text-center text-gray-500">
+                <TableCell colSpan={8} className="px-5 py-10 text-center text-gray-500">
                   No items found.
                 </TableCell>
               </TableRow>
@@ -235,6 +242,9 @@ export default function ItemTable({
                   </TableCell>
                   <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
                     {item.type}
+                  </TableCell>
+                  <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
+                    {item.stock_on_hand ?? 0}
                   </TableCell>
 
                   <TableCell className="px-4 py-3 text-end">

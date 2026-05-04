@@ -41,12 +41,14 @@ export default function RootLayout({
             `,
           }}
         />
-        <AppProviders>
-          <Suspense fallback={null}>
-            <NavigationEvents />
-          </Suspense>
-          {children}
-        </AppProviders>
+        <Suspense fallback={null}>
+          <AppProviders>
+            <Suspense fallback={null}>
+              <NavigationEvents />
+            </Suspense>
+            {children}
+          </AppProviders>
+        </Suspense>
       </body>
     </html>
   );
