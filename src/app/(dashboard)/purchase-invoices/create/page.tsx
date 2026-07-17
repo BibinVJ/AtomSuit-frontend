@@ -25,6 +25,7 @@ import Select from '@/components/form/Select';
 import TextArea from '@/components/form/input/TextArea';
 import DatePicker from '@/components/form/date-picker';
 import { Plus } from 'lucide-react';
+import NProgress from 'nprogress';
 
 interface PurchaseInvoiceItemInput {
   item_id: string;
@@ -144,6 +145,7 @@ export default function CreatePurchaseInvoice() {
               discount_value: number;
               tax_group_id?: number;
               purchase_order_item_id?: number;
+              invoiced_quantity?: number;
             }>;
           };
 
@@ -156,12 +158,17 @@ export default function CreatePurchaseInvoice() {
 
           if (grn.items && grn.items.length > 0) {
             const grnItems = grn.items
-              .filter((grnItem) => grnItem.accepted_quantity > 0)
+              .filter((grnItem) => {
+                const alreadyInvoiced = grnItem.invoiced_quantity || 0;
+                return grnItem.accepted_quantity - alreadyInvoiced > 0;
+              })
               .map((grnItem) => {
+                const alreadyInvoiced = grnItem.invoiced_quantity || 0;
+                const remaining = grnItem.accepted_quantity - alreadyInvoiced;
                 return {
                   item_id: String(grnItem.item_id),
                   description: grnItem.description || '',
-                  quantity: grnItem.accepted_quantity,
+                  quantity: remaining,
                   unit_price: grnItem.unit_price || 0,
                   discount_type: grnItem.discount_type || ('percentage' as DiscountType),
                   discount_value: grnItem.discount_value || 0,
@@ -169,11 +176,13 @@ export default function CreatePurchaseInvoice() {
                   purchase_order_item_id: grnItem.purchase_order_item_id,
                   goods_received_note_item_id: grnItem.id,
                   ordered_quantity: grnItem.accepted_quantity,
-                  already_invoiced: 0,
+                  already_invoiced: alreadyInvoiced,
                 };
               });
             if (grnItems.length > 0) {
               setItems(grnItems);
+            } else {
+              toast.warning('All items on this GRN have already been fully invoiced.');
             }
           }
         }
@@ -246,6 +255,18 @@ export default function CreatePurchaseInvoice() {
     };
     fetchData();
   }, [purchaseOrderId, grnId]);
+
+  // Keep the top progress bar running while page data is loading
+  useEffect(() => {
+    if (isLoading) {
+      NProgress.start();
+    } else {
+      NProgress.done();
+    }
+    return () => {
+      NProgress.done();
+    };
+  }, [isLoading]);
 
   const selectedVendor = useMemo(
     () => vendors.find((v) => String(v.id) === vendorId),
@@ -727,13 +748,13 @@ export default function CreatePurchaseInvoice() {
                       {grnId ? 'Received' : 'Ordered'}
                     </div>
                     <div className="text-center uppercase text-theme-xs font-bold tracking-wider text-gray-500">
-                      Invoiced
+                      Previously Invoiced
                     </div>
                     <div className="text-center uppercase text-theme-xs font-bold tracking-wider text-gray-500">
-                      Qty to Invoice *
+                      Qty to Invoice <span className="text-red-500">*</span>
                     </div>
                     <div className="text-center uppercase text-theme-xs font-bold tracking-wider text-gray-500">
-                      Price *
+                      Price <span className="text-red-500">*</span>
                     </div>
                     <div className="text-center uppercase text-theme-xs font-bold tracking-wider text-gray-500">
                       Discount

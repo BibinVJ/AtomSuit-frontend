@@ -24,6 +24,7 @@ import Select from '@/components/form/Select';
 import TextArea from '@/components/form/input/TextArea';
 import DatePicker from '@/components/form/date-picker';
 import { Plus } from 'lucide-react';
+import NProgress from 'nprogress';
 
 interface GoodsReceivedNoteItemInput {
   item_id: string;
@@ -189,6 +190,18 @@ export default function CreateGoodsReceivedNote() {
     };
     fetchData();
   }, [purchaseOrderId]);
+
+  // Keep the top progress bar running while page data is loading
+  useEffect(() => {
+    if (isLoading) {
+      NProgress.start();
+    } else {
+      NProgress.done();
+    }
+    return () => {
+      NProgress.done();
+    };
+  }, [isLoading]);
 
   const selectedVendor = useMemo(
     () => vendors.find((v) => String(v.id) === vendorId),
@@ -631,13 +644,13 @@ export default function CreateGoodsReceivedNote() {
                       Ordered
                     </div>
                     <div className="text-center uppercase text-theme-xs font-bold tracking-wider text-gray-500">
-                      Received
+                      Previously Received
                     </div>
                     <div className="text-center uppercase text-theme-xs font-bold tracking-wider text-gray-500">
-                      Qty to Receive *
+                      Qty to Receive <span className="text-red-500">*</span>
                     </div>
                     <div className="text-center uppercase text-theme-xs font-bold tracking-wider text-gray-500">
-                      Price *
+                      Price <span className="text-red-500">*</span>
                     </div>
                     <div className="text-center uppercase text-theme-xs font-bold tracking-wider text-gray-500">
                       Discount

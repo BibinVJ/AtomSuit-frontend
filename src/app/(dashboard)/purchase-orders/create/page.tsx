@@ -14,6 +14,7 @@ import { useRouter } from 'next/navigation';
 import DatePicker from '@/components/form/date-picker';
 import { useSettings } from '@/hooks/useSettings';
 import { toast } from 'sonner';
+import NProgress from 'nprogress';
 import { getVendors } from '@/services/VendorService';
 import { getItems } from '@/services/ItemService';
 import { getNextPurchaseOrderNumber, addPurchaseOrder } from '@/services/PurchaseOrderService';
@@ -132,6 +133,18 @@ export default function AddPurchaseOrder() {
   useEffect(() => {
     fetchInitialData();
   }, [fetchInitialData]);
+
+  // Keep the top progress bar running while page data is loading
+  useEffect(() => {
+    if (isLoading) {
+      NProgress.start();
+    } else {
+      NProgress.done();
+    }
+    return () => {
+      NProgress.done();
+    };
+  }, [isLoading]);
 
   const handleAddItem = () => {
     setPurchaseItems([
@@ -402,10 +415,11 @@ export default function AddPurchaseOrder() {
                 />
               </div>
               <div>
-                <Label>Order Number</Label>
+                <Label required>Order Number</Label>
                 <Input
                   type="text"
                   value={orderNumber}
+                  required
                   onChange={(e) => {
                     setOrderNumber(e.target.value);
                     clearError('order_number');
@@ -430,7 +444,7 @@ export default function AddPurchaseOrder() {
                 />
               </div>
               <div className="lg:col-span-1">
-                <Label>Order Date</Label>
+                <Label required>Order Date</Label>
                 <DatePicker
                   id="order_date"
                   required
@@ -486,7 +500,7 @@ export default function AddPurchaseOrder() {
               </div>
 
               <div className="lg:col-span-1">
-                <Label>Status</Label>
+                <Label required>Status</Label>
                 <Select
                   options={[
                     { value: PurchaseOrderStatus.DRAFT, label: 'Draft' },
@@ -514,7 +528,7 @@ export default function AddPurchaseOrder() {
               </div>
 
               <div className="lg:col-span-1">
-                <Label>Cost Center</Label>
+                <Label required>Cost Center</Label>
                 <Select
                   options={costCenters.map((c) => ({ value: String(c.id), label: c.name }))}
                   onChange={(value) => {

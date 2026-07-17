@@ -15,6 +15,8 @@ export * from './Vendor';
 export * from './PurchaseOrder';
 export * from './PurchaseInvoice';
 export * from './GoodsReceivedNote';
+export * from './DebitNote';
+export * from './VendorPayment';
 export * from './Dashboard';
 export * from './Plan';
 export * from './PriceList';

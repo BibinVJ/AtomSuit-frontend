@@ -102,6 +102,22 @@ export default function ViewPurchaseInvoice() {
       />
 
       <div className="flex justify-end gap-2 mb-4">
+        {invoice.status !== 'PAID' && (
+          <Button
+            href={`/vendor-payments/create?vendor_id=${invoice.vendor_id}`}
+            size="sm"
+            variant="primary"
+          >
+            Record Payment
+          </Button>
+        )}
+        <Button
+          href={`/debit-notes/create?purchase_invoice_id=${invoice.id}`}
+          size="sm"
+          variant="outline"
+        >
+          Create Debit Note
+        </Button>
         <Button variant="outline" size="sm" onClick={handlePrint}>
           Print
         </Button>

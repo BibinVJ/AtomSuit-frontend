@@ -3,7 +3,13 @@
 import { useState } from 'react';
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '@/components/ui/table';
 import Badge from '@/components/ui/badge/Badge';
-import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide } from 'lucide-react';
+import {
+  ChevronsUpDown,
+  ArrowUpWideNarrow,
+  ArrowDownNarrowWide,
+  Banknote,
+  Undo2,
+} from 'lucide-react';
 import { TableActions } from '@/components/common/TableActions';
 import ConfirmModal from '@/components/common/ConfirmModal';
 import { isApiError } from '@/utils/errors';
@@ -11,6 +17,8 @@ import { PurchaseInvoice } from '@/types/PurchaseInvoice';
 import { usePermissions } from '@/hooks/usePermissions';
 import { useSettings } from '@/hooks/useSettings';
 import SkeletonTable from '@/components/common/SkeletonTable';
+import Tooltip from '@/components/ui/tooltip/Tooltip';
+import Button from '@/components/ui/button/Button';
 import { toast } from 'sonner';
 
 interface Props {
@@ -188,6 +196,34 @@ export default function PurchaseInvoiceTable({
                     <TableCell className="px-4 py-3 text-gray-500 text-end text-theme-sm dark:text-gray-400">
                       <TableActions
                         isTrashed={isVoided}
+                        customActions={
+                          !isVoided && (
+                            <>
+                              {invoice.status !== 'PAID' && (
+                                <Tooltip text="Record Payment">
+                                  <Button
+                                    variant="ghost"
+                                    size="xs"
+                                    href={`/vendor-payments/create?vendor_id=${invoice.vendor_id}`}
+                                    className="text-gray-500 hover:text-green-600"
+                                  >
+                                    <Banknote size={18} />
+                                  </Button>
+                                </Tooltip>
+                              )}
+                              <Tooltip text="Create Debit Note">
+                                <Button
+                                  variant="ghost"
+                                  size="xs"
+                                  href={`/debit-notes/create?purchase_invoice_id=${invoice.id}`}
+                                  className="text-gray-500 hover:text-orange-500"
+                                >
+                                  <Undo2 size={18} />
+                                </Button>
+                              </Tooltip>
+                            </>
+                          )
+                        }
                         viewHref={
                           hasPermission('view-purchase-invoice')
                             ? `/purchase-invoices/${invoice.id}`

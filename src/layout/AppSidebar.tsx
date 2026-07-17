@@ -101,6 +101,8 @@ const navItems: NavItem[] = [
         path: '/purchase-invoices',
         permission: 'view-purchase-invoice',
       },
+      { name: 'Debit Notes', path: '/debit-notes', permission: 'view-debit-note' },
+      { name: 'Vendor Payments', path: '/vendor-payments', permission: 'view-vendor-payment' },
     ],
   },
 ];
