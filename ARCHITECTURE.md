@@ -82,3 +82,18 @@ import Button from '../../../../components/ui/Button';
 - **Naming**: PascalCase for components, camelCase for functions/vars.
 - **Types**: Strict TypeScript (no `any`). Define interfaces.
 - **Exports**: Named exports for utils, Default for Components/Pages.
+
+## 6. Origin & current reality (be accurate)
+
+- **Template origin:** this app is built on the **TailAdmin** free Next.js template (package
+  still named `free-nextjs-admin-dashboard`). Leftover template dirs under
+  `src/components/{ecommerce,calendar,charts,videos,example,home,tables}` are **not** part of the
+  ERP — don't wire features to them. The ERP lives under `src/app/(dashboard)`.
+- **Auth is client-side.** `middleware.ts` is a deliberate no-op; `AuthProvider` is the real gate
+  (verifies via `GET /profile`, exposes `hasPermission`). Tokens live in
+  `localStorage`/`sessionStorage` (not httpOnly cookies) — an XSS trade-off flagged for hardening.
+- **Data fetching** is the actual axios `BaseService` + TanStack Query pattern; the versions here
+  are Next.js 15 / React 19 / Tailwind **v4** (this doc's header numbers are indicative).
+- **Not built yet — don't assume they exist:** AI assistant / report summarizer, a Reports
+  module, Journal Entry UI, and Credit Note UI (only Debit Note exists). Test coverage is ~zero
+  (3 trivial test files) despite the Jest setup — add tests for new features.

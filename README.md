@@ -6,6 +6,8 @@ The modern, high-performance frontend for **Atom Suit**, built with **Next.js 15
 
 - **[Architecture Guide](ARCHITECTURE.md)**: Deep dive into the project structure, design patterns, and technical decisions. **Start here if you are a developer.**
 - **[Contributing Guidelines](CONTRIBUTING.md)**: Setup guide, git workflow, and coding standards.
+- **[Agent Guide](AGENTS.md)**: Rules (and a short AI startup prompt) for AI-assisted development.
+- **[Project Log](PROJECT_LOG.md)**: What was last implemented in this repo.
 
 ## 🚀 Quick Start
 
