@@ -211,6 +211,8 @@ export default function TenantTable({
                   </TableCell>
                   <TableCell className="px-4 py-3 text-gray-500 text-end text-theme-sm dark:text-gray-400">
                     <TableActions
+                      viewHref={hasPermission('view-tenant') ? `/tenants/${tenant.id}` : undefined}
+                      viewTooltip="View details & modules"
                       onDelete={
                         hasPermission('delete-tenant') ? () => handleDelete(tenant) : undefined
                       }

@@ -22,14 +22,17 @@ recent PROJECT_LOG.md entries first (so you don't undo or duplicate recent work)
 2. Feature structure: route under src/app/(dashboard)/<feature> with colocated _components; a
    service in src/services extending createBaseService (BaseService.ts); types in src/types
    (+ barrel index). Reuse src/services/api.ts — never write one-off axios/fetch calls.
-3. Data fetching via TanStack Query (not useEffect). Use `@/` absolute imports. Respect dark
-   mode and the shared components in src/components/{common,ui,form}.
+3. Data fetching: list/table views use TanStack Query (via the shared useDataTable hook);
+   create/view/edit screens fetch with useEffect + the axios services — follow the pattern of
+   the sibling module you're extending. Use `@/` absolute imports. Respect dark mode and the
+   shared components in src/components/{common,ui,form}.
 4. Multi-tenancy: api.ts sends `Authorization: Bearer` + `X-Tenant` (from src/utils/tenant.ts).
    Don't duplicate tenant parsing. Auth is client-side (token in localStorage/sessionStorage);
-   the real gate is AuthProvider + hasPermission(), not middleware.ts (a no-op).
+   the real gate is AuthProvider + hasPermission(). middleware.ts only does tenant-domain
+   routing/redirects, not auth.
 5. Authorize UI with permissions: hasPermission('name'), not roles.
-NOT built yet — don't assume: AI assistant, a Reports module, Journal Entry UI, Credit Note UI
-(only Debit Note exists), meaningful test coverage.
+NOT built yet — don't assume: AI assistant, a Reports module, Journal Entry UI, meaningful test
+coverage. (The full sales + purchase document chains, incl. Credit/Debit Notes, ARE built.)
 Before finishing: npm run lint · npx tsc --noEmit · npm run test · npm run build. Add tests, and
 append an entry to PROJECT_LOG.md (newest on top: date, type, what/why, impact, ref).
 ```
@@ -38,7 +41,8 @@ append an entry to PROJECT_LOG.md (newest on top: date, type, what/why, impact, 
 
 - Next.js 15 (App Router), React 19, TypeScript
 - Tailwind CSS v4
-- TanStack Query (server state) + React Context (global UI/auth/tenant/settings state)
+- TanStack Query (server state, used by list/table views via `useDataTable`) + React Context
+  (global UI/auth/tenant/settings state)
 - Axios service layer (`src/services/api.ts`) — no form library; `react-select`, `flatpickr`,
   `apexcharts`, `lucide-react`, `sonner` (toasts)
 
@@ -48,7 +52,9 @@ append an entry to PROJECT_LOG.md (newest on top: date, type, what/why, impact, 
 - Prefer feature-local `_components` before promoting UI into shared folders.
 - Reuse the shared API/service patterns instead of one-off fetch utilities.
 - Keep types in `src/types` (with the barrel `index.ts`) and service logic in `src/services`.
-- Data fetching uses **TanStack Query**, not `useEffect`.
+- Data fetching: **list/table views** use TanStack Query through the shared `useDataTable` hook;
+  **create/view/edit** screens fetch with `useEffect` + the axios services. Match the sibling
+  module you're extending rather than introducing a new pattern.
 - Server-side pagination is mandatory for list views; use `useDebounce` for search and
   `next/dynamic` for heavy visual components (charts/maps).
 
@@ -63,7 +69,8 @@ append an entry to PROJECT_LOG.md (newest on top: date, type, what/why, impact, 
 
 ## Auth
 
-- Client-side. `middleware.ts` is a deliberate no-op. The gate is `AuthProvider` (verifies via
+- Client-side. `middleware.ts` handles tenant-domain routing (redirecting restricted routes on
+  tenant subdomains) but is **not** the auth gate. The gate is `AuthProvider` (verifies via
   `GET /profile`, redirects, listens for the axios 401 `logout` event) exposing `hasPermission`.
 - Token stored in `localStorage`/`sessionStorage`. Password reset is OTP-based.
 - Route guards are components (`PrivateRoute`, `PublicRoute`), not middleware.
@@ -93,8 +100,11 @@ append an entry to PROJECT_LOG.md (newest on top: date, type, what/why, impact, 
 - **AI assistant / report summarizer:** none.
 - **Reports module:** absent (no route, no service).
 - **Journal Entry UI:** absent (backend has GL; no web screen).
-- **Credit Note UI:** absent (only Debit Note exists on the web).
-- **Tests:** only 3 trivial test files — coverage is ~zero. Add tests for what you build.
+- **Tests:** only 3 small test suites (21 tests) — coverage is minimal. Add tests for what you build.
+
+Built and not a gap (don't rebuild): the full **purchase** chain (PO → GRN → PI → Debit Note +
+Vendor Payment) and **sales** chain (SO → Delivery Note → Sales Invoice → Credit Note + Customer
+Payment).
 
 ## Validation (run before finishing)
 

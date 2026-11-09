@@ -1,3 +1,4 @@
+import { Module } from './Module';
 export interface Plan {
   id: number;
   name: string;
@@ -10,6 +11,8 @@ export interface Plan {
   is_expired_user_plan: boolean;
   currency?: string;
   features?: PlanFeature[];
+  /** Modules bundled with this plan. */
+  modules?: Module[];
   subscribed_tenants?: unknown[];
 }
 

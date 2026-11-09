@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import PageMeta from '@/components/common/PageMeta';
 import PageBreadcrumb from '@/components/common/PageBreadCrumb';
@@ -37,17 +37,6 @@ export default function ViewDebitNote() {
   useEffect(() => {
     fetchDebitNoteDetails();
   }, [fetchDebitNoteDetails]);
-
-  const taxBreakdown = useMemo(() => {
-    if (!debitNote?.items) return [];
-    const taxMap: Record<string, number> = {};
-    debitNote.items.forEach((item) => {
-      // Assuming similar tax structure as Purchase Invoice
-      // Usually, backend resources provide the tax meta
-      // But for simplicity let's stick to total tax if meta is complex
-    });
-    return [];
-  }, [debitNote?.items]);
 
   const handlePrint = () => {
     window.print();

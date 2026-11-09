@@ -10,6 +10,7 @@ import Select from '@/components/form/Select';
 import { toast } from 'sonner';
 import { updatePlan } from '@/services/PlanService';
 import { isApiError } from '@/utils/errors';
+import PlanModulesField from './PlanModulesField';
 import { Plan, PlanFeature } from '@/types';
 import { Plus, Trash2 } from 'lucide-react';
 
@@ -29,6 +30,7 @@ export default function EditPlanModal({ isOpen, onClose, onPlanUpdated, plan }: 
   const [trialDays, setTrialDays] = useState('14');
   const [isExpiredUserPlan, setIsExpiredUserPlan] = useState(false);
   const [features, setFeatures] = useState<PlanFeature[]>([]);
+  const [moduleIds, setModuleIds] = useState<number[]>([]);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
@@ -51,6 +53,7 @@ export default function EditPlanModal({ isOpen, onClose, onPlanUpdated, plan }: 
           display_order: f.display_order,
         })) || []
       );
+      setModuleIds(plan.modules?.map((m) => m.id) || []);
     }
   }, [plan]);
 
@@ -106,6 +109,7 @@ export default function EditPlanModal({ isOpen, onClose, onPlanUpdated, plan }: 
         is_trial_plan: isTrial,
         trial_duration_in_days: isTrial ? Number(trialDays) : undefined,
         is_expired_user_plan: isExpiredUserPlan,
+        modules: moduleIds,
         features: features.map((f, index) => ({
           id: f.id,
           key: f.key,
@@ -277,6 +281,8 @@ export default function EditPlanModal({ isOpen, onClose, onPlanUpdated, plan }: 
                 />
               </div>
             </div>
+
+            <PlanModulesField value={moduleIds} onChange={setModuleIds} />
 
             {/* Features Section */}
             <div className="mt-6">

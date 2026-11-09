@@ -55,8 +55,12 @@ describe('TenantLoading', () => {
       </TenantLoading>
     );
 
-    expect(screen.getByText('Loading Tenant')).toBeInTheDocument();
-    expect(screen.getByText('Validating tenant configuration...')).toBeInTheDocument();
+    expect(screen.getByText('Initializing Your Space')).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'Please wait while we validate your tenant configuration and optimize your workspace.'
+      )
+    ).toBeInTheDocument();
     expect(screen.queryByTestId('child-content')).not.toBeInTheDocument();
 
     // Check for loading spinner
@@ -103,7 +107,7 @@ describe('TenantLoading', () => {
       </TenantLoading>
     );
 
-    const loadingContainer = screen.getByText('Loading Tenant').closest('div');
+    const loadingContainer = screen.getByText('Initializing Your Space').closest('div');
     expect(loadingContainer?.parentElement).toHaveClass(
       'min-h-screen',
       'flex',

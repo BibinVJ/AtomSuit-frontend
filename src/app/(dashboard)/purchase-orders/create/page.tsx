@@ -11,6 +11,7 @@ import Input from '@/components/form/input/InputField';
 import Label from '@/components/form/Label';
 import TextArea from '@/components/form/input/TextArea';
 import { useRouter } from 'next/navigation';
+import { usePermissions } from '@/hooks/usePermissions';
 import DatePicker from '@/components/form/date-picker';
 import { useSettings } from '@/hooks/useSettings';
 import { toast } from 'sonner';
@@ -40,6 +41,7 @@ interface ApiError {
 
 export default function AddPurchaseOrder() {
   const { getSetting, formatCurrency, formatNumber } = useSettings();
+  const { hasPermission } = usePermissions();
   const router = useRouter();
   const currencySymbol = getSetting('currency_symbol', '$');
   const [vendors, setVendors] = useState<Vendor[]>([]);
@@ -271,6 +273,7 @@ export default function AddPurchaseOrder() {
         cost_center_id: Number(costCenterId),
         warehouse_id: Number(warehouseId),
         notes: notes,
+        status: status,
         items: purchaseItems.map((item) => ({
           item_id: Number(item.item_id),
           quantity: Number(item.quantity),
@@ -384,6 +387,10 @@ export default function AddPurchaseOrder() {
   };
 
   const orderTotals = calculateOrderTotals();
+
+  if (!hasPermission('create-purchase-order')) {
+    return <div className="p-6 text-center">Access Denied</div>;
+  }
 
   return (
     <>

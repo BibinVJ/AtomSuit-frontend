@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import PageBreadcrumb from '@/components/common/PageBreadCrumb';
 import PageMeta from '@/components/common/PageMeta';
 import SkeletonForm from '@/components/common/SkeletonForm';
@@ -34,9 +34,10 @@ interface AllocationInput {
 export default function CreateVendorPayment() {
   const { hasPermission } = usePermissions();
   const router = useRouter();
-  const { getSetting, formatCurrency } = useSettings();
+  const searchParams = useSearchParams();
+  const { formatCurrency } = useSettings();
 
-  // Form State
+  // Form State (vendor may be pre-selected via ?vendor_id= from the "Record Payment" action)
   const [vendorId, setVendorId] = useState('');
   const [accountId, setAccountId] = useState('');
   const [paymentNumber, setPaymentNumber] = useState('');
@@ -71,7 +72,9 @@ export default function CreateVendorPayment() {
         setAccounts(aData.data || []);
         setCostCenters(ccData.data || []);
         setPaymentNumber(
-          (nextNumData as any)?.payment_number || (nextNumData as any)?.data?.payment_number || ''
+          (nextNumData as Record<string, string>)?.payment_number ||
+            (nextNumData as { data?: { payment_number?: string } })?.data?.payment_number ||
+            ''
         );
       } catch (error) {
         console.error('Failed to fetch data:', error);
@@ -97,14 +100,17 @@ export default function CreateVendorPayment() {
       });
       const invoices = response.data as PurchaseInvoice[];
       setAllocations(
-        invoices.map((inv) => ({
-          purchase_invoice_id: inv.id,
-          invoice_number: inv.invoice_number,
-          total_amount: inv.total_amount,
-          paid_amount: inv.paid_amount || 0,
-          outstanding_amount: inv.total_amount - (inv.paid_amount || 0),
-          allocated_amount: 0,
-        }))
+        invoices
+          // Only invoices with an outstanding balance can receive a payment.
+          .filter((inv) => inv.total_amount - (inv.paid_amount || 0) > 0)
+          .map((inv) => ({
+            purchase_invoice_id: inv.id,
+            invoice_number: inv.invoice_number,
+            total_amount: inv.total_amount,
+            paid_amount: inv.paid_amount || 0,
+            outstanding_amount: inv.total_amount - (inv.paid_amount || 0),
+            allocated_amount: 0,
+          }))
       );
     } catch (error) {
       console.error('Failed to fetch invoices:', error);
@@ -113,6 +119,13 @@ export default function CreateVendorPayment() {
       setIsFetchingInvoices(false);
     }
   }, []);
+
+  // Pre-select the vendor when arriving from the PI "Record Payment" action. Read on the client
+  // (not in useState init) because useSearchParams is empty during server rendering.
+  useEffect(() => {
+    const preselect = searchParams.get('vendor_id');
+    if (preselect) setVendorId(preselect);
+  }, [searchParams]);
 
   useEffect(() => {
     if (vendorId) {
@@ -163,7 +176,7 @@ export default function CreateVendorPayment() {
       await VendorPaymentService.create(payload);
       toast.success('Vendor Payment recorded successfully');
       router.push('/vendor-payments');
-    } catch (error: any) {
+    } catch (error: unknown) {
       if (isApiError(error)) {
         setErrors(error.response?.data?.errors || {});
         toast.error(error.response?.data?.message || 'Failed to create payment');

@@ -10,6 +10,8 @@ interface SwitchProps {
   onChange?: (checked: boolean) => void;
   color?: 'blue' | 'gray'; // Added prop to toggle color theme
   tooltip?: string;
+  /** Accessible name when the visible label is empty. */
+  ariaLabel?: string;
 }
 
 const Switch: React.FC<SwitchProps> = ({
@@ -19,6 +21,7 @@ const Switch: React.FC<SwitchProps> = ({
   onChange,
   color = 'blue', // Default to blue color
   tooltip,
+  ariaLabel,
 }) => {
   const [isChecked, setIsChecked] = useState(checked);
 
@@ -52,7 +55,24 @@ const Switch: React.FC<SwitchProps> = ({
         disabled ? 'text-gray-400' : 'text-gray-700 dark:text-gray-400'
       }`}
     >
-      <div className="relative" onClick={handleToggle}>
+      <div
+        className="relative"
+        onClick={handleToggle}
+        // The toggle is a styled div rather than an <input>, so it has to carry the switch
+        // semantics itself — otherwise it is invisible to screen readers and unreachable by
+        // keyboard.
+        role="switch"
+        aria-checked={isChecked}
+        aria-disabled={disabled || undefined}
+        aria-label={label || ariaLabel}
+        tabIndex={disabled ? -1 : 0}
+        onKeyDown={(e) => {
+          if (e.key === ' ' || e.key === 'Enter') {
+            e.preventDefault();
+            handleToggle();
+          }
+        }}
+      >
         <div
           className={`block transition duration-150 ease-linear h-6 w-11 rounded-full ${
             disabled ? 'bg-gray-100 pointer-events-none dark:bg-gray-800' : switchColors.background

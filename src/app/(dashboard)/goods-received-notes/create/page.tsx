@@ -14,10 +14,12 @@ import { getCostCenters } from '@/services/CostCenterService';
 import { getWarehouses } from '@/services/WarehouseService';
 import { getTaxGroups } from '@/services/TaxService';
 import { isApiError } from '@/utils/errors';
+import { remapItemErrorIndices, selectedRowIndices } from '@/utils/conversionSelection';
 import { Item, Vendor, DiscountType, CostCenter, Warehouse, TaxGroup } from '@/types';
 import { usePermissions } from '@/hooks/usePermissions';
 import { useSettings } from '@/hooks/useSettings';
 import Button from '@/components/ui/button/Button';
+import Checkbox from '@/components/form/input/Checkbox';
 import Input from '@/components/form/input/InputField';
 import Label from '@/components/form/Label';
 import Select from '@/components/form/Select';
@@ -39,6 +41,8 @@ interface GoodsReceivedNoteItemInput {
   // PO conversion tracking (read-only display)
   ordered_quantity?: number;
   already_received?: number;
+  // Conversion screens only: unchecked lines are left out of the document entirely.
+  selected: boolean;
 }
 
 export default function CreateGoodsReceivedNote() {
@@ -46,6 +50,7 @@ export default function CreateGoodsReceivedNote() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const purchaseOrderId = searchParams.get('purchase_order_id');
+  const isConverting = !!purchaseOrderId;
   const { getSetting, formatCurrency, formatNumber } = useSettings();
 
   // Form State
@@ -66,6 +71,7 @@ export default function CreateGoodsReceivedNote() {
       discount_type: 'percentage',
       discount_value: 0,
       tax_group_id: '',
+      selected: true,
     },
   ]);
 
@@ -169,6 +175,7 @@ export default function CreateGoodsReceivedNote() {
                   discount_type: poItem.discount_type || ('percentage' as DiscountType),
                   discount_value: scaledDiscount || 0,
                   tax_group_id: poItem.tax_group_id ? String(poItem.tax_group_id) : '',
+                  selected: true,
                   purchase_order_item_id: poItem.id,
                   ordered_quantity: poItem.quantity,
                   already_received: poItem.received_quantity,
@@ -220,6 +227,7 @@ export default function CreateGoodsReceivedNote() {
         discount_type: 'percentage',
         discount_value: 0,
         tax_group_id: '',
+        selected: true,
       },
     ]);
   };
@@ -335,8 +343,25 @@ export default function CreateGoodsReceivedNote() {
     [taxGroups]
   );
 
+  // Only the checked lines become document lines. A line the user leaves out is
+  // omitted from the payload rather than sent with quantity 0 — the API rejects a
+  // zero-quantity line, and one would otherwise be snapshotted into the document.
+  const selectedItems = useMemo(() => items.filter((item) => item.selected), [items]);
+  const submittedRowIndices = useMemo(() => selectedRowIndices(items), [items]);
+  const allItemsSelected = items.length > 0 && items.every((item) => item.selected);
+
+  const handleToggleItem = (index: number, checked: boolean) => {
+    setItems((prev) =>
+      prev.map((item, i) => (i === index ? { ...item, selected: checked } : item))
+    );
+  };
+
+  const handleToggleAllItems = (checked: boolean) => {
+    setItems((prev) => prev.map((item) => ({ ...item, selected: checked })));
+  };
+
   const orderTotals = useMemo(() => {
-    return items.reduce(
+    return selectedItems.reduce(
       (acc, item) => {
         const totals = calculateItemTotals(item);
         acc.subtotal += totals.subtotal;
@@ -363,12 +388,18 @@ export default function CreateGoodsReceivedNote() {
         taxBreakdown: [] as { name: string; rate: number; amount: number }[],
       }
     );
-  }, [items, calculateItemTotals]);
+  }, [selectedItems, calculateItemTotals]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setErrors({});
+
+    if (selectedItems.length === 0) {
+      toast.error('Select at least one item to include in this goods received note.');
+      setIsSubmitting(false);
+      return;
+    }
 
     const payload = {
       vendor_id: Number(vendorId),
@@ -379,7 +410,7 @@ export default function CreateGoodsReceivedNote() {
       warehouse_id: Number(warehouseId),
       notes: notes,
       ...(purchaseOrderId ? { purchase_order_id: Number(purchaseOrderId) } : {}),
-      items: items.map((item) => ({
+      items: selectedItems.map((item) => ({
         item_id: Number(item.item_id),
         description: item.description,
         quantity_received: Number(item.quantity_received),
@@ -402,7 +433,7 @@ export default function CreateGoodsReceivedNote() {
       let message = 'Failed to create Goods Received Note';
       if (isApiError(error)) {
         const data = error.response?.data;
-        const formErrors = data?.errors || {};
+        const formErrors = remapItemErrorIndices(data?.errors || {}, submittedRowIndices);
         setErrors(formErrors);
 
         const firstErrorKey = Object.keys(formErrors)[0];
@@ -441,7 +472,8 @@ export default function CreateGoodsReceivedNote() {
           </svg>
           <span>
             Converting from Purchase Order <strong>#{purchaseOrderNumber}</strong> — details have
-            been auto-filled. You can adjust quantities before saving.
+            been auto-filled. You can adjust quantities, and untick any line you don&apos;t want to
+            include, before saving.
           </span>
         </div>
       )}
@@ -624,7 +656,14 @@ export default function CreateGoodsReceivedNote() {
               </div>
 
               <div className="flex items-center justify-between mt-8 mb-4">
-                <h3 className="text-xl font-bold dark:text-white">Items</h3>
+                <h3 className="text-xl font-bold dark:text-white">
+                  Items
+                  {isConverting && (
+                    <span className="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400">
+                      {selectedItems.length} of {items.length} selected
+                    </span>
+                  )}
+                </h3>
                 {!purchaseOrderId && (
                   <Button type="button" variant="outline" onClick={handleAddItem} className="gap-2">
                     <Plus className="w-4 h-4" />
@@ -636,7 +675,14 @@ export default function CreateGoodsReceivedNote() {
               <div className="space-y-4">
                 {/* Table Headers - PO Conversion Mode */}
                 {purchaseOrderId ? (
-                  <div className="grid grid-cols-[2fr_0.7fr_0.7fr_0.8fr_1.2fr_1.2fr_0.7fr_0.9fr] gap-x-3 px-4 py-3 mb-2 bg-gray-50 dark:bg-gray-800/50 rounded-lg items-end">
+                  <div className="grid grid-cols-[auto_2fr_0.7fr_0.7fr_0.8fr_1.2fr_1.2fr_0.7fr_0.9fr] gap-x-3 px-4 py-3 mb-2 bg-gray-50 dark:bg-gray-800/50 rounded-lg items-end">
+                    <div className="flex items-center justify-center">
+                      <Checkbox
+                        checked={allItemsSelected}
+                        onChange={handleToggleAllItems}
+                        ariaLabel="Select all items"
+                      />
+                    </div>
                     <div className="uppercase text-theme-xs font-bold tracking-wider text-gray-500">
                       Item
                     </div>
@@ -728,7 +774,20 @@ export default function CreateGoodsReceivedNote() {
 
                       {/* PO Conversion Mode Grid */}
                       {purchaseOrderId ? (
-                        <div className="grid grid-cols-[2fr_0.7fr_0.7fr_0.8fr_1.2fr_1.2fr_0.7fr_0.9fr] gap-x-3 items-center">
+                        <div
+                          className={`grid grid-cols-[auto_2fr_0.7fr_0.7fr_0.8fr_1.2fr_1.2fr_0.7fr_0.9fr] gap-x-3 items-center ${
+                            item.selected
+                              ? ''
+                              : '[&>*:not(:first-child)]:pointer-events-none [&>*:not(:first-child)]:opacity-40'
+                          }`}
+                        >
+                          <div className="flex items-center justify-center">
+                            <Checkbox
+                              checked={item.selected}
+                              onChange={(checked) => handleToggleItem(index, checked)}
+                              ariaLabel={`Include ${selectedItem?.name ?? `line ${index + 1}`} in this document`}
+                            />
+                          </div>
                           {/* Item Name (read-only) */}
                           <div>
                             <Select

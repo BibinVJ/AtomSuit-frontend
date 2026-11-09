@@ -34,7 +34,7 @@ npm run build
 - **Modular Architecture**: Feature-based co-location for scalability.
 - **High Performance**:
   - `Next.js` App Router.
-  - `TanStack Query` for caching and state management.
+  - `TanStack Query` for list-view caching/pagination (via the shared `useDataTable` hook).
   - Dynamic imports for heavy visualizations.
 - **Multi-Tenant Ready**: Built-in tenant context and API isolation.
 - **Type-Safe**: 100% TypeScript coverage with strict mode.

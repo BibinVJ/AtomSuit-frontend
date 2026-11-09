@@ -10,6 +10,7 @@ import Select from '@/components/form/Select';
 import Input from '@/components/form/input/InputField';
 import Label from '@/components/form/Label';
 import { useRouter } from 'next/navigation';
+import { usePermissions } from '@/hooks/usePermissions';
 import DatePicker from '@/components/form/date-picker';
 import { useSettings } from '@/hooks/useSettings';
 import { toast } from 'sonner';
@@ -43,6 +44,7 @@ export default function AddSale() {
     openModal: openCustomerModal,
     closeModal: closeCustomerModal,
   } = useModal();
+  const { hasPermission } = usePermissions();
   const router = useRouter();
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [items, setItems] = useState<Item[]>([]);
@@ -180,6 +182,10 @@ export default function AddSale() {
   };
 
   const getErrorMessage = (field: string) => errors[field]?.[0] || '';
+
+  if (!hasPermission('create-sale')) {
+    return <div className="p-6 text-center">Access Denied</div>;
+  }
 
   return (
     <>

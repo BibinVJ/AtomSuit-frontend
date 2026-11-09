@@ -10,6 +10,7 @@ import Select from '@/components/form/Select';
 import { toast } from 'sonner';
 import { createPlan } from '@/services/PlanService';
 import { isApiError } from '@/utils/errors';
+import PlanModulesField from './PlanModulesField';
 import { Plan, PlanFeature } from '@/types/Plan';
 import { Plus, Trash2 } from 'lucide-react';
 
@@ -28,6 +29,7 @@ export default function AddPlanModal({ isOpen, onClose, onPlanAdded }: Props) {
   const [trialDays, setTrialDays] = useState('14');
   const [isExpiredUserPlan, setIsExpiredUserPlan] = useState(false);
   const [features, setFeatures] = useState<Omit<PlanFeature, 'id'>[]>([]);
+  const [moduleIds, setModuleIds] = useState<number[]>([]);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   const resetForm = () => {
@@ -99,6 +101,7 @@ export default function AddPlanModal({ isOpen, onClose, onPlanAdded }: Props) {
         is_trial_plan: isTrial,
         trial_duration_in_days: isTrial ? Number(trialDays) : undefined,
         is_expired_user_plan: isExpiredUserPlan,
+        modules: moduleIds,
         features: features.map((f, index) => ({
           key: f.key,
           value: f.value,
@@ -269,6 +272,8 @@ export default function AddPlanModal({ isOpen, onClose, onPlanAdded }: Props) {
                 />
               </div>
             </div>
+
+            <PlanModulesField value={moduleIds} onChange={setModuleIds} />
 
             {/* Features Section */}
             <div className="mt-6">

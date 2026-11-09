@@ -100,6 +100,12 @@ export default function DebitNoteTable({
                 </TableCell>
                 <TableCell
                   isHeader
+                  className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                >
+                  Invoice #
+                </TableCell>
+                <TableCell
+                  isHeader
                   className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400"
                   onClick={() => onSort('date')}
                 >
@@ -137,13 +143,13 @@ export default function DebitNoteTable({
             <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
               {loading ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="p-0">
-                    <SkeletonTable rows={perPage} columns={7} />
+                  <TableCell colSpan={8} className="p-0">
+                    <SkeletonTable rows={perPage} columns={8} />
                   </TableCell>
                 </TableRow>
               ) : data.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="px-5 py-10 text-center text-gray-500">
+                  <TableCell colSpan={8} className="px-5 py-10 text-center text-gray-500">
                     No debit notes found.
                   </TableCell>
                 </TableRow>
@@ -159,6 +165,16 @@ export default function DebitNoteTable({
                     </TableCell>
                     <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
                       {dn.debit_note_number}
+                    </TableCell>
+                    <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
+                      {dn.purchase_invoice?.invoice_number ?? (
+                        <span
+                          className="text-gray-400 dark:text-gray-500"
+                          title="no invoice — direct debit note"
+                        >
+                          &mdash;
+                        </span>
+                      )}
                     </TableCell>
                     <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">
                       {formatDate(dn.date)}

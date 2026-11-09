@@ -5,6 +5,10 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
+  BarChart3,
+  Scale,
+  FileText,
+  Truck,
   LayoutDashboard,
   Package,
   ShoppingCart,
@@ -22,6 +26,7 @@ import {
 import { useSidebar } from '@/hooks/useSidebar';
 import { usePermissions } from '@/hooks/usePermissions';
 import { useSettings } from '@/hooks/useSettings';
+import { isNavItemActive } from './navActive';
 
 type NavItem = {
   name: string;
@@ -86,7 +91,16 @@ const navItems: NavItem[] = [
     icon: <Receipt size={20} />,
     subItems: [
       { name: 'Customers', path: '/customers', permission: 'view-customer' },
-      { name: 'Sales', path: '/sales', permission: 'view-sale' },
+      { name: 'Sales Orders', path: '/sales-orders', permission: 'view-sales-order' },
+      { name: 'Delivery Notes', path: '/delivery-notes', permission: 'view-delivery-note' },
+      { name: 'Sales Invoices', path: '/sales-invoices', permission: 'view-sales-invoice' },
+      { name: 'Credit Notes', path: '/credit-notes', permission: 'view-credit-note' },
+      {
+        name: 'Customer Payments',
+        path: '/customer-payments',
+        permission: 'view-customer-payment',
+      },
+      { name: 'Quick Sale', path: '/sales', permission: 'view-sale' },
     ],
   },
   {
@@ -104,6 +118,98 @@ const navItems: NavItem[] = [
       { name: 'Debit Notes', path: '/debit-notes', permission: 'view-debit-note' },
       { name: 'Vendor Payments', path: '/vendor-payments', permission: 'view-vendor-payment' },
     ],
+  },
+];
+
+/**
+ * Reports get their own sidebar section with one collapsible submenu per category, rather than a
+ * single long list — an accountant and a store manager go to different places, and each category
+ * is separately permissioned.
+ */
+const reportItems: NavItem[] = [
+  {
+    name: 'Financial',
+    icon: <Scale size={20} />,
+    subItems: [
+      {
+        name: 'Trial Balance',
+        path: '/reports/trial-balance',
+        permission: 'view-financial-report',
+      },
+      {
+        name: 'Profit & Loss',
+        path: '/reports/profit-and-loss',
+        permission: 'view-financial-report',
+      },
+      {
+        name: 'Balance Sheet',
+        path: '/reports/balance-sheet',
+        permission: 'view-financial-report',
+      },
+      { name: 'Tax Summary', path: '/reports/tax-summary', permission: 'view-financial-report' },
+    ],
+  },
+  {
+    name: 'Sales',
+    icon: <FileText size={20} />,
+    subItems: [
+      { name: 'Sales Register', path: '/reports/sales-register', permission: 'view-sales-report' },
+      {
+        name: 'Receivables Aging',
+        path: '/reports/receivables-aging',
+        permission: 'view-sales-report',
+      },
+      {
+        name: 'Customer Balances',
+        path: '/reports/customer-balances',
+        permission: 'view-sales-report',
+      },
+    ],
+  },
+  {
+    name: 'Purchase',
+    icon: <Truck size={20} />,
+    subItems: [
+      {
+        name: 'Purchase Register',
+        path: '/reports/purchase-register',
+        permission: 'view-purchase-report',
+      },
+      {
+        name: 'Payables Aging',
+        path: '/reports/payables-aging',
+        permission: 'view-purchase-report',
+      },
+      {
+        name: 'Vendor Balances',
+        path: '/reports/vendor-balances',
+        permission: 'view-purchase-report',
+      },
+      {
+        name: 'Outstanding GRNs',
+        path: '/reports/outstanding-grns',
+        permission: 'view-purchase-report',
+      },
+    ],
+  },
+  {
+    name: 'Inventory',
+    icon: <Package size={20} />,
+    subItems: [
+      {
+        name: 'Stock Valuation',
+        path: '/reports/stock-valuation',
+        permission: 'view-inventory-report',
+      },
+      { name: 'Expiry Report', path: '/reports/expiry', permission: 'view-inventory-report' },
+      { name: 'Low Stock', path: '/reports/low-stock', permission: 'view-inventory-report' },
+    ],
+  },
+  {
+    name: 'All Reports',
+    icon: <BarChart3 size={20} />,
+    path: '/reports',
+    permission: 'view-financial-report',
   },
 ];
 
@@ -179,7 +285,7 @@ const AppSidebar: React.FC = () => {
   const pathname = usePathname();
 
   const [openSubmenu, setOpenSubmenu] = useState<{
-    type: 'main' | 'others' | 'administration';
+    type: 'main' | 'others' | 'administration' | 'reports';
     index: number;
   } | null>(null);
   const [subMenuHeight, setSubMenuHeight] = useState<Record<string, number>>({});
@@ -204,32 +310,43 @@ const AppSidebar: React.FC = () => {
     });
   }, [settings]);
 
+  /** Every path declared anywhere in the sidebar, so the most specific match can win. */
+  const allNavPaths = useMemo(() => {
+    const paths: string[] = [];
+
+    const collect = (items: NavItem[]) =>
+      items.forEach((item) => {
+        if (item.path) paths.push(item.path);
+        item.subItems?.forEach((subItem) => paths.push(subItem.path));
+      });
+
+    [navItems, othersItems, reportItems, dynamicAdministrationItems].forEach(collect);
+
+    return paths;
+  }, [dynamicAdministrationItems]);
+
   const isActive = useCallback(
-    (path: string) => {
-      if (!pathname) return false;
-      if (path === '/dashboard') {
-        return pathname === path;
-      }
-      return pathname.startsWith(path);
-    },
-    [pathname]
+    (path: string) => isNavItemActive(pathname, path, allNavPaths),
+    [pathname, allNavPaths]
   );
 
   useEffect(() => {
     let submenuMatched = false;
-    ['main', 'others', 'administration'].forEach((menuType) => {
+    ['main', 'others', 'administration', 'reports'].forEach((menuType) => {
       const items =
         menuType === 'main'
           ? navItems
           : menuType === 'others'
             ? othersItems
-            : dynamicAdministrationItems;
+            : menuType === 'reports'
+              ? reportItems
+              : dynamicAdministrationItems;
       items.forEach((nav, index) => {
         if (nav.subItems) {
           nav.subItems.forEach((subItem) => {
             if (isActive(subItem.path)) {
               setOpenSubmenu({
-                type: menuType as 'main' | 'others' | 'administration',
+                type: menuType as 'main' | 'others' | 'administration' | 'reports',
                 index,
               });
               submenuMatched = true;
@@ -256,7 +373,10 @@ const AppSidebar: React.FC = () => {
     }
   }, [openSubmenu]);
 
-  const handleSubmenuToggle = (index: number, menuType: 'main' | 'others' | 'administration') => {
+  const handleSubmenuToggle = (
+    index: number,
+    menuType: 'main' | 'others' | 'administration' | 'reports'
+  ) => {
     setOpenSubmenu((prevOpenSubmenu) => {
       if (prevOpenSubmenu && prevOpenSubmenu.type === menuType && prevOpenSubmenu.index === index) {
         return null;
@@ -278,7 +398,10 @@ const AppSidebar: React.FC = () => {
     });
   };
 
-  const renderMenuItems = (items: NavItem[], menuType: 'main' | 'others' | 'administration') => (
+  const renderMenuItems = (
+    items: NavItem[],
+    menuType: 'main' | 'others' | 'administration' | 'reports'
+  ) => (
     <ul className="flex flex-col gap-4">
       {items.map((nav, index) => {
         const hasSubItems = nav.subItems && nav.subItems.length > 0;
@@ -500,6 +623,18 @@ const AppSidebar: React.FC = () => {
                     {isExpanded || isHovered || isMobileOpen ? 'Others' : <MoreHorizontal />}
                   </h2>
                   {renderMenuItems(othersItems, 'others')}
+                </div>
+              )}
+              {hasAnyPermission(reportItems) && (
+                <div className="">
+                  <h2
+                    className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${
+                      !isExpanded && !isHovered ? 'lg:justify-center' : 'justify-start'
+                    }`}
+                  >
+                    {isExpanded || isHovered || isMobileOpen ? 'Reports' : <MoreHorizontal />}
+                  </h2>
+                  {renderMenuItems(reportItems, 'reports')}
                 </div>
               )}
               {hasAnyPermission(dynamicAdministrationItems) && (
